@@ -63,5 +63,13 @@
             <ui:Label name="bag-note" class="hud__bag-note" text="" picking-mode="Ignore" />
             <ui:Label class="hud__reading-close hud__loc" text="ui.hud.bag.close" picking-mode="Ignore" />
         </ui:VisualElement>
+        <!-- The menu on Esc (owner, 2026-11-12): Esc closes any window open, and with none it opens this and closes it again. -->
+        <ui:VisualElement name="menu" class="hud__notes hud__menu">
+            <ui:Label class="hud__notes-title hud__loc" text="ui.hud.menu.title" picking-mode="Ignore" />
+            <ui:Label name="menu-resume" class="hud__note hud__bag-action hud__loc" text="ui.hud.menu.resume" />
+            <ui:Label name="menu-language" class="hud__note hud__bag-action hud__loc" text="ui.hud.menu.language" />
+            <ui:Label name="menu-quit" class="hud__note hud__bag-action hud__loc" text="ui.hud.menu.quit" />
+            <ui:Label class="hud__reading-close hud__loc" text="ui.hud.menu.close" picking-mode="Ignore" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

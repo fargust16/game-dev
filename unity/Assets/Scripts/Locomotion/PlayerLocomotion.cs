@@ -75,8 +75,11 @@ namespace GameDev.Locomotion
         [SerializeField] private float jumpBuffer = 0.15f;
         [Tooltip("m: how far below the feet the ground is sought, so slopes and steps down keep the body grounded.")]
         [SerializeField] private float groundSnap = 0.35f;
-        [Tooltip("s the landing's bent knees hold at least, the body braking to a stop meanwhile (owner, 2026-11-12: half a second, then 1.5–2 times shorter); with no key pressed the landing plays LandingShare of its clip.")]
-        [SerializeField] private float landingHold = 0.3f;
+        [Tooltip("s the landing's bent knees hold at least, the body braking to a stop meanwhile (owner, 2026-11-12: half a second, then 1.5–2 times shorter, then half again); with no key pressed the landing plays landingShare of its clip. In the slice the tuning page sets it.")]
+        [SerializeField] private float landingHold = 0.15f;
+        [Tooltip("The share of the landing clip, after its first frames, played with no key pressed: 0.6, then halved (owner, 2026-11-12), the run's fade taking the rest. In the slice the tuning page sets it.")]
+        [Range(0f, 1f)]
+        [SerializeField] private float landingShare = 0.3f;
         [Tooltip("s in the air before a fall off an edge lands in the knees; a jump always does.")]
         [SerializeField] private float landingAfter = 0.45f;
 
@@ -116,11 +119,26 @@ namespace GameDev.Locomotion
         /// </summary>
         private const float LandStart = 0.12f;
 
-        /// <summary>
-        /// The share of the landing clip, after <see cref="LandStart"/>, played with no key pressed: 0.6, the delay 1.5–2
-        /// times shorter as the owner asked (2026-11-12, authoring default within it), the run's fade taking the rest.
-        /// </summary>
-        private const float LandingShare = 0.6f;
+        /// <summary>s the landing's knees hold at least before a key runs on (the tuning page's <c>Jump</c>).</summary>
+        public float LandingHold
+        {
+            get => landingHold;
+            set => landingHold = Mathf.Max(0f, value);
+        }
+
+        /// <summary>The share of the landing clip played with no key pressed, from 0 to 1.</summary>
+        public float LandingShare
+        {
+            get => landingShare;
+            set => landingShare = Mathf.Clamp01(value);
+        }
+
+        /// <summary>s in the air before a fall off an edge lands in the knees.</summary>
+        public float LandingAfter
+        {
+            get => landingAfter;
+            set => landingAfter = Mathf.Max(0f, value);
+        }
 
         /// <summary>
         /// Authoring default, degrees: the least an upper arm or a forearm may hang from the body's down in a jump, so an
@@ -634,11 +652,11 @@ namespace GameDev.Locomotion
         {
             if (_animator == null || !_animator.isActiveAndEnabled || _animator.IsInTransition(0))
             {
-                return Mathf.Max(landingHold, 0.6f);
+                return Mathf.Max(landingHold, 0.3f);
             }
 
             var info = _animator.GetCurrentAnimatorStateInfo(0);
-            return info.shortNameHash == LandState && info.length > 0.01f ? Mathf.Max(landingHold, (info.length - LandStart) * LandingShare) : landingHold;
+            return info.shortNameHash == LandState && info.length > 0.01f ? Mathf.Max(landingHold, (info.length - LandStart) * landingShare) : landingHold;
         }
 
         /// <summary>

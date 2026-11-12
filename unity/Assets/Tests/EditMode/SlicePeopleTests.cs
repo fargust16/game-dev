@@ -176,7 +176,17 @@ namespace GameDev.Slice.Tests
                 CollectionAssert.Contains(PlayerWork.Clips, key.Key);
                 var length = SliceClips.Get(key.Key).length;
                 Assert.That(key.Value, Is.InRange(0.1f, length + 0.01f), $"{key.Key}'s key frame inside its {length:0.00} s");
+                Assert.That(PlayerWork.KeyOf(key.Key), Is.InRange(0f, length + 0.01f), $"{key.Key}'s key frame on the tuning page inside its {length:0.00} s");
             }
+
+            // The tuning page's defaults are the measured key frames (owner, 2026-11-12: the owner sets them from there).
+            var defaults = ScriptableObject.CreateInstance<SliceTuning>();
+            foreach (var key in PlayerWork.Keys)
+            {
+                Assert.AreEqual(key.Value, defaults.Work(key.Key).CheckAtSeconds, 1e-4f, $"{key.Key}: the page's default is the code's");
+            }
+
+            Object.DestroyImmediate(defaults);
 
             Assert.IsFalse(SliceClips.Get("Harvest").isLooping, "the patch is stooped over and risen from once");
             Assert.IsFalse(SliceClips.Get("Kneel").isLooping, "and the kneel");

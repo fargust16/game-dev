@@ -73,7 +73,7 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(world.Reaction.Running, "the blade about to meet the trunk brings the swing's bar");
             var state = player.GetComponentInChildren<Animator>().GetCurrentAnimatorStateInfo(0);
             var into = (state.normalizedTime % 1f) * state.length;
-            Assert.That(into, Is.InRange(PlayerWork.Keys["Chop"] - 0.05f, PlayerWork.Keys["Chop"] + 0.05f),
+            Assert.That(into, Is.InRange(PlayerWork.KeyOf("Chop") - 0.05f, PlayerWork.KeyOf("Chop") + 0.05f),
                 "the swing stops just before the blow, never as the axe swings back (owner, 2026-11-12)");
             Assert.IsTrue(world.Work.AtKey);
             Assert.AreEqual(0f, player.GetComponentInChildren<Animator>().speed, "the swing stands still at its key frame");

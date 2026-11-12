@@ -140,6 +140,14 @@
     margin-bottom: 10px;
 }
 
+/* The menu on Esc (owner, 2026-11-12): a short panel in the middle. */
+.hud__menu {
+    left: 36%;
+    right: 36%;
+    top: 32%;
+    bottom: 32%;
+}
+
 /* S5a.2: a bag line that can be clicked, and the note under the list. */
 .hud__bag-action:hover {
     color: rgb(255, 214, 140);

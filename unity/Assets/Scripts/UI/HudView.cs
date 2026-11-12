@@ -217,7 +217,9 @@ namespace GameDev.UI
             _reaction.style.position = Position.Absolute;
             _reaction.style.left = Length.Percent(30f);
             _reaction.style.width = Length.Percent(40f);
-            _reaction.style.bottom = Length.Percent(22f);
+            // Under the prompt at 22 %, which shows the work's own line beside the bar (the owner's play test of
+            // 2026-11-12: the two stood one over the other).
+            _reaction.style.bottom = Length.Percent(11f);
             _reactionCaption = new Label { pickingMode = PickingMode.Ignore };
             _reactionCaption.style.unityTextAlign = TextAnchor.MiddleCenter;
             _reactionCaption.style.color = new Color(0.93f, 0.89f, 0.80f);
@@ -388,6 +390,75 @@ namespace GameDev.UI
         public void CloseBag()
         {
             _bag?.RemoveFromClassList(NotesVisible);
+        }
+
+        // The menu on Esc (owner, 2026-11-12): its lines in order, each a click.
+        private static readonly string[] MenuNames = { "menu-resume", "menu-language", "menu-quit" };
+        private readonly System.Action[] _menuActions = new System.Action[3];
+        private VisualElement _menu;
+
+        public bool IsMenuOpen => _menu != null && _menu.ClassListContains(NotesVisible);
+
+        /// <summary>The menu's lines as shown, in order.</summary>
+        public IReadOnlyList<string> MenuLines => _menu == null ? new string[0] : MenuNames.Select(n => _menu.Q<Label>(n)?.text).ToArray();
+
+        /// <summary>Whether any window is open: a page, a shop, a conversation, the reading panel or the menu.</summary>
+        public bool AnyWindowOpen => IsReadingOpen || IsNotesOpen || IsBagOpen || IsShopOpen || IsMapOpen || IsDialogueOpen || IsMenuOpen;
+
+        /// <summary>
+        /// The menu on Esc (owner, 2026-11-12: Esc closes any window open, and with none it opens the menu and closes it
+        /// again): resume, change the language, quit the game, each line a click. The pages close under it.
+        /// </summary>
+        public void ShowMenu(System.Action resume, System.Action language, System.Action quit)
+        {
+            if (!Bind() || _menu == null)
+            {
+                return;
+            }
+
+            _menuActions[0] = resume;
+            _menuActions[1] = language;
+            _menuActions[2] = quit;
+            foreach (var name in MenuNames)
+            {
+                var line = _menu.Q<Label>(name);
+                if (line != null)
+                {
+                    line.UnregisterCallback<ClickEvent>(OnMenuClick);
+                    line.RegisterCallback<ClickEvent>(OnMenuClick);
+                }
+            }
+
+            CloseMap();
+            CloseNotes();
+            CloseBag();
+            CloseReading();
+            _menu.AddToClassList(NotesVisible);
+        }
+
+        public void CloseMenu()
+        {
+            _menu?.RemoveFromClassList(NotesVisible);
+        }
+
+        /// <summary>Clicks the n-th line of the menu, as the mouse does; false if it has no action.</summary>
+        public bool ClickMenuLine(int index)
+        {
+            if (!IsMenuOpen || index < 0 || index >= _menuActions.Length || _menuActions[index] == null)
+            {
+                return false;
+            }
+
+            _menuActions[index]();
+            return true;
+        }
+
+        private void OnMenuClick(ClickEvent click)
+        {
+            if (click.currentTarget is VisualElement line)
+            {
+                ClickMenuLine(System.Array.IndexOf(MenuNames, line.name));
+            }
         }
 
         public bool IsShopOpen => _shop != null && _shop.ClassListContains(NotesVisible);
@@ -627,6 +698,7 @@ namespace GameDev.UI
             _dialogue = root.Q<VisualElement>("dialogue");
             _dialogueLines = root.Q<ScrollView>("dialogue-lines");
             _dialogueOptions = root.Q<VisualElement>("dialogue-options");
+            _menu = root.Q<VisualElement>("menu");
             if (_time == null || _prompt == null || _reading == null || _readingTitle == null || _readingText == null || _notes == null || _notesList == null)
             {
                 _time = null;

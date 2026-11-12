@@ -7,17 +7,23 @@ ui.prompt.talk,E  Talk,E  Говорить
 ui.prompt.examine,E  Examine,E  Осмотреть
 ui.prompt.look_closer,E  Look closer,E  Присмотреться
 ui.hud.time,Day {0} · {1:00}:{2:00},День {0} · {1:00}:{2:00}
-ui.hud.reading.close,E  Close,E  Закрыть
+ui.hud.reading.close,E or Esc  Close,E или Esc  Закрыть
 ui.hud.map.title,Veilmouth,Вейлмут
-ui.hud.map.close,M  Close,M  Закрыть
+ui.hud.map.close,M or Esc  Close,M или Esc  Закрыть
 ui.hud.notes.title,Notes,Записи
-ui.hud.notes.close,J  Close,J  Закрыть
+ui.hud.notes.close,J or Esc  Close,J или Esc  Закрыть
 ui.hud.notes.empty,Nothing noted yet.,Пока ничего не записано.
 "# The tip sources (TipSourcePoint): a board's title, and what it says when it has nothing now"
 source.board.title,Notice Board,Доска объявлений
 source.board.nothing,Nothing new on the board.,На доске ничего нового.
 "# The dialogue column (PersonTalk, S2.4): its keys, the character's name for itself, a check's tag by Intelligence (10.4 §3), and its result"
 ui.hud.dialogue.close,1–9  Answer    Esc  Leave,1–9  Ответить    Esc  Уйти
+"# The menu on Esc (owner, 2026-11-12): Esc closes any window open, and with none it opens the menu and closes it again"
+ui.hud.menu.title,Menu,Меню
+ui.hud.menu.resume,Resume,Продолжить
+ui.hud.menu.language,Change the language,Сменить язык
+ui.hud.menu.quit,Quit the game,Выйти из игры
+ui.hud.menu.close,Esc  Close,Esc  Закрыть
 ui.dialogue.you,You,Вы
 ui.dialogue.check,[{0}],[{0}]
 ui.dialogue.check.chance,[{0}: {1} %],[{0}: {1} %]
@@ -175,7 +181,7 @@ ui.coins.gold,{0} gold,{0} зол.
 ui.coins.silver,{0} silver,{0} сер.
 ui.coins.bronze,{0} bronze,{0} бронз.
 ui.hud.bag.title,Bag,Сумка
-ui.hud.bag.close,I  Close,I  Закрыть
+ui.hud.bag.close,I or Esc  Close,I или Esc  Закрыть
 ui.hud.bag.empty,The bag is empty.,Сумка пуста.
 ui.hud.bag.money,Money: {0},Деньги: {0}
 ui.hud.bag.load,"Load: {0} of {1} kg, {2}","Груз: {0} из {1} кг, {2}"
@@ -205,7 +211,7 @@ ui.bag.fault.pair,"A second weapon goes only beside a dagger, a sword, an axe or
 "# The shops on Bawling Row and the modifiers in words (S5a.3; 19 §2.4, §6)"
 ui.prompt.trade,E  Trade,E  Торговать
 ui.prompt.shop_closed,Closed until {0}:00,Закрыто до {0}:00
-ui.hud.shop.close,E  Leave,E  Уйти
+ui.hud.shop.close,E or Esc  Leave,E или Esc  Уйти
 ui.shop.title,{0},{0}
 ui.shop.hint,"Click a line to buy, learn or sell.","Щелчок по строке: купить, научиться или продать."
 ui.shop.for_sale,For sale,На продажу

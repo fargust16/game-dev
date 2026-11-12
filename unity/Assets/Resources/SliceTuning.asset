@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 377eda5a2df943f9af310335b82bfb48, type: 3}
+  m_Name: SliceTuning
+  m_EditorClassIdentifier:
+  Jump:
+    KneesHeldSeconds: 0.15
+    PlayedShareWithoutKeys: 0.3
+    FallBeforeKneesSeconds: 0.45
+  Chopping:
+    CheckAtSeconds: 0.17
+    FirstStrokeFromSeconds: 0.6
+  Mining:
+    CheckAtSeconds: 0.35
+    FirstStrokeFromSeconds: 0
+  Forging:
+    CheckAtSeconds: 0.35
+    FirstStrokeFromSeconds: 0
+  HerbPicking:
+    CheckAtSeconds: 1.27
+    FirstStrokeFromSeconds: 0
+  Kneeling:
+    CheckAtSeconds: 4.3
+    FirstStrokeFromSeconds: 0
+  Pickpocketing:
+    CheckAtSeconds: 0.6
+    FirstStrokeFromSeconds: 0
+  Axe:
+    ShiftInHandMetres: {x: 0, y: 0, z: 0}
+    TurnDegrees: {x: 0, y: 0, z: 0}
+  Pickaxe:
+    ShiftInHandMetres: {x: 0, y: 0, z: 0}
+    TurnDegrees: {x: 0, y: 0, z: 0}
+  Hammer:
+    ShiftInHandMetres: {x: 0, y: 0, z: 0}
+    TurnDegrees: {x: 0, y: 0, z: 0}
+  Ui:
+    Scale: 1
+    FitToHeight: 0

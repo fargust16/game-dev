@@ -22,6 +22,8 @@ using GameDev.World.State;
 using GameDev.World.Timekeeping;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using PanelSettings = UnityEngine.UIElements.PanelSettings;
+using UIDocument = UnityEngine.UIElements.UIDocument;
 
 namespace GameDev.Slice
 {
@@ -396,6 +398,16 @@ namespace GameDev.Slice
             }
 
             KeepStamina(hud);
+            Tune(hud);
+            if (_menuPaused && !hud.IsMenuOpen)
+            {
+                Unpause(); // the menu closed by its own line or with its scene
+            }
+
+            if (input.CancelPressed)
+            {
+                Escape(hud);
+            }
 
             if (input.NotesPressed)
             {
@@ -422,7 +434,7 @@ namespace GameDev.Slice
                 }
             }
 
-            FreeCursorForPage(hud.IsBagOpen || hud.IsShopOpen);
+            FreeCursorForPage(hud.IsBagOpen || hud.IsShopOpen || hud.IsMenuOpen);
 
             if (input.MapPressed)
             {
@@ -439,6 +451,155 @@ namespace GameDev.Slice
             {
                 ShowMap(hud);
             }
+        }
+
+        // ------------------------------------------------------------------------------------------- Esc and the menu
+
+        private bool _windowWasOpen;
+        private bool _menuPaused;
+        private IDisposable _menuHold;
+        private float _menuTimeScale = 1f;
+
+        /// <summary>
+        /// Esc (owner, 2026-11-12): the menu closes if it is open; otherwise any window open closes, the pages here and the
+        /// shop, the anvil and the conversation by their own hands, which hear the same key; with no window, the menu
+        /// opens. A window open at the end of the last frame counts, so one closed earlier this frame by its own hand
+        /// never opens the menu behind it.
+        /// </summary>
+        private void Escape(HudView hud)
+        {
+            if (hud.IsMenuOpen)
+            {
+                CloseMenu(hud);
+                return;
+            }
+
+            if (_windowWasOpen || hud.AnyWindowOpen)
+            {
+                hud.CloseNotes();
+                hud.CloseBag();
+                hud.CloseMap();
+                hud.CloseReading();
+                return;
+            }
+
+            OpenMenu(hud);
+        }
+
+        /// <summary>The menu, the world stopped under it: its clock paused and the frame's time at a stand.</summary>
+        private void OpenMenu(HudView hud)
+        {
+            hud.ShowMenu(() => CloseMenu(hud), Loc.Next, Quit);
+            if (!hud.IsMenuOpen || _menuPaused)
+            {
+                return;
+            }
+
+            _menuPaused = true;
+            _menuHold = Clock?.Pause();
+            _menuTimeScale = Time.timeScale;
+            Time.timeScale = 0f;
+        }
+
+        private void CloseMenu(HudView hud)
+        {
+            hud.CloseMenu();
+            Unpause();
+        }
+
+        private void Unpause()
+        {
+            if (!_menuPaused)
+            {
+                return;
+            }
+
+            _menuPaused = false;
+            _menuHold?.Dispose();
+            _menuHold = null;
+            Time.timeScale = _menuTimeScale > 0f ? _menuTimeScale : 1f;
+        }
+
+        private static void Quit()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+
+        private void LateUpdate()
+        {
+            var hud = Hud();
+            _windowWasOpen = hud != null && hud.AnyWindowOpen;
+        }
+
+        // ------------------------------------------------------------------------------------------- the tuning page
+
+        private PlayerLocomotion _tuned;
+        private PanelSettings _panel;
+        private Vector2Int _panelResolution;
+        private float _panelMatch;
+
+        /// <summary>
+        /// The owner's tuning page (<see cref="SliceTuning"/>) on what it governs here, each frame, so a change made while
+        /// the game runs shows at once: the landing, and the HUD's size and fit. The HUD's panel is given back as it was
+        /// when the world ends.
+        /// </summary>
+        private void Tune(HudView hud)
+        {
+            var tuning = SliceTuning.Current;
+            if (_tuned == null)
+            {
+                _tuned = FindAnyObjectByType<PlayerLocomotion>();
+            }
+
+            if (_tuned != null)
+            {
+                _tuned.LandingHold = tuning.Jump.KneesHeldSeconds;
+                _tuned.LandingShare = tuning.Jump.PlayedShareWithoutKeys;
+                _tuned.LandingAfter = tuning.Jump.FallBeforeKneesSeconds;
+            }
+
+            var document = hud.GetComponent<UIDocument>();
+            var panel = document != null ? document.panelSettings : null;
+            if (panel == null)
+            {
+                return;
+            }
+
+            if (panel != _panel)
+            {
+                RestorePanel();
+                _panel = panel;
+                _panelResolution = panel.referenceResolution;
+                _panelMatch = panel.match;
+            }
+
+            var scale = Mathf.Clamp(tuning.Ui.Scale, 0.5f, 1.5f);
+            var wanted = new Vector2Int(Mathf.RoundToInt(_panelResolution.x / scale), Mathf.RoundToInt(_panelResolution.y / scale));
+            if (panel.referenceResolution != wanted)
+            {
+                panel.referenceResolution = wanted;
+            }
+
+            var fit = Mathf.Clamp01(tuning.Ui.FitToHeight);
+            if (!Mathf.Approximately(panel.match, fit))
+            {
+                panel.match = fit;
+            }
+        }
+
+        private void RestorePanel()
+        {
+            if (_panel != null)
+            {
+                _panel.referenceResolution = _panelResolution;
+                _panel.match = _panelMatch;
+            }
+
+            _panel = null;
         }
 
         private void ShowMap(HudView hud)
@@ -731,7 +892,7 @@ namespace GameDev.Slice
         private bool PageOpen()
         {
             var hud = Hud();
-            return hud != null && (hud.IsDialogueOpen || hud.IsReadingOpen || hud.IsBagOpen || hud.IsShopOpen || hud.IsMapOpen || hud.IsNotesOpen);
+            return hud != null && hud.AnyWindowOpen;
         }
 
         private HudView Hud()
@@ -747,6 +908,8 @@ namespace GameDev.Slice
 
         private void OnDestroy()
         {
+            Unpause();
+            RestorePanel();
             if (_running == this)
             {
                 SceneManager.sceneLoaded -= OnSceneLoaded;

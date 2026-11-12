@@ -72,6 +72,51 @@ namespace GameDev.Slice.Tests
 
             Assert.IsFalse(hud.IsBagOpen, "I again closes it");
         }
+
+        /// <summary>
+        /// Esc (owner, 2026-11-12): any open window closes; with none, the menu opens and the world stops under it; Esc
+        /// again, or Resume, closes it and the world goes on.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator EscClosesAnyWindowAndOpensTheMenu()
+        {
+            yield return ForgetTheWorld();
+            yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
+            var world = SliceWorldDriver.Running;
+            var hud = Object.FindAnyObjectByType<HudView>();
+            Assert.IsFalse(hud.AnyWindowOpen);
+
+            yield return Tap(Key.I);
+            Assert.IsTrue(hud.IsBagOpen);
+            yield return Tap(Key.Escape);
+            Assert.IsFalse(hud.IsBagOpen, "Esc closes the bag");
+            Assert.IsFalse(hud.IsMenuOpen, "and opens nothing behind it");
+
+            yield return Tap(Key.J);
+            Assert.IsTrue(hud.IsNotesOpen);
+            yield return Tap(Key.Escape);
+            Assert.IsFalse(hud.IsNotesOpen, "Esc closes the notes");
+            Assert.IsFalse(hud.IsMenuOpen);
+
+            yield return Tap(Key.Escape);
+            Assert.IsTrue(hud.IsMenuOpen, "with no window, Esc opens the menu");
+            CollectionAssert.AreEqual(new[] { "Resume", "Change the language", "Quit the game" }, hud.MenuLines);
+            Assert.AreEqual(0f, Time.timeScale, "the world stops under the menu");
+            Assert.IsTrue(world.Clock.IsPaused, "its clock too");
+
+            yield return Tap(Key.Escape);
+            Assert.IsFalse(hud.IsMenuOpen, "Esc again closes it");
+            Assert.AreEqual(1f, Time.timeScale, "and the world goes on");
+            Assert.IsFalse(world.Clock.IsPaused);
+
+            yield return Tap(Key.Escape);
+            Assert.IsTrue(hud.IsMenuOpen);
+            Assert.IsTrue(hud.ClickMenuLine(0), "Resume");
+            yield return null;
+            Assert.IsFalse(hud.IsMenuOpen, "Resume closes it");
+            Assert.AreEqual(1f, Time.timeScale);
+            Assert.IsFalse(world.Clock.IsPaused);
+        }
     }
 }
 #endif

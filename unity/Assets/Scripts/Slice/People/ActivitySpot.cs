@@ -146,33 +146,67 @@ namespace GameDev.Slice.People
 
         private LooseProp[] _chairs;
 
-        /// <summary>The loose chair of a place, found by its home under the place's seat; null for a fixed bench or pew, and for a spot that is no seat.</summary>
+        /// <summary>
+        /// The loose seat of a place: the spot's own piece where it is loose (a street bench), or else the loose chair whose
+        /// home lies under the place's seat (the taproom's chairs); null for a fixed bench or pew, and for a spot that is no
+        /// seat. A bench's home lies far from its end places, so the piece is asked first: found by its home alone, a moved
+        /// bench was read as fixed, and the townsfolk sat on the air where it had stood (owner's play test, 2026-11-12).
+        /// </summary>
         public LooseProp Chair(int place)
         {
             if (_chairs == null || _chairs.Length != places.Length)
             {
                 _chairs = new LooseProp[places.Length];
+                var own = activity == Activity.Sit && piece != null ? piece.GetComponentInParent<LooseProp>() : null;
                 for (var i = 0; activity == Activity.Sit && i < places.Length; i++)
                 {
-                    _chairs[i] = LooseProp.NearestHome(places[i].Seat, ChairReach);
+                    _chairs[i] = own != null ? own : LooseProp.NearestHome(places[i].Seat, ChairReach);
                 }
             }
 
             return place >= 0 && place < _chairs.Length ? _chairs[place] : null;
         }
 
-        /// <summary>Whether a place can be sat on now: a fixed seat, or its chair standing at home.</summary>
+        /// <summary>Authoring default, degrees: a seat tilted from its home's upright no more than this still stands to be sat on where it is.</summary>
+        public const float UprightAngle = 10f;
+
+        /// <summary>Whether a loose seat stands upright, however far it was pushed or turned over the ground.</summary>
+        public static bool Upright(LooseProp chair) =>
+            chair != null && Vector3.Angle(chair.transform.rotation * Quaternion.Inverse(chair.HomeRotation) * Vector3.up, Vector3.up) <= UprightAngle;
+
+        /// <summary>
+        /// A place as it stands now: on a loose seat pushed upright to a new spot, its stand point, seat and facing go with
+        /// the seat, as a person on a moving platform goes with it (owner, 2026-11-12: the townsfolk sit on the very bench,
+        /// wherever it was pushed); otherwise the place as authored.
+        /// </summary>
+        public Place Now(int place)
+        {
+            var p = places[place];
+            var chair = Chair(place);
+            if (chair == null || !chair.Displaced || !Upright(chair))
+            {
+                return p;
+            }
+
+            var home = chair.HomePosition;
+            var at = chair.transform.position;
+            var yaw = Mathf.DeltaAngle(chair.HomeRotation.eulerAngles.y, chair.transform.rotation.eulerAngles.y);
+            var turn = Quaternion.Euler(0f, yaw, 0f);
+            return new Place { Stand = at + (turn * (p.Stand - home)), Seat = at + (turn * (p.Seat - home)), Yaw = p.Yaw + yaw };
+        }
+
+        /// <summary>Whether a place can be sat on now: a fixed seat, or its loose seat upright, at home or pushed.</summary>
         public bool SeatReady(int place)
         {
             var chair = Chair(place);
-            return chair == null || !chair.Displaced;
+            return chair == null || !chair.Displaced || Upright(chair);
         }
 
-        /// <summary>Whether the place's chair lies knocked near its home, for whoever comes to sit to set it up first.</summary>
+        /// <summary>Whether the place's seat lies knocked over near its home, for whoever comes to sit to set it up first.</summary>
         public bool ChairNear(int place)
         {
             var chair = Chair(place);
-            if (chair == null || !chair.Displaced || chair.Held)
+            if (chair == null || !chair.Displaced || Upright(chair) || chair.Held)
             {
                 return false;
             }

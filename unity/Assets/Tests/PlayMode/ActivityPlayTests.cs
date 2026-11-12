@@ -934,6 +934,68 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// The owner's play test of 2026-11-12: townsfolk sat on the air beside a bench the player had pushed. A bench
+        /// pushed and turned upright to a new spot is sat on where it stands, its places going with it as a person goes with
+        /// a moving platform, though its middle lies far from each place.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator APushedBenchIsSatOnWhereItStands()
+        {
+            yield return Ground();
+            var list = new ActivitySpot.Place[2];
+            for (var i = 0; i < list.Length; i++)
+            {
+                var seat = Area + new Vector3(i * 1.2f, SeatHeight, 0f);
+                list[i] = new ActivitySpot.Place { Seat = seat, Stand = new Vector3(seat.x, Area.y, seat.z + TownsfolkWalker.SeatedHipsBack), Yaw = 0f };
+            }
+
+            var bench = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            bench.name = "Test bench";
+            bench.transform.localScale = new Vector3(2.4f, SeatHeight, 0.45f);
+            bench.transform.position = new Vector3(Area.x + 0.6f, Area.y + (SeatHeight / 2f), Area.z);
+            bench.AddComponent<Rigidbody>().mass = 30f;
+            var prop = bench.AddComponent<LooseProp>();
+            var body = bench.GetComponent<Rigidbody>();
+            var spot = new GameObject("Bench spot").AddComponent<ActivitySpot>();
+            spot.Configure(ActivitySpot.Activity.Sit, false, 4f, 4f, list, bench.transform);
+            Physics.SyncTransforms();
+            yield return new WaitForSeconds(0.3f);
+            Assert.AreSame(prop, spot.Chair(0), "the bench is its places' seat, though its middle lies 0.6 m from each");
+            Assert.AreSame(prop, spot.Chair(1));
+
+            var home = prop.HomePosition;
+            var turn = Quaternion.Euler(0f, 30f, 0f);
+            var to = home + new Vector3(2f, 0f, 1f);
+            var turned = turn * prop.HomeRotation;
+            bench.transform.SetPositionAndRotation(to, turned);
+            body.position = to;
+            body.rotation = turned;
+            Physics.SyncTransforms();
+            yield return new WaitForSeconds(0.3f);
+            Assert.IsTrue(prop.Displaced, "pushed");
+            Assert.IsTrue(spot.SeatReady(1) && !spot.ChairNear(1), "upright, it is ready where it stands, with nothing to set up");
+            var now = spot.Now(1);
+            var expected = prop.transform.position + (turn * (list[1].Seat - home));
+            Assert.Less(Vector3.Distance(now.Seat, expected), 0.02f, $"the seat goes with the bench: {now.Seat} against {expected}");
+            Assert.AreEqual(30f, Mathf.DeltaAngle(0f, now.Yaw), 0.5f, "and turns with it");
+
+            var square = new[] { new Vector3(-3f, 0f, 3f), new Vector3(4f, 0f, 3f), new Vector3(4f, 0f, 9f), new Vector3(-3f, 0f, 9f) };
+            var a = Walker(ManWalker, square, square[0]);
+            yield return new WaitForSeconds(0.3f);
+            Assert.IsTrue(a.Send(spot, 1));
+            Assert.IsTrue(prop.Held, "the bench is held from the moment the place is taken");
+            yield return Until(() => a.Seated && State(a) == "Sit", 10f, "it sits");
+            yield return new WaitForSeconds(1f); // it reads its own seated hips and settles onto the seat
+
+            var seatNow = spot.Now(1).Seat;
+            var hips = a.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Hips).position;
+            Assert.That(hips.y - seatNow.y, Is.InRange(0.08f, 0.25f), "its hip joint over the seat's top");
+            Assert.Less(new Vector2(hips.x - seatNow.x, hips.z - seatNow.z).magnitude, 0.12f, $"on the bench where it stands now, off it by {hips - seatNow:F3}");
+            Assert.Greater(new Vector2(hips.x - list[1].Seat.x, hips.z - list[1].Seat.z).magnitude, 1.5f, "never on the air where the bench stood");
+            Assert.Less(Mathf.Abs(Mathf.DeltaAngle(a.transform.eulerAngles.y, 30f)), 2f, "facing out from the turned bench");
+        }
+
+        /// <summary>
         /// A place whose chair lies far off is never taken (owner, 2026-11-12: nobody sits where a chair was); a person with
         /// no route whose own chair is gone sits at another place of its spot.
         /// </summary>

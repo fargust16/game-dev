@@ -102,6 +102,12 @@ namespace GameDev.Slice
                 }
             }
 
+            // Closed from outside, by Esc or by another window (owner, 2026-11-12): the next E opens it again, not closes nothing.
+            if (IsOpen && Hud() != null && !Hud().IsReadingOpen)
+            {
+                IsOpen = false;
+            }
+
             var inReach = InReach(_player.transform.position);
             if (IsOpen && !inReach)
             {

@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.17
+Version: 0.18
 
 Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09, 2026-11-10); fireplaces and radiators in §10.1 (owner, 2026-11-10); every piece's size checked in §11 (owner's walk, 2026-11-10); the CC0 pieces in §12 (2026-11-11); seat sizes in §13 (owner, 2026-11-12)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-12 (§13, the owner's next play test: every loose piece under a sitter's seat is held, not only the place's own chair. The earlier note is in the update history)
+Last Updated: 2026-11-12 (§13, the owner's next play test: a pushed seat still upright is sat on where it stands, its places going with it. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -370,7 +370,8 @@ Measured after it (`Logs/SliceSurvey/seats.txt`): the street bench, the pew, the
 **Knocked furniture** (owner's play test, 2026-11-12). The player could knock a chair out from under a seated person, who sat on in the air, and people walked to sit where a chair had stood. Since then:
 
 - a chair under a sitter, or under one on its way to sit, is held still, kinematic, so no push or blow moves it. Since the owner's next play test, when the player still knocked one, whatever loose piece stands within 0.3 m of the seat's point is held too, the place's own chair or not: a chair is found as the place's by its home within 0.5 m of the seat, and one whose home lies farther off went unheld (`TownsfolkWalker.IgnoreSeat`, `ActivityPlayTests.ALooseSeatUnderASitterIsHeldThoughItsHomeLiesOff`);
-- nobody sits where the chair is gone: a chair knocked within 2.5 m of its place (authoring default) is set back up by whoever comes to sit, stooping as at gathering, and a place whose chair lies farther stays empty;
+- a seat pushed and still upright, within 10° of its own upright (authoring default), is sat on where it stands now: its places go with it, turned with it, as a person goes with a moving platform (owner's play test, 2026-11-12: townsfolk sat on the air beside a pushed bench, got up and sat on the air again; the owner chose seats that follow over seats that cannot move). A street bench is its places' seat as the spot's own piece, since its home lies too far from its end places to be found by the 0.5 m rule, and a pushed bench was read as fixed. A walk to a pushed seat's place is not begun if a wall stands between, read at knee height, 0.5 m (authoring default) (`ActivitySpot.Now`, `ActivityPlayTests.APushedBenchIsSatOnWhereItStands`);
+- nobody sits where the chair is gone: a chair knocked over within 2.5 m of its place (authoring default) is set back up by whoever comes to sit, stooping as at gathering, and a place whose chair lies over farther stays empty;
 - every loose prop, a chair, a table or a set's thing, goes back to its place by itself one game hour, 60 ticks, after it came to rest away from it, so a room the player wrecked is in order an hour later (`LooseProp.RestoreTicks`). A prop counts as moved 0.1 m or 10° from its place (authoring defaults).
 
 ## Sources
@@ -381,6 +382,7 @@ Measured after it (`Logs/SliceSurvey/seats.txt`): the street bench, the pew, the
 
 ## Update history
 
+- 2026-11-12 (v0.18): §13, the owner's next play test: a pushed seat still upright is sat on where it stands, its places going with it; a street bench is its places' seat as the spot's piece (PB7).
 - 2026-11-12 (v0.17): §13, the owner's next play test: every loose piece under a sitter's seat held (PB3).
 - 2026-11-12 (v0.16): §13, the owner's play test: a sitter's chair held, a knocked chair set up first, wrecked furniture back in place an hour later.
 - 2026-11-12 (v0.15): §13, the owner kept the scaled kit seats; the pew and the furniture kit's chair get new models; a new seat is fitted by `FitSeat`.

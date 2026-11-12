@@ -68,14 +68,14 @@ namespace GameDev.Slice
         /// <summary>
         /// Each work clip's key frame, s into it (ANIMATION_PIPELINE_PLAN.md §8, §10). A blow stops just before it lands,
         /// at the right hand's fastest (owner, 2026-11-12: the check came after the axe had begun to swing back; measured
-        /// by <c>SliceTools.Measure</c>, `tools.txt`): the axe's at 0.13 s, the hand falling through 1.38 m to strike at
-        /// 0.18 s; the pick's at 0.35 s, through 1.3 m to strike the ground at 0.40 s; the hammer's at 0.35 s, through
+        /// by <c>SliceTools.Measure</c>, `tools.txt`): the axe's at 0.17 s, the hand falling through 1.38 m to strike at
+        /// 0.18 s (0.13 s came too early, the owner's play test of the same day); the pick's at 0.35 s, through 1.3 m to strike the ground at 0.40 s; the hammer's at 0.35 s, through
         /// 1.25 m to meet the anvil at 0.38 s. The rest by <c>SliceClipSurvey</c>, `clip_survey.txt`: the hips beginning to
         /// rise from the ground, the crouched hand at its farthest into the pocket.
         /// </summary>
         public static readonly IReadOnlyDictionary<string, float> Keys = new Dictionary<string, float>
         {
-            ["Chop"] = 0.13f,
+            ["Chop"] = 0.17f,
             ["Mine"] = 0.35f,
             ["HammerDown"] = 0.35f,
             ["Harvest"] = 1.27f,
@@ -92,6 +92,26 @@ namespace GameDev.Slice
         {
             ["Chop"] = 0.6f,
         };
+
+        /// <summary>
+        /// A work clip's key frame, s into it: the owner's tuning page's (<see cref="SliceTuning"/>, owner 2026-11-12: the
+        /// check came too early at the axe's 0.13 s, and the owner sets it there), or <see cref="Keys"/>' default.
+        /// </summary>
+        public static float KeyOf(string clip)
+        {
+            var timing = SliceTuning.Current.Work(clip);
+            return timing != null ? timing.CheckAtSeconds : Keys.TryGetValue(clip, out var key) ? key : 0f;
+        }
+
+        /// <summary>Where a work clip's first stroke starts, s into it: the tuning page's, or <see cref="Starts"/>' default.</summary>
+        public static float StartOf(string clip)
+        {
+            var timing = SliceTuning.Current.Work(clip);
+            return timing != null ? timing.FirstStrokeFromSeconds : Starts.TryGetValue(clip, out var start) ? start : 0f;
+        }
+
+        /// <summary>Each tool's grip as <c>SliceTools.Arm</c> set it in the hand, read the first time the tool is out.</summary>
+        private readonly Dictionary<GameObject, (Vector3 Position, Quaternion Rotation)> _baked = new Dictionary<GameObject, (Vector3, Quaternion)>();
 
         /// <summary>Every work state the player's controller carries: those with a key frame, and the hammer's rebound.</summary>
         public static readonly string[] Clips = { "Chop", "Mine", "HammerDown", "HammerUp", "Harvest", "Kneel", "Gather2" };
@@ -202,6 +222,7 @@ namespace GameDev.Slice
             if (_tool != null)
             {
                 _tool.SetActive(true);
+                Grip();
             }
 
             return true;
@@ -219,6 +240,29 @@ namespace GameDev.Slice
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// The tool in hand at the grip <c>SliceTools.Arm</c> set, with the tuning page's correction on it: shifted in the
+        /// hand's axes, turned about its own (owner, 2026-11-12: the axe was held wrong, and the owner sets the grip).
+        /// </summary>
+        private void Grip()
+        {
+            var grip = _tool != null ? SliceTuning.Current.Grip(_tool.name) : null;
+            if (grip == null)
+            {
+                return;
+            }
+
+            var t = _tool.transform;
+            if (!_baked.TryGetValue(_tool, out var baked))
+            {
+                baked = (t.localPosition, t.localRotation);
+                _baked[_tool] = baked;
+            }
+
+            t.localPosition = baked.Position + grip.ShiftInHandMetres;
+            t.localRotation = baked.Rotation * Quaternion.Euler(grip.TurnDegrees);
         }
 
         /// <summary>Breaks the work off: the bar goes with no result, and the character walks again.</summary>
@@ -279,6 +323,7 @@ namespace GameDev.Slice
                 return;
             }
 
+            Grip(); // each frame, so the owner's turn of the grip shows while the work plays
             _phaseTime += Time.deltaTime;
             switch (_phase)
             {
@@ -295,7 +340,7 @@ namespace GameDev.Slice
                     break;
                 case Phase.ToKey:
                     // A clip that does not loop stops at its end, so a key at the end is read there.
-                    var key = Keys[_stroke.Clip] / Length(_stroke.Clip);
+                    var key = KeyOf(_stroke.Clip) / Length(_stroke.Clip);
                     if (Played(_stroke.Clip, _base + (Loops(_stroke.Clip) ? key : Mathf.Min(key, 1f))))
                     {
                         Check();
@@ -362,8 +407,8 @@ namespace GameDev.Slice
                 return;
             }
 
-            var start = Starts.TryGetValue(_stroke.Clip, out var s) ? s : 0f;
-            _base = start > Keys[_stroke.Clip] ? 1f : 0f;
+            var start = StartOf(_stroke.Clip);
+            _base = start > KeyOf(_stroke.Clip) ? 1f : 0f;
             Play(_stroke.Clip, _stroke.LeadIn.Length > 0 ? 0.05f : Fade, start);
             _phase = Phase.ToKey;
         }
@@ -424,7 +469,7 @@ namespace GameDev.Slice
         {
             var hash = Animator.StringToHash(clip);
             var info = _animator.IsInTransition(0) ? _animator.GetNextAnimatorStateInfo(0) : _animator.GetCurrentAnimatorStateInfo(0);
-            return info.shortNameHash == hash && info.length > 0.01f ? info.length : Keys[clip] + 0.01f;
+            return info.shortNameHash == hash && info.length > 0.01f ? info.length : KeyOf(clip) + 0.01f;
         }
 
         private bool Loops(string clip)

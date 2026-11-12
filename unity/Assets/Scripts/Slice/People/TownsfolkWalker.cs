@@ -333,7 +333,7 @@ namespace GameDev.Slice.People
             if (route.Length < 2)
             {
                 // A person with no route: seated or at the bar from the start; with its chair away, it looks for a seat.
-                var stand = home.PlaceAt(homePlace).Stand;
+                var stand = home.Now(homePlace).Stand;
                 if (home.SeatReady(homePlace) && Begin(home, homePlace, stand))
                 {
                     Arrive();
@@ -704,7 +704,7 @@ namespace GameDev.Slice.People
         /// </summary>
         private bool Begin(ActivitySpot spot, int place, Vector3 back)
         {
-            if (spot == null || !spot.Usable(place) || !spot.Take(place, this))
+            if (spot == null || !spot.Usable(place) || !Reachable(spot, place) || !spot.Take(place, this))
             {
                 return false;
             }
@@ -731,6 +731,25 @@ namespace GameDev.Slice.People
             VisitsBegun++;
             Play(WalkState);
             return true;
+        }
+
+        /// <summary>Authoring default, m: the height of the clear-way check to a pushed seat's place, about a person's knee.</summary>
+        private const float KneeHeight = 0.5f;
+
+        /// <summary>
+        /// Whether a straight walk to a place reaches it: the editor found the walks to the places as they were built, and a
+        /// seat pushed against a wall puts its new place behind it, where a person walking through would sit inside the wall.
+        /// </summary>
+        private bool Reachable(ActivitySpot spot, int place)
+        {
+            var chair = spot.Kind == ActivitySpot.Activity.Sit ? spot.Chair(place) : null;
+            if (chair == null || !chair.Displaced)
+            {
+                return true;
+            }
+
+            var knee = Vector3.up * KneeHeight;
+            return !Physics.Linecast(transform.position + knee, spot.Now(place).Stand + knee, LayerMask.GetMask(KitLayers.Structure), QueryTriggerInteraction.Ignore);
         }
 
         private float Going(float seconds)
@@ -831,7 +850,7 @@ namespace GameDev.Slice.People
         /// <summary>A person with no route starts in its place: seated, or at the bar, without the walk or the sitting down.</summary>
         private void Skip()
         {
-            var place = _spot.PlaceAt(_place);
+            var place = _spot.Now(_place);
             transform.rotation = Quaternion.Euler(0f, place.Yaw, 0f);
             if (_spot.Kind == ActivitySpot.Activity.Sit)
             {
@@ -859,7 +878,7 @@ namespace GameDev.Slice.People
         /// <summary>The while at a spot, step by step, each step's time taken from the walk's seconds.</summary>
         private float Pass(float seconds)
         {
-            var place = _spot.PlaceAt(_place);
+            var place = _spot.Now(_place);
             if (_step == 0)
             {
                 // Settling: it turns to the place's facing.
@@ -1014,7 +1033,7 @@ namespace GameDev.Slice.People
 
         private float Back(float seconds)
         {
-            var target = home != null && route.Length < 2 ? home.PlaceAt(homePlace).Stand : _back;
+            var target = home != null && route.Length < 2 ? home.Now(homePlace).Stand : _back;
             if (!MoveTo(target, ref seconds))
             {
                 return seconds;
@@ -1105,7 +1124,7 @@ namespace GameDev.Slice.People
             if (ignore)
             {
                 _seatParts.Clear();
-                _seatParts.AddRange(Physics.OverlapSphere(_spot.PlaceAt(_place).Seat, 0.3f, ~0, QueryTriggerInteraction.Ignore)
+                _seatParts.AddRange(Physics.OverlapSphere(_spot.Now(_place).Seat, 0.3f, ~0, QueryTriggerInteraction.Ignore)
                     .Where(c => !c.transform.IsChildOf(transform)));
 
                 // Whatever loose piece stands under the seat is held too, the place's own chair or not: the player still
@@ -1142,7 +1161,7 @@ namespace GameDev.Slice.People
         /// <summary>Where it stands before it sits or at the place, on the ground; for a seat, in front of it by the body's own size.</summary>
         private Vector3 StandPoint()
         {
-            var place = _spot.PlaceAt(_place);
+            var place = _spot.Now(_place);
             if (_spot.Kind != ActivitySpot.Activity.Sit)
             {
                 return place.Stand;
@@ -1158,7 +1177,7 @@ namespace GameDev.Slice.People
         /// </summary>
         private Vector3 SeatRoot()
         {
-            var place = _spot.PlaceAt(_place);
+            var place = _spot.Now(_place);
             var turn = Quaternion.Euler(0f, place.Yaw, 0f);
             var back = float.IsNaN(_seatedBack) ? SeatedHipsBack * _k : _seatedBack;
             var root = place.Seat + (turn * new Vector3(-_seatedSide, 0f, back));
