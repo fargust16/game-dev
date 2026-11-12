@@ -29,7 +29,7 @@ namespace GameDev.Slice.People
     /// seated, at a bar, or standing quietly in the chapel.
     /// </para>
     /// </summary>
-    public sealed class TownsfolkWalker : MonoBehaviour
+    public sealed partial class TownsfolkWalker : MonoBehaviour
     {
         /// <summary>How many times faster than life a walker walks the ticks a paused world was moved by (authoring default).</summary>
         public const float CatchUp = 6f;
@@ -151,6 +151,7 @@ namespace GameDev.Slice.People
             Going,
             Busy,
             Back,
+            Heed,
         }
 
         private readonly List<(int turn, ActivitySpot spot, int place)> _visits = new List<(int, ActivitySpot, int)>();
@@ -497,6 +498,9 @@ namespace GameDev.Slice.People
                         break;
                     case Mode.Back:
                         seconds = Back(seconds);
+                        break;
+                    case Mode.Heed:
+                        seconds = HeedStep(seconds);
                         break;
                 }
             }

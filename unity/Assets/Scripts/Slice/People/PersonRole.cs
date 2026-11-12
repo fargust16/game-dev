@@ -134,6 +134,28 @@ namespace GameDev.Slice.People
             _ => new Row(null, null, 0, 4, 7, null, null, RoleFirearm.None),
         };
 
+        /// <summary>
+        /// 10.2 §5e (owner, 2026-11-12, VS-ALARM (f)): the share of a role's people who go to look at an Alarm, authoring
+        /// defaults. <paramref name="otherResident"/> is a resident of no listed role, a Master or a servant.
+        /// </summary>
+        public static double LookShare(ResidentRole role, bool otherResident = false) => role switch
+        {
+            ResidentRole.OldPriest or ResidentRole.Acolyte or ResidentRole.Dockworker => 1d / 2d,
+            ResidentRole.Vagrant => 2d / 5d,
+            ResidentRole.FactoryWorker or ResidentRole.OldDockworker or ResidentRole.Innkeeper => 1d / 4d,
+            ResidentRole.OldBeliever => 1d / 5d,
+            ResidentRole.Townsfolk => otherResident ? 1d / 4d : 1d / 6d,
+            ResidentRole.ChurchMaid or ResidentRole.Moneylender or ResidentRole.Tailor => 1d / 10d,
+            _ => 1d / 4d,
+        };
+
+        /// <summary>10.2 §5e: a person's Boldness, 0 to 1, drawn once by the seed from its name, the same in every run of a world.</summary>
+        public static double Boldness(string name, IWorldSeed seed) =>
+            (seed != null ? seed.Fork(SliceSeedStreams.Boldness, StableHash.Of(name ?? string.Empty)) : new Random(StableHash.Of(name ?? string.Empty) ^ 0x2545F491)).NextDouble();
+
+        /// <summary>10.2 §5e: whether a person goes to look at an Alarm, its Boldness higher than 1 minus its role's share.</summary>
+        public static bool GoesToLook(double boldness, double share) => boldness > 1d - share;
+
         /// <summary>The person named <paramref name="name"/> of <paramref name="role"/>, made by the world's seed.</summary>
         public static Made Make(ResidentRole role, string name, IWorldSeed seed)
         {

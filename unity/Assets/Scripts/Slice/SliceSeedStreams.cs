@@ -71,10 +71,19 @@ namespace GameDev.Slice
         /// <summary>The roll of an Aimed Shot that touched someone out of a fight (10.2 §5e; PB8b); fork it with the shot's count.</summary>
         public const string Shots = "slice.shots";
 
+        /// <summary>A resident's Boldness, whether it goes to look at an Alarm (10.2 §5e; PB8c); fork it with the person's name hashed.</summary>
+        public const string Boldness = "slice.boldness";
+
+        /// <summary>How long after a death its News item enters the pool, 1–2 game hours (09, 10.2 §5e; PB8d); fork it with the item's number.</summary>
+        public const string News = "slice.news";
+
+        /// <summary>Whether the god notices a death that makes two or more within the hour, one in two (10.2 §5e; PB8d); fork it with the death's number.</summary>
+        public const string GodNotices = "slice.god.notices";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
-            ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens, Roles, Search, Shots,
+            ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens, Roles, Search, Shots, Boldness, News, GodNotices,
 
         };
     }

@@ -98,6 +98,9 @@ namespace GameDev.Slice.Beasts
             {
                 _fights.BeastFightEnded += OnFightEnded;
             }
+
+            SliceAlarm.Raised -= OnAlarm;
+            SliceAlarm.Raised += OnAlarm;
         }
 
         /// <summary>The warnings a pack has given since it noticed the character.</summary>
@@ -671,6 +674,115 @@ namespace GameDev.Slice.Beasts
             }
         }
 
+        /// <summary>
+        /// 10.2 §5e, the beasts' part of the Alarm Check (owner, 2026-11-12; PB8c). A pack at rest that hears an Alarm, any
+        /// of its beasts within 30 cells of it, answers out of a fight: wolves and every glowing beast converge on the place
+        /// as on a character they noticed, running there Alert, or to their territory's edge nearest it; every other beast,
+        /// a boar too, runs to the far side of its territory from the place. Either way the pack stays there a full wander's
+        /// while before it wanders again, and never leaves its territory.
+        /// </summary>
+        private void OnAlarm(Alarm alarm)
+        {
+            if (_rules == null || (_fights != null && _fights.InFight))
+            {
+                return;
+            }
+
+            foreach (var pack in _packs.Values)
+            {
+                if (pack.Attacking || pack.Chasing || pack.Noticed || !pack.Present(out var first) || !Hears(pack, alarm.At))
+                {
+                    continue;
+                }
+
+                var converges = pack.Members.Exists(b => b != null && (b.Kind == BeastKind.Wolf || b.Glowing));
+                var place = converges ? Toward(first, alarm.At) : AwayFrom(first, alarm.At);
+                pack.WanderIn = WanderMost;
+                pack.Heard++;
+                pack.Converged = converges;
+                var k = 0;
+                foreach (var b in pack.Members)
+                {
+                    if (b == null || !b.isActiveAndEnabled || b.State != BeastState.Resting)
+                    {
+                        continue;
+                    }
+
+                    if (converges)
+                    {
+                        EyesOf(b)?.Meter?.Alarm();
+                    }
+
+                    if (place is Vector3 to)
+                    {
+                        b.Go(to + Around[k % Around.Length], ChaseSpeed, false);
+                    }
+
+                    k++;
+                }
+            }
+        }
+
+        /// <summary>How many Alarms a pack has answered, and whether it converged on the last.</summary>
+        public int HeardBy(int pack) => _packs.TryGetValue(pack, out var p) ? p.Heard : 0;
+
+        public bool Converged(int pack) => _packs.TryGetValue(pack, out var p) && p.Converged;
+
+        private static bool Hears(Pack pack, Vector3 at)
+        {
+            foreach (var b in pack.Members)
+            {
+                if (b != null && b.isActiveAndEnabled && b.State == BeastState.Resting && SliceAlarm.Hears(at, b.transform.position))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>The Alarm's place where it lies in the territory, else the territory's edge nearest it; null when no ground there will do.</summary>
+        private Vector3? Toward(SliceBeast leader, Vector3 at)
+        {
+            var way = Flat(at - leader.Home);
+            var reach = Mathf.Min(way.magnitude, _rules.TerritoryRadius * 0.95f);
+            for (var share = 1f; share > 0.3f; share -= 0.2f)
+            {
+                var place = leader.Home + (way.sqrMagnitude > 1e-4f ? way.normalized * (reach * share) : Vector3.zero);
+                if (Standable(ref place))
+                {
+                    return place;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>The far side of the territory from the Alarm's place, turned aside where no ground there will do; null when none will.</summary>
+        private Vector3? AwayFrom(SliceBeast leader, Vector3 at)
+        {
+            var way = Flat(leader.Home - at);
+            if (way.sqrMagnitude < 1e-4f)
+            {
+                way = Flat(leader.transform.position - at);
+            }
+
+            way = way.sqrMagnitude > 1e-4f ? way.normalized : Vector3.forward;
+            foreach (var turn in new[] { 0f, 30f, -30f, 60f, -60f })
+            {
+                for (var share = 0.9f; share > 0.4f; share -= 0.2f)
+                {
+                    var place = leader.Home + (Quaternion.Euler(0f, turn, 0f) * way * (_rules.TerritoryRadius * share));
+                    if (Standable(ref place))
+                    {
+                        return place;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>A fallen or fleeing beast notices no more, and its cone goes.</summary>
         private void Blind(SliceBeast b)
         {
@@ -690,6 +802,7 @@ namespace GameDev.Slice.Beasts
 
         private void OnDestroy()
         {
+            SliceAlarm.Raised -= OnAlarm;
             if (_clock != null)
             {
                 _clock.TickBoundary -= OnTick;
@@ -726,6 +839,10 @@ namespace GameDev.Slice.Beasts
             public float WanderIn { get; set; }
 
             public int Wanders { get; set; }
+
+            public int Heard { get; set; }
+
+            public bool Converged { get; set; }
 
             /// <summary>Whether a member stands in the scene, alive and at rest, the first of them given.</summary>
             public bool Present(out SliceBeast first)

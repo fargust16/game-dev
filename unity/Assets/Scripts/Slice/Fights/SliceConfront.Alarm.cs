@@ -16,7 +16,8 @@ namespace GameDev.Slice.Fights
     /// way brings nobody. A Warden who comes when the fight is over looks round 3 ticks before it goes back. In an Assault
     /// the Wardens take the side of the one struck, against the character; in a fight with the cult, the Veinmarket or
     /// beasts they join the character (owner, 2026-11-12, VS-ALARM (i)); in any other fight an Alarm brings nobody. A shot
-    /// out of a fight (PB8b) sends every free Warden who hears it to the shooter's place to look round.
+    /// out of a fight (PB8b) sends every free Warden who hears it to the shooter's place to look round. The townsfolk's part
+    /// is in SliceConfront.Heed (PB8c).
     /// </summary>
     public sealed partial class SliceConfront
     {
@@ -63,7 +64,7 @@ namespace GameDev.Slice.Fights
 
             if (alarm.Kind == AlarmKind.Call)
             {
-                // 10.2 §5a: the residents who hear a call say so; what each then does is its own (PB8c).
+                // 10.2 §5a: the residents who hear a call say so; what each then does is its own (PB8c, below).
                 foreach (var body in PeopleAround.InSight())
                 {
                     if (body != alarm.Source && !PeopleAround.IsWarden(body) && !IsPlayer(body) && SliceAlarm.Hears(alarm.At, body.position) && !Lying(body))
@@ -73,6 +74,7 @@ namespace GameDev.Slice.Fights
                 }
             }
 
+            TownsfolkHear(alarm);
             if (!InFight && alarm.Kind == AlarmKind.Shot)
             {
                 Debug.Log($"[Confront] a shot out of a fight: {LookAt(alarm.At)} Wardens go to look.");
