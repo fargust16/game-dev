@@ -284,11 +284,9 @@ namespace GameDev.Slice.EditorTools
                                   $"plays it x{scales[use]:0.00}");
             }
 
-            // The turn on the spot: its clip played at the pace PlayerLocomotion turns the body.
-            var clipTurn = Mathf.Abs(SliceClips.TurnSpeed(SliceClips.Get("TurnRight")));
-            var bodyTurn = Field("idleTurnSpeed");
-            var turnRate = clipTurn > 20f ? Mathf.Clamp(bodyTurn / clipTurn, 0.5f, 2f) : 1f;
-            report.AppendLine($"Player turn: the clip turns {clipTurn:0} deg/s (measured), the body {bodyTurn:0} deg/s, so it plays x{turnRate:0.00}");
+            // The turn on the spot is no longer played: the body turns to where it goes (owner, 2026-11-12). Its states stay
+            // in the controller at their own pace, Turn01 having no root rotation of its own (measured 0 deg/s).
+            const float turnRate = 1f;
 
             // The sneak's own pace, which PlayerLocomotion matches by the Crouch state's Pace while it creeps.
             var sneak = SliceClips.Get("Sneak");
@@ -343,6 +341,7 @@ namespace GameDev.Slice.EditorTools
         {
             var root = PrefabUtility.LoadPrefabContents(prefabPath);
             var model = root.transform.Find("Model").gameObject;
+            var before = Mathf.DeltaAngle(0f, model.transform.localEulerAngles.y);
             var animator = Animated(model, look);
             var walk = SliceClips.Get("Walk", look.Female);
             var stature = Fit(model, walk, look.Height, !rescale);
@@ -353,9 +352,11 @@ namespace GameDev.Slice.EditorTools
             capsule.center = new Vector3(0f, look.Height * 0.5f, 0f);
             var walker = root.GetComponent<TownsfolkWalker>();
             walker.Configure(walker.Route, speed, SliceTownsfolk.GroundMask);
+            var after = Mathf.DeltaAngle(0f, model.transform.localEulerAngles.y);
             PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
             PrefabUtility.UnloadPrefabContents(root);
-            report.AppendLine($"{prefabPath}: {stature:0.00} m (head bone at {head:0.00} m), walking {speed:0.00} m/s in {walk.name}");
+            report.AppendLine($"{prefabPath}: {stature:0.00} m (head bone at {head:0.00} m), walking {speed:0.00} m/s in {walk.name}, " +
+                              $"the model turned from {before:+0.0;-0.0} to {after:+0.0;-0.0} deg");
             return speed;
         }
 
@@ -496,6 +497,10 @@ namespace GameDev.Slice.EditorTools
                 Pose(animator, clip, 0f);
             }
 
+            // The facing is the avatar's own, read in its neutral pose. A clip's first pose turns the shoulders with its
+            // stride or stance, and that turn stayed in play: every walker went 13–30° off its way, the owner saw them walk
+            // sideways (2026-11-12; ActivityPlayTests.MeasureTheWalkFacing).
+            Neutral(animator);
             var l = root.InverseTransformPoint(animator.GetBoneTransform(HumanBodyBones.LeftUpperArm).position);
             var r = root.InverseTransformPoint(animator.GetBoneTransform(HumanBodyBones.RightUpperArm).position);
             var facing = Vector3.Cross(Vector3.up, l - r);
@@ -520,6 +525,15 @@ namespace GameDev.Slice.EditorTools
 
             var eyes = root.InverseTransformPoint((left.position + right.position) * 0.5f).y - seen.min.y;
             return eyes / EyeShare;
+        }
+
+        /// <summary>The avatar's neutral pose: every muscle at rest, the body upright and facing the animator's forward.</summary>
+        private static void Neutral(Animator animator)
+        {
+            var handler = new HumanPoseHandler(animator.avatar, animator.transform);
+            var pose = new HumanPose { bodyPosition = Vector3.up, bodyRotation = Quaternion.identity, muscles = new float[HumanTrait.MuscleCount] };
+            handler.SetHumanPose(ref pose);
+            handler.Dispose();
         }
 
         internal static void Pose(Animator animator, AnimationClip clip, float time)
@@ -699,18 +713,7 @@ namespace GameDev.Slice.EditorTools
                     lines.Add($"{go.name}: {Path.GetFileNameWithoutExtension(source)} to {look.Name}{(walker != null ? " (walking)" : string.Empty)}");
                 }
 
-                // Every walker at its prefab's measured pace, the refitted townsfolk's among them.
-                foreach (var w in Object.FindObjectsByType<TownsfolkWalker>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-                {
-                    var source = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(w.gameObject);
-                    if (speeds.TryGetValue(source, out var speed) && Mathf.Abs(w.Speed - speed) > 0.001f)
-                    {
-                        w.Configure(w.Route, speed, SliceTownsfolk.GroundMask);
-                        EditorUtility.SetDirty(w);
-                        lines.Add($"{w.name}: walking {speed:0.00} m/s");
-                    }
-                }
-
+                Paces(speeds, lines);
                 if (path == VeilmouthScene.ScenePath)
                 {
                     PlaceBlacksmith(lines);
@@ -724,6 +727,81 @@ namespace GameDev.Slice.EditorTools
                     report.AppendLine($"{path}:\n  " + string.Join("\n  ", lines));
                 }
             }
+        }
+
+        /// <summary>Every walker in the open scene at its prefab's measured pace, the refitted townsfolk's among them.</summary>
+        private static void Paces(Dictionary<string, float> speeds, List<string> lines)
+        {
+            foreach (var w in Object.FindObjectsByType<TownsfolkWalker>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                var source = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(w.gameObject);
+                if (speeds.TryGetValue(source, out var speed) && Mathf.Abs(w.Speed - speed) > 0.001f)
+                {
+                    w.Configure(w.Route, speed, SliceTownsfolk.GroundMask);
+                    EditorUtility.SetDirty(w);
+                    lines.Add($"{w.name}: walking {speed:0.00} m/s");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Batch, after the owner's play test of 2026-11-12 (the walkers went sideways): every person's model and both
+        /// player bodies turned to the avatar's own forward by <see cref="Fit"/>, the walkers' paces measured again, and
+        /// each walker in the slice's scenes set to its prefab's new pace; nothing else in a scene changes.
+        /// -executeMethod GameDev.Slice.EditorTools.SlicePeopleModels.FaceForward
+        /// </summary>
+        public static void FaceForward()
+        {
+            var report = new StringBuilder();
+            var speeds = new Dictionary<string, float>
+            {
+                [SliceTownsfolk.PrefabPath] = Refit(SliceTownsfolk.PrefabPath, Townsman, false, report),
+                [SliceTownsfolk.WomanPrefabPath] = Refit(SliceTownsfolk.WomanPrefabPath, Matron, false, report),
+            };
+            foreach (var look in NewWalkers)
+            {
+                speeds[look.Walking] = Refit(look.Walking, look, false, report);
+            }
+
+            foreach (var look in All)
+            {
+                Turn(look.Standing, look, SliceClips.Get(IdleUse(look), look.Female), report);
+            }
+
+            Turn(SliceTestScenes.PlayerPrefabPath, PlayerMan, SliceClips.Get("Idle"), report);
+            Turn(PlayerWomanPrefab, PlayerWoman, SliceClips.Get("Idle", true), report);
+
+            foreach (var path in AssetDatabase.FindAssets("t:Scene", new[] { "Assets/Scenes/Slice" }).Select(AssetDatabase.GUIDToAssetPath)
+                         .Where(p => p != VeilmouthDwellings.ScenePath).OrderBy(p => p))
+            {
+                var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+                var lines = new List<string>();
+                Paces(speeds, lines);
+                if (lines.Count > 0)
+                {
+                    EditorSceneManager.MarkSceneDirty(scene);
+                    EditorSceneManager.SaveScene(scene);
+                    report.AppendLine($"{path}: {lines.Count} walkers at their new pace");
+                }
+            }
+
+            Directory.CreateDirectory(OutputFolder);
+            File.WriteAllText($"{OutputFolder}/people_facing.txt", report.ToString());
+            Debug.Log("[SlicePeopleModels] facing:\n" + report);
+        }
+
+        /// <summary>A standing person's or the player's prefab with its model turned to the avatar's forward, its size kept.</summary>
+        private static void Turn(string prefabPath, Look look, AnimationClip clip, StringBuilder report)
+        {
+            var root = PrefabUtility.LoadPrefabContents(prefabPath);
+            var model = root.transform.Find("Model");
+            var before = Mathf.DeltaAngle(0f, model.localEulerAngles.y);
+            Fit(model.gameObject, clip, look.Height, true);
+            Keep(model.gameObject, model.GetComponent<Animator>());
+            var after = Mathf.DeltaAngle(0f, model.localEulerAngles.y);
+            PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
+            PrefabUtility.UnloadPrefabContents(root);
+            report.AppendLine($"{prefabPath}: the model turned from {before:+0.0;-0.0} to {after:+0.0;-0.0} deg");
         }
 
         /// <summary>Every person's prefab instance in the open scene: the Dummies and the townsfolk's prefabs.</summary>

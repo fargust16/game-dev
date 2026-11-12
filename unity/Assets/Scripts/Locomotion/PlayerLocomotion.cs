@@ -16,15 +16,15 @@ namespace GameDev.Locomotion
     /// ground probe that sticks the body to slopes and steps down instead of falling, coyote time and a jump buffer.
     /// </para>
     /// <para>
-    /// The character faces the camera (owner, 2026-11-11; 16 §2) and moves in eight directions: walking, running and
-    /// sprinting go any way, the body turned to where the camera looks, and standing still it turns on the spot once the
-    /// camera has swung more than <see cref="idleTurnAngle"/> away. A sprint backward is a run, as the clips have none.
-    /// In Stealth Mode the body turns to where it goes, as the sneak has only a forward clip.
+    /// The body always faces where it goes (owner, 2026-11-12; 16 §2): the keys pick a way relative to the camera, the body
+    /// turns to it at <see cref="turnSpeed"/> and walks, runs or sprints face first, never backward or sideways. The camera
+    /// only looks; standing still, the body keeps the way it last faced. This replaces the owner's earlier choice of
+    /// 2026-11-11, a body facing the camera and stepping in eight directions.
     /// </para>
     /// <para>
-    /// The Animator's states, by name, where the controller has them: <c>Locomotion</c> (a 2D blend on MoveX and MoveZ,
-    /// the body's own velocity on the scale 0–3 of idle, walk, run and sprint; a controller with the old 1D blend reads
-    /// Speed), <c>TurnLeft</c> and <c>TurnRight</c> (a turn on the spot), <c>Crouch</c> (blend on Speed 0–1, crouched
+    /// The Animator's states, by name, where the controller has them: <c>Locomotion</c> (a 2D blend on MoveX and MoveZ
+    /// on the scale 0–3 of idle, walk, run and sprint, driven straight ahead only, MoveX staying 0; a controller with the
+    /// old 1D blend reads Speed), <c>Crouch</c> (blend on Speed 0–1, crouched
     /// idle and sneak, its pace on <c>Pace</c> against the sneak's own in <c>SneakPace</c>), <c>Fall</c> and
     /// <c>JumpLand</c>, <c>Swim</c> (blend on Speed 0–1, the float and the stroke, played faster on Pace for the fast
     /// swim) and <c>ClimbOut</c>. A controller without one of them falls back to <c>Locomotion</c>.
@@ -63,16 +63,8 @@ namespace GameDev.Locomotion
         [SerializeField] private float groundDeceleration = 38f;
         [Tooltip("m/s² of steering in the air.")]
         [SerializeField] private float airAcceleration = 9f;
-        [Tooltip("Degrees a second the body turns toward where it goes.")]
+        [Tooltip("Degrees a second the body turns toward where it goes: a turn round in a fifth of a second.")]
         [SerializeField] private float turnSpeed = 900f;
-        [Tooltip("The body faces the camera and moves in eight directions (owner, 2026-11-11); off, it turns to where it goes.")]
-        [SerializeField] private bool faceCamera = true;
-        [Tooltip("Degrees the camera swings from a body standing still before it turns on the spot.")]
-        [SerializeField] private float idleTurnAngle = 60f;
-        [Tooltip("Degrees a second a body standing still turns on the spot.")]
-        [SerializeField] private float idleTurnSpeed = 240f;
-        [Tooltip("Degrees from the camera's forward within which Shift sprints; further back it runs.")]
-        [SerializeField] private float sprintArc = 100f;
 
         [Header("Jump / Gravity")]
         [SerializeField] private float jumpHeight = 1.2f;
@@ -110,8 +102,6 @@ namespace GameDev.Locomotion
         private static readonly int SpeedParam = Animator.StringToHash("Speed");
         private static readonly int MoveXParam = Animator.StringToHash("MoveX");
         private static readonly int MoveZParam = Animator.StringToHash("MoveZ");
-        private static readonly int TurnLeftState = Animator.StringToHash("TurnLeft");
-        private static readonly int TurnRightState = Animator.StringToHash("TurnRight");
         private static readonly int GroundedParam = Animator.StringToHash("Grounded");
         private static readonly int PaceParam = Animator.StringToHash("Pace");
         private static readonly int SneakPaceParam = Animator.StringToHash("SneakPace");
@@ -135,7 +125,6 @@ namespace GameDev.Locomotion
         private float _sneakPace;
         private bool _hasPace;
         private bool _hasMove;
-        private int _turning;
         private float _climbTime;
         private Vector3 _climbFrom;
         private Vector3 _climbTo;
@@ -226,7 +215,6 @@ namespace GameDev.Locomotion
             // Back to the plain locomotion standing still, from which a fight's guard and a talk are entered.
             _velocity = Vector3.zero;
             IsSprinting = false;
-            _turning = 0;
             if (_animator != null && _animator.isActiveAndEnabled)
             {
                 _animator.SetFloat(SpeedParam, 0f);
@@ -256,7 +244,6 @@ namespace GameDev.Locomotion
             var hasInput = moveInput.sqrMagnitude > 0.01f;
             var crouching = CrouchShare > 0f;
             var direction = CameraRelativeDirection(new Vector3(moveInput.x, 0f, moveInput.y));
-            var look = CameraForward();
             if (State == Move.Climbing)
             {
                 Climb(dt);
@@ -281,9 +268,8 @@ namespace GameDev.Locomotion
                     WadeOut(level);
                 }
             }
-            var strafing = faceCamera && !crouching && look.sqrMagnitude > 0.5f;
-            IsSprinting = hasInput && !crouching && SprintAllowed && input.SprintHeld &&
-                          (!strafing || Vector3.Angle(look, direction) <= sprintArc);
+
+            IsSprinting = hasInput && !crouching && SprintAllowed && input.SprintHeld;
 
             // The wanted speed: a crouch at its share of the walk, else a run, a sprint with Shift; a light stick walks.
             var wanted = !hasInput ? 0f
@@ -332,7 +318,7 @@ namespace GameDev.Locomotion
             _grounded = _controller.isGrounded || (_verticalVelocity <= 0f && Snap(wasGrounded));
             _sinceGround = _grounded ? 0f : _sinceGround + dt;
 
-            Face(strafing, look, direction, hasInput, dt);
+            Face(direction, dt);
             Step(hasInput, crouching, dt);
             if (water && Deep(level))
             {
@@ -392,7 +378,7 @@ namespace GameDev.Locomotion
 
             _grounded = false;
             _sinceGround = 0f;
-            Face(false, Vector3.zero, direction, hasInput, dt);
+            Face(direction, dt);
             Drive(dt);
             return true;
         }
@@ -457,68 +443,14 @@ namespace GameDev.Locomotion
         }
 
         /// <summary>
-        /// Turns the body: to the camera's forward while it moves (eight-way movement), on the spot once the camera has
-        /// swung far from a body standing still; in Stealth Mode, or with <see cref="faceCamera"/> off, to where it goes.
+        /// Turns the body to where it goes (owner, 2026-11-12); with no key held it keeps the way it faced, as a body set
+        /// down at a door.
         /// </summary>
-        private void Face(bool strafing, Vector3 look, Vector3 direction, bool hasInput, float dt)
+        private void Face(Vector3 direction, float dt)
         {
-            if (!strafing)
+            if (direction.sqrMagnitude > 0.0001f)
             {
-                StopTurning();
-                if (direction.sqrMagnitude > 0.0001f)
-                {
-                    transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction, Vector3.up), turnSpeed * dt);
-                }
-
-                return;
-            }
-
-            var want = Quaternion.LookRotation(look, Vector3.up);
-            var off = Vector3.SignedAngle(Flat(transform.forward), look, Vector3.up);
-            if (hasInput)
-            {
-                StopTurning();
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, want, turnSpeed * dt);
-                return;
-            }
-
-            if (State != Move.Grounded)
-            {
-                // A fall or a landing with no key pressed keeps the way the body faced, as a body set down at a door.
-                StopTurning();
-                return;
-            }
-
-            if (_turning == 0 && Mathf.Abs(off) > idleTurnAngle)
-            {
-                _turning = off > 0f ? 1 : -1;
-                if (Has(TurnRightState) && Has(TurnLeftState))
-                {
-                    Play(_turning > 0 ? TurnRightState : TurnLeftState, LocomotionFade);
-                }
-            }
-
-            if (_turning != 0)
-            {
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, want, idleTurnSpeed * dt);
-                if (Mathf.Abs(off) < 2f)
-                {
-                    StopTurning();
-                }
-            }
-        }
-
-        private void StopTurning()
-        {
-            if (_turning == 0)
-            {
-                return;
-            }
-
-            _turning = 0;
-            if (State == Move.Grounded)
-            {
-                Play(LocomotionState, LocomotionFade);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(direction, Vector3.up), turnSpeed * dt);
             }
         }
 
@@ -579,7 +511,6 @@ namespace GameDev.Locomotion
 
             State = next;
             _stateTime = 0f;
-            _turning = 0;
             if (next == Move.Airborne)
             {
                 _airTime = 0f;
@@ -644,12 +575,10 @@ namespace GameDev.Locomotion
             _animator.SetFloat(SpeedParam, blend, BlendDamp, dt);
             if (_hasMove)
             {
-                // The body's own velocity, its length on the blend's scale: the eight-way clips by direction and pace.
-                var local = transform.InverseTransformDirection(new Vector3(_velocity.x, 0f, _velocity.z));
-                local.y = 0f;
-                var way = local.sqrMagnitude > 1e-4f ? local.normalized * blend : Vector3.zero;
-                _animator.SetFloat(MoveXParam, State == Move.Crouched ? 0f : way.x, BlendDamp, dt);
-                _animator.SetFloat(MoveZParam, State == Move.Crouched ? blend : way.z, BlendDamp, dt);
+                // Straight ahead only: the body faces where it goes, so it walks face first even while it turns round
+                // (owner, 2026-11-12). The blend's side and back clips stay in the controller, unplayed.
+                _animator.SetFloat(MoveXParam, 0f, BlendDamp, dt);
+                _animator.SetFloat(MoveZParam, blend, BlendDamp, dt);
             }
 
             _animator.SetBool(GroundedParam, _grounded);
@@ -716,20 +645,6 @@ namespace GameDev.Locomotion
             }
 
             return false;
-        }
-
-        /// <summary>The camera's forward over the ground, or zero with no camera.</summary>
-        private static Vector3 CameraForward()
-        {
-            var cam = Camera.main;
-            if (cam == null)
-            {
-                return Vector3.zero;
-            }
-
-            var forward = cam.transform.forward;
-            forward.y = 0f;
-            return forward.sqrMagnitude > 1e-4f ? forward.normalized : Vector3.zero;
         }
 
         private static Vector3 CameraRelativeDirection(Vector3 input)

@@ -37,12 +37,6 @@ namespace GameDev.Slice.Fights
 
         private IWorldState _state;
         private IWorldClock _clock;
-        // Authoring default, S3a.7: seconds a treatment's result stays on the life line.
-        private const float NoteSeconds = 8f;
-
-        private string _lifeNote;
-        private float _lifeNoteUntil;
-
         // The frame First Aid's bar in a fight was stopped: its Space must not also end the turn.
         private int _checkedFrame = -1;
         private int _lifeShown = -1;
@@ -208,25 +202,15 @@ namespace GameDev.Slice.Fights
             return true;
         }
 
-        private void Note(string text)
-        {
-            _lifeNote = text;
-            _lifeNoteUntil = Time.unscaledTime + NoteSeconds;
-            _lifeShown = -1;
-        }
+        // A treatment's result is a Screen Message, short and on the screen (owner, 2026-11-12), no longer on the life line.
+        private void Note(string text) => DialogueColumn()?.ShowMessage(text);
 
-        /// <summary>The life line: HP and conditions while hurt, the First Aid key while a condition lasts, and the last treatment.</summary>
+        /// <summary>The life line: HP and conditions while hurt, and the First Aid key while a condition lasts.</summary>
         private void ShowLife(Fighter inFight)
         {
             if (_hud == null)
             {
                 return;
-            }
-
-            if (_lifeNote != null && Time.unscaledTime > _lifeNoteUntil)
-            {
-                _lifeNote = null;
-                _lifeShown = -1;
             }
 
             int lost;
@@ -253,7 +237,7 @@ namespace GameDev.Slice.Fights
             }
 
             _lifeShown = shown;
-            if (lost <= 0 && flags == 0 && string.IsNullOrEmpty(_lifeNote))
+            if (lost <= 0 && flags == 0)
             {
                 _hud.Life(null);
                 return;
@@ -265,11 +249,6 @@ namespace GameDev.Slice.Fights
             if (conditions.Length > 0)
             {
                 text += " · " + conditions + "\n" + Loc.Get("ui.life.hint");
-            }
-
-            if (!string.IsNullOrEmpty(_lifeNote))
-            {
-                text += "\n" + _lifeNote;
             }
 
             _hud.Life(text);

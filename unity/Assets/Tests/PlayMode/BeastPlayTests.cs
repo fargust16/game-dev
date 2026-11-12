@@ -154,13 +154,14 @@ namespace GameDev.Slice.Tests
             yield return Tap(Key.E);
             Assert.AreEqual(fangs + 1, world.Bag.Count("wolf_fang"), "E takes its fang, with no lesson");
             Assert.IsTrue(world.Remains.PartsTaken(carcass.Id));
-            yield return new WaitForSeconds(BeastRemains.NoteSeconds + 0.2f);
-            Assert.AreEqual(Loc.Get("ui.remains.fault.lesson"), remains.PromptFor(player.transform.position), "the hide waits for the lesson");
+            var hud = Object.FindAnyObjectByType<GameDev.UI.HudView>();
+            Assert.That(hud.MessageText, Does.Contain(Loc.Get("item.wolf_fang")), "what was taken is said on the screen (owner, 2026-11-12)");
+            Assert.AreEqual(Loc.Get("ui.remains.fault.lesson"), remains.PromptFor(player.transform.position),
+                "and the prompt goes on at once: the hide waits for the lesson");
             yield return Tap(Key.E);
             Assert.IsFalse(world.Remains.Skinned(carcass.Id), "no skinning without it");
 
             world.State.Set(SliceShops.LessonKey(SliceRemains.Lesson), 1);
-            yield return new WaitForSeconds(BeastRemains.NoteSeconds + 0.2f);
             Assert.AreEqual(Loc.Format("ui.prompt.remains.skin", 3), remains.PromptFor(player.transform.position));
             var tick = world.Clock.Tick;
             var leather = world.Bag.Count("leather");

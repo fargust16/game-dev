@@ -120,13 +120,14 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
-        /// AN2: the player's controller moves in eight directions: its Locomotion is a 2D blend on MoveX and MoveZ with the
-        /// idle at the centre and every walk, run and sprint of the table at its direction and gait, each played at the pace
-        /// the body moves; it turns on the spot; the woman player's override plays the women's takes; and the body faces the
-        /// camera.
+        /// AN2: the player's controller: its Locomotion is a 2D blend on MoveX and MoveZ with the idle at the centre and
+        /// every walk, run and sprint of the table at its direction and gait, each played at the pace the body moves; the
+        /// woman player's override plays the women's takes. Since the owner's decision of 2026-11-12 the body faces where it
+        /// goes and the code drives the blend straight ahead only, so the side and back clips stay in it unplayed
+        /// (<c>MovementSmokeTests.ThePlayerTurnsAndWalksFaceFirst</c>).
         /// </summary>
         [Test]
-        public void ThePlayerMovesInEightDirectionsFacingTheCamera()
+        public void ThePlayerControllerBlendsItsGaits()
         {
             var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(SlicePeopleModels.PlayerController);
             Assert.IsNotNull(controller, SlicePeopleModels.PlayerController);
@@ -148,16 +149,11 @@ namespace GameDev.Slice.Tests
                 Assert.That(child.timeScale, Is.InRange(0.6f, 1.3f), $"{use} plays at the body's pace");
             }
 
-            Assert.IsTrue(states.Any(s => s.name == "TurnLeft") && states.Any(s => s.name == "TurnRight"), "it turns on the spot");
-
             var woman = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(SlicePeopleModels.WomanPlayerController);
             Assert.IsNotNull(woman, SlicePeopleModels.WomanPlayerController);
             Assert.AreSame(SliceClips.Get("Walk", true), woman[SliceClips.Get("Walk")], "the woman walks in the women's take");
             var womanPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(SlicePeopleModels.PlayerWomanPrefab);
             Assert.AreSame(woman, womanPrefab.GetComponentInChildren<Animator>(true).runtimeAnimatorController);
-
-            var locomotion = AssetDatabase.LoadAssetAtPath<GameObject>(SliceTestScenes.PlayerPrefabPath).GetComponentInChildren<PlayerLocomotion>(true);
-            Assert.IsTrue(new SerializedObject(locomotion).FindProperty("faceCamera").boolValue, "the body faces the camera");
         }
 
         /// <summary>

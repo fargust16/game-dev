@@ -561,6 +561,146 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(-TownsfolkWalker.SeatedHipsBack * k, hips.z, 0.04f, "and behind it");
         }
 
+        /// <summary>
+        /// Diagnostic, run by name: every person's walk and idle over its root, degrees, positive to the right (clockwise
+        /// from above), averaged over the clip: the shoulders, the hips by the thighs, the feet by heel to toe, and the
+        /// animator's body rotation. Writes <c>Logs/SliceSurvey/walk_facing.txt</c>.
+        /// </summary>
+        [UnityTest, Explicit("diagnostic: run by name"), Category("Diagnostic")]
+        public IEnumerator MeasureTheWalkFacing()
+        {
+            yield return Ground();
+            var report = new StringBuilder("Facing over the root, deg, + to the right; shoulders / hips / feet / body rotation, mean (min..max)\n");
+            var prefabs = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/Prefabs/Slice" })
+                .Select(AssetDatabase.GUIDToAssetPath)
+                .Where(p => !p.Contains("/SliceKit/") && AssetDatabase.LoadAssetAtPath<GameObject>(p).GetComponentInChildren<Animator>() != null)
+                .ToList();
+            var at = 0;
+            foreach (var path in prefabs)
+            {
+                var go = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(path), Area + new Vector3(-20f + (at++ * 3f), 0f, -20f), Quaternion.identity);
+                foreach (var b in go.GetComponentsInChildren<MonoBehaviour>())
+                {
+                    b.enabled = false;
+                }
+
+                var animator = go.GetComponentInChildren<Animator>();
+                if (!animator.isHuman || animator.GetBoneTransform(HumanBodyBones.LeftUpperArm) == null)
+                {
+                    Object.Destroy(go);
+                    continue;
+                }
+
+                animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                animator.applyRootMotion = false;
+                yield return null;
+                foreach (var state in new[] { "Walk", "Idle", "Run" })
+                {
+                    var hash = Animator.StringToHash(state);
+                    if (!animator.HasState(0, hash))
+                    {
+                        continue;
+                    }
+
+                    var rows = new List<float[]>();
+                    for (var i = 0; i < 16; i++)
+                    {
+                        animator.Play(hash, 0, i / 16f);
+                        animator.Update(0f);
+                        rows.Add(new[]
+                        {
+                            Facing(animator, go.transform),
+                            Across(go.transform, animator, HumanBodyBones.LeftUpperLeg, HumanBodyBones.RightUpperLeg),
+                            Feet(go.transform, animator),
+                            Yaw(go.transform.InverseTransformDirection(animator.bodyRotation * Vector3.forward)),
+                        });
+                    }
+
+                    string Col(int c) => $"{Mean(rows.Select(r => r[c])):+0;-0} ({rows.Min(r => r[c]):0}..{rows.Max(r => r[c]):0})";
+                    report.AppendLine($"{System.IO.Path.GetFileNameWithoutExtension(path)} {state} [{animator.runtimeAnimatorController.name}]: {Col(0)} / {Col(1)} / {Col(2)} / {Col(3)}");
+                }
+
+                Object.Destroy(go);
+            }
+
+            System.IO.Directory.CreateDirectory("Logs/SliceSurvey");
+            System.IO.File.WriteAllText("Logs/SliceSurvey/walk_facing.txt", report.ToString());
+            Debug.Log("[MeasureTheWalkFacing]\n" + report);
+        }
+
+        /// <summary>
+        /// The owner's play test of 2026-11-12: every walker, and the player in both bodies, walks forward facing its way,
+        /// the body over the walk within 4° of the root's forward. The walkers went 13–30° to the right before the
+        /// model's facing was read in the avatar's neutral pose (SlicePeopleModels.Fit), and the player 7° to the left.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator EveryWalkerWalksFacingItsWay()
+        {
+            yield return Ground();
+            var means = new List<(string name, float deg)>();
+            var at = 0;
+            foreach (var path in Bodies.Concat(new[] { "Assets/Prefabs/Slice/SlicePlayer.prefab", "Assets/Prefabs/Slice/SlicePlayerWoman.prefab" }))
+            {
+                var go = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(path), Area + new Vector3(-20f + (at++ * 3f), 0f, 0f), Quaternion.identity);
+                foreach (var b in go.GetComponentsInChildren<MonoBehaviour>())
+                {
+                    b.enabled = false;
+                }
+
+                var animator = go.GetComponentInChildren<Animator>();
+                animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                animator.applyRootMotion = false;
+                yield return null;
+                var walk = Animator.StringToHash("Walk");
+                var state = animator.HasState(0, walk) ? walk : Animator.StringToHash("Locomotion");
+                var body = new List<float>();
+                for (var i = 0; i < 16; i++)
+                {
+                    if (state != walk)
+                    {
+                        animator.SetFloat("MoveX", 0f);
+                        animator.SetFloat("MoveZ", 1f); // the player's walk forward in its blend
+                    }
+
+                    animator.Play(state, 0, i / 16f);
+                    animator.Update(0f);
+                    body.Add(Yaw(go.transform.InverseTransformDirection(animator.bodyRotation * Vector3.forward)));
+                }
+
+                means.Add((System.IO.Path.GetFileNameWithoutExtension(path), Mean(body)));
+                Object.Destroy(go);
+            }
+
+            Assert.IsTrue(means.All(m => Mathf.Abs(m.deg) < 4f), "every body walks facing its way: " + string.Join(", ", means.Select(m => $"{m.name} {m.deg:+0.0;-0.0}")));
+        }
+
+        private static float Yaw(Vector3 v) => Mathf.Atan2(v.x, v.z) * Mathf.Rad2Deg;
+
+        private static float Across(Transform root, Animator animator, HumanBodyBones left, HumanBodyBones right) =>
+            Yaw(Vector3.Cross(root.InverseTransformDirection(animator.GetBoneTransform(right).position - animator.GetBoneTransform(left).position), Vector3.up));
+
+        private static float Feet(Transform root, Animator animator)
+        {
+            var sum = Vector3.zero;
+            foreach (var (foot, toes) in new[] { (HumanBodyBones.LeftFoot, HumanBodyBones.LeftToes), (HumanBodyBones.RightFoot, HumanBodyBones.RightToes) })
+            {
+                var f = animator.GetBoneTransform(foot);
+                var t = animator.GetBoneTransform(toes);
+                if (f != null && t != null)
+                {
+                    sum += Flat(root.InverseTransformDirection(t.position - f.position)).normalized;
+                }
+            }
+
+            return sum == Vector3.zero ? float.NaN : Yaw(sum);
+        }
+
+        private static float Mean(IEnumerable<float> degrees)
+        {
+            var s = degrees.Where(d => !float.IsNaN(d)).Aggregate(Vector2.zero, (a, d) => a + new Vector2(Mathf.Sin(d * Mathf.Deg2Rad), Mathf.Cos(d * Mathf.Deg2Rad)));
+            return Mathf.Atan2(s.x, s.y) * Mathf.Rad2Deg;
+        }
+
         [UnityTest]
         public IEnumerator AWalkerSentToABenchSitsTalksWithCompanyAndWalksBack()
         {

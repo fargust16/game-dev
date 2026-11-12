@@ -12,15 +12,13 @@ namespace GameDev.Slice.Gathering
     /// E again, a move key, the bag or a fight ends it. The work goes by its animation (07.1 §8a, the owner's second
     /// direction of 2026-11-11): at a tree or a vein each swing stops where the blade or the pick meets it for its Reaction
     /// Check, the world paused, and the next swing follows once the last has played out; a patch is picked in one go, its
-    /// check as the character begins to rise. While it is gathered the prompt shows what was taken and the Stamina left; a
-    /// spent node hides its models and colliders until it comes back. The driver puts one on each node's kit block when a
-    /// scene loads, so no scene is changed for it.
+    /// check as the character begins to rise. While it is gathered the prompt shows what was taken and the Stamina left, and
+    /// why it ended is a Screen Message, never a prompt that keeps E from the next try (owner, 2026-11-12); a spent node hides
+    /// its models and colliders until it comes back. The driver puts one on each node's kit block when a scene loads, so
+    /// no scene is changed for it.
     /// </summary>
     public sealed class GatherNode : MonoBehaviour, IPromptSource
     {
-        /// <summary>Authoring default, s: how long the reason gathering ended stays in the prompt.</summary>
-        public const float NoteSeconds = 4f;
-
         /// <summary>
         /// Authoring defaults, m: how far beyond the node's collider the character stands to work it, so the axe meets the
         /// trunk and the pick the rock (their reach ahead of the chest, measured in `clip_survey.txt`), and the hands the patch.
@@ -41,7 +39,6 @@ namespace GameDev.Slice.Gathering
         private int _seenStops;
         private int _begunFrame;
         private bool _finishing;
-        private float _noteUntil;
         private string _kind;
 
         public GatherSpot Spot { get; private set; }
@@ -109,11 +106,6 @@ namespace GameDev.Slice.Gathering
                 return null;
             }
 
-            if (_gathering.StoppedAt == Spot && _gathering.Stopped != null && Time.unscaledTime < _noteUntil)
-            {
-                return Loc.Get(_gathering.Stopped);
-            }
-
             var fault = _gathering.Fault(Spot);
             if (fault == "ui.gather.fault.tool")
             {
@@ -133,9 +125,10 @@ namespace GameDev.Slice.Gathering
             if (_gathering.Stops != _seenStops)
             {
                 _seenStops = _gathering.Stops;
-                if (_gathering.StoppedAt == Spot)
+                if (_gathering.StoppedAt == Spot && _gathering.Stopped != null)
                 {
-                    _noteUntil = Time.unscaledTime + NoteSeconds;
+                    _hud ??= FindAnyObjectByType<HudView>();
+                    _hud?.ShowMessage(Loc.Get(_gathering.Stopped));
                 }
             }
 

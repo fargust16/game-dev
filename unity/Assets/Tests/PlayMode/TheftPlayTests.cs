@@ -86,6 +86,7 @@ namespace GameDev.Slice.Tests
             yield return Tap(Key.Space);
             Assert.IsFalse(world.Reaction.Running, "Space stops the marker");
             Assert.IsFalse(hud.IsReactionShown);
+            Assert.IsNotNull(hud.MessageText, "the outcome is said on the screen at once (owner, 2026-11-12)");
             yield return GatheringPlayTests.PlayedOut(world);
             Assert.IsTrue(player.enabled, "the hand drawn back, the character moves again");
             Assert.That(world.Bag.Bronze - bronze, Is.InRange(SliceTheft.PurseLeast, SliceTheft.PurseMost), "the purse lifted unseen");
@@ -118,7 +119,8 @@ namespace GameDev.Slice.Tests
                 Assert.IsTrue(eyes.Meter == null || eyes.Meter.Noticed, "and has noticed the character");
             }
 
-            Assert.AreEqual("Noticed! Nothing taken.", second.PromptFor(player.transform.position));
+            Assert.AreEqual(Loc.Get("ui.theft.noticed"), hud.MessageText, "on the screen, not on the person");
+            Assert.AreNotEqual(hud.MessageText, second.PromptFor(player.transform.position));
             yield return GatheringPlayTests.PlayedOut(world);
 
             // A person who moves on calls the try off: the bar goes, nothing is spent, and it may be tried again.
@@ -134,7 +136,9 @@ namespace GameDev.Slice.Tests
             Assert.IsFalse(world.Reaction.Running, "1 m away the bar goes");
             Assert.IsFalse(world.Work.Busy, "and the work with it");
             Assert.IsFalse(world.Theft.TriedToday(third.Person), "the try is not spent");
-            Assert.AreEqual("They moved off; the try is called off.", third.PromptFor(third.transform.position));
+            Assert.AreEqual(Loc.Get("ui.theft.called_off"), hud.MessageText, "why is said on the screen");
+            Assert.AreEqual(Loc.Get("ui.prompt.theft"), third.PromptFor(third.transform.position),
+                "and the Screen Message keeps nothing from the next try (owner, 2026-11-12)");
         }
 
         /// <summary>

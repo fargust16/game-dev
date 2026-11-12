@@ -23,7 +23,7 @@ namespace GameDev.Slice.Theft
         /// <summary>Authoring default, m: how near the person the character stands to reach the purse.</summary>
         public const float Reach = 1.5f;
 
-        /// <summary>Authoring default, s: how long the outcome stays in the prompt, and the cry over the person's head.</summary>
+        /// <summary>Authoring default, s: how long the cry stays over the person's head. The outcome is a Screen Message.</summary>
         public const float NoteSeconds = 4f;
 
         /// <summary>The owner's, m (2026-11-11): how far the person may move from where it stood before the try is called off.</summary>
@@ -42,8 +42,6 @@ namespace GameDev.Slice.Theft
         private StealthObserver _eyes;
         private PlayerLocomotion _player;
         private HudView _hud;
-        private string _note;
-        private float _noteUntil;
         private bool _settled;
 
         /// <summary>The person's name and place among its siblings in the scene, the same in every run, for the world state's keys.</summary>
@@ -69,11 +67,6 @@ namespace GameDev.Slice.Theft
             if (_theft == null || !isActiveAndEnabled || !InteractReach.Within(transform, player, Reach))
             {
                 return null;
-            }
-
-            if (_note != null && Time.unscaledTime < _noteUntil)
-            {
-                return _note;
             }
 
             return Ready && !_theft.TriedToday(Person) ? Loc.Get("ui.prompt.theft") : null;
@@ -167,10 +160,11 @@ namespace GameDev.Slice.Theft
             }
         }
 
+        // The outcome on the screen, never in the prompt, so it never keeps E from the next try (owner, 2026-11-12).
         private void Say(string note)
         {
-            _note = note;
-            _noteUntil = Time.unscaledTime + NoteSeconds;
+            _hud ??= FindAnyObjectByType<HudView>();
+            _hud?.ShowMessage(note);
         }
     }
 }

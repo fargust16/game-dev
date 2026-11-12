@@ -21,6 +21,12 @@ namespace GameDev.UI
     public sealed class HudView : MonoBehaviour
     {
         private const string PromptVisible = "hud__prompt--visible";
+        private const string MessageVisible = "hud__message--visible";
+
+        /// <summary>
+        /// The owner's, s (2026-11-12, "2–3 seconds"; this value an authoring default): how long a Screen Message stays on the screen.
+        /// </summary>
+        public const float MessageSeconds = 2.5f;
         private const string ReadingVisible = "hud__reading--visible";
         private const string NotesVisible = "hud__notes--visible";
         private const string NoteClass = "hud__note";
@@ -29,6 +35,8 @@ namespace GameDev.UI
 
         private Label _time;
         private Label _prompt;
+        private Label _message;
+        private float _messageUntil;
         private VisualElement _reading;
         private Label _readingTitle;
         private Label _readingText;
@@ -77,6 +85,26 @@ namespace GameDev.UI
         public bool IsPromptVisible => _prompt != null && _prompt.ClassListContains(PromptVisible);
 
         public string PromptText => _prompt?.text;
+
+        /// <summary>The Screen Message on the screen now, or null.</summary>
+        public string MessageText => _message != null && Time.unscaledTime < _messageUntil ? _message.text : null;
+
+        /// <summary>
+        /// A Screen Message: an outcome or a hint said on the screen for <see cref="MessageSeconds"/>, short and plain, such as "Failed: the target moved
+        /// off" (owner, 2026-11-12): it never stands in a prompt, so it never keeps E from the next try. A newer one
+        /// replaces it. Whoever says something an attribute gates, Intelligence or Perception, checks it first (07.1 §11).
+        /// </summary>
+        public void ShowMessage(string text)
+        {
+            if (string.IsNullOrEmpty(text) || !Bind() || _message == null)
+            {
+                return;
+            }
+
+            _message.text = text;
+            _messageUntil = Time.unscaledTime + MessageSeconds;
+            _message.AddToClassList(MessageVisible);
+        }
 
         public bool IsReadingOpen => _reading != null && _reading.ClassListContains(ReadingVisible);
 
@@ -579,6 +607,7 @@ namespace GameDev.UI
             _nameTag = root.Q<Label>("nametag");
             _time = root.Q<Label>("time");
             _prompt = root.Q<Label>("prompt");
+            _message = root.Q<Label>("message");
             _reading = root.Q<VisualElement>("reading");
             _readingTitle = root.Q<Label>("reading-title");
             _readingText = root.Q<Label>("reading-text");
@@ -655,6 +684,7 @@ namespace GameDev.UI
             }
 
             _prompt.EnableInClassList(PromptVisible, prompt != null);
+            _message?.EnableInClassList(MessageVisible, Time.unscaledTime < _messageUntil);
             ShowNameTag();
         }
 

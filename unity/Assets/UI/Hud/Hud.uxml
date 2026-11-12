@@ -4,6 +4,8 @@
     <ui:VisualElement name="hud" class="hud" picking-mode="Ignore">
         <ui:Label name="time" class="hud__time" text="" picking-mode="Ignore" />
         <ui:Label name="prompt" class="hud__prompt" text="" picking-mode="Ignore" />
+        <!-- A Screen Message: an outcome or a hint, 2–3 s on the screen and never in the prompt (owner, 2026-11-12). -->
+        <ui:Label name="message" class="hud__message" text="" picking-mode="Ignore" />
         <ui:Label name="nametag" class="hud__nametag" text="" picking-mode="Ignore" />
         <!-- S3a.7: the character's HP and conditions while it is hurt, and the last treatment. -->
         <ui:Label name="life" class="hud__life" text="" picking-mode="Ignore" />

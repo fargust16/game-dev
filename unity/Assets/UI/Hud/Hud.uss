@@ -33,6 +33,24 @@
     display: flex;
 }
 
+/* A Screen Message, an outcome or a hint (owner, 2026-11-12): over the prompt and the Reaction Check's bar, in brass. */
+.hud__message {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 34%;
+    font-size: 22px;
+    -unity-text-align: middle-center;
+    color: rgb(232, 200, 140);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.85);
+    display: none;
+}
+
+.hud__message--visible {
+    display: flex;
+}
+
 .hud__life {
     position: absolute;
     left: 24px;

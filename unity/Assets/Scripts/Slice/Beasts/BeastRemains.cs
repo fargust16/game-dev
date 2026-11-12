@@ -12,16 +12,13 @@ namespace GameDev.Slice.Beasts
     /// A fallen beast's carcass as something to take from (S5a.6): within reach, E takes its ingredients, and E again
     /// skins it once Skinning is learned: the character kneels at the carcass, its 3 ticks pass with the world running,
     /// and the Reaction Check comes where it begins to rise, the world paused (the owner's second direction of 2026-11-11).
-    /// The prompt says what is left or why not, and for a few seconds after, what was taken. The driver puts one on every
+    /// The prompt says what is left or why not, and a Screen Message what was taken or what went wrong. The driver puts one on every
     /// beast; it speaks only while the beast is dead.
     /// </summary>
     public sealed class BeastRemains : MonoBehaviour, IPromptSource
     {
         /// <summary>Authoring default, m: how near the carcass the character stands to take from it.</summary>
         public const float Reach = 2.5f;
-
-        /// <summary>Authoring default, s: how long what was taken stays in the prompt.</summary>
-        public const float NoteSeconds = 4f;
 
         /// <summary>Authoring default, m: how far beyond the carcass's edge the character kneels, its hands at the hide.</summary>
         public const float KneelReach = 0.35f;
@@ -31,8 +28,7 @@ namespace GameDev.Slice.Beasts
         private Func<bool> _busy;
         private PlayerWork _work;
         private PlayerLocomotion _player;
-        private string _note;
-        private float _noteUntil;
+        private HudView _hud;
 
         /// <param name="work">The character's work by its animation, the check where the kneeling character rises.</param>
         public void Configure(SliceRemains remains, Func<bool> busy, PlayerWork work)
@@ -51,11 +47,6 @@ namespace GameDev.Slice.Beasts
             if (!Ready || !InteractReach.Within(transform, player, Reach))
             {
                 return null;
-            }
-
-            if (_note != null && Time.unscaledTime < _noteUntil)
-            {
-                return _note;
             }
 
             if (!_remains.PartsTaken(_beast.Id))
@@ -141,10 +132,11 @@ namespace GameDev.Slice.Beasts
             }
         }
 
+        // The outcome on the screen, never in the prompt, so it never keeps E from the next step (owner, 2026-11-12).
         private void Say(string note)
         {
-            _note = note;
-            _noteUntil = Time.unscaledTime + NoteSeconds;
+            _hud ??= FindAnyObjectByType<HudView>();
+            _hud?.ShowMessage(note);
         }
     }
 }
