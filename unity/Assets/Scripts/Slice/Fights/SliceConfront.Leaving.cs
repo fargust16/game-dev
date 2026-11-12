@@ -11,8 +11,9 @@ using UnityEngine;
 namespace GameDev.Slice.Fights
 {
     /// <summary>
-    /// S3a.9: leaving a fight in the slice (08 §5, §7; 10.2 §9). The player breaks away by walking ten cells from every
-    /// enemy, and the fight ends. Y yields to people, for 2 AP: the fight ends at once, and their terms are said in the
+    /// S3a.9: leaving a fight in the slice (08 §5, §7; 10.2 §9). Since the owner's direction of 2026-11-12 the player
+    /// breaks away by Сбежать, Z, for 2 AP, seen by no enemy and 15 cells or more from the nearest, and the fight ends.
+    /// Y yields to people, for 2 AP: the fight ends at once, and their terms are said in the
     /// dialogue column. The Wardens take the character to their lock-up until 08:00 and keep its weapons till it pays a
     /// fine of 1 000 bronze; Veinmarket and robbers take what it carries. The cult and beasts take no surrender. A
     /// person of the other side who is losing asks for mercy, and V spares every one asking. At 0 HP the character
@@ -92,6 +93,29 @@ namespace GameDev.Slice.Fights
         {
             _killed.Clear();
             _brokeAway = _yielded = false;
+        }
+
+        /// <summary>
+        /// Сбежать in the player's turn (Z or its slot; 10.2 §9, owner 2026-11-12): a refusal says why, an enemy's sight
+        /// first, then one too near; AP short only dims the slot.
+        /// </summary>
+        private bool BreakAwayByWill(Combatant player)
+        {
+            if (_turns.SubmitIntent(TurnIntent.BreakAway))
+            {
+                return true;
+            }
+
+            if (_turns.Seen(player))
+            {
+                _hud.Line(Loc.Get("ui.fight.noflee.seen"));
+            }
+            else if (_turns.NearestEnemy(player) < _settings.FightRules.BreakAwayCells)
+            {
+                _hud.Line(Loc.Get("ui.fight.noflee.near"));
+            }
+
+            return true;
         }
 
         /// <summary>The player's Yield and Spare in its turn (Y, V, or their hotbar slots); a refused Yield says why.</summary>

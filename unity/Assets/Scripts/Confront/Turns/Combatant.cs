@@ -123,6 +123,15 @@ namespace GameDev.Confront.Turns
         /// </summary>
         public bool Hidden { get; set; }
 
+        /// <summary>
+        /// It has a Vision Cone (10.3 §2): every NPC and beast does, the player none (10.2 §9, owner 2026-11-12), so only
+        /// the cones of the player's allies see an NPC take Сбежать.
+        /// </summary>
+        public bool Watches { get; set; } = true;
+
+        /// <summary>The enemy its Target Rules chose this turn, kept while the enemy stands (10.2 §5a); null before its first turn.</summary>
+        public Combatant Chosen => Intent;
+
         /// <summary>The pack it runs with, or −1 (10.2 *Beasts of the slice*): when the first of a pack falls, the rest flee.</summary>
         public int Pack { get; set; } = -1;
 

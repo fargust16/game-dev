@@ -125,12 +125,13 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
-        public void TheConeReachesTenCellsAtItsAngle()
+        public void TheConeReachesFifteenCellsAtItsAngle()
         {
-            Assert.AreEqual(10, _rules.ConeCells);
+            Assert.AreEqual(15, _rules.ConeCells, "the owner's direction of 2026-11-12");
             var half = _rules.ConeDegrees / 2f;
-            Assert.IsTrue(_rules.InCone(Vector3.zero, Vector3.forward, new Vector3(0f, 0f, 9.9f), 1f), "ahead, in reach");
-            Assert.IsFalse(_rules.InCone(Vector3.zero, Vector3.forward, new Vector3(0f, 0f, 10.1f), 1f), "beyond 10 cells");
+            Assert.IsTrue(_rules.InCone(Vector3.zero, Vector3.forward, new Vector3(0f, 0f, 14.9f), 1f), "ahead, in reach");
+            Assert.IsFalse(_rules.InCone(Vector3.zero, Vector3.forward, new Vector3(0f, 0f, 15.1f), 1f), "beyond 15 cells");
+
             Assert.IsFalse(_rules.InCone(Vector3.zero, Vector3.forward, new Vector3(0f, 0f, -2f), 1f), "behind its back");
             var inside = Quaternion.Euler(0f, half - 1f, 0f) * Vector3.forward * 5f;
             var outside = Quaternion.Euler(0f, half + 1f, 0f) * Vector3.forward * 5f;

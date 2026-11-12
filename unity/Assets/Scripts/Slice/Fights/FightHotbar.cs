@@ -16,6 +16,7 @@ namespace GameDev.Slice.Fights
         ChangeSet,
         FirstAid,
         Stealth,
+        BreakAway,
         Yield,
         Spare,
     }
@@ -37,7 +38,9 @@ namespace GameDev.Slice.Fights
         public static readonly (FightAction Action, string Id)[] Slots =
         {
             (FightAction.EndTurn, "end"), (FightAction.Wait, "wait"), (FightAction.Stance, "stance"), (FightAction.ChangeSet, "set"),
-            (FightAction.FirstAid, "aid"), (FightAction.Stealth, "hide"), (FightAction.Yield, "yield"), (FightAction.Spare, "spare"),
+            (FightAction.FirstAid, "aid"), (FightAction.Stealth, "hide"), (FightAction.BreakAway, "flee"), (FightAction.Yield, "yield"),
+            (FightAction.Spare, "spare"),
+
         };
 
         private readonly IReadOnlyList<Sprite> _icons;

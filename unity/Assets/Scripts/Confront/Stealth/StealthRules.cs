@@ -26,8 +26,8 @@ namespace GameDev.Confront.Stealth
         [SerializeField] private int apPerTwoCells = 3;
 
         [Header("Vision Cone (10.3 §2)")]
-        [Tooltip("The cone's reach, cells.")]
-        [SerializeField] private int coneCells = 10;
+        [Tooltip("The cone's reach, cells: 15 by the owner's direction of 2026-11-12, 10 before.")]
+        [SerializeField] private int coneCells = 15;
 
         [Tooltip("The cone's whole angle, degrees: the World Inhabitants setting's middle until that slider exists (authoring default; 60–130° range).")]
         [SerializeField] private float coneDegrees = 95f;

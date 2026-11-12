@@ -7,6 +7,7 @@ using GameDev.Confront.Turns;
 using GameDev.Core.Localization;
 using GameDev.Core.Scenes;
 using GameDev.Locomotion;
+using GameDev.Player.Progression;
 using GameDev.Slice.Fights;
 using GameDev.UI;
 using GameDev.World.Portals;
@@ -19,8 +20,9 @@ using UnityEngine.TestTools;
 namespace GameDev.Slice.Tests
 {
     /// <summary>
-    /// S3a.9 in play, in a Veilmouth street: the player breaks away from the development fight by walking ten cells
-    /// from both opponents, and the fight ends; the player yields to two Wardens with Y, hears their terms, goes with
+    /// S3a.9 in play, in a Veilmouth street: since the owner's direction of 2026-11-12 the player breaks away by Сбежать,
+    /// Z, with both opponents eighteen cells off, beyond their cones, and the fight ends; Z under their eyes four cells
+    /// off is refused and says why; the player yields to two Wardens with Y, hears their terms, goes with
     /// them, and is let out of their lock-up at 08:00, owing the fine, the weapons held.
     /// </summary>
     public sealed class LeavingFightPlayTests : SliceInputTestBase
@@ -37,15 +39,19 @@ namespace GameDev.Slice.Tests
             fights.TurnPause = 0f;
             fights.BeatPace = 4f;
             var player = Object.FindAnyObjectByType<PlayerLocomotion>();
+            world.Character.Set(CharacterAttribute.Perception, 100); // the player acts first, before the cultists close in
 
-            Assert.IsTrue(fights.StartDevelopmentFight(), "a fight with two cultists");
+            var places = Far(player.transform.position, 18);
+            Assert.AreEqual(2, places.Count, "two cells eighteen cells off, reachable from the player");
+            Assert.IsTrue(fights.StartDevelopmentFight(SliceConfront.Cult, places), "a fight with two cultists far off");
             yield return PlayersTurn(fights);
             var me = fights.PlayerCombatant;
             var turns = fights.Turns;
-            var away = Away(fights, me, out var steps);
-            Assert.IsTrue(away.HasValue, $"a cell ten cells from both opponents within {turns.ApLeft} AP of {me.Cell}");
-            Assert.IsTrue(turns.SubmitIntent(TurnIntent.MoveTo(away.Value)), $"the walk to {away.Value}, {steps} steps");
-            Assert.AreEqual(Departure.BrokeAway, me.Departure, "the player breaks away");
+            Assert.GreaterOrEqual(turns.NearestEnemy(me), 15, "fifteen cells or more from the nearest");
+            Assert.IsFalse(turns.Seen(me), "beyond their cones' fifteen cells");
+            Assert.IsTrue(turns.CanBreakAway(me));
+            yield return Tap(Key.Z);
+            Assert.AreEqual(Departure.BrokeAway, me.Departure, "Z: Сбежать");
             yield return Ended(fights);
 
             Assert.IsTrue(fights.BrokeAway, "the fight ended by the player breaking away");
@@ -53,6 +59,30 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(player.enabled, "free movement returns");
             Assert.IsFalse(world.Clock.IsPaused, "the world runs again");
             Assert.AreEqual(1, world.State.Get(SliceConfront.FoughtKey(SliceConfront.Cult)), "the fight with the cult is counted");
+        }
+
+        [UnityTest]
+        public IEnumerator BreakingAwayUnderAnEnemysEyeIsRefused()
+        {
+            yield return ForgetTheWorld();
+            yield return LoadScene(Veilmouth);
+            var fights = SliceWorldDriver.Running.Fights;
+            fights.TurnPause = 0f;
+            fights.BeatPace = 4f;
+            SliceWorldDriver.Running.Character.Set(CharacterAttribute.Perception, 100);
+
+            Assert.IsTrue(fights.StartDevelopmentFight(), "two cultists four cells off");
+            yield return PlayersTurn(fights);
+            var me = fights.PlayerCombatant;
+            var ap = fights.Turns.ApLeft;
+            Assert.IsTrue(fights.Turns.Seen(me), "they face the fight");
+            yield return Tap(Key.Z);
+            Assert.AreEqual(Departure.None, me.Departure, "refused");
+            Assert.IsTrue(fights.InFight);
+            Assert.AreEqual(ap, fights.Turns.ApLeft, "nothing spent");
+            Assert.AreEqual(Loc.Get("ui.fight.noflee.seen"), fights.Hud.LogText, "the reason, said");
+            fights.Turns.Stop();
+            yield return Ended(fights);
         }
 
         [UnityTest]
@@ -105,38 +135,37 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(player.enabled, "free to walk out");
         }
 
-        /// <summary>The cell within the turn's AP nearest by steps that stands ten cells or more from every opponent.</summary>
-        private static CombatCell? Away(SliceConfront fights, Combatant me, out int steps)
+        /// <summary>Two cells reachable from the player, <paramref name="cells"/> cells off as moves count them and a few apart.</summary>
+        private static List<Vector3> Far(Vector3 from, int cells)
         {
-            var grid = fights.Grid;
-            var turns = fights.Turns;
-            var foes = turns.Order.Where(c => c.Standing && c.Side != me.Side).ToList();
-            var path = new List<CombatCell>();
-            CombatCell? best = null;
-            steps = int.MaxValue;
-            var reach = turns.ApLeft;
-            for (var dz = -reach; dz <= reach; dz++)
+            var grid = new CombatGridReader(1f);
+            var places = new List<Vector3>();
+            if (!grid.Follow(from))
             {
-                for (var dx = -reach; dx <= reach; dx++)
+                return places;
+            }
+
+            var origin = grid.Origin;
+            for (var dz = -cells; dz <= cells && places.Count < 2; dz++)
+            {
+                for (var dx = -cells; dx <= cells && places.Count < 2; dx++)
                 {
-                    var at = grid.Center(me.Cell) + new Vector3(dx * grid.CellSize, 0f, dz * grid.CellSize);
-                    if (!grid.TryCellAt(at, out var cell) || !grid.IsReachable(cell) || grid.OccupantAt(cell) >= 0
-                        || foes.Any(f => Mathf.Max(Mathf.Abs(f.Cell.X - cell.X), Mathf.Abs(f.Cell.Z - cell.Z)) < 10))
+                    if (Mathf.Max(Mathf.Abs(dx), Mathf.Abs(dz)) != cells)
                     {
                         continue;
                     }
 
-                    var n = grid.FindPath(me.Cell, cell, path);
-                    if (n > 0 && n <= reach && n < steps)
+                    var at = grid.Center(origin) + new Vector3(dx, 0f, dz);
+                    if (grid.TryCellAt(at, out var cell) && grid.IsReachable(cell) && places.All(p => Vector3.Distance(p, grid.Center(cell)) > 3f))
                     {
-                        best = cell;
-                        steps = n;
+                        places.Add(grid.Center(cell));
                     }
                 }
             }
 
-            return best;
+            return places;
         }
+
 
         private static IEnumerator PlayersTurn(SliceConfront fights)
         {

@@ -364,6 +364,7 @@ namespace GameDev.Slice.Fights
                 || ((input.StancePressed || picked == FightAction.Stance) && _turns.SubmitIntent(TurnIntent.Stance))
                 || ((input.ChangeSetPressed || picked == FightAction.ChangeSet) && _turns.SubmitIntent(TurnIntent.ChangeSet))
                 || ((input.FirstAidPressed || picked == FightAction.FirstAid) && TreatInFight(player))
+                || ((input.BreakAwayPressed || picked == FightAction.BreakAway) && BreakAwayByWill(player))
                 || LeaveByWill(player, input.YieldPressed || picked == FightAction.Yield, input.SparePressed || picked == FightAction.Spare))
             {
                 _cursor.Clear();
@@ -398,6 +399,8 @@ namespace GameDev.Slice.Fights
                     return (ours && treatment.HasValue && _turns.ApLeft >= treatAp, treatAp);
                 case FightAction.Stealth:
                     return (ours && _turns.CanHide(player), _settings != null && _settings.StealthRules != null ? _settings.StealthRules.EnterAp : 0);
+                case FightAction.BreakAway:
+                    return (ours && _turns.CanBreakAway(player), rules != null ? rules.BreakAwayAp : 0);
                 case FightAction.Yield:
                     return (ours && _turns.ApLeft >= rules.YieldAp, rules != null ? rules.YieldAp : 0);
                 case FightAction.Spare:
@@ -517,12 +520,17 @@ namespace GameDev.Slice.Fights
             _hud.Show(true);
             _cursor.Clear();
             ResetLeaving();
+            if (_playerCombatant != null)
+            {
+                _playerCombatant.Watches = false; // the player has no Vision Cone (10.2 §9)
+            }
+
             foreach (var pair in _bodies)
             {
                 Guard(pair.Key, pair.Value, true);
             }
 
-            Debug.Log($"[Confront] fight {_fights} begins ({request.Reason}): {request.Combatants.Count} combatants, {_view.Cells} cells.");
+            Debug.Log($"[Confront] fight {_fights} begins ({request.Reason}): {request.Combatants.Count} combatants, {_view.Cells} cells, the grid's last read {_grid.Window.TotalMs:F1} ms.");
         }
 
         private void OnTurnAdvanced(Combatant acting)

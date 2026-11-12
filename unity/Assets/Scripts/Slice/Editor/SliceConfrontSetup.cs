@@ -35,12 +35,14 @@ namespace GameDev.Slice.EditorTools
         // The fight hotbar's icons (owner's play test, 2026-11-11, after BG3's): the Modern GDR pack's bright atlas, which
         // the asset map names for every icon of the game, tinted by the HUD, one for each FightAction after None: the
         // skip for ending the turn, the clock for waiting, the shield for the Defensive Stance, the turning arrow for the
-        // other Weapon Set, the full heart for First Aid, the figure in shadow for Stealth, the way out for a Yield, the
-        // open heart for mercy.
+        // other Weapon Set, the full heart for First Aid, the figure in shadow for Stealth, the arrows running back for
+        // Сбежать (owner, 2026-11-12), the way out for a Yield, the open heart for mercy.
         private const string IconAtlas = "Assets/Modern GDR - Free icons pack/00_Atlas/BrightIcons.png";
         private static readonly string[] FightIcons =
         {
-            "Skip_Bright", "Watch_Bright", "Shield_Bright", "Reload_Bright", "Heart02_Bright", "Network_Bright", "Exit_Bright", "Heart01_Bright",
+            "Skip_Bright", "Watch_Bright", "Shield_Bright", "Reload_Bright", "Heart02_Bright", "Network_Bright", "Rewind_Bright", "Exit_Bright",
+            "Heart01_Bright",
+
         };
 
         public static void Configure()

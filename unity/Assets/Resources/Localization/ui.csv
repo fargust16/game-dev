@@ -60,6 +60,9 @@ ui.fight.action.aid.key,B,B
 ui.fight.action.hide,Stealth,Скрытность
 ui.fight.action.hide.tip,"Hide where no enemy cone of sight covers you. Hidden, you walk crouched, and your first blow can surprise.","Скрыться там, где вас не накрывает конус зрения врага. Скрытым вы идёте пригнувшись, а первый удар может застать врасплох."
 ui.fight.action.hide.key,C,C
+ui.fight.action.flee,Break Away,Сбежать
+ui.fight.action.flee.tip,"Leave the fight, once no enemy sees you and the nearest is 15 cells or more away. Those who meant to strike you search where they last saw you.","Покинуть бой, когда вас не видит ни один враг, а ближайший не ближе 15 клеток. Те, кто целился в вас, ищут там, где видели вас в последний раз."
+ui.fight.action.flee.key,Z,Z
 ui.fight.action.yield,Yield,Сдаться
 ui.fight.action.yield.tip,Surrender to those who take a surrender: the fight ends on their terms.,"Сдаться тем, кто принимает сдачу: бой закончится на их условиях."
 ui.fight.action.yield.key,Y,Y
@@ -129,6 +132,9 @@ ui.fight.log.mercy,{0} asks for mercy,{0} просит пощады
 ui.fight.log.yield,{0} yields,{0}: сдаётся
 ui.fight.mercy,V  Spare those who ask for mercy,V  Пощадить просящих пощады
 ui.fight.noyield,They take no surrender,Сдачи здесь не принимают
+ui.fight.noflee.seen,An enemy sees you,Вас видит враг
+ui.fight.noflee.near,An enemy is nearer than 15 cells,Враг ближе 15 клеток
+
 ui.yield.wardens.line,"Drop it. You're coming with us: a night in the lock-up, and your weapons stay in our store till you pay the fine, a thousand bronze.","Бросай оружие. Пойдёшь с нами: ночь в камере, а оружие полежит у нас на складе, пока не заплатишь штраф — тысячу бронзовых."
 ui.yield.wardens.go,Go with them,Пойти с ними
 ui.yield.take.line,"Sensible. Turn out your pockets, every coin of it.","Разумно. Выворачивай карманы, всё до монеты."

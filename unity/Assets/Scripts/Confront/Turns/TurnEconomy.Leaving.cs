@@ -4,9 +4,9 @@ using GameDev.Confront.Grid;
 namespace GameDev.Confront.Turns
 {
     /// <summary>
-    /// S3a.9: leaving a fight (08 §7; 10.2 §9). A step that ends <see cref="Rules.FightRules.BreakAwayCells"/> or more from
-    /// every enemy, and farther from the nearest than the fighter stood, breaks away: the fighter is out of the fight,
-    /// the Reaction Attacks it drew on the way already struck. A Yield to people costs its AP and ends the fight at once;
+    /// S3a.9: leaving a fight (08 §7; 10.2 §9). Since the owner's direction of 2026-11-12 nobody walks out of a fight:
+    /// Сбежать, for its AP, takes the fighter out once the nearest enemy is <see cref="Rules.FightRules.BreakAwayCells"/>
+    /// or more away and no enemy sees it (<see cref="CanBreakAway"/>). A Yield to people costs its AP and ends the fight at once;
     /// people only, so a Yield with the cult or a beast among the enemies standing is refused. A fighter of people asks
     /// for mercy on its turn below a share of its HP when its side has fewer fighters standing; it strikes no more, and
     /// the other side spares it, and it leaves, or does not. A fighter with no will of its own spares those asking once
@@ -62,25 +62,42 @@ namespace GameDev.Confront.Turns
             Leave(c);
         }
 
-        /// <summary>Whether the step from <paramref name="from"/> to the fighter's cell broke away from every enemy.</summary>
-        private bool BreaksAway(Combatant c, CombatCell from)
+        /// <summary>
+        /// 10.2 §9 (owner, 2026-11-12): whether the acting fighter may take Сбежать now: its AP, the nearest enemy
+        /// standing <see cref="Rules.FightRules.BreakAwayCells"/> or more away, and no enemy's Vision Cone on it in sight.
+        /// An enemy asking for mercy or losing its turns counts for neither. The player has no cone
+        /// (<see cref="Combatant.Watches"/>), so an NPC is seen only by the cones of the player's allies.
+        /// </summary>
+        public bool CanBreakAway(Combatant c) =>
+            c != null && IsRunning && c.Standing && Acting == c && ApLeft >= _rules.BreakAwayAp && NearestFoe(c, c.Cell) >= _rules.BreakAwayCells
+            && Watcher(c) == null;
+
+        /// <summary>Whether an enemy's Vision Cone covers the fighter in sight now (10.3 §2), which keeps Сбежать closed.</summary>
+        public bool Seen(Combatant c) => c != null && Watcher(c) != null;
+
+        /// <summary>Cells, as moves count them, from the fighter to the nearest enemy standing that is not helpless; int.MaxValue with none.</summary>
+        public int NearestEnemy(Combatant c) => c != null ? NearestFoe(c, c.Cell) : int.MaxValue;
+
+        /// <summary>Сбежать for its AP: the fighter leaves the fight, the Reaction Attacks of the steps that took it away already struck.</summary>
+        private bool BreakAway(Combatant c)
         {
-            if (!c.Standing)
+            if (!CanBreakAway(c))
             {
                 return false;
             }
 
-            var now = NearestFoe(c, c.Cell);
-            return now >= _rules.BreakAwayCells && now != int.MaxValue && now > NearestFoe(c, from);
+            ApLeft -= _rules.BreakAwayAp;
+            Depart(c, Departure.BrokeAway);
+            return true;
         }
 
-        /// <summary>Cells, as moves count them, from a cell to the nearest enemy standing; int.MaxValue with none.</summary>
+        /// <summary>Cells, as moves count them, from a cell to the nearest enemy standing that is not helpless; int.MaxValue with none.</summary>
         private int NearestFoe(Combatant c, CombatCell cell)
         {
             var nearest = int.MaxValue;
             foreach (var f in _order)
             {
-                if (f.Standing && f.Side != c.Side)
+                if (f.Standing && f.Side != c.Side && !f.Helpless)
                 {
                     nearest = Math.Min(nearest, Distance(cell, f.Cell));
                 }

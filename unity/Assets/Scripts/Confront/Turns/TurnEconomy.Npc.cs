@@ -418,8 +418,7 @@ namespace GameDev.Confront.Turns
                     {
                         if ((dx == 0 && dz == 0)
                             || !_grid.TryCellAt(new Vector3((here.X + dx + 0.5f) * size, _grid.Center(here).y, (here.Z + dz + 0.5f) * size), out var cell)
-                            || !_grid.CanStep(here, cell) || (_grid.OccupantAt(cell) >= 0 && _grid.OccupantAt(cell) != c.Id) || _route.Contains(cell)
-                            || NearestFoe(c, cell) >= _rules.BreakAwayCells) // a step back keeps the shooter in the fight (S3a.9)
+                            || !_grid.CanStep(here, cell) || (_grid.OccupantAt(cell) >= 0 && _grid.OccupantAt(cell) != c.Id) || _route.Contains(cell))
                         {
                             continue;
                         }

@@ -87,10 +87,10 @@ namespace GameDev.Confront.Turns
             return null;
         }
 
-        /// <summary>10.3 §2 on the grid: an enemy that can act, its cone along its facing, the hider in reach and in sight.</summary>
+        /// <summary>10.3 §2 on the grid: an enemy with a cone that can act, its cone along its facing, the hider in reach and in sight.</summary>
         private bool Covers(Combatant observer, Combatant hider)
         {
-            if (Stealth == null || observer == hider || !observer.Standing || observer.Side == hider.Side || observer.Helpless)
+            if (Stealth == null || observer == hider || !observer.Watches || !observer.Standing || observer.Side == hider.Side || observer.Helpless)
             {
                 return false;
             }

@@ -69,7 +69,7 @@ namespace GameDev.Confront.Grid
     public sealed class CombatGridReader : ICombatGrid
     {
         public const int MaxLevels = 16;
-        public const int Reach = 20;
+        public const int Reach = 30; // cells from the origin on each axis: 30 since the owner's play test of 2026-11-12, 20 before
         // The grid reads the place, never the characters in it (AGENTS, Vertical Slice target), so it leaves out Water
         // (4), the slice's Character layer (12), and NoGrid (14); Ignore Raycast (2) is already outside the defaults.
         public const int Mask = Physics.DefaultRaycastLayers & ~(1 << 4) & ~(1 << 12) & ~(1 << 14);

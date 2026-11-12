@@ -19,6 +19,7 @@ namespace GameDev.Confront.Turns
         Yield,
         Spare,
         Hide,
+        BreakAway,
     }
 
     /// <summary>An Environment Action open across the edge to a cell beside (10.1, S3a.7): what it is, where it lands, and its AP and chance.</summary>
@@ -105,6 +106,9 @@ namespace GameDev.Confront.Turns
 
         /// <summary>Spares an enemy that asks for mercy: it leaves the fight (08 §7, S3a.9).</summary>
         public static TurnIntent Spare(int target) => new TurnIntent(IntentKind.Spare, default, target);
+
+        /// <summary>Сбежать, for its AP, seen by no enemy and far enough from the nearest (10.2 §9, owner 2026-11-12).</summary>
+        public static TurnIntent BreakAway => new TurnIntent(IntentKind.BreakAway, default, -1);
     }
 
     /// <summary>
@@ -175,6 +179,15 @@ namespace GameDev.Confront.Turns
 
         /// <summary>Ends the encounter at once with no side standing, −1: the place the fight was kept round has left it (S3a.9).</summary>
         void Stop();
+
+        /// <summary>Whether the acting fighter may take Сбежать now (10.2 §9).</summary>
+        bool CanBreakAway(Combatant c);
+
+        /// <summary>Whether an enemy's Vision Cone covers the fighter in sight now (10.3 §2).</summary>
+        bool Seen(Combatant c);
+
+        /// <summary>Cells, as moves count them, to the nearest enemy standing that is not helpless; int.MaxValue with none.</summary>
+        int NearestEnemy(Combatant c);
 
         /// <summary>
         /// Raised as a combatant leaves the fight before its end, its <see cref="Combatant.Departure"/> saying how: broken

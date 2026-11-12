@@ -161,6 +161,8 @@ namespace GameDev.Confront.Turns
                     return Spare(c, Find(intent.Target));
                 case IntentKind.Hide:
                     return Hide(c);
+                case IntentKind.BreakAway:
+                    return BreakAway(c);
                 default:
                     EndTurn(c);
                     return true;
@@ -565,14 +567,12 @@ namespace GameDev.Confront.Turns
 
         /// <summary>
         /// Walks a path a step at a time while AP last, stopping once <paramref name="target"/> is reached. Leaving the
-        /// side of a melee enemy draws its Reaction Attack first; a walker who falls to one stops, and its turn ends. A
-        /// walk with no target, a move or a step back, breaks away at the first step that leaves every enemy far enough
-        /// behind (S3a.9); a walk toward a target never does, so a fighter coming round a house from afar stays in.
+        /// side of a melee enemy draws its Reaction Attack first; a walker who falls to one stops, and its turn ends.
+        /// Since the owner's direction of 2026-11-12 no walk leaves the fight: Сбежать does (10.2 §9).
         /// </summary>
         private int Walk(Combatant c, List<CombatCell> path, int steps, Combatant target)
         {
             var walked = 0;
-            var brokeAway = false;
             _walked.Clear();
             if (c.Fighter.LegBroken)
             {
@@ -594,18 +594,11 @@ namespace GameDev.Confront.Turns
                 }
 
                 Face(c, path[i]);
-                var from = c.Cell;
                 c.Cell = path[i];
                 c.Position = _grid.Center(c.Cell);
                 _walked.Add(path[i]);
                 ApLeft -= cost;
                 walked++;
-                if (target == null && BreaksAway(c, from))
-                {
-                    brokeAway = true;
-                    break;
-                }
-
                 if (target != null && Reaches(c, target))
                 {
                     break;
@@ -615,12 +608,6 @@ namespace GameDev.Confront.Turns
             c.Position = _grid.Center(c.Cell);
             FlushWalk(c);
             CheckCones();
-            if (brokeAway)
-            {
-                Depart(c, Departure.BrokeAway);
-                return walked;
-            }
-
             if (!c.Standing && IsRunning && !CheckEnd() && Acting == c)
             {
                 NextTurn();
@@ -896,16 +883,13 @@ namespace GameDev.Confront.Turns
             Face(c, to);
             var success = _rolls.NextDouble() < option.Chance;
             var fallen = 0d;
-            var brokeAway = false;
             if (success && option.Kind != EnvironmentActionKind.KickBreach && ReactionAttacks(c) && _grid.Occupy(c.Id, option.Landing))
             {
-                var from = c.Cell;
                 c.Cell = option.Landing;
                 c.Position = _grid.Center(c.Cell);
                 _walked.Clear();
                 _walked.Add(option.Landing);
                 FlushWalk(c);
-                brokeAway = BreaksAway(c, from);
             }
             else if (!success && (option.Kind == EnvironmentActionKind.ClimbUp || option.Kind == EnvironmentActionKind.MantleOnto))
             {
@@ -917,12 +901,6 @@ namespace GameDev.Confront.Turns
             }
 
             Traversed?.Invoke(c, option, success, fallen);
-            if (brokeAway)
-            {
-                Depart(c, Departure.BrokeAway);
-                return true;
-            }
-
             if (CheckEnd() || Acting != c)
             {
                 return true;

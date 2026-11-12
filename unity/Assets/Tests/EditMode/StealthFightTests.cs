@@ -78,17 +78,17 @@ namespace GameDev.Slice.Tests
         [Test]
         public void StealthModeCostsThreeApAndACrouchingWalkThreeForTwoCells()
         {
-            var me = At(0, 0, Fighter(100), 3, 10, will: true);
-            var enemy = At(1, 1, Fighter(), 18, 10);
+            var me = At(0, 0, Fighter(100), 1, 10, will: true);
+            var enemy = At(1, 1, Fighter(), 20, 10);
             Begin(null, null, me, enemy);
             Assert.AreEqual(me, _turns.Acting);
             var ap = _turns.ApLeft;
-            Assert.IsTrue(_turns.CanHide(me), "fifteen cells off, no cone reaches it");
+            Assert.IsTrue(_turns.CanHide(me), "nineteen cells off, no cone reaches it (15 cells since 2026-11-12)");
             Assert.IsTrue(_turns.SubmitIntent(TurnIntent.Hide));
             Assert.IsTrue(me.Hidden);
             Assert.AreEqual(ap - 3, _turns.ApLeft, "3 AP");
             Assert.AreEqual(3, _turns.WalkAp(me, 2));
-            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.MoveTo(Cell(3, 12))), "two cells crouching");
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.MoveTo(Cell(1, 12))), "two cells crouching");
             Assert.AreEqual(ap - 6, _turns.ApLeft, "3 AP for two cells");
             Assert.IsFalse(_turns.SubmitIntent(TurnIntent.Hide), "already hidden");
         }
@@ -109,14 +109,14 @@ namespace GameDev.Slice.Tests
         [Test]
         public void AnEnemyDoesNotGoForAHiddenFighter()
         {
-            var me = At(0, 0, Fighter(100), 3, 10, will: true);
-            var enemy = At(1, 1, Fighter(), 18, 10);
+            var me = At(0, 0, Fighter(100), 1, 10, will: true);
+            var enemy = At(1, 1, Fighter(), 20, 10);
             Begin(null, null, me, enemy);
             Assert.IsTrue(_turns.SubmitIntent(TurnIntent.Hide));
             Assert.IsTrue(_turns.SubmitIntent(TurnIntent.EndTurn));
             Assert.AreEqual(enemy, _turns.Acting);
             _turns.PlayTurn();
-            Assert.AreEqual(Cell(18, 10), enemy.Cell, "it has nobody to go for");
+            Assert.AreEqual(Cell(20, 10), enemy.Cell, "it has nobody to go for");
             Assert.AreEqual(me.Fighter.MaxHp, me.Fighter.Hp, 1e-9);
             Assert.IsTrue(me.Hidden);
         }
@@ -124,19 +124,20 @@ namespace GameDev.Slice.Tests
         [Test]
         public void AConeThatComesToTouchAHiddenFighterChecksOnce()
         {
-            var me = At(0, 0, Fighter(100, dexterity: 4, stealth: 2), 4, 10, will: true);
-            var ally = At(1, 0, Fighter(50), 12, 10, will: true);
-            var enemy = At(2, 1, Fighter(4), 18, 10);
+            var me = At(0, 0, Fighter(100, dexterity: 4, stealth: 2), 0, 10, will: true);
+            var ally = At(1, 0, Fighter(50), 11, 10, will: true);
+            var enemy = At(2, 1, Fighter(4), 17, 10);
             Begin(null, null, me, ally, enemy);
             Assert.AreEqual(new Vector2Int(-1, 0), enemy.Facing, "it faces the ally, the nearer");
-            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.Hide), "fourteen cells off, beyond its cone");
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.Hide), "seventeen cells off, beyond its cone of 15");
             Assert.IsTrue(_turns.SubmitIntent(TurnIntent.EndTurn));
             Assert.AreEqual(ally, _turns.Acting);
             Assert.IsTrue(_turns.SubmitIntent(TurnIntent.EndTurn));
             Assert.AreEqual(enemy, _turns.Acting);
             CollectionAssert.IsEmpty(_checks, "no cone has touched it yet");
 
-            _turns.PlayTurn(); // it walks to the ally, and the hider comes within its cone's ten cells
+            _turns.PlayTurn(); // it walks to the ally, and the hider comes within its cone's fifteen cells
+
             var mine = _checks.FindAll(c => c.Hider == me);
             Assert.AreEqual(1, mine.Count, "one check when the cone comes, none while it stays");
             Assert.AreEqual(enemy, mine[0].Observer);

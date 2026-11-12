@@ -40,6 +40,7 @@ namespace GameDev.Input
         private InputAction _firstAid;
         private InputAction _yield;
         private InputAction _spare;
+        private InputAction _breakAway;
         private InputAction _stealth;
 
         private InputAction _pause;
@@ -178,6 +179,9 @@ namespace GameDev.Input
 
         public bool SparePressed => _spare != null && _spare.WasPressedThisFrame();
 
+        /// <summary>The owner's direction of 2026-11-12, authoring default Z: Сбежать, Break Away from a fight (10.2 §9).</summary>
+        public bool BreakAwayPressed => _breakAway != null && _breakAway.WasPressedThisFrame();
+
         /// <summary>S3b.1 authoring default, C: Stealth Mode, in free movement and in a fight (10.3 §1, §8).</summary>
         public bool StealthPressed => _stealth != null && _stealth.WasPressedThisFrame();
 
@@ -248,6 +252,8 @@ namespace GameDev.Input
             _firstAid = _player.AddAction("FirstAid", InputActionType.Button, "<Keyboard>/b");
             _yield = _player.AddAction("Yield", InputActionType.Button, "<Keyboard>/y");
             _spare = _player.AddAction("Spare", InputActionType.Button, "<Keyboard>/v");
+            _breakAway = _player.AddAction("BreakAway", InputActionType.Button, "<Keyboard>/z");
+
             _stealth = _player.AddAction("Stealth", InputActionType.Button, "<Keyboard>/c");
 
             _camera = new InputActionMap("Camera");
