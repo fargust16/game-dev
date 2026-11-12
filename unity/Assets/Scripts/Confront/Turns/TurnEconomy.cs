@@ -100,6 +100,8 @@ namespace GameDev.Confront.Turns
             {
                 combatant.Fired = false;
                 combatant.Intent = null;
+                combatant.SawAt = null;
+                combatant.SawWho = null;
                 combatant.AsksMercy = false;
                 combatant.Departure = Departure.None;
                 if (Place(combatant))
@@ -596,6 +598,7 @@ namespace GameDev.Confront.Turns
                 Face(c, path[i]);
                 c.Cell = path[i];
                 c.Position = _grid.Center(c.Cell);
+                Spotted(c);
                 _walked.Add(path[i]);
                 ApLeft -= cost;
                 walked++;
@@ -887,7 +890,9 @@ namespace GameDev.Confront.Turns
             {
                 c.Cell = option.Landing;
                 c.Position = _grid.Center(c.Cell);
+                Spotted(c);
                 _walked.Clear();
+
                 _walked.Add(option.Landing);
                 FlushWalk(c);
             }

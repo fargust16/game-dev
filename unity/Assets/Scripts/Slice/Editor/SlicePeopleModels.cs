@@ -459,6 +459,19 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// Batch: every controller built again on the clips as they stand, with no import, as when a state is added
+        /// (the people's run, PB5b). -executeMethod GameDev.Slice.EditorTools.SlicePeopleModels.ControllersOnly
+        /// </summary>
+        public static void ControllersOnly()
+        {
+            var report = new StringBuilder();
+            Controllers(report);
+            AssetDatabase.SaveAssets();
+            Debug.Log("[SlicePeopleModels] controllers: " + report);
+        }
+
+
+        /// <summary>
         /// Batch, after the city is built again: the people's looks, their paces, the blacksmith and the walkers' routes in
         /// the slice's scenes, with the prefabs as they stand. -executeMethod GameDev.Slice.EditorTools.SlicePeopleModels.ScenesOnly
         /// </summary>

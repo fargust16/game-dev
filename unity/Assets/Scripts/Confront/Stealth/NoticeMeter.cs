@@ -116,7 +116,15 @@ namespace GameDev.Confront.Stealth
             }
         }
 
+        /// <summary>10.2 §9: Alert now, as a searcher is, its count to calm started again.</summary>
+        public void Alarm()
+        {
+            Alert = true;
+            _alertLeft = _rules.AlertTicks;
+        }
+
         /// <summary>Forget everything: a new scene or a new run.</summary>
+
         public void Reset()
         {
             Fill = 0f;

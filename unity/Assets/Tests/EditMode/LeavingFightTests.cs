@@ -141,7 +141,25 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
+        public void AnEnemyNotesTheLastCellWhereItSawTheOneItChose()
+        {
+            _sight = AssetDatabase.LoadAssetAtPath<StealthRules>(Data + "StealthRules.asset");
+            var me = At(0, 0, Fighter(100), 6, 10, will: true);
+            var enemy = At(1, 1, Fighter(), 19, 10);
+            Begin(me, enemy);
+            Assert.AreEqual(me, enemy.Chosen, "its nearest enemy, until its first turn chooses");
+            Assert.AreEqual(me, enemy.SawWho, "seen as the fight begins, thirteen cells ahead");
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.MoveTo(Cell(1, 10))), "five steps back");
+            Assert.IsFalse(_turns.Seen(me), "eighteen cells off");
+            Assert.IsTrue(enemy.SawAt.HasValue);
+            Assert.AreEqual(4.5f, enemy.SawAt.Value.x, 1e-3f, "fifteen cells off, the last cell in its cone");
+            Assert.AreEqual(10.5f, enemy.SawAt.Value.z, 1e-3f);
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.BreakAway), "fifteen cells or more, and unseen");
+        }
+
+        [Test]
         public void ThePlayerHasNoConeSoOnlyItsAlliesSeeAnNpcBreakAway()
+
         {
             _sight = AssetDatabase.LoadAssetAtPath<StealthRules>(Data + "StealthRules.asset");
             var npc = At(0, 1, Fighter(100), 2, 10, will: true);

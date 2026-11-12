@@ -129,8 +129,20 @@ namespace GameDev.Confront.Turns
         /// </summary>
         public bool Watches { get; set; } = true;
 
-        /// <summary>The enemy its Target Rules chose this turn, kept while the enemy stands (10.2 §5a); null before its first turn.</summary>
+        /// <summary>
+        /// The enemy it means to strike (10.2 §5a, §9): the nearest when the fight began, then the one its Target Rules chose
+        /// in its last turn, kept while the enemy stands.
+        /// </summary>
         public Combatant Chosen => Intent;
+
+        /// <summary>
+        /// 10.2 §9: where it last saw the enemy it chose, by its cone and a clear line (10.3 §2), and whom; null until it
+        /// has. A search after Сбежать runs there.
+        /// </summary>
+        public Vector3? SawAt { get; internal set; }
+
+        public Combatant SawWho { get; internal set; }
+
 
         /// <summary>The pack it runs with, or −1 (10.2 *Beasts of the slice*): when the first of a pack falls, the rest flee.</summary>
         public int Pack { get; set; } = -1;

@@ -319,6 +319,11 @@ namespace GameDev.Slice.Fights
                     continue;
                 }
 
+                if (r.Body.TryGetComponent<FightSearch>(out _))
+                {
+                    continue; // a searcher goes back by its own walk (10.2 §9)
+                }
+
                 if ((r.Body.position - at).sqrMagnitude > PostReturnDistance * PostReturnDistance &&
                     (r.Post - at).sqrMagnitude > PostReturnDistance * PostReturnDistance)
                 {

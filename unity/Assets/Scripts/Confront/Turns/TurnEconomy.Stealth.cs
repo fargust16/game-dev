@@ -111,6 +111,8 @@ namespace GameDev.Confront.Turns
                 return;
             }
 
+            Look();
+
             foreach (var h in _order)
             {
                 if (!h.Hidden)
@@ -188,16 +190,48 @@ namespace GameDev.Confront.Turns
             Struck?.Invoke(attacker, target, result);
         }
 
-        /// <summary>At the start, a fighter that has faced nowhere yet faces the nearest enemy.</summary>
+        /// <summary>
+        /// 10.2 §9: each fighter whose cone has the enemy it chose in sight notes where that enemy stands; a hidden one is
+        /// not seen by being under a cone, only by a failed check, which reveals it.
+        /// </summary>
+        private void Look()
+        {
+            foreach (var o in _order)
+            {
+                if (o.Intent != null && !o.Intent.Hidden && Covers(o, o.Intent))
+                {
+                    o.SawAt = o.Intent.Position;
+                    o.SawWho = o.Intent;
+                }
+            }
+        }
+
+        /// <summary>A step of <paramref name="c"/>: each fighter that chose it and has it in its cone notes the cell.</summary>
+        private void Spotted(Combatant c)
+        {
+            if (Stealth == null || c.Hidden)
+            {
+                return;
+            }
+
+            foreach (var o in _order)
+            {
+                if (o.Intent == c && Covers(o, c))
+                {
+                    o.SawAt = c.Position;
+                    o.SawWho = c;
+                }
+            }
+        }
+
+        /// <summary>
+        /// At the start, a fighter that has faced nowhere yet faces the nearest enemy, and each means to strike its nearest
+        /// until its first turn chooses (10.2 §9).
+        /// </summary>
         private void FaceTheFight()
         {
             foreach (var c in _order)
             {
-                if (c.Facing != Vector2Int.zero)
-                {
-                    continue;
-                }
-
                 Combatant nearest = null;
                 var best = int.MaxValue;
                 foreach (var e in _order)
@@ -210,10 +244,17 @@ namespace GameDev.Confront.Turns
                     }
                 }
 
-                if (nearest != null)
+                if (nearest == null)
+                {
+                    continue;
+                }
+
+                c.Intent ??= nearest;
+                if (c.Facing == Vector2Int.zero)
                 {
                     Face(c, nearest.Cell);
                 }
+
             }
         }
     }

@@ -181,8 +181,10 @@ namespace GameDev.Slice.Fights
             }
             else if (c.Departure == Departure.BrokeAway)
             {
-                // The fight was kept round the player; once it has left, what remains of it is not played here.
+                // The fight was kept round the player; once it has left, what remains of it is not played here. Those who
+                // meant to strike it and saw it search where they last saw it (10.2 §9).
                 _brokeAway = true;
+                ChooseSearchers(c);
                 if (_turns.IsRunning)
                 {
                     _turns.Stop();

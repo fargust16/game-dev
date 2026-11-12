@@ -276,6 +276,7 @@ namespace GameDev.Slice.Fights
             {
                 ClearBodies();
                 WardensAfterAssault();
+                WatchTheSearch();
                 if (_died)
                 {
                     return;
@@ -527,6 +528,11 @@ namespace GameDev.Slice.Fights
 
             foreach (var pair in _bodies)
             {
+                RecordStart(pair.Key, pair.Value);
+            }
+
+            foreach (var pair in _bodies)
+            {
                 Guard(pair.Key, pair.Value, true);
             }
 
@@ -556,6 +562,7 @@ namespace GameDev.Slice.Fights
                 var c = fighter.Combatant;
                 if (c != null && c.State != CombatantState.Fighting && !c.Fighter.Down && c.Departure == Departure.None && _grid.TryCellAt(fighter.transform.position, out _))
                 {
+                    RecordStart(c, fighter.transform);
                     c.Position = fighter.transform.position;
                     _bodies[c] = fighter.transform;
                     Guard(c, fighter.transform, true);
@@ -608,6 +615,7 @@ namespace GameDev.Slice.Fights
             }
 
             AfterFight(_yieldedTo);
+            BeginSearch();
             BeastsAfterFight();
             PeopleAfterFight();
             Hiding?.SetActive(_playerCombatant != null && _playerCombatant.Hidden && !_died);

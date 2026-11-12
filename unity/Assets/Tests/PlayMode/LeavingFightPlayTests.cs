@@ -86,7 +86,147 @@ namespace GameDev.Slice.Tests
         }
 
         [UnityTest]
+        public IEnumerator ThoseWhoSawThePlayerSearchAndTheFightStartsAgainOnSight()
+        {
+            yield return SetOut();
+            var fights = SliceWorldDriver.Running.Fights;
+            var hp = fights.Searching.Select(s => s.Fighter).ToList();
+            Assert.IsTrue(fights.Searching.All(s => s.Now == FightSearch.Phase.Running), "running where they saw the player");
+            for (var time = 0f; time < 30f && !fights.InFight; time += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            Assert.IsTrue(fights.InFight, "a searcher sees the player and the fight starts again");
+            Assert.AreEqual(0, fights.Searching.Count, "the search is over");
+            var again = fights.Turns.Order.Where(c => c != fights.PlayerCombatant).Select(c => c.Fighter).ToList();
+            CollectionAssert.AreEquivalent(hp, again, "the same two, their HP as they left");
+            fights.Turns.Stop();
+            yield return Ended(fights);
+        }
+
+        [UnityTest]
+        public IEnumerator ASearcherWhoFindsNobodyLooksRoundAndGoesBack()
+        {
+            yield return SetOut();
+            var world = SliceWorldDriver.Running;
+            var fights = world.Fights;
+            var player = Object.FindAnyObjectByType<PlayerLocomotion>();
+            player.enabled = false; // nobody can see a character who is not about
+            var bodies = fights.Searching.Select(s => s.gameObject).ToList();
+            for (var time = 0f; time < 30f && fights.Searching.Any(s => s.Now == FightSearch.Phase.Running); time += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            Assert.IsTrue(fights.Searching.All(s => s.Now == FightSearch.Phase.Looking), "both look round where they stopped: " + Searchers(fights) + $", paused {world.Clock.IsPaused}");
+            using (world.Clock.Pause())
+            {
+                // The clock held, each tick is one of ours; a searcher that got there first has looked longer.
+                for (var tick = 0; tick < FightSearch.LookTicks; tick++)
+                {
+                    world.Clock.AdvanceTicks(1);
+                    foreach (var s in fights.Searching)
+                    {
+                        Assert.AreEqual(s.Looked >= FightSearch.LookTicks ? FightSearch.Phase.Returning : FightSearch.Phase.Looking, s.Now, $"{s.name} after {s.Looked} ticks");
+                    }
+                }
+            }
+
+            Assert.IsTrue(fights.Searching.All(s => s.Now == FightSearch.Phase.Returning), "three ticks of looking, then back");
+            for (var time = 0f; time < 40f && fights.Searching.Count > 0; time += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            Assert.AreEqual(0, fights.Searching.Count, "back where they stood");
+            yield return null;
+            Assert.IsTrue(bodies.All(b => b == null), "development opponents go once their search is over");
+            Assert.IsFalse(fights.InFight);
+            player.enabled = true;
+        }
+
+        private static string Searchers(SliceConfront fights) => string.Join("; ", fights.Searching.Select(s =>
+            $"{s.name} {s.Now} at {s.transform.position} to {s.Place}, {Vector3.Distance(s.transform.position, s.Place):F1} m"));
+
+        /// <summary>
+        /// Two cultists twelve cells ahead along a street see the player; it walks ten cells back, beyond their cones,
+        /// and takes Сбежать; both set out to search.
+        /// </summary>
+        private IEnumerator SetOut()
+        {
+            yield return ForgetTheWorld();
+            yield return LoadScene(Veilmouth);
+            var world = SliceWorldDriver.Running;
+            var fights = world.Fights;
+            fights.TurnPause = 0f;
+            fights.BeatPace = 4f;
+            var player = Object.FindAnyObjectByType<PlayerLocomotion>();
+            world.Character.Set(CharacterAttribute.Perception, 100);
+            world.Character.Set(CharacterAttribute.Dexterity, 100); // 15 AP: ten steps back and Сбежать
+
+            Assert.IsTrue(Line(player.transform.position, out var places, out var back), "a straight way: two cells twelve ahead, ten behind");
+            Assert.IsTrue(fights.StartDevelopmentFight(SliceConfront.Cult, places), "two cultists twelve cells off");
+            yield return PlayersTurn(fights);
+            var me = fights.PlayerCombatant;
+            var turns = fights.Turns;
+            var cultists = turns.Order.Where(c => c != me).ToList();
+            Assert.IsTrue(cultists.All(c => c.Chosen == me && c.SawWho == me), "both mean to strike the player and see it");
+            Assert.IsTrue(turns.SubmitIntent(TurnIntent.MoveTo(back)), "ten cells back");
+            yield return PlayersTurn(fights);
+            Assert.IsFalse(turns.Seen(me), "beyond their cones");
+            Assert.IsTrue(cultists.All(c => c.SawAt.HasValue), "each knows where it last saw the player");
+            yield return Tap(Key.Z);
+            Assert.AreEqual(Departure.BrokeAway, me.Departure, "Z: Сбежать");
+            yield return Ended(fights);
+            Assert.AreEqual(2, fights.Searching.Count, "both search");
+        }
+
+        /// <summary>
+        /// A straight way from the player along an axis: two reachable cells twelve cells ahead, three apart, both seeing
+        /// the player's cell, and the cell ten back, every cell from the first to it reachable.
+        /// </summary>
+        private static bool Line(Vector3 from, out List<Vector3> places, out CombatCell back)
+        {
+            places = new List<Vector3>();
+            back = default;
+            var grid = new CombatGridReader(1f);
+            if (!grid.Follow(from))
+            {
+                return false;
+            }
+
+            var origin = grid.Origin;
+            var start = grid.Center(origin);
+            foreach (var d in new[] { Vector3.right, Vector3.left, Vector3.forward, Vector3.back })
+            {
+                var side = new Vector3(d.z, 0f, -d.x);
+                if (!grid.TryCellAt(start + (d * 12f), out var a) || !grid.TryCellAt(start + (d * 12f) + (side * 3f), out var b)
+                    || !grid.IsReachable(a) || !grid.IsReachable(b) || !grid.CanSee(a, origin) || !grid.CanSee(b, origin))
+                {
+                    continue;
+                }
+
+                var clear = true;
+                for (var k = -11; k <= 10 && clear; k++)
+                {
+                    clear = grid.TryCellAt(start - (d * k), out var c) && grid.IsReachable(c);
+                }
+
+                if (clear && grid.TryCellAt(start - (d * 10f), out back))
+                {
+                    places.Add(grid.Center(a));
+                    places.Add(grid.Center(b));
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        [UnityTest]
         public IEnumerator AYieldToTheWardensEndsInTheLockUp()
+
         {
             yield return ForgetTheWorld();
             yield return LoadScene(Veilmouth);

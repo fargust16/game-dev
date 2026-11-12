@@ -155,6 +155,17 @@ namespace GameDev.Slice.Fights
             }
 
             Unarm();
+            spared += _searchSpared;
+            _searchSpared = 0;
+            if (_searching.Count > 0)
+            {
+                // 10.2 §9: the host hears how its fight ended once the search is over, or from the fight it leads back into.
+                WalkAgain();
+                _searchEnded = ended;
+                _searchSpared = spared;
+                return;
+            }
+
             ended(won, spared);
         }
 
