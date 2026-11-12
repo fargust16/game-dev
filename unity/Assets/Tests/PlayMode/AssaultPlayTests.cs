@@ -246,6 +246,77 @@ namespace GameDev.Slice.Tests
             posts[1].ForEach(k => k.gameObject.SetActive(true));
         }
 
+        [UnityTest]
+        public IEnumerator InAFightWithTheCultTheWardensWhoHearJoinTheCharacter()
+        {
+            yield return ForgetTheWorld();
+            yield return LoadScene(Veilmouth);
+            var world = SliceWorldDriver.Running;
+            var fights = world.Fights;
+            var player = Object.FindAnyObjectByType<PlayerLocomotion>();
+            for (var t = 0f; t < 2f && !player.IsGrounded; t += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            // The character six metres before a Warden on post, and two cultists with pistols four cells off.
+            var warden = PeopleAround.Wardens(player.transform.position).FirstOrDefault();
+            Assert.IsNotNull(warden, "Veilmouth has Wardens on post");
+            var way = Vector3.ProjectOnPlane(warden.forward, Vector3.up).normalized;
+            player.Teleport(Ground(warden.position + (way * 6f)), Quaternion.LookRotation(way));
+            for (var t = 0f; t < 0.5f; t += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            fights.TurnPause = 0f;
+            fights.BeatPace = 6f;
+            fights.AutoPlayer = true;
+            Assert.IsTrue(fights.StartDevelopmentFight(SliceConfront.Cult), "a fight with two cultists");
+            var me = fights.PlayerCombatant;
+
+            // VS-ALARM (i): a shot is heard, and the Warden runs to the character's side.
+            SliceAlarm.Raise(new Alarm(AlarmKind.Shot, player.transform.position, null));
+            Assert.IsTrue(fights.ComingBodies.Contains(warden), "the Warden six metres off hears the shot and comes");
+            Assert.IsTrue(warden.TryGetComponent<SliceFighter>(out var part) && part.Combatant != null, "as a fighter");
+            var ally = part.Combatant;
+            Assert.AreEqual(me.Side, ally.Side, "on the character's side");
+            Assert.IsFalse(fights.Innocent(ally), "its harm is no harm the character did");
+
+            var joined = false;
+            for (var t = 0f; t < 120f && fights.InFight; t += Time.deltaTime)
+            {
+                joined |= ally.State == CombatantState.Fighting && fights.Turns.Order.Contains(ally);
+                if (joined)
+                {
+                    break;
+                }
+
+                yield return null;
+            }
+
+            Assert.IsTrue(joined || !fights.InFight, "it joins at the end of its round, unless the fight is over first");
+            if (fights.Turns.IsRunning)
+            {
+                fights.Turns.Stop();
+            }
+
+            for (var t = 0f; t < 60f && fights.InFight; t += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            Assert.IsFalse(fights.InFight, "the fight ends");
+            yield return null;
+            Assert.IsFalse(warden.TryGetComponent<SliceFighter>(out var after) && after.Combatant != null, "the Warden fights no more");
+            for (var t = 0f; t < 3f; t += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            Assert.IsFalse(fights.InFight, "a Warden come to the character's help never turns on it");
+        }
+
         private static bool Lying(Transform body)
         {
             var animator = body.GetComponentInChildren<Animator>(true);

@@ -525,6 +525,12 @@ namespace GameDev.Slice.Fights
             _hud.Show(true);
             _cursor.Clear();
             ResetLeaving();
+            Whistled = false;
+            foreach (var c in request.Combatants)
+            {
+                _nextId = Mathf.Max(_nextId, c.Id + 1); // a Warden who comes takes an id nobody holds (10.2 §5e)
+            }
+
             if (_playerCombatant != null)
             {
                 _playerCombatant.Watches = false; // the player has no Vision Cone (10.2 §9)
@@ -624,6 +630,9 @@ namespace GameDev.Slice.Fights
             BeginSearch();
             BeastsAfterFight();
             PeopleAfterFight();
+            ComeLate(); // the Wardens still on their way, to any fight (10.2 §5e)
+            Unarm(); // and those who came fight no more
+            _there.Clear();
             Hiding?.SetActive(_playerCombatant != null && _playerCombatant.Hidden && !_died);
             _animated.Clear();
             foreach (var opponent in _developmentOpponents)

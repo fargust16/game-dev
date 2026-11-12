@@ -13,8 +13,9 @@ namespace GameDev.Slice.Fights
     /// the Force Estimate, and below 1 it blows its whistle, an Alarm of its own, once in a fight. A resident who breaks
     /// away is the runner: it runs to the nearest post whose Wardens did not answer, reckoned at 4.5 m/s as the Wardens
     /// are, and when it gets there the post's Wardens set out; at an empty post nothing happens, and a runner fallen on its
-    /// way brings nobody. A Warden who comes when the fight is over looks round 3 ticks before it goes back. The Wardens
-    /// take a side only in an Assault, against the character; whom they join in another fight waits (VS-ALARM (i)).
+    /// way brings nobody. A Warden who comes when the fight is over looks round 3 ticks before it goes back. In an Assault
+    /// the Wardens take the side of the one struck, against the character; in a fight with the cult, the Veinmarket or
+    /// beasts they join the character (owner, 2026-11-12, VS-ALARM (i)); in any other fight an Alarm brings nobody.
     /// </summary>
     public sealed partial class SliceConfront
     {
@@ -71,22 +72,54 @@ namespace GameDev.Slice.Fights
                 }
             }
 
-            if (Assaulting)
+            var side = Assaulting ? HostileSide : WardensJoinTheCharacter() ? PlayerSide : -1;
+            if (side >= 0)
             {
-                var came = Answer(alarm.At);
-                Debug.Log($"[Confront] the {alarm.Kind.ToString().ToLowerInvariant()}: {came} Wardens set out.");
+                var came = Answer(alarm.At, side);
+                Debug.Log($"[Confront] the {alarm.Kind.ToString().ToLowerInvariant()}: {came} Wardens set out, on side {side}.");
             }
         }
 
-        /// <summary>Every free Warden who hears an Alarm at <paramref name="at"/> runs to it; how many set out.</summary>
-        private int Answer(Vector3 at)
+        /// <summary>
+        /// VS-ALARM (i) (owner, 2026-11-12): whether the fight under way is one the Wardens join beside the character,
+        /// every enemy in it of the cult, of the Veinmarket, or a beast.
+        /// </summary>
+        private bool WardensJoinTheCharacter()
+        {
+            if (!InFight || Assaulting || _playerCombatant == null)
+            {
+                return false;
+            }
+
+            var enemies = 0;
+            foreach (var c in _bodies.Keys)
+            {
+                if (c.Side == _playerCombatant.Side)
+                {
+                    continue;
+                }
+
+                var group = Group(c);
+                if (!c.Beast && group != Cult && group != Veinmarket)
+                {
+                    return false;
+                }
+
+                enemies++;
+            }
+
+            return enemies > 0;
+        }
+
+        /// <summary>Every free Warden who hears an Alarm at <paramref name="at"/> runs to it, to fight on <paramref name="side"/>; how many set out.</summary>
+        private int Answer(Vector3 at, int side)
         {
             var came = 0;
             foreach (var body in PeopleAround.Wardens(at))
             {
                 if (SliceAlarm.Hears(at, body.position) && Free(body))
                 {
-                    Come(body, at);
+                    Come(body, at, side);
                     came++;
                 }
             }
@@ -94,20 +127,34 @@ namespace GameDev.Slice.Fights
             return came;
         }
 
-        /// <summary>A Warden runs to <paramref name="at"/> and joins the fight at the end of the round by which it is there.</summary>
-        private void Come(Transform body, Vector3 at)
+        /// <summary>A Warden runs to <paramref name="at"/> and joins the fight on <paramref name="side"/> at the end of the round by which it is there.</summary>
+        private void Come(Transform body, Vector3 at, int side)
         {
             var back = _returning.Find(r => r.Body == body);
             _returning.RemoveAll(r => r.Body == body);
             _coming.Add(new Coming
             {
                 Body = body,
-                Combatant = Person(body, Wardens, _nextId++),
+                Combatant = Person(body, Wardens, _nextId++, side: side),
                 Round = _lastRound + TicksToRun(body.position, at),
+                To = at,
+                Allied = side == PlayerSide,
                 Post = back != null ? back.Post : body.position,
                 PostFacing = back != null ? back.PostFacing : body.rotation,
             });
             Say(body, "ui.fight.help.warden");
+        }
+
+        /// <summary>The fight is over: the Wardens still on their way come late, each when its run is done.</summary>
+        private void ComeLate()
+        {
+            foreach (var coming in _coming)
+            {
+                coming.Arrives = Time.time + (Mathf.Max(0, coming.Round - _lastRound) * SecondsPerTick);
+                _late.Add(coming);
+            }
+
+            _coming.Clear();
         }
 
         /// <summary>A Warden who can answer: standing, in no fight, on no errand or search, and not already on its way.</summary>
@@ -125,7 +172,7 @@ namespace GameDev.Slice.Fights
         /// <summary>At a round's end: the first Warden there weighs the fight, and below 1 whistles, once in a fight.</summary>
         private void WeighTheFight()
         {
-            if (!Assaulting || Whistled || !_turns.IsRunning)
+            if (Whistled || !_turns.IsRunning)
             {
                 return;
             }
@@ -201,7 +248,7 @@ namespace GameDev.Slice.Fights
         {
             if (Assaulting && InFight)
             {
-                Come(warden, _assaultAt);
+                Come(warden, _assaultAt, HostileSide);
                 return;
             }
 
@@ -209,6 +256,7 @@ namespace GameDev.Slice.Fights
             {
                 Body = warden,
                 Arrives = Time.time + (TicksToRun(warden.position, _assaultAt) * SecondsPerTick),
+                To = _assaultAt,
                 Post = warden.position,
                 PostFacing = warden.rotation,
             });

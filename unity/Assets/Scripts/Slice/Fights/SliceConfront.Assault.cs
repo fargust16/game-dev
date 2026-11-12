@@ -165,10 +165,13 @@ namespace GameDev.Slice.Fights
             return false;
         }
 
-        /// <summary>A person of <paramref name="group"/> as a fighter with what it carries (<see cref="Armed"/>), out of its walk.</summary>
-        private Combatant Person(Transform body, string group, int id, Fighter fighter = null)
+        /// <summary>
+        /// A person of <paramref name="group"/> as a fighter with what it carries (<see cref="Armed"/>), out of its walk;
+        /// on the character's side, a Warden come to its help (VS-ALARM (i)), its harm is no harm the character did.
+        /// </summary>
+        private Combatant Person(Transform body, string group, int id, Fighter fighter = null, int side = HostileSide)
         {
-            var c = new Combatant(id, HostileSide, fighter ?? Armed(body, group), body.position) { AcceptsYield = TakesYield(group) };
+            var c = new Combatant(id, side, fighter ?? Armed(body, group), body.position) { AcceptsYield = TakesYield(group) };
             if (!body.TryGetComponent<SliceFighter>(out var part))
             {
                 part = body.gameObject.AddComponent<SliceFighter>();
@@ -181,7 +184,11 @@ namespace GameDev.Slice.Fights
             }
 
             _groups[c] = group;
-            _innocents.Add(c);
+            if (side == HostileSide)
+            {
+                _innocents.Add(c);
+            }
+
             _peopleInFight.Add(body);
 
             // A walker stops what it does, and stands where its fight's guard begins.
@@ -237,14 +244,7 @@ namespace GameDev.Slice.Fights
             Assaulting = false;
             Aftermath();
             WalkAgain();
-            var perTick = GameClockDriver.RealSecondsPerTick > 0f ? GameClockDriver.RealSecondsPerTick : FallbackSecondsPerTick;
-            foreach (var coming in _coming)
-            {
-                coming.Arrives = Time.time + (Mathf.Max(0, coming.Round - _lastRound) * perTick);
-                _late.Add(coming);
-            }
-
-            _coming.Clear();
+            ComeLate();
         }
 
         private void WalkAgain()
@@ -289,12 +289,15 @@ namespace GameDev.Slice.Fights
                 }
 
                 _late.RemoveAt(i);
-                var way = Vector3.ProjectOnPlane(late.Post - _assaultAt, Vector3.up);
+                var way = Vector3.ProjectOnPlane(late.Post - late.To, Vector3.up);
                 way = way.sqrMagnitude > 1e-4f ? way.normalized : Vector3.forward;
-                Place(late.Body, Ground(_assaultAt + (way * LateStandOff)), _player.transform.position);
+                Place(late.Body, Ground(late.To + (way * LateStandOff)), _player.transform.position);
                 late.LookUntil = (_clock != null ? _clock.Tick : 0) + FightSearch.LookTicks; // 10.2 §5e: it looks round
                 _returning.Add(late);
-                (arrived ??= new List<Transform>()).Add(late.Body);
+                if (!late.Allied)
+                {
+                    (arrived ??= new List<Transform>()).Add(late.Body); // one come to the character's help fights nobody
+                }
             }
 
             if (arrived != null && !_died && !InFight && (_player.transform.position - _assaultAt).sqrMagnitude <= LateWardenReach * LateWardenReach)
@@ -458,6 +461,13 @@ namespace GameDev.Slice.Fights
             public int Round;
             public float Arrives;
             public long LookUntil;
+
+            /// <summary>The place it runs to, the Alarm's.</summary>
+            public Vector3 To;
+
+            /// <summary>It comes to the character's help (VS-ALARM (i)), not against it.</summary>
+            public bool Allied;
+
             public Vector3 Post;
             public Quaternion PostFacing;
         }
