@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,7 +26,7 @@ namespace GameDev.Slice.EditorTools
     /// the route test's capsule clear of every structure, prop and tree but the spot's own piece and the last 0.6 m.</item>
     /// <item>The Soot &amp; Bell: two drinkers at the two nearest free chairs, talking, and one at the bar, drinking, 1.6 m
     /// or more along it from the place before Nell.</item>
-    /// <item>The old chapel: three people standing quietly in its pews' rows, the pews too high to sit on.</item>
+    /// <item>The old chapel: three people standing quietly in its pews' rows, with no prayer clip to sit in them.</item>
     /// </list>
     /// Distances are authoring defaults. Writes <c>Logs/SliceSurvey/activities.txt</c>. Batch:
     /// -executeMethod GameDev.Slice.EditorTools.SliceActivities.Run; every seat of the kit, <see cref="SurveySeats"/>.
@@ -107,6 +108,7 @@ namespace GameDev.Slice.EditorTools
             var paths = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/Prefabs/SliceKit" }).Select(AssetDatabase.GUIDToAssetPath)
                 .Where(p => SeatNames.IsMatch(Path.GetFileNameWithoutExtension(p))).OrderBy(p => p).ToList();
             var report = new StringBuilder($"Every seat of the kit ({paths.Count}), read as the townsfolk read a bench (SliceActivities.Seats)\n\n");
+            var places = new StringBuilder();
             var x = 0f;
             foreach (var path in paths)
             {
@@ -114,16 +116,46 @@ namespace GameDev.Slice.EditorTools
                 go.transform.position = new Vector3(x, 0f, 0f);
                 x += 8f;
                 Physics.SyncTransforms();
-                if (Seats(go, report).Length == 0)
+                var read = Seats(go, report);
+                if (read.Length == 0)
                 {
                     report.AppendLine($"    ({path})");
+                }
+                else
+                {
+                    // Turned to face -z for ActivityPlayTests.RenderTheKitSeats, and read again.
+                    go.transform.RotateAround(go.transform.position, Vector3.up, 180f - read[0].Yaw);
+                    Physics.SyncTransforms();
+                    read = Seats(go, null);
+                }
+
+                places.AppendLine($"kit\t{path}\t{go.transform.eulerAngles.y.ToString("0.###", CultureInfo.InvariantCulture)}\t{Line(read, go.transform.position)}");
+            }
+
+            // Every seat's places in the Soot & Bell and the old chapel, for ActivityPlayTests.RenderTheSeatsInPlace.
+            foreach (var scene in new[] { VeilmouthScene.SootAndBellScenePath, ChapelScenePath })
+            {
+                EditorSceneManager.OpenScene(scene, OpenSceneMode.Single);
+                Physics.SyncTransforms();
+                foreach (var go in Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).Select(t => t.gameObject)
+                             .Where(g => PrefabUtility.IsOutermostPrefabInstanceRoot(g) && SeatNames.IsMatch(Path.GetFileNameWithoutExtension(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g)))))
+                {
+                    places.AppendLine($"room\t{scene}\t0\t{Line(Seats(go, null), Vector3.zero)}");
                 }
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(SeatReport) ?? ".");
             File.WriteAllText(SeatReport, report.ToString());
-            Debug.Log($"[SliceActivities] written {SeatReport}");
+            File.WriteAllText(SeatPlaces, places.ToString());
+            Debug.Log($"[SliceActivities] written {SeatReport}, {SeatPlaces}");
         }
+
+        private const string SeatPlaces = "Logs/SliceSurvey/seat_places.txt";
+
+        /// <summary>Places as text, relative to <paramref name="from"/>: seat x y z, stand x y z, yaw, separated by ';'.</summary>
+        private static string Line(IEnumerable<ActivitySpot.Place> places, Vector3 from) =>
+            string.Join(";", places.Select(p => string.Join(" ", new[] { p.Seat.x - from.x, p.Seat.y - from.y, p.Seat.z - from.z, p.Stand.x - from.x, p.Stand.y - from.y, p.Stand.z - from.z, p.Yaw }
+                .Select(f => f.ToString("0.####", CultureInfo.InvariantCulture)))));
 
         // ------------------------------------------------------------------------------------------- the city
 
@@ -317,8 +349,8 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// The old chapel's people stand quietly in its pews' rows, facing the rostrum: the kit's pew is the Dungeon pack's
-        /// wooden bench fitted to 4 m by its box, its seat 0.85 m over the floor (measured), too high to sit on (99 VS-ANIM).
+        /// The old chapel's people stand quietly in its pews' rows, facing the rostrum, since neither clip pack has a prayer
+        /// (99 VS-ANIM); the pew, 0.85 m before, has stood 0.42 m since the owner's seat trial (99 VS-SEAT).
         /// </summary>
         private static void Chapel_(StringBuilder report)
         {
@@ -437,22 +469,8 @@ namespace GameDev.Slice.EditorTools
                 .Where(h => !h.collider.transform.IsChildOf(seat.transform) && h.point.y < box.center.y).OrderByDescending(h => h.point.y).FirstOrDefault();
             var sunk = floorHit.collider != null ? floorHit.point.y - foot : 0f;
             foot += sunk;
-            var bins = new Dictionary<int, float>();
-            foreach (var (a, b, c) in tris)
-            {
-                var n = Vector3.Cross(b - a, c - a);
-                var area = n.magnitude * 0.5f;
-                var h = ((a.y + b.y + c.y) / 3f) - foot;
-                if (area < 1e-6f || n.normalized.y < 0.9f || h < 0.25f || h > 0.8f)
-                {
-                    continue;
-                }
-
-                var bin = Mathf.RoundToInt(h / 0.02f);
-                bins[bin] = (bins.TryGetValue(bin, out var sum) ? sum : 0f) + area;
-            }
-
-            if (bins.Count == 0)
+            var over = MostAreaUp(tris, foot, 0.8f);
+            if (over == null)
             {
                 // What faces up, by 5 cm of height over the foot, the most area first, and how much it leans.
                 var up = tris.Select(t => (n: Vector3.Cross(t.b - t.a, t.c - t.a), h: ((t.a.y + t.b.y + t.c.y) / 3f) - foot))
@@ -464,7 +482,7 @@ namespace GameDev.Slice.EditorTools
                 return new ActivitySpot.Place[0];
             }
 
-            var top = foot + (bins.OrderByDescending(p => p.Value).First().Key * 0.02f);
+            var top = foot + over.Value;
             Vector3 seatSum = Vector3.zero, backSum = Vector3.zero;
             float seatArea = 0f, backArea = 0f, backTop = top, armSum = 0f, armArea = 0f;
             var seatPoints = new List<Vector3>();
@@ -569,6 +587,37 @@ namespace GameDev.Slice.EditorTools
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// The top of a model's seat over its own foot, m: the height, in 2 cm steps, that holds the most up-facing area
+        /// between 0.25 m and <paramref name="highest"/> over the foot, as <see cref="Seats"/> reads it; null with none.
+        /// The kit sizes its seats by it (<c>SliceKitCatalogue</c>, <c>Spec.SeatTop</c>).
+        /// </summary>
+        public static float? SeatTopOf(GameObject model, float highest = 1f)
+        {
+            var tris = Triangles(model);
+            return tris.Count == 0 ? null : MostAreaUp(tris, tris.Min(t => Mathf.Min(t.a.y, Mathf.Min(t.b.y, t.c.y))), highest);
+        }
+
+        private static float? MostAreaUp(List<(Vector3 a, Vector3 b, Vector3 c)> tris, float foot, float highest)
+        {
+            var bins = new Dictionary<int, float>();
+            foreach (var (a, b, c) in tris)
+            {
+                var n = Vector3.Cross(b - a, c - a);
+                var area = n.magnitude * 0.5f;
+                var h = ((a.y + b.y + c.y) / 3f) - foot;
+                if (area < 1e-6f || n.normalized.y < 0.9f || h < 0.25f || h > highest)
+                {
+                    continue;
+                }
+
+                var bin = Mathf.RoundToInt(h / 0.02f);
+                bins[bin] = (bins.TryGetValue(bin, out var sum) ? sum : 0f) + area;
+            }
+
+            return bins.Count == 0 ? null : bins.OrderByDescending(p => p.Value).First().Key * 0.02f;
         }
 
         private static List<(Vector3 a, Vector3 b, Vector3 c)> Triangles(GameObject g)

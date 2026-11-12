@@ -125,7 +125,7 @@ namespace GameDev.Slice.Tests
             var worshippers = Object.FindObjectsByType<TownsfolkWalker>(FindObjectsSortMode.None).Where(w => w.Home != null).ToList();
             Assert.AreEqual(3, worshippers.Count);
 
-            // The kit's pew is too high to sit on, its seat 0.85 m over the floor (99 VS-ANIM): they stand in its rows.
+            // No prayer in either clip pack (99 VS-ANIM): they stand in its rows, though since the owner's seat trial the pew is low enough to sit on.
             Assert.IsTrue(worshippers.All(w => w.Home.Kind == ActivitySpot.Activity.Attend && w.Home.Quiet), "standing quietly in the pews' rows");
             Assert.AreEqual(3, worshippers.Select(w => w.HomePlace).Distinct().Count());
         }

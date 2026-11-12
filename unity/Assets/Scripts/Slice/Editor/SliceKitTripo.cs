@@ -120,7 +120,7 @@ namespace GameDev.Slice.EditorTools
             // In the room. True sizes: a wing chair 1.05 m high, a coat stand 1.7 m, a floor vase 0.75 m, a log basket
             // 0.55 m, a stand of fire irons 0.67 m, a pedestal table 0.67 m. The armchair matches Victorian Interiors' own
             // (1.4 m), which stands beside it in the same rooms.
-            yield return T("TrArmchair", "red_velvet_armchair", 1.4f);
+            yield return Seat(T("TrArmchair", "red_velvet_armchair", 1.4f)); // its seat at 0.42 m (FitSeat), 1.05 m high
             yield return T("TrCoatRack", "wooden_coat_rack", 2.05f);
             yield return T("TrVase", "antique_vase", 0.9f);
             yield return T("TrLogHolder", "log_holder", 0.65f);

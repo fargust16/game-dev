@@ -93,6 +93,7 @@ namespace GameDev.Slice.EditorTools
             public string RailPosts;  // the stair: this newel post at each end of each of its rails, as the pack's demo stands them (StairLab)
             public bool KeepY;        // the model's own floor line (y 0) stands on the floor, and what lies below it hangs below: the balustrade's fascia over the well's edge
             public float Sink;        // m what is seen is set into the ground: leaf cards whose clear edges reach below the leaves (S5a play test)
+            public float SeatTop;     // when above 0, a seat: scaled so its seat's top stands this high, m, instead of by Factor (FitSeat; the owner, 2026-11-12)
             public Vector3? Seat;     // a linear leaf seated as the pack's demo seats it: its middle this far along from the block's middle, its foot this high, its own pivot plane this far across the line (StairLab.MeasureDoorways)
             public bool Books;        // a bookcase: rows of the pack's books stand on each of its shelves
             public string[] Goods;    // shelves of goods: the pack's files stand in rows on each shelf, as books do
@@ -173,6 +174,23 @@ namespace GameDev.Slice.EditorTools
             return spec;
         }
 
+        /// <summary>
+        /// A seat (the owner, 2026-11-12: the seats alone leave the furniture's scale, to see whether the kit's seats will
+        /// do): scaled by <see cref="FitSeat"/> so its seat's top stands at the seated bodies' 0.42 m
+        /// (<see cref="GameDev.Slice.People.TownsfolkWalker.SeatTop"/>, furnishing rules §13), whatever its Factor or size.
+        /// </summary>
+        private static Spec Seat(Spec spec)
+        {
+            spec.SeatTop = GameDev.Slice.People.TownsfolkWalker.SeatTop;
+            return spec;
+        }
+
+        /// <summary>
+        /// The seats' wrappers written again in place, keeping their GUIDs, after <see cref="FitSeat"/>. Batch:
+        /// -executeMethod GameDev.Slice.EditorTools.SliceKitCatalogue.RebuildSeats
+        /// </summary>
+        public static void RebuildSeats() => LoadRebuilding(Specs().Where(s => s.SeatTop > 0f).Select(s => s.Key).ToArray());
+
         private static Spec S(string key, string family, string part, string folder, string file, string layer,
             Body body = Body.Box, Anchor anchor = Anchor.Centre) =>
             new Spec { Key = key, Family = family, Part = part, Folder = folder, File = file, Layer = layer, Body = body, Anchor = anchor };
@@ -243,7 +261,7 @@ namespace GameDev.Slice.EditorTools
             var lamp = S("LampPost", "Street", "Lamp", Tripo, "vintage_street_lamp_3d_model", pr);
             lamp.SizeY = 4f;
             yield return lamp;
-            yield return Game(S("Bench", "Street", "Bench", VictorianStreet, "Wooden bench", pr, anchor: Anchor.Front));
+            yield return Seat(Game(S("Bench", "Street", "Bench", VictorianStreet, "Wooden bench", pr, anchor: Anchor.Front)));
             yield return Game(S("TrashCan", "Street", "TrashCan", VictorianStreet, "Trash can", pr));
             yield return Game(S("Barrel", "Props", "Barrel", Cc0, "WoodBarrel", pr)); // rileyb3d, CC0 (2026-11-11), in place of the low-poly barrel
             yield return Game(S("Box", "Props", "Box", Cc0, "WoodenCrateC", pr)); // rileyb3d, CC0 (2026-11-11), in place of the low-poly box
@@ -264,8 +282,8 @@ namespace GameDev.Slice.EditorTools
 
             yield return Game(S("Table", "Furniture", "Table", Dungeon2, "Table_Preset_01", pr));
             yield return Game(S("TablePlain", "Furniture", "TablePlain", Dungeon2, "Table_01", pr));
-            yield return Game(S("Chair", "Furniture", "Chair", Dungeon2, "Chair_Wooden_01", pr));
-            yield return Game(S("Pew", "Furniture", "Pew", Dungeon2, "Bench_Wooden_01", pr));
+            yield return Seat(Game(S("Chair", "Furniture", "Chair", Dungeon2, "Chair_Wooden_01", pr)));
+            yield return Seat(Game(S("Pew", "Furniture", "Pew", Dungeon2, "Bench_Wooden_01", pr)));
             yield return Game(S("Rostrum", "Furniture", "Rostrum", Dungeon2, "Rostrum_Preset_01", pr, anchor: Anchor.Back));
             yield return Game(S("Candles", "Furniture", "Candles", Dungeon2, "Candlestick_Floor_01_Lit", pr));
             yield return Game(S("Drawer", "Furniture", "Drawer", Dungeon2, "Drawer_Preset_01", pr, anchor: Anchor.Front));
@@ -490,7 +508,7 @@ namespace GameDev.Slice.EditorTools
             yield return F("BkCupboardGlass", "WoodCupboard02", pr, anchor: Anchor.Back);
             yield return F("BkCupboardTall", "WoodCupboard03", pr, anchor: Anchor.Back);
             yield return F("BkDrawer", "WoodDrawer01", pr, anchor: Anchor.Back);
-            yield return F("BkChair", "Chair01", pr);
+            yield return Seat(F("BkChair", "Chair01", pr));
             yield return F("BkStool", "WoodStool", pr);
             yield return F("BkAlembic", "Alembic02", pr, anchor: Anchor.Back);
             yield return F("BkCarpet", "Carpet02", ng, Body.None);
@@ -764,6 +782,11 @@ namespace GameDev.Slice.EditorTools
             {
                 Scale(model, spec);
             }
+
+            if (spec.SeatTop > 0f)
+            {
+                model = FitSeat(root, model, spec);
+            }
             var b = Seen(model);
             var linear = spec.Anchor == Anchor.Linear || spec.Anchor == Anchor.Face;
             var node = spec.Anchor == Anchor.Node;
@@ -1011,6 +1034,44 @@ namespace GameDev.Slice.EditorTools
             leaf.name = "Cell door";
             PrefabUtility.SaveAsPrefabAsset(root, bars.Path);
             PrefabUtility.UnloadPrefabContents(root);
+        }
+
+        /// <summary>
+        /// A seat scaled so its seat's top, as the townsfolk read it (<see cref="SliceActivities.SeatTopOf"/>), stands
+        /// <see cref="Spec.SeatTop"/> over its foot: a seat for one whole, and a seat for several (over 1.5 m long, a bench,
+        /// a pew) in height only, so that it keeps its length, its places and its footprint: scaled in depth too, the street
+        /// bench took one cell where it had two, and every bench stood 1 m further back (the owner's trial of 2026-11-12).
+        /// </summary>
+        private static GameObject FitSeat(GameObject root, GameObject model, Spec spec)
+        {
+            var top = SliceActivities.SeatTopOf(model);
+            if (top == null || top.Value < 0.1f)
+            {
+                Debug.LogError($"Slice kit catalogue: no seat read on '{spec.Key}'.");
+                return model;
+            }
+
+            // A seat already within 3 cm of it keeps its size (the Victorian armchair, settee and sofas, 0.40–0.42 m):
+            // grown 5 %, a sofa was 1.05 m deep and took a second cell.
+            if (Mathf.Abs(top.Value - spec.SeatTop) <= 0.03f)
+            {
+                return model;
+            }
+
+            var k = spec.SeatTop / top.Value;
+            if (Seen(model).size.x <= 1.5f)
+            {
+                model.transform.localScale *= k;
+                return model;
+            }
+
+            // A vendor root is often turned, so the scale goes on an upright holder, as Stretch's does.
+            var holder = new GameObject("Model");
+            holder.transform.SetParent(root.transform, false);
+            model.name = "Base";
+            model.transform.SetParent(holder.transform, true);
+            holder.transform.localScale = new Vector3(1f, k, 1f);
+            return holder;
         }
 
         private static void Scale(GameObject model, Spec spec)

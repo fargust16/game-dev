@@ -280,6 +280,252 @@ namespace GameDev.Slice.Tests
             Debug.Log("[RenderTheSeatedBodies] Logs/SliceSurvey/seated_side_40.png, _45.png, seated_close.png");
         }
 
+        // ------------------------------------------------------------- the kit's seats seen (the owner, 2026-11-12)
+
+        /// <summary>
+        /// Every seat's places as the editor reads them, which a play test cannot (a mesh not marked readable): written by
+        /// <c>SliceActivities.SurveySeats</c>, run first. Kind (kit or room), prefab or scene, the kit seat's turn, places.
+        /// </summary>
+        private static List<(string Kind, string Path, float Yaw, ActivitySpot.Place[] Places)> SeatPlaces()
+        {
+            const string file = "Logs/SliceSurvey/seat_places.txt";
+            Assert.IsTrue(System.IO.File.Exists(file), $"{file}: run SliceActivities.SurveySeats first");
+            float F(string s) => float.Parse(s, System.Globalization.CultureInfo.InvariantCulture);
+            ActivitySpot.Place[] Places(string text) => text.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(p => p.Split(' ').Select(F).ToArray())
+                .Select(v => new ActivitySpot.Place { Seat = new Vector3(v[0], v[1], v[2]), Stand = new Vector3(v[3], v[4], v[5]), Yaw = v[6] }).ToArray();
+            return System.IO.File.ReadAllLines(file).Select(l => l.Split('\t')).Where(f => f.Length >= 3)
+                .Select(f => (f[0], f[1], F(f[2]), f.Length > 3 ? Places(f[3]) : new ActivitySpot.Place[0])).ToList();
+        }
+
+        /// <summary>Every loose prop held where it stands: a body set down in its seat would push a loose chair over.</summary>
+        private static void HoldLooseProps()
+        {
+            foreach (var body in Object.FindObjectsByType<Rigidbody>(FindObjectsSortMode.None).Where(b => b.GetComponentInParent<Animator>() == null))
+            {
+                body.isKinematic = true;
+            }
+        }
+
+        private static GameObject SeatedBody(string prefab, ActivitySpot.Place place)
+        {
+            var go = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(prefab), place.Stand, Quaternion.Euler(0f, place.Yaw, 0f));
+            var animator = go.GetComponentInChildren<Animator>();
+            animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            var walker = go.GetComponent<TownsfolkWalker>();
+            if (walker != null)
+            {
+                walker.enabled = false;
+            }
+
+            animator.Play("Sit", 0, 0.5f);
+            return go;
+        }
+
+        private static Bounds Seen(GameObject g)
+        {
+            var renderers = g.GetComponentsInChildren<Renderer>().Where(r => r.enabled).ToArray();
+            var b = renderers[0].bounds;
+            foreach (var r in renderers)
+            {
+                b.Encapsulate(r.bounds);
+            }
+
+            return b;
+        }
+
+        private static Texture2D Read(RenderTexture texture)
+        {
+            RenderTexture.active = texture;
+            var image = new Texture2D(texture.width, texture.height, TextureFormat.RGB24, false);
+            image.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
+            RenderTexture.active = null;
+            return image;
+        }
+
+        /// <summary>Writes <c>Logs/SliceSurvey/&lt;name&gt;.png</c>, and with a <c>&lt;name&gt;_before.png</c> beside it, the two one over the other as <c>&lt;name&gt;_compare.png</c>.</summary>
+        private static void Write(string name, Texture2D image)
+        {
+            System.IO.Directory.CreateDirectory("Logs/SliceSurvey");
+            System.IO.File.WriteAllBytes($"Logs/SliceSurvey/{name}.png", image.EncodeToPNG());
+            var before = $"Logs/SliceSurvey/{name}_before.png";
+            if (!System.IO.File.Exists(before))
+            {
+                return;
+            }
+
+            var old = new Texture2D(2, 2);
+            old.LoadImage(System.IO.File.ReadAllBytes(before));
+            if (old.width != image.width)
+            {
+                return;
+            }
+
+            const int band = 8;
+            var both = new Texture2D(image.width, old.height + band + image.height, TextureFormat.RGB24, false);
+            both.SetPixels(0, 0, image.width, image.height, image.GetPixels());
+            both.SetPixels(0, image.height, image.width, band, Enumerable.Repeat(Color.black, image.width * band).ToArray());
+            both.SetPixels(0, image.height + band, old.width, old.height, old.GetPixels());
+            System.IO.File.WriteAllBytes($"Logs/SliceSurvey/{name}_compare.png", both.EncodeToPNG());
+        }
+
+        /// <summary>
+        /// Every seat of the kit with the townsfolk seated where they sit (the owner's trial of 2026-11-12, the seats'
+        /// scale): a sheet of 4 × 3, in the order of their names, each turned to face the camera, from the front at
+        /// three quarters and from the side. Writes <c>kit_seats_front.png</c> and <c>kit_seats_side.png</c>.
+        /// </summary>
+        [UnityTest, Explicit("diagnostic: run by name"), Category("Diagnostic")]
+        public IEnumerator RenderTheKitSeats()
+        {
+            yield return Ground();
+            var kit = SeatPlaces().Where(s => s.Kind == "kit").ToList();
+            var origin = Area + new Vector3(-25f, 0f, 22f);
+            var centres = new List<Vector3>();
+            var body = 0;
+            for (var i = 0; i < kit.Count; i++)
+            {
+                var at = origin + new Vector3(i * 4f, 0f, i * -4f); // on a diagonal out of each other's views
+                var seat = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(kit[i].Path), at, Quaternion.Euler(0f, kit[i].Yaw, 0f)); // its front toward -z, the camera
+                HoldLooseProps();
+                foreach (var place in kit[i].Places)
+                {
+                    SeatedBody(Bodies[body++ % Bodies.Length], new ActivitySpot.Place { Seat = at + place.Seat, Stand = at + place.Stand, Yaw = place.Yaw });
+                }
+
+                centres.Add(Seen(seat).center);
+                Debug.Log($"[RenderTheKitSeats] {i + 1}: {System.IO.Path.GetFileNameWithoutExtension(kit[i].Path)}, {kit[i].Places.Length} seated");
+            }
+
+            yield return new WaitForSeconds(1f);
+            var camera = new GameObject("Seat camera").AddComponent<Camera>();
+            camera.backgroundColor = new Color(0.85f, 0.87f, 0.9f);
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            foreach (var side in new[] { false, true })
+            {
+                var sheet = new RenderTexture(side ? 2400 : 3200, side ? 1800 : 1800, 24);
+                camera.targetTexture = sheet;
+                camera.orthographic = side;
+                camera.orthographicSize = 0.85f;
+                camera.fieldOfView = 35f;
+                for (var i = 0; i < centres.Count && i < 12; i++)
+                {
+                    camera.rect = new Rect((i % 4) / 4f, 1f - (((i / 4) + 1) / 3f), 0.25f, 1f / 3f);
+                    camera.aspect = side ? 1f : 4f / 3f;
+                    var c = centres[i];
+                    if (side)
+                    {
+                        camera.transform.SetPositionAndRotation(new Vector3(c.x + 6f, origin.y + 0.75f, c.z), Quaternion.Euler(0f, -90f, 0f));
+                    }
+                    else
+                    {
+                        var eye = c + new Vector3(-2.2f, 0.9f, -3.6f);
+                        camera.transform.SetPositionAndRotation(eye, Quaternion.LookRotation(c + (Vector3.up * 0.05f) - eye));
+                    }
+
+                    camera.Render();
+                }
+
+                Write(side ? "kit_seats_side" : "kit_seats_front", Read(sheet));
+            }
+        }
+
+        /// <summary>
+        /// The seats where they stand, every free place taken (the owner's trial of 2026-11-12): the Soot &amp; Bell's
+        /// taproom and the old chapel, each from its two most open sides, and two of Veilmouth's street benches. Writes
+        /// <c>seats_soot_and_bell.png</c>, <c>seats_old_chapel.png</c> and <c>seats_street.png</c>.
+        /// </summary>
+        [UnityTest, Explicit("diagnostic: run by name"), Category("Diagnostic")]
+        public IEnumerator RenderTheSeatsInPlace()
+        {
+            yield return Room("Assets/Scenes/Slice/Interiors/SootAndBell.unity", "seats_soot_and_bell");
+            yield return Room("Assets/Scenes/Slice/Interiors/OldChapel.unity", "seats_old_chapel");
+
+            yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
+            var benches = ActivitySpot.All.Where(s => s.Kind == ActivitySpot.Activity.Sit && s.Piece != null && s.Piece.name.Contains("Bench")).Take(2).ToList();
+            HoldLooseProps();
+            var texture = new RenderTexture(3200, 900, 24);
+            var camera = new GameObject("Bench camera").AddComponent<Camera>();
+            camera.targetTexture = texture;
+            camera.fieldOfView = 40f;
+            var body = 0;
+            foreach (var spot in benches)
+            {
+                for (var p = 0; p < spot.Count; p++)
+                {
+                    SeatedBody(Bodies[body++ % Bodies.Length], spot.PlaceAt(p));
+                }
+            }
+
+            yield return new WaitForSeconds(1f);
+            for (var i = 0; i < benches.Count; i++)
+            {
+                var place = benches[i].PlaceAt(0);
+                var middle = Enumerable.Range(0, benches[i].Count).Select(p => benches[i].PlaceAt(p).Seat).Aggregate(Vector3.zero, (a, v) => a + v) / benches[i].Count;
+                var forward = Quaternion.Euler(0f, place.Yaw, 0f) * Vector3.forward;
+                var right = Vector3.Cross(Vector3.up, forward);
+                var eye = middle + (forward * 3.2f) + (right * 1.4f) + (Vector3.up * 0.8f);
+                camera.rect = new Rect(i * 0.5f, 0f, 0.5f, 1f);
+                camera.aspect = 16f / 9f;
+                camera.transform.SetPositionAndRotation(eye, Quaternion.LookRotation(middle + (Vector3.up * 0.2f) - eye));
+                camera.Render();
+            }
+
+            Write("seats_street", Read(texture));
+        }
+
+        private static IEnumerator Room(string scene, string name)
+        {
+            yield return LoadScene(scene);
+            var people = Object.FindObjectsByType<Animator>(FindObjectsSortMode.None).Select(a => a.transform.position).ToList();
+            var seats = SeatPlaces().Where(s => s.Kind == "room" && s.Path == scene).ToList();
+            HoldLooseProps();
+            var ground = seats.SelectMany(s => s.Places).Select(p => p.Stand.y).DefaultIfEmpty(0f).Min();
+            var body = 0;
+            var centres = new List<Vector3>();
+            foreach (var seat in seats)
+            {
+                foreach (var place in seat.Places.Where(p => p.Stand.y < ground + 1f)) // the ground floor's
+                {
+                    centres.Add(place.Seat);
+                    if (body < 18 && people.All(p => Vector3.Distance(Flat(p), Flat(place.Seat)) > 0.6f))
+                    {
+                        SeatedBody(Bodies[body++ % Bodies.Length], place);
+                    }
+                }
+            }
+
+            Debug.Log($"[RenderTheSeatsInPlace] {scene}: {seats.Count} seats, {centres.Count} places, {body} seated");
+            yield return new WaitForSeconds(1f);
+            var centre = centres.Count > 0 ? centres.Aggregate(Vector3.zero, (a, v) => a + v) / centres.Count : Vector3.zero;
+            var floor = ground;
+            var eyeLevel = new Vector3(centre.x, floor + 2.3f, centre.z);
+
+            // The two most open ways from the seats' middle, at least 90° apart.
+            var ways = Enumerable.Range(0, 24).Select(k => Quaternion.Euler(0f, k * 15f, 0f) * Vector3.forward)
+                .Select(d => (d, far: Physics.Raycast(eyeLevel, d, out var hit, 10f, ~0, QueryTriggerInteraction.Ignore) ? hit.distance : 10f))
+                .OrderByDescending(w => w.far).ToList();
+            var first = ways[0];
+            var second = ways.First(w => Vector3.Angle(w.d, first.d) >= 90f);
+            var texture = new RenderTexture(3200, 900, 24);
+            var camera = new GameObject("Room camera").AddComponent<Camera>();
+            camera.targetTexture = texture;
+            camera.fieldOfView = 60f;
+            camera.nearClipPlane = 0.05f;
+            var views = new[] { first, second };
+            for (var i = 0; i < views.Length; i++)
+            {
+                var eye = eyeLevel + (views[i].d * Mathf.Max(0.5f, views[i].far - 0.4f));
+                camera.rect = new Rect(i * 0.5f, 0f, 0.5f, 1f);
+                camera.aspect = 16f / 9f;
+                camera.transform.SetPositionAndRotation(eye, Quaternion.LookRotation(new Vector3(centre.x, floor + 0.7f, centre.z) - eye));
+                camera.Render();
+            }
+
+            Write(name, Read(texture));
+        }
+
+        private static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
+
         [UnityTest]
         public IEnumerator QuaterniusClipsFaceTheWayTheRootDoesInPlay()
         {

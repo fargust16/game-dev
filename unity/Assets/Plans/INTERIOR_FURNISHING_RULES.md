@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.13
+Version: 0.14
 
 Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09, 2026-11-10); fireplaces and radiators in §10.1 (owner, 2026-11-10); every piece's size checked in §11 (owner's walk, 2026-11-10); the CC0 pieces in §12 (2026-11-11); seat sizes in §13 (owner, 2026-11-12)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-12 (§13, the owner's seat sizes in game metres, measured on the seated bodies; their game scale open as VS-SEAT. The earlier note is in the update history)
+Last Updated: 2026-11-12 (§13, the owner's trial: the kit's seats scaled so their top stands 0.42 m instead of ×1.2, to judge whether new seat models are needed. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -266,7 +266,7 @@ Furniture stands at game scale, ×1.2 its true size (kit standard §1). A true s
 | A nightstand | 0.6–0.7 m |
 | A standing lamp | 1.5–1.8 m |
 
-A seat is the exception the seated bodies make: its game size is §13's, its top 0.42 m over the floor, and how it is scaled is open (VS-SEAT).
+A seat is the exception the seated bodies make: its game size is §13's, its top 0.42 m over the floor, and since the owner's trial of 2026-11-12 the kit's seats are scaled to it instead of ×1.2 (§13); whether that stays is open (VS-SEAT).
 
 **Changed** (game sizes; `SliceKitTripo`, `SliceKitVictorian`):
 
@@ -357,17 +357,18 @@ The owner asked which benches, chairs and armchairs the player and the NPCs can 
 
 No high stool: the sitting clip keeps the feet on the floor. A seat's places are read from its own mesh (`SliceActivities.Seats`), so a new model needs no hand-placed points: a place to every metre of seat, at most four, the sitter's hip joint 0.225 m behind the front edge.
 
-**Game scale.** These are game sizes, set by the bodies. Furniture stands at ×1.2 its true size (§11, kit standard §1), so a real chair's 0.42–0.46 m (§11's table) stands 0.50–0.55 m in the game, as the kit's Victorian chair (0.50 m) and street bench (0.54 m) do (measured), and a body sinks 8–12 cm into them. §11 sets a table's top at 0.90 m in the game: 0.48 m over a 0.42 m seat, where a real table stands about 0.3 m over its chair. Two things are the owner's ([99](../../../99%20Open%20Questions.md) VS-SEAT):
+**Game scale.** These are game sizes, set by the bodies. Furniture stands at ×1.2 its true size (§11, kit standard §1), so a real chair's 0.42–0.46 m (§11's table) stands 0.50–0.55 m in the game, as the kit's Victorian chair (0.50 m) and street bench (0.54 m) did before the owner's trial below (measured), a body sinking 8–12 cm into them. §11 sets a table's top at 0.90 m in the game: 0.48 m over a 0.42 m seat, where a real table stands about 0.3 m over its chair. Two things are the owner's ([99](../../../99%20Open%20Questions.md) VS-SEAT):
 
 - whether a new seat is modelled at its game size divided by 1.2 and wrapped like the rest, or modelled at its game size and exempt from FurnitureScale;
 - whether the tables people sit at come down with it.
 
-**Until the new seats come**, the walker sits on the kit's seats 0.36–0.62 m over the ground under its place, its feet on the floor, and sinks into the higher ones. It does not sit on these (measured, `Logs/SliceSurvey/seats.txt`):
+**The owner's trial** (2026-11-12): to see whether new models are needed, the kit's seats, and no other furniture, leave the ×1.2 scale and are scaled so that their seat's top stands 0.42 m (`Spec.SeatTop`, `SliceKitCatalogue.FitSeat`). Removing ×1.2 alone would not have fitted them: the street bench would stand 0.45 m, the dark chair 0.47, the furniture kit's chair 0.65 and the pew 0.71 (both fitted by their boxes), and the Victorian pieces and the Tripo armchair carry no ×1.2. So:
 
-- the pew, 0.85 m;
-- the furniture kit's chair, 0.78 m;
-- the dark stool, 0.70 m;
-- the footstool, 0.34 m.
+- a seat for one person, a chair or an armchair, is scaled whole;
+- a seat for several, the street bench or the pew, is scaled in height only, so that it keeps its length, its depth and its cells;
+- a seat already within 3 cm of 0.42 m keeps its size: the Victorian armchair, settee and sofas.
+
+Measured after it (`Logs/SliceSurvey/seats.txt`): the street bench, the pew, the furniture kit's chair, the dark chair, the Victorian chair, the Tripo armchair and the settee 0.42 m; the Victorian armchair and sofas 0.40 m. Before it the street bench stood 0.54 m, the Victorian chair 0.50, the dark chair and the Tripo armchair 0.56, the furniture kit's chair 0.78 and the pew 0.85. Not sat on, and not scaled: the dark stool, 0.70 m, and the footstool, 0.34 m. The walker sits on seats 0.36–0.62 m over the ground under its place, and a seated walker's body ignores its seat's colliders, so that it no longer shoves a loose chair aside (`TownsfolkWalker.IgnoreSeat`). The tables stay at §11's 0.90 m. Whether the scaled seats stay or new models come is the owner's ([99](../../../99%20Open%20Questions.md) VS-SEAT); the renders before and after are `ActivityPlayTests.RenderTheKitSeats` and `RenderTheSeatsInPlace`, diagnostics run by name.
 
 ## Sources
 
@@ -377,6 +378,7 @@ No high stool: the sitting clip keeps the feet on the floor. A seat's places are
 
 ## Update history
 
+- 2026-11-12 (v0.14): §13, the owner's trial: the kit's seats leave the ×1.2 scale and are scaled so their top stands 0.42 m; the seated walker no longer shoves its seat.
 - 2026-11-12 (v0.13): §13, the owner's seat sizes in game metres, measured on the seated bodies; their game scale open as VS-SEAT; §11's table notes the exception.
 - 2026-11-11 (v0.12): §12, the CC0 pieces from the owner's four Blender libraries, on the Victorian tables and placed in the Soot & Bell and the cellar; `HangOnWall`.
 - 2026-11-11 (v0.11): §11.1, the owner's play test: the radiator ×1.5 against a plain wall, the Tripo desk larger at the same top; §10, §10.1 changed to match.

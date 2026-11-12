@@ -277,9 +277,9 @@ namespace GameDev.Slice.EditorTools
             yield return Back("ViSideboard", "Cupboard_4");
             yield return Back("ViShelfSmall", "Shelf_4");
             yield return Back("ViClock", "Clock");
-            yield return Back("ViSettee", "Couch_1");
-            yield return Back("ViSofa", "Couch_2_Brown");
-            yield return Back("ViSofaGreen", "Couch_2_Green");
+            yield return Seat(Back("ViSettee", "Couch_1"));
+            yield return Seat(Back("ViSofa", "Couch_2_Brown"));
+            yield return Seat(Back("ViSofaGreen", "Couch_2_Green"));
             yield return Back("ViBed", "Bed", ia); // measured on the sheets: its head is at its back
             yield return Back("ViBath", "Bathtub");
             yield return Back("ViToilet", "Toilet_Seat");
@@ -354,8 +354,8 @@ namespace GameDev.Slice.EditorTools
             var chess = F("ViTableChess", "Table_3");
             chess.On = new[] { (Cc0, "ChessSet", 0.5f, 0.5f) };
             yield return chess;
-            yield return F("ViChair", "Chair_1");
-            yield return F("ViArmchair", "Chair_2");
+            yield return Seat(F("ViChair", "Chair_1"));
+            yield return Seat(F("ViArmchair", "Chair_2"));
             yield return F("ViFootstool", "Chair_Small");
             yield return F("ViCoatStand", "Hanger");
             // §11 of the furnishing rules: the pack's candle stand stood 3.29 m, a true 2.74 m; a torchère's 1.7 m true (authoring default).

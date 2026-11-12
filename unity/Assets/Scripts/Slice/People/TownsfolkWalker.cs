@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using GameDev.World.Timekeeping;
 using UnityEngine;
 
@@ -89,10 +90,9 @@ namespace GameDev.Slice.People
         public const float HipsBehindFront = 0.225f;
 
         /// <summary>
-        /// The seats a walker sits on, m over the floor: the kit's chairs and street benches (0.50–0.56 m) until the owner's
-        /// new seats replace them, the body sinking a little into them, and a street bench on a slope standing up to 6 cm
-        /// higher over the ground under its place (two in Veilmouth at 0.60 m, measured); never a pew or a stool (0.70 m and
-        /// over) or a footstool (authoring defaults).
+        /// The seats a walker sits on, m over the floor: the kit's seats, scaled to SeatTop on the owner's trial (0.40–0.42 m,
+        /// 99 VS-SEAT), with room for a seat at the old 0.50–0.56 m and a street bench on a slope standing higher over the
+        /// ground under its place; never a stool (0.70 m) or a footstool (0.34 m) (authoring defaults).
         /// </summary>
         public const float SeatLowest = 0.36f;
 
@@ -639,6 +639,11 @@ namespace GameDev.Slice.People
 
             _spot = spot;
             _place = place;
+            if (spot.Kind == ActivitySpot.Activity.Sit)
+            {
+                IgnoreSeat(true);
+            }
+
             _back = back;
             _mode = Mode.Going;
             VisitsBegun++;
@@ -918,7 +923,39 @@ namespace GameDev.Slice.People
             if (_spot != null)
             {
                 _spot.Leave(_place, this);
+                IgnoreSeat(false);
                 _spot = null;
+            }
+        }
+
+        private readonly List<Collider> _seatParts = new List<Collider>();
+
+        /// <summary>
+        /// A seated walker never shoves its seat: its capsule, round its root, reaches about 0.2 m into the seat, and a
+        /// loose chair or armchair it sat on was pushed aside or over (measured, ActivityPlayTests.RenderTheKitSeats,
+        /// 2026-11-12). From the visit's start to its end its colliders ignore whatever is within 0.3 m of its place's seat.
+        /// </summary>
+        private void IgnoreSeat(bool ignore)
+        {
+            var own = GetComponents<Collider>().Where(c => c.enabled).ToArray();
+            if (ignore)
+            {
+                _seatParts.Clear();
+                _seatParts.AddRange(Physics.OverlapSphere(_spot.PlaceAt(_place).Seat, 0.3f, ~0, QueryTriggerInteraction.Ignore)
+                    .Where(c => !c.transform.IsChildOf(transform)));
+            }
+
+            foreach (var part in _seatParts.Where(c => c != null && c.enabled && c.gameObject.activeInHierarchy))
+            {
+                foreach (var mine in own)
+                {
+                    Physics.IgnoreCollision(mine, part, ignore);
+                }
+            }
+
+            if (!ignore)
+            {
+                _seatParts.Clear();
             }
         }
 
