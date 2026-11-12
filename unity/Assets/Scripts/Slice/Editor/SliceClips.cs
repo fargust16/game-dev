@@ -51,7 +51,13 @@ namespace GameDev.Slice.EditorTools
             public readonly float From;
             public readonly float To;
 
-            private Entry(string use, string folder, string name, string file, bool loop, float from = -1f, float to = -1f)
+            /// <summary>
+            /// Whether a cut leaves its clip's own rise out of the pose, its lowest foot kept on the root, as the jump's
+            /// take-off is while the code carries the body up.
+            /// </summary>
+            public readonly bool FreeHeight;
+
+            private Entry(string use, string folder, string name, string file, bool loop, float from = -1f, float to = -1f, bool freeHeight = false)
             {
                 Use = use;
                 Folder = folder;
@@ -60,6 +66,7 @@ namespace GameDev.Slice.EditorTools
                 Loop = loop;
                 From = from;
                 To = to;
+                FreeHeight = freeHeight;
             }
 
             public bool Kevin => File == null;
@@ -67,7 +74,8 @@ namespace GameDev.Slice.EditorTools
             public bool Cut => From >= 0f;
 
             /// <summary>A part of a Kevin Iglesias file, from <paramref name="from"/> to <paramref name="to"/> s, cut out as a clip of its own.</summary>
-            public static Entry KCut(string use, string folder, string name, float from, float to) => new Entry(use, folder, name, null, false, from, to);
+            public static Entry KCut(string use, string folder, string name, float from, float to, bool freeHeight = false) =>
+                new Entry(use, folder, name, null, false, from, to, freeHeight);
 
             /// <summary>A Kevin Iglesias file, e.g. <c>K("Walk", "Movement/Walk", "Walk01_Forward", true)</c>.</summary>
             public static Entry K(string use, string folder, string name, bool loop) => new Entry(use, folder, name, null, loop);
@@ -114,6 +122,12 @@ namespace GameDev.Slice.EditorTools
             K("JumpUp", "Movement/Jump", "Jump01 - Begin"),
             K("Fall", "Movement/Jump", "Fall01", true),
             K("JumpLand", "Movement/Jump", "Jump01 - Land"),
+
+            // The jump's take-off as the body rises (owner, 2026-11-12: the jump showed only a fall, its arms raised): from
+            // the legs' push at 0.10 s to the knees drawn up at 0.43 s, before the arms begin to rise (measured,
+            // tools.txt: the toes leave the ground at 0.25 s and stand 0.38 m up at 0.43 s; the hands rise over -0.22 m
+            // under the shoulders only after 0.45 s). The code carries the body up, so the clip's own rise is left out.
+            Entry.KCut("JumpRise", "Movement/Jump", "Jump01 - Begin", 0.10f, 0.43f, true),
 
             // Combat (Human Melee, Soldier and Spellcasting)
             K("Guard", "Combat", "CombatIdle01", true),
@@ -436,14 +450,14 @@ namespace GameDev.Slice.EditorTools
                 loopTime = false,
                 loopPose = false,
                 lockRootRotation = own.lockRootRotation,
-                lockRootHeightY = own.lockRootHeightY,
+                lockRootHeightY = !e.FreeHeight && own.lockRootHeightY,
                 lockRootPositionXZ = own.lockRootPositionXZ,
                 keepOriginalOrientation = own.keepOriginalOrientation,
-                keepOriginalPositionY = own.keepOriginalPositionY,
+                keepOriginalPositionY = !e.FreeHeight && own.keepOriginalPositionY,
                 keepOriginalPositionXZ = own.keepOriginalPositionXZ,
-                heightFromFeet = own.heightFromFeet,
+                heightFromFeet = e.FreeHeight || own.heightFromFeet,
                 rotationOffset = own.rotationOffset,
-                heightOffset = own.heightOffset,
+                heightOffset = e.FreeHeight ? 0f : own.heightOffset,
                 cycleOffset = own.cycleOffset,
                 mirror = own.mirror,
             })).ToArray();
@@ -488,13 +502,15 @@ namespace GameDev.Slice.EditorTools
         /// A walking townsperson's controller at <paramref name="path"/> (AN6), built afresh in place so the prefabs keep it.
         /// Its states have no transitions: <c>TownsfolkWalker</c> cross-fades to each as it walks, stands, greets, sits,
         /// bargains or drinks. Walk, the four idles of a stop (Idle, Idle2, Idle3, FoldArms), Sit, SitTalk, TalkIdle and
-        /// ShakeHead loop; StandToSit, SitToStand, Nod and Drink play once. Foot IK on every state.
+        /// ShakeHead loop; StandToSit, SitToStand, Nod, Drink and Gather2, with which a knocked chair is set up, play once:
+        /// Gather2, as its hands come down to 0.73 m at 0.53 s, where Gather's stay at 1.17 m (measured, clip_survey.txt).
+        /// Foot IK on every state.
         /// </summary>
         public static AnimatorController Walker(string path, bool female)
         {
             var controller = Fresh(path);
             var machine = controller.layers[0].stateMachine;
-            var uses = new[] { "Walk", "Idle", "Idle2", "Idle3", "FoldArms", "StandToSit", "Sit", "SitTalk", "SitToStand", "TalkIdle", "Nod", "ShakeHead", "Drink" };
+            var uses = new[] { "Walk", "Idle", "Idle2", "Idle3", "FoldArms", "StandToSit", "Sit", "SitTalk", "SitToStand", "TalkIdle", "Nod", "ShakeHead", "Drink", "Gather2" };
             for (var i = 0; i < uses.Length; i++)
             {
                 var state = State(machine, uses[i], Get(uses[i], female), new Vector3(300f + (i / 5 * 260f), i % 5 * 80f));
@@ -586,6 +602,7 @@ namespace GameDev.Slice.EditorTools
             State(machine, "ClimbOut", Get("ClimbOut"), new Vector3(560f, 240f));
 
             State(machine, "Fall", Get("Fall"), new Vector3(560f, 0f));
+            State(machine, "JumpRise", Get("JumpRise"), new Vector3(560f, -60f));
             var land = State(machine, "JumpLand", Get("JumpLand"), new Vector3(560f, 120f));
             land.iKOnFeet = true;
 

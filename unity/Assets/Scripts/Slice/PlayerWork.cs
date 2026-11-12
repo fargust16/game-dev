@@ -66,23 +66,50 @@ namespace GameDev.Slice
     public sealed class PlayerWork : MonoBehaviour
     {
         /// <summary>
-        /// Each work clip's key frame, s into it (measured by <c>SliceClipSurvey</c>, `clip_survey.txt`, and on the armed
-        /// blacksmith for the anvil; ANIMATION_PIPELINE_PLAN.md §8, §10): the axe's blade at its farthest, the pick's fist at
-        /// its lowest, the hammer on the anvil's face at the end of its blow, the hips beginning to rise from the ground, the
-        /// crouched hand at its farthest into the pocket.
+        /// Each work clip's key frame, s into it (ANIMATION_PIPELINE_PLAN.md §8, §10). A blow stops just before it lands,
+        /// at the right hand's fastest (owner, 2026-11-12: the check came after the axe had begun to swing back; measured
+        /// by <c>SliceTools.Measure</c>, `tools.txt`): the axe's at 0.13 s, the hand falling through 1.38 m to strike at
+        /// 0.18 s; the pick's at 0.35 s, through 1.3 m to strike the ground at 0.40 s; the hammer's at 0.35 s, through
+        /// 1.25 m to meet the anvil at 0.38 s. The rest by <c>SliceClipSurvey</c>, `clip_survey.txt`: the hips beginning to
+        /// rise from the ground, the crouched hand at its farthest into the pocket.
         /// </summary>
         public static readonly IReadOnlyDictionary<string, float> Keys = new Dictionary<string, float>
         {
-            ["Chop"] = 0.53f,
-            ["Mine"] = 0.40f,
-            ["HammerDown"] = 0.37f,
+            ["Chop"] = 0.13f,
+            ["Mine"] = 0.35f,
+            ["HammerDown"] = 0.35f,
             ["Harvest"] = 1.27f,
             ["Kneel"] = 4.30f,
             ["Gather2"] = 0.60f,
         };
 
+        /// <summary>
+        /// Where a looping work clip's first stroke starts, s into it, when its blow comes too early to be seen after the
+        /// fade: the axe's swing begins its clip, so the first stroke starts at the raised axe (0.6 s, measured: the hand
+        /// rising through 1.49 m) and its check comes in the clip's second cycle.
+        /// </summary>
+        public static readonly IReadOnlyDictionary<string, float> Starts = new Dictionary<string, float>
+        {
+            ["Chop"] = 0.6f,
+        };
+
         /// <summary>Every work state the player's controller carries: those with a key frame, and the hammer's rebound.</summary>
         public static readonly string[] Clips = { "Chop", "Mine", "HammerDown", "HammerUp", "Harvest", "Kneel", "Gather2" };
+
+        /// <summary>The tools in the player's right hand, switched off but while the work they are for lasts (<c>SliceTools.Arm</c>).</summary>
+        public const string AxeTool = "Tool_Axe";
+
+        public const string PickaxeTool = "Tool_Pickaxe";
+
+        public const string HammerTool = "Tool_Hammer";
+
+        /// <summary>The tool each work clip is played with: the axe at a tree, the pick at a vein, the hammer at the anvil.</summary>
+        public static readonly IReadOnlyDictionary<string, string> ToolOf = new Dictionary<string, string>
+        {
+            ["Chop"] = AxeTool,
+            ["Mine"] = PickaxeTool,
+            ["HammerDown"] = HammerTool,
+        };
 
         /// <summary>The fade into a work clip and back to walking, s.</summary>
         public const float Fade = 0.2f;
@@ -117,6 +144,7 @@ namespace GameDev.Slice
         private Vector3 _approachTo;
         private Quaternion _turnFrom;
         private Quaternion _turnTo;
+        private GameObject _tool;
 
         public void Configure(SliceReaction reaction, IWorldClock clock)
         {
@@ -170,7 +198,27 @@ namespace GameDev.Slice
             }
 
             _phase = Phase.Approach;
+            _tool = ToolOf.TryGetValue(stroke.Clip, out var tool) ? Tool(_player.transform, tool) : null;
+            if (_tool != null)
+            {
+                _tool.SetActive(true);
+            }
+
             return true;
+        }
+
+        /// <summary>The tool <paramref name="name"/> in the character's hand, switched on or off, or null.</summary>
+        public static GameObject Tool(Transform character, string name)
+        {
+            foreach (var t in character.GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name == name)
+                {
+                    return t.gameObject;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>Breaks the work off: the bar goes with no result, and the character walks again.</summary>
@@ -314,8 +362,9 @@ namespace GameDev.Slice
                 return;
             }
 
-            _base = 0f;
-            Play(_stroke.Clip, _stroke.LeadIn.Length > 0 ? 0.05f : Fade);
+            var start = Starts.TryGetValue(_stroke.Clip, out var s) ? s : 0f;
+            _base = start > Keys[_stroke.Clip] ? 1f : 0f;
+            Play(_stroke.Clip, _stroke.LeadIn.Length > 0 ? 0.05f : Fade, start);
             _phase = Phase.ToKey;
         }
 
@@ -385,10 +434,10 @@ namespace GameDev.Slice
             return info.shortNameHash == hash && info.loop;
         }
 
-        private void Play(string clip, float fade)
+        private void Play(string clip, float fade, float start = 0f)
         {
             _playing = Animator.StringToHash(clip);
-            _animator.CrossFadeInFixedTime(_playing, fade, 0, 0f);
+            _animator.CrossFadeInFixedTime(_playing, fade, 0, start);
         }
 
         private void End(bool broken)
@@ -402,6 +451,11 @@ namespace GameDev.Slice
             var atKey = _phase == Phase.Check;
             _phase = Phase.None;
             _stroke = null;
+            if (_tool != null)
+            {
+                _tool.SetActive(false);
+                _tool = null;
+            }
             if (atKey && _reaction != null)
             {
                 _reaction.Cancel();

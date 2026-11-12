@@ -16,8 +16,6 @@ namespace GameDev.Slice.Tests
     /// </summary>
     public sealed class TownsfolkTests
     {
-        [TestCase(SliceTownsfolk.PrefabPath)]
-        [TestCase(SliceTownsfolk.WomanPrefabPath)]
         [TestCase(SlicePeopleModels.Folder + "/GentlemanWalker.prefab")]
         [TestCase(SlicePeopleModels.Folder + "/LadyWalker.prefab")]
         [TestCase(SlicePeopleModels.Folder + "/WorkingWomanWalker.prefab")]
@@ -33,16 +31,19 @@ namespace GameDev.Slice.Tests
 
             // AN6: the walk and the idle, sitting on a bench and talking there, bargaining at a stall, greeting, drinking.
             var clips = machine.states.ToDictionary(s => s.state.name, s => (AnimationClip)s.state.motion);
-            CollectionAssert.AreEquivalent(new[] { "Walk", "Idle", "Idle2", "Idle3", "FoldArms", "StandToSit", "Sit", "SitTalk", "SitToStand", "TalkIdle", "Nod", "ShakeHead", "Drink" }, clips.Keys);
+            CollectionAssert.AreEquivalent(new[] { "Walk", "Idle", "Idle2", "Idle3", "FoldArms", "StandToSit", "Sit", "SitTalk", "SitToStand", "TalkIdle", "Nod", "ShakeHead", "Drink", "Gather2" }, clips.Keys);
             foreach (var loop in new[] { "Walk", "Idle", "Idle2", "Idle3", "FoldArms", "Sit", "SitTalk", "TalkIdle", "ShakeHead" })
             {
                 Assert.IsTrue(clips[loop].isLooping, loop);
             }
 
-            foreach (var once in new[] { "StandToSit", "SitToStand", "Nod", "Drink" })
+            foreach (var once in new[] { "StandToSit", "SitToStand", "Nod", "Drink", "Gather2" })
             {
                 Assert.IsFalse(clips[once].isLooping, once);
             }
+
+            // A knocked chair is set up in the gathering clip, its length the walker's (owner, 2026-11-12).
+            Assert.AreEqual(clips["Gather2"].length, TownsfolkWalker.FetchSeconds, 0.02f);
 
             // The walker times its one-shot clips by their lengths.
             Assert.AreEqual(clips["StandToSit"].length, TownsfolkWalker.StandToSitSeconds, 0.02f);

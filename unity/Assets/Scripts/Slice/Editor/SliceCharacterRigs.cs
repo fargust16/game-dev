@@ -26,7 +26,7 @@ namespace GameDev.Slice.EditorTools
         public static readonly string[] People =
         {
             "vintage_gentleman_3d_model", "victorian_dress_3d_model", "victorian_woman_3d_model", "military_officer_3d_model",
-            "steampunk_detective_3d_model", "medieval_blacksmith_3d_model", "stylized_male_character_3d_model", "historical_woman_3d_model",
+            "steampunk_detective_3d_model", "medieval_blacksmith_3d_model",
             "military_uniform_3d_model", "human_figure_3d_model", "human_body_3d_model",
         };
 

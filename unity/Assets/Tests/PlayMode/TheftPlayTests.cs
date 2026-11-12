@@ -139,6 +139,32 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(Loc.Get("ui.theft.called_off"), hud.MessageText, "why is said on the screen");
             Assert.AreEqual(Loc.Get("ui.prompt.theft"), third.PromptFor(third.transform.position),
                 "and the Screen Message keeps nothing from the next try (owner, 2026-11-12)");
+
+            // A person who goes in at a door is gone: the try fails, and the screen says why (owner, 2026-11-12).
+            PurseTarget fourth = null;
+            var walking = targets.Where(t => t != first && t != second && t != third && !t.GetComponent<TownsfolkWalker>().Away).ToArray();
+            yield return Choose(walking, null, player, t => fourth = t);
+            Assert.IsNotNull(fourth, "a fourth walker on its route");
+            yield return Tap(Key.E);
+            yield return GatheringPlayTests.AtKey(world);
+            Assert.IsTrue(world.Reaction.Running);
+            var walker = fourth.GetComponent<TownsfolkWalker>();
+            var door = new GameObject("Test door").AddComponent<ActivitySpot>();
+            door.Configure(ActivitySpot.Activity.GoIn, false, 5f, 5f, new[]
+            {
+                new ActivitySpot.Place { Seat = walker.transform.position, Stand = walker.transform.position, Yaw = walker.transform.eulerAngles.y },
+            });
+            walker.enabled = true;
+            Assert.IsTrue(walker.Send(door, 0), "the person goes in at the door it stands at");
+            for (var t = 0f; t < 3f && world.Reaction.Running; t += Time.deltaTime)
+            {
+                yield return null;
+            }
+
+            Assert.IsTrue(walker.Inside, "it went in");
+            Assert.IsFalse(world.Reaction.Running, "and the bar went with it");
+            Assert.IsFalse(world.Work.Busy);
+            Assert.AreEqual(Loc.Get("ui.theft.went_in"), hud.MessageText, "the failure is said on the screen");
         }
 
         /// <summary>

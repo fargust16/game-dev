@@ -184,6 +184,33 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>
+        /// Both player bodies hold the axe, the pick and the hammer in the right hand, switched off until the work they are
+        /// for (owner, 2026-11-12: the player felled and mined with empty hands), each at its measured length, no collider
+        /// on it.
+        /// </summary>
+        [Test]
+        public void ThePlayerHoldsItsToolsInTheRightHand()
+        {
+            foreach (var path in new[] { SliceTestScenes.PlayerPrefabPath, SlicePeopleModels.PlayerWomanPrefab })
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                var hand = prefab.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.RightHand);
+                Assert.IsNotNull(hand, $"{path}: a right hand");
+                foreach (var (name, _, length, _, use) in SliceTools.Tools)
+                {
+                    var tool = PlayerWork.Tool(prefab.transform, name);
+                    Assert.IsNotNull(tool, $"{path}: {name}");
+                    Assert.AreSame(hand, tool.transform.parent, $"{path}: {name} in the right hand");
+                    Assert.IsFalse(tool.activeSelf, $"{path}: {name} put away until its work");
+                    Assert.AreEqual(name, PlayerWork.ToolOf[use], $"{use} is worked with {name}");
+                    Assert.IsEmpty(tool.GetComponentsInChildren<Collider>(true), $"{path}: {name} bumps nothing");
+                    var size = tool.GetComponentsInChildren<MeshFilter>(true).Select(f => f.sharedMesh.bounds.size.magnitude * f.transform.lossyScale.x).Max();
+                    Assert.That(size, Is.InRange(length * 0.8f, length * 1.6f), $"{path}: {name} about {length} m long");
+                }
+            }
+        }
+
+        /// <summary>
         /// Every clip of the table, Kevin Iglesias' a man's and a woman's take and Quaternius' cut from its two files, is
         /// Humanoid with muscle curves and loops as the table says; the Mixamo and Blender folders are gone, and the
         /// blacksmith at the anvil hammers.

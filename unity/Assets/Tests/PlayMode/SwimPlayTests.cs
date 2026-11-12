@@ -44,10 +44,19 @@ namespace GameDev.Slice.Tests
             block.transform.localScale = size;
         }
 
+        /// <summary>The root's lowest while the character fell in and came up, m.</summary>
+        private static float _lowest;
+
         private static IEnumerator FallIn(PlayerLocomotion player, float z)
         {
             player.Teleport(Basin + new Vector3(0f, -0.5f, z), Quaternion.identity);
-            yield return new WaitForSeconds(1.5f);
+            _lowest = float.MaxValue;
+            for (var t = 0f; t < 1.5f; t += Time.deltaTime)
+            {
+                _lowest = Mathf.Min(_lowest, player.transform.position.y);
+                yield return null;
+            }
+
             Assert.AreEqual(PlayerLocomotion.Move.Swimming, player.State, Describe(player));
         }
 
@@ -58,7 +67,8 @@ namespace GameDev.Slice.Tests
             var player = Object.FindAnyObjectByType<PlayerLocomotion>();
             yield return FallIn(player, 0f);
             Assert.IsTrue(player.InWater);
-            Assert.AreEqual(0.05f, player.transform.position.y, 0.1f, "the root floats at the surface, where the stroke holds the chest under it");
+            Assert.Less(_lowest, -1.35f, "fallen in, the body goes under before it comes up (owner, 2026-11-12)");
+            Assert.AreEqual(-0.04f, player.transform.position.y, 0.08f, "the root floats a little under the surface, where the stroke holds the chest under it");
             var animator = player.GetComponentInChildren<Animator>();
             Assert.IsTrue(animator.GetCurrentAnimatorStateInfo(0).IsName("Swim") || animator.GetNextAnimatorStateInfo(0).IsName("Swim"), "the swim plays");
 

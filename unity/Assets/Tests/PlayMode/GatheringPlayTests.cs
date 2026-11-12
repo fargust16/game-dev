@@ -65,9 +65,16 @@ namespace GameDev.Slice.Tests
             yield return Tap(Key.E);
             Assert.IsTrue(tree.IsActive, "E begins felling");
             Assert.IsTrue(world.Work.Busy, "the character swings");
+            var axe = PlayerWork.Tool(player.transform, PlayerWork.AxeTool);
+            Assert.IsNotNull(axe, "the player carries an axe in its hand");
+            Assert.IsTrue(axe.activeInHierarchy, "and holds it while it fells (owner, 2026-11-12)");
 
             yield return AtKey(world);
-            Assert.IsTrue(world.Reaction.Running, "the blade meeting the trunk brings the swing's bar");
+            Assert.IsTrue(world.Reaction.Running, "the blade about to meet the trunk brings the swing's bar");
+            var state = player.GetComponentInChildren<Animator>().GetCurrentAnimatorStateInfo(0);
+            var into = (state.normalizedTime % 1f) * state.length;
+            Assert.That(into, Is.InRange(PlayerWork.Keys["Chop"] - 0.05f, PlayerWork.Keys["Chop"] + 0.05f),
+                "the swing stops just before the blow, never as the axe swings back (owner, 2026-11-12)");
             Assert.IsTrue(world.Work.AtKey);
             Assert.AreEqual(0f, player.GetComponentInChildren<Animator>().speed, "the swing stands still at its key frame");
             Assert.IsTrue(world.Clock.IsPaused, "and the world with it");
@@ -89,6 +96,7 @@ namespace GameDev.Slice.Tests
             Assert.Greater(world.State.Get(tree.Spot.EmptiedKey), 0, "the run remembers it");
             yield return PlayedOut(world);
             Assert.IsTrue(player.enabled, "the last swing played out, the character walks again");
+            Assert.IsFalse(axe.activeSelf, "and the axe is put away");
         }
 
         [UnityTest]

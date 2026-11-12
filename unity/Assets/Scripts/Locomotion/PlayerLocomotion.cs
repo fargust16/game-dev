@@ -75,16 +75,16 @@ namespace GameDev.Locomotion
         [SerializeField] private float jumpBuffer = 0.15f;
         [Tooltip("m: how far below the feet the ground is sought, so slopes and steps down keep the body grounded.")]
         [SerializeField] private float groundSnap = 0.35f;
-        [Tooltip("s a landing from a long fall holds when no key is pressed; any key leaves it at once.")]
-        [SerializeField] private float landingHold = 0.2f;
-        [Tooltip("s in the air before a landing plays at all.")]
+        [Tooltip("s the landing's bent knees hold at least, the body braking to a stop meanwhile (owner, 2026-11-12: half a second); with no key pressed the landing plays whole.")]
+        [SerializeField] private float landingHold = 0.5f;
+        [Tooltip("s in the air before a fall off an edge lands in the knees; a jump always does.")]
         [SerializeField] private float landingAfter = 0.45f;
 
         [Header("Swimming (10.1, AN5)")]
         [Tooltip("m of water over the bed from which the character swims: chest-deep on a person 1.8 m tall (authoring default).")]
         [SerializeField] private float wadeDepth = 1.3f;
-        [Tooltip("m the root floats over the water while swimming: the Swim clip holds the chest 0.12 m under the root and the head from 0.04 m under it to 0.08 m over (measured, SliceAnimationCheck).")]
-        [SerializeField] private float floatHeight = 0.05f;
+        [Tooltip("m the root floats over the water while swimming, below it when negative: the Swim clip holds the chest 0.12 m under the root and the head from 0.04 m under it to 0.08 m over (measured, SliceAnimationCheck), so at -0.04 the chest is 0.16 m under the water and the head's bone from 0.08 m under to 0.04 m over (owner, 2026-11-12: the body floated too high).")]
+        [SerializeField] private float floatHeight = -0.04f;
         [SerializeField] private float swimSpeed = 1.8f;
         [SerializeField] private float fastSwimSpeed = 3f;
         [Tooltip("m/s² toward the wanted velocity in the water.")]
@@ -92,6 +92,24 @@ namespace GameDev.Locomotion
         [Tooltip("m over the water a bank's top may stand for Space to climb out onto it: the city's quays stand 1.9 m over the sea (measured: built ground 25.9 m, Sea Level 24 m).")]
         [SerializeField] private float climbOutHeight = 2.1f;
         [SerializeField] private float climbOutSeconds = 0.8f;
+
+        /// <summary>
+        /// Authoring defaults: the water's pull toward the float, 1/s², and its drag, 1/s, so a body that falls or wades
+        /// in goes under first and comes up to its float in about a second with a small bob (owner, 2026-11-12: the change
+        /// to swimming was abrupt, with no dip).
+        /// </summary>
+        private const float BuoyancySpring = 12f;
+
+        private const float BuoyancyDrag = 5f;
+
+        /// <summary>Authoring default, degrees: a turn sharper than this brakes and turns round; a gentler one carries the run round with the body.</summary>
+        private const float ReverseAngle = 135f;
+
+        /// <summary>
+        /// s into the landing clip where it starts: its first frames still hold the arms up as the fall did, so they are
+        /// left out (measured, tools.txt: the hands over the shoulders until 0.10 s, the knees bending from 0.07 s).
+        /// </summary>
+        private const float LandStart = 0.12f;
 
         private const float LocomotionFade = 0.12f;
         private const float CrouchFade = 0.15f;
@@ -108,6 +126,7 @@ namespace GameDev.Locomotion
         private static readonly int LocomotionState = Animator.StringToHash("Locomotion");
         private static readonly int CrouchState = Animator.StringToHash("Crouch");
         private static readonly int FallState = Animator.StringToHash("Fall");
+        private static readonly int JumpRiseState = Animator.StringToHash("JumpRise");
         private static readonly int LandState = Animator.StringToHash("JumpLand");
         private static readonly int SwimState = Animator.StringToHash("Swim");
         private static readonly int ClimbState = Animator.StringToHash("ClimbOut");
@@ -128,6 +147,8 @@ namespace GameDev.Locomotion
         private float _climbTime;
         private Vector3 _climbFrom;
         private Vector3 _climbTo;
+        private bool _jumped;
+        private bool _jumpQueued;
 
         /// <summary>The movement state now.</summary>
         public Move State { get; private set; } = Move.Grounded;
@@ -169,6 +190,8 @@ namespace GameDev.Locomotion
             _verticalVelocity = 0f;
             _velocity = Vector3.zero;
             _airTime = 0f;
+            _jumped = false;
+            _jumpQueued = false;
             Enter(CrouchShare > 0f ? Move.Crouched : Move.Grounded);
         }
 
@@ -256,6 +279,7 @@ namespace GameDev.Locomotion
             {
                 if (!water)
                 {
+                    _jumped = false;
                     Enter(Move.Airborne);
                 }
                 else if (Swim(input, hasInput, direction, level, dt))
@@ -277,23 +301,40 @@ namespace GameDev.Locomotion
                 : IsSprinting ? sprintSpeed
                 : Mathf.Lerp(walkSpeed, runSpeed, Mathf.InverseLerp(0.5f, 0.9f, moveInput.magnitude));
 
-            // The jump: a press kept for a moment before landing, honoured a moment after leaving an edge.
-            if (_sinceJumpPressed <= jumpBuffer && (_grounded || _sinceGround <= coyoteTime) && State != Move.Airborne)
+            // The jump: a press kept for a moment before landing, honoured a moment after leaving an edge. A press while
+            // the landing's knees are bent waits for them (owner, 2026-11-12).
+            var landing = State == Move.Landing && _stateTime < landingHold;
+            _jumpQueued |= landing && input.JumpPressed;
+            if ((_sinceJumpPressed <= jumpBuffer || _jumpQueued) && !landing && (_grounded || _sinceGround <= coyoteTime) && State != Move.Airborne)
             {
                 _sinceJumpPressed = float.MaxValue;
+                _jumpQueued = false;
                 _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
                 _grounded = false;
                 _sinceGround = coyoteTime + 1f;
+                _jumped = true;
                 Enter(Move.Airborne);
             }
 
-            // Velocity over the ground, reached by a steep acceleration; a reversal or a stop brakes harder.
-            var target = direction * wanted;
+            // The body turns first, and on the ground the run goes the way it faces, so a turn carries the run round
+            // with it and never slides it on the old way (owner, 2026-11-12). A turn sharper than ReverseAngle, and a
+            // stop, brake on the old way as before; the landing brakes to a stop.
+            Face(direction, dt);
+            var target = State == Move.Landing ? Vector3.zero : direction * wanted;
             var airborne = State == Move.Airborne;
-            var rate = airborne ? airAcceleration
-                : Vector3.Dot(target, _velocity) < 0f || target.sqrMagnitude < _velocity.sqrMagnitude ? groundDeceleration
-                : groundAcceleration;
-            _velocity = Vector3.MoveTowards(_velocity, target, rate * dt);
+            var speedNow = PlanarSpeed;
+            if (!airborne && State != Move.Landing && hasInput && (speedNow < 0.1f || Vector3.Angle(_velocity, direction) < ReverseAngle))
+            {
+                var along = Mathf.MoveTowards(speedNow, wanted, (wanted < speedNow ? groundDeceleration : groundAcceleration) * dt);
+                _velocity = Flat(transform.forward) * along;
+            }
+            else
+            {
+                var rate = airborne ? airAcceleration
+                    : Vector3.Dot(target, _velocity) < 0f || target.sqrMagnitude < _velocity.sqrMagnitude ? groundDeceleration
+                    : groundAcceleration;
+                _velocity = Vector3.MoveTowards(_velocity, target, rate * dt);
+            }
 
             _verticalVelocity += gravity * dt;
             if (_grounded && _verticalVelocity < 0f)
@@ -318,12 +359,13 @@ namespace GameDev.Locomotion
             _grounded = _controller.isGrounded || (_verticalVelocity <= 0f && Snap(wasGrounded));
             _sinceGround = _grounded ? 0f : _sinceGround + dt;
 
-            Face(direction, dt);
             Step(hasInput, crouching, dt);
             if (water && Deep(level))
             {
-                _verticalVelocity = 0f;
+                // The fall carried in, so the body goes under before it comes up (owner, 2026-11-12).
+                _verticalVelocity = Mathf.Max(_verticalVelocity, -4f);
                 IsSprinting = false;
+                _jumpQueued = false;
                 Enter(Move.Swimming);
             }
 
@@ -367,8 +409,10 @@ namespace GameDev.Locomotion
             var wanted = !hasInput ? 0f : (IsSprinting ? fastSwimSpeed : swimSpeed) * Mathf.Clamp01(SwimShare);
             _velocity = Vector3.MoveTowards(_velocity, direction * wanted, swimAcceleration * dt);
 
-            // The root eased to its float over the water, so a body that fell in comes up and one that waded in rises.
-            _verticalVelocity = Mathf.Clamp((level + floatHeight - transform.position.y) * 6f, -4f, 4f);
+            // The water pulls the root to its float and drags on it, so a body that fell or waded in goes under, comes
+            // up and bobs once, never springing straight to the surface.
+            _verticalVelocity += (((level + floatHeight - transform.position.y) * BuoyancySpring) - (_verticalVelocity * BuoyancyDrag)) * dt;
+            _verticalVelocity = Mathf.Clamp(_verticalVelocity, -4f, 4f);
             var flags = _controller.Move((_velocity + (Vector3.up * _verticalVelocity)) * dt);
             if ((flags & CollisionFlags.Sides) != 0)
             {
@@ -469,6 +513,7 @@ namespace GameDev.Locomotion
                 case Move.Crouched:
                     if (!_grounded && _sinceGround > coyoteTime)
                     {
+                        _jumped = false;
                         Enter(Move.Airborne);
                     }
                     else if (crouching != (State == Move.Crouched))
@@ -482,18 +527,21 @@ namespace GameDev.Locomotion
                     _airTime += dt;
                     if (_grounded && _verticalVelocity <= 0f)
                     {
-                        // A long fall with no key pressed lands in the knees; otherwise the walk takes over at once.
-                        Enter(_airTime >= landingAfter && !hasInput && !crouching ? Move.Landing : crouching ? Move.Crouched : Move.Grounded);
+                        // A jump, and a long fall, land in the knees (owner, 2026-11-12); a step down walks on.
+                        Enter((_jumped || _airTime >= landingAfter) && !crouching ? Move.Landing : crouching ? Move.Crouched : Move.Grounded);
                     }
 
                     break;
 
                 case Move.Landing:
+                    // The knees bend for landingHold at least while the body brakes; then a key, or a jump pressed
+                    // meanwhile, runs on at once, and with none the landing plays to its end.
                     if (!_grounded && _sinceGround > coyoteTime)
                     {
+                        _jumped = false;
                         Enter(Move.Airborne);
                     }
-                    else if (hasInput || crouching || _stateTime >= landingHold)
+                    else if (crouching || (_stateTime >= landingHold && (hasInput || _jumpQueued)) || _stateTime >= LandingLength())
                     {
                         Enter(crouching ? Move.Crouched : Move.Grounded);
                     }
@@ -525,10 +573,12 @@ namespace GameDev.Locomotion
                     Play(Has(CrouchState) ? CrouchState : LocomotionState, CrouchFade);
                     break;
                 case Move.Airborne:
-                    Play(Has(FallState) ? FallState : LocomotionState, AirFade);
+                    // A jump plays its take-off and holds its last pose to the ground, the arms never rising (owner,
+                    // 2026-11-12); a fall off an edge plays the fall.
+                    Play(_jumped && Has(JumpRiseState) ? JumpRiseState : Has(FallState) ? FallState : LocomotionState, AirFade);
                     break;
                 case Move.Landing:
-                    Play(Has(LandState) ? LandState : LocomotionState, LandFade);
+                    Play(Has(LandState) ? LandState : LocomotionState, LandFade, LandStart);
                     break;
                 case Move.Swimming:
                     Play(Has(SwimState) ? SwimState : LocomotionState, CrouchFade);
@@ -537,6 +587,18 @@ namespace GameDev.Locomotion
                     Play(Has(ClimbState) ? ClimbState : LocomotionState, AirFade);
                     break;
             }
+        }
+
+        /// <summary>The landing clip's whole length, s, as the Animator plays it; landingHold where it has none.</summary>
+        private float LandingLength()
+        {
+            if (_animator == null || !_animator.isActiveAndEnabled || _animator.IsInTransition(0))
+            {
+                return Mathf.Max(landingHold, 0.6f);
+            }
+
+            var info = _animator.GetCurrentAnimatorStateInfo(0);
+            return info.shortNameHash == LandState && info.length > 0.01f ? Mathf.Max(landingHold, info.length - LandStart) : landingHold;
         }
 
         /// <summary>The blends follow the body's real speed, so the clips' steps keep pace with the ground.</summary>
@@ -616,14 +678,14 @@ namespace GameDev.Locomotion
             return true;
         }
 
-        private void Play(int state, float fade)
+        private void Play(int state, float fade, float start = 0f)
         {
             if (_animator == null || !_animator.isActiveAndEnabled || _playing == state || !_animator.HasState(0, state))
             {
                 return;
             }
 
-            _animator.CrossFadeInFixedTime(state, fade, 0);
+            _animator.CrossFadeInFixedTime(state, fade, 0, start);
             _playing = state;
         }
 

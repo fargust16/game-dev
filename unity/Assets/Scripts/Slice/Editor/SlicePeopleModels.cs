@@ -76,8 +76,8 @@ namespace GameDev.Slice.EditorTools
 
             public string Standing => $"{Folder}/{Name}.prefab";
 
-            /// <summary>The walking prefab: the townsfolk's own for the stylized man and the historical woman.</summary>
-            public string Walking => Name == "Townsman" ? SliceTownsfolk.PrefabPath : Name == "Matron" ? SliceTownsfolk.WomanPrefabPath : $"{Folder}/{Name}Walker.prefab";
+            /// <summary>The walking prefab.</summary>
+            public string Walking => $"{Folder}/{Name}Walker.prefab";
         }
 
         public static readonly Look Gentleman = new Look("Gentleman", "vintage_gentleman_3d_model", false, 1.78f);
@@ -86,19 +86,27 @@ namespace GameDev.Slice.EditorTools
         public static readonly Look Officer = new Look("Officer", "military_officer_3d_model", false, 1.80f);
         public static readonly Look Detective = new Look("Detective", "steampunk_detective_3d_model", false, 1.79f);
         public static readonly Look Blacksmith = new Look("Blacksmith", "medieval_blacksmith_3d_model", false, 1.82f);
-        public static readonly Look Townsman = new Look("Townsman", "stylized_male_character_3d_model", false, SliceTownsfolk.Height);
-        public static readonly Look Matron = new Look("Matron", "historical_woman_3d_model", true, 1.65f);
+
+        /// <summary>
+        /// The first townsfolk models, the stylized man and the historical woman, are retired as out of style (owner,
+        /// 2026-11-12): the working men wear the gentleman's model and the older women the working woman's until the
+        /// owner brings a working man's and an older woman's (asset map §1).
+        /// </summary>
+        public static readonly string[] Retired =
+        {
+            "Assets/Prefabs/Slice/Townsperson.prefab", "Assets/Prefabs/Slice/Townswoman.prefab", Folder + "/Townsman.prefab", Folder + "/Matron.prefab",
+        };
 
         public static readonly Look WardenWoman = new Look("WardenWoman", "military_uniform_3d_model", true, 1.70f);
 
-        public static readonly Look[] All = { Gentleman, Lady, WorkingWoman, Officer, Detective, Blacksmith, Townsman, Matron, WardenWoman };
+        public static readonly Look[] All = { Gentleman, Lady, WorkingWoman, Officer, Detective, Blacksmith, WardenWoman };
 
         /// <summary>The player's two bodies (owner, 2026-11-10): worn by the player's prefabs, with no standing prefab of their own.</summary>
         public static readonly Look PlayerMan = new Look("PlayerMan", "human_figure_3d_model", false, 1.80f);
         public static readonly Look PlayerWoman = new Look("PlayerWoman", "human_body_3d_model", true, 1.68f);
         public const string PlayerWomanPrefab = "Assets/Prefabs/Slice/SlicePlayerWoman.prefab";
 
-        /// <summary>The looks with a walking prefab of their own here; the townsman and the matron walk as the townsfolk.</summary>
+        /// <summary>The looks with a walking prefab.</summary>
         private static readonly Look[] NewWalkers = { Gentleman, Lady, WorkingWoman };
 
         /// <summary>
@@ -129,16 +137,16 @@ namespace GameDev.Slice.EditorTools
                 case "Nell Garrow": case "Lottie Wren": case "Edda Brann": case "Tavern keeper": case "Master of Item Creation":
                     return WorkingWoman;
                 case "Pip Vance": case "Kit Mallow": case "Dace": case "Veinmarket": case "Veinmarket at a table": case "Drunkard": case "Farmer":
-                    return Townsman;
+                    return Gentleman;
                 case "Ruth Kettle": case "The pawnbroker": case "POI B - Old woman in a doorway": case "POI A - Neighbour (middle)":
-                    return Matron;
+                    return WorkingWoman;
                 case "Faction member":
                     return female ? Lady : Gentleman;
             }
 
             if (name.StartsWith("POI B - Collector") || name.StartsWith("POI A - Neighbour"))
             {
-                return Townsman;
+                return Gentleman;
             }
 
             if (name.StartsWith("POI B - Mill girl"))
@@ -151,7 +159,7 @@ namespace GameDev.Slice.EditorTools
                 "Blue" => Officer,
                 "Red" => Detective,
                 "Green" or "Orange" or "Teal" => female ? Lady : Gentleman,
-                _ => female ? WorkingWoman : Townsman,
+                _ => female ? WorkingWoman : Gentleman,
             };
         }
 
@@ -167,8 +175,8 @@ namespace GameDev.Slice.EditorTools
             return (block?.wealth ?? "middling") switch
             {
                 "rich" => female ? Lady : Gentleman,
-                "poor" or "works" => female ? (odd ? Matron : WorkingWoman) : Townsman,
-                _ => female ? (odd ? Matron : Lady) : (odd ? Townsman : Gentleman),
+                "poor" or "works" => female ? WorkingWoman : Gentleman,
+                _ => female ? (odd ? WorkingWoman : Lady) : Gentleman,
             };
         }
 
@@ -196,15 +204,10 @@ namespace GameDev.Slice.EditorTools
             var report = new StringBuilder();
             SliceClips.Import(report);
             Controllers(report);
-            var speeds = new Dictionary<string, float>
-            {
-                [SliceTownsfolk.PrefabPath] = Refit(SliceTownsfolk.PrefabPath, Townsman, false, report),
-                [SliceTownsfolk.WomanPrefabPath] = Refit(SliceTownsfolk.WomanPrefabPath, Matron, true, report),
-            };
-            var townsmanScale = AssetDatabase.LoadAssetAtPath<GameObject>(SliceTownsfolk.PrefabPath).transform.Find("Model").localScale;
+            var speeds = new Dictionary<string, float>();
             foreach (var look in All)
             {
-                Build(look, false, look == Townsman ? townsmanScale : (Vector3?)null, report);
+                Build(look, false, null, report);
             }
 
             foreach (var look in NewWalkers)
@@ -226,12 +229,74 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
+        /// Batch, once (owner, 2026-11-12): the stylized man and the historical woman leave the game. In every slice scene
+        /// each person in one of their prefabs takes the gentleman's or the working woman's in place, walking or standing,
+        /// its name, place, route and parts kept, and walks at its new prefab's pace; then their four prefabs are deleted.
+        /// The owner's model files stay in <c>Assets/TripoModels</c>. -executeMethod GameDev.Slice.EditorTools.SlicePeopleModels.RetireOldLooks
+        /// </summary>
+        public static void RetireOldLooks()
+        {
+            var report = new StringBuilder();
+            var speeds = NewWalkers.ToDictionary(l => l.Walking, l => AssetDatabase.LoadAssetAtPath<GameObject>(l.Walking).GetComponent<TownsfolkWalker>().Speed);
+            foreach (var path in AssetDatabase.FindAssets("t:Scene", new[] { "Assets/Scenes/Slice" }).Select(AssetDatabase.GUIDToAssetPath).OrderBy(p => p))
+            {
+                var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+                var lines = new List<string>();
+                var old = Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None).Select(t => t.gameObject)
+                    .Where(g => PrefabUtility.IsOutermostPrefabInstanceRoot(g) && Retired.Contains(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g))).ToList();
+                foreach (var go in old)
+                {
+                    var source = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go);
+                    var female = source.EndsWith("Townswoman.prefab") || source.EndsWith("Matron.prefab");
+                    var look = female ? WorkingWoman : Gentleman;
+                    var prefab = go.GetComponent<TownsfolkWalker>() != null ? look.Walking : look.Standing;
+                    Replace(go, AssetDatabase.LoadAssetAtPath<GameObject>(prefab));
+                    lines.Add($"{go.name}: {Path.GetFileNameWithoutExtension(source)} to {Path.GetFileNameWithoutExtension(prefab)}");
+                }
+
+                Paces(speeds, lines);
+                if (lines.Count > 0)
+                {
+                    EditorSceneManager.MarkSceneDirty(scene);
+                    EditorSceneManager.SaveScene(scene);
+                    report.AppendLine($"{path}:\n  " + string.Join("\n  ", lines));
+                }
+            }
+
+            foreach (var path in Retired.Where(p => AssetDatabase.LoadAssetAtPath<GameObject>(p) != null))
+            {
+                AssetDatabase.DeleteAsset(path);
+                report.AppendLine($"{path}: deleted");
+            }
+
+            AssetDatabase.SaveAssets();
+            Directory.CreateDirectory(OutputFolder);
+            File.WriteAllText($"{OutputFolder}/retired_looks.txt", report.ToString());
+            Debug.Log("[SlicePeopleModels] the old looks retired:\n" + report);
+        }
+
+        /// <summary>
+        /// Batch: the clips imported and cut again and every controller built again, the people and the scenes as they
+        /// stand. -executeMethod GameDev.Slice.EditorTools.SlicePeopleModels.ClipsAndControllers
+        /// </summary>
+        public static void ClipsAndControllers()
+        {
+            var report = new StringBuilder();
+            SliceClips.Import(report);
+            Controllers(report);
+            AssetDatabase.SaveAssets();
+            Directory.CreateDirectory(OutputFolder);
+            File.WriteAllText($"{OutputFolder}/controllers.txt", report.ToString());
+            Debug.Log("[SlicePeopleModels] clips and controllers: " + report);
+        }
+
+        /// <summary>
         /// Batch, after the city is built again: the people's looks, their paces, the blacksmith and the walkers' routes in
         /// the slice's scenes, with the prefabs as they stand. -executeMethod GameDev.Slice.EditorTools.SlicePeopleModels.ScenesOnly
         /// </summary>
         public static void ScenesOnly()
         {
-            var speeds = new[] { SliceTownsfolk.PrefabPath, SliceTownsfolk.WomanPrefabPath }.Concat(NewWalkers.Select(l => l.Walking))
+            var speeds = NewWalkers.Select(l => l.Walking)
                 .ToDictionary(p => p, p => AssetDatabase.LoadAssetAtPath<GameObject>(p).GetComponent<TownsfolkWalker>().Speed);
             var report = new StringBuilder();
             Scenes(speeds, report);
@@ -686,18 +751,18 @@ namespace GameDev.Slice.EditorTools
                 {
                     var source = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go);
                     var dummy = source.Contains("Human Character Dummy");
-                    var townsWoman = source == SliceTownsfolk.WomanPrefabPath;
+                    var female = dummy ? source.Contains("HumanDummy_F") : NewWalkers.Any(l => l.Female && l.Walking == source);
                     var walker = go.GetComponent<TownsfolkWalker>();
                     Look look;
                     string prefab;
-                    if (dummy || ((townsWoman || source == SliceTownsfolk.PrefabPath) && walker == null))
+                    if (dummy)
                     {
-                        look = LookFor(go.name, dummy ? source.Contains("HumanDummy_F") : townsWoman);
+                        look = LookFor(go.name, female);
                         prefab = look.Standing;
                     }
                     else if (walker != null && go.name != "Farmer" && walker.Route.Length > 0)
                     {
-                        look = WalkerLook(townsWoman, go.transform.position, layout);
+                        look = WalkerLook(female, go.transform.position, layout);
                         prefab = look.Walking;
                         if (prefab == source)
                         {
@@ -753,11 +818,7 @@ namespace GameDev.Slice.EditorTools
         public static void FaceForward()
         {
             var report = new StringBuilder();
-            var speeds = new Dictionary<string, float>
-            {
-                [SliceTownsfolk.PrefabPath] = Refit(SliceTownsfolk.PrefabPath, Townsman, false, report),
-                [SliceTownsfolk.WomanPrefabPath] = Refit(SliceTownsfolk.WomanPrefabPath, Matron, false, report),
-            };
+            var speeds = new Dictionary<string, float>();
             foreach (var look in NewWalkers)
             {
                 speeds[look.Walking] = Refit(look.Walking, look, false, report);
@@ -811,7 +872,7 @@ namespace GameDev.Slice.EditorTools
                 .Where(g =>
                 {
                     var p = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g);
-                    return p.Contains("Human Character Dummy") || p == SliceTownsfolk.PrefabPath || p == SliceTownsfolk.WomanPrefabPath;
+                    return p.Contains("Human Character Dummy") || NewWalkers.Any(l => l.Walking == p);
                 });
 
         /// <summary>

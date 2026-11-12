@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using GameDev.Slice.Kit;
 using GameDev.Slice.People;
 using NUnit.Framework;
 using UnityEditor;
@@ -22,7 +23,7 @@ namespace GameDev.Slice.Tests
     public sealed class ActivityPlayTests : SliceInputTestBase
     {
         private const string ScenePath = "Assets/Scenes/Slice/S0_Movement_Test.unity";
-        private const string ManWalker = "Assets/Prefabs/Slice/Townsperson.prefab";
+        private const string ManWalker = "Assets/Prefabs/Slice/People/GentlemanWalker.prefab";
         private const string WomanWalker = "Assets/Prefabs/Slice/People/WorkingWomanWalker.prefab";
         private static readonly Vector3 Area = new Vector3(-300f, 0f, 300f);
         private const float SeatHeight = TownsfolkWalker.SeatTop;
@@ -83,7 +84,7 @@ namespace GameDev.Slice.Tests
         {
             var animator = w.GetComponentInChildren<Animator>();
             var info = animator.IsInTransition(0) ? animator.GetNextAnimatorStateInfo(0) : animator.GetCurrentAnimatorStateInfo(0);
-            foreach (var name in new[] { "Walk", "Idle", "StandToSit", "Sit", "SitTalk", "SitToStand", "TalkIdle", "Nod", "ShakeHead", "Drink" })
+            foreach (var name in new[] { "Walk", "Idle", "StandToSit", "Sit", "SitTalk", "SitToStand", "TalkIdle", "Nod", "ShakeHead", "Drink", "Gather2" })
             {
                 if (info.IsName(name))
                 {
@@ -104,8 +105,7 @@ namespace GameDev.Slice.Tests
 
         private static readonly string[] Bodies =
         {
-            ManWalker, "Assets/Prefabs/Slice/Townswoman.prefab", "Assets/Prefabs/Slice/People/GentlemanWalker.prefab",
-            "Assets/Prefabs/Slice/People/LadyWalker.prefab", WomanWalker,
+            ManWalker, "Assets/Prefabs/Slice/People/LadyWalker.prefab", WomanWalker,
         };
 
         /// <summary>Every skin of the body baked as it stands now, in its root's frame.</summary>
@@ -558,7 +558,9 @@ namespace GameDev.Slice.Tests
             var hips = w.transform.InverseTransformPoint(animator.GetBoneTransform(HumanBodyBones.Hips).position);
             var k = standing / TownsfolkWalker.StandingHipsUp; // the body against the measured man, by its hips, as the walker reads it
             Assert.AreEqual(TownsfolkWalker.SeatedHipsUp * k, hips.y, 0.04f, "the seated hips' height over the root");
-            Assert.AreEqual(-TownsfolkWalker.SeatedHipsBack * k, hips.z, 0.04f, "and behind it");
+            // The gentleman's proportions set his 5 cm farther back than the measured man's; seated, the walker reads its
+            // own (LateUpdate), so the constant is only its first guess.
+            Assert.AreEqual(-TownsfolkWalker.SeatedHipsBack * k, hips.z, 0.08f, "and behind it");
         }
 
         /// <summary>
@@ -701,8 +703,12 @@ namespace GameDev.Slice.Tests
             return Mathf.Atan2(s.x, s.y) * Mathf.Rad2Deg;
         }
 
+        /// <summary>
+        /// Two sent to one bench sit with their hips on the seat and only sit, the sitting talk's odd hands left out (owner,
+        /// 2026-11-12), then get up and walk back to their route.
+        /// </summary>
         [UnityTest]
-        public IEnumerator AWalkerSentToABenchSitsTalksWithCompanyAndWalksBack()
+        public IEnumerator AWalkerSentToABenchSitsQuietlyAndWalksBack()
         {
             yield return Ground();
             var bench = Spot(ActivitySpot.Activity.Sit, 7f);
@@ -731,8 +737,15 @@ namespace GameDev.Slice.Tests
                 Assert.Less(Mathf.Abs(Mathf.DeltaAngle(w.transform.eulerAngles.y, 0f)), 2f, $"{w.name}: facing out from the bench");
             }
 
-            yield return Until(() => State(a) == "SitTalk" && State(b) == "SitTalk", 5f, "two on one bench talk");
+            var seen = new HashSet<string>();
+            while (a.Seated && b.Seated)
+            {
+                seen.Add(State(a));
+                seen.Add(State(b));
+                yield return null;
+            }
 
+            Assert.IsFalse(seen.Contains("SitTalk"), $"two on one bench only sit: {string.Join(", ", seen)}");
             yield return Until(() => !a.Seated && !b.Seated, 10f, "they get up when their while is over");
             Assert.IsTrue(bench.Free(0) && bench.Free(1), "and leave the bench free");
             yield return Until(() => !a.Away && !b.Away, 8f, "and walk back to their route");
@@ -814,6 +827,152 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(pew.Free(1));
             worshipper.enabled = true;
             yield return Until(() => worshipper.Seated && State(worshipper) == "Sit", 6f, "back in its seat");
+        }
+
+        /// <summary>A loose chair standing at a place: a box 0.45 m square with its top at the seat.</summary>
+        private static LooseProp Chair(ActivitySpot.Place place)
+        {
+            var chair = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            chair.name = "Test chair";
+            chair.transform.localScale = new Vector3(0.45f, SeatHeight, 0.45f);
+            chair.transform.position = new Vector3(place.Seat.x, Area.y + (SeatHeight / 2f), place.Seat.z);
+            chair.AddComponent<Rigidbody>().mass = 6f;
+            return chair.AddComponent<LooseProp>();
+        }
+
+        /// <summary>The chair laid on its side <paramref name="by"/> from its home, as a kick leaves it.</summary>
+        private static void Knock(LooseProp chair, Vector3 by)
+        {
+            var body = chair.GetComponent<Rigidbody>();
+            var at = chair.HomePosition + by;
+            at.y = Area.y + 0.25f;
+            var turned = Quaternion.Euler(0f, 0f, 90f) * chair.HomeRotation;
+            chair.transform.SetPositionAndRotation(at, turned);
+            body.position = at;
+            body.rotation = turned;
+            Physics.SyncTransforms();
+            body.WakeUp();
+        }
+
+        /// <summary>
+        /// The owner's play test of 2026-11-12: a chair under a sitter is held, so no blow knocks it out from under them;
+        /// let go, it is loose again; knocked near its place, whoever comes to sit sets it up first, stooping as at
+        /// gathering, and only then sits.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ASittersChairIsHeldAndAKnockedChairIsSetUpFirst()
+        {
+            yield return Ground();
+            var spot = Spot(ActivitySpot.Activity.Sit, 4f, 1);
+            var chair = Chair(spot.PlaceAt(0));
+            var body = chair.GetComponent<Rigidbody>();
+            var square = new[] { new Vector3(-3f, 0f, 3f), new Vector3(4f, 0f, 3f), new Vector3(4f, 0f, 9f), new Vector3(-3f, 0f, 9f) };
+            var a = Walker(ManWalker, square, square[0]);
+            yield return new WaitForSeconds(0.3f);
+            Assert.AreSame(chair, spot.Chair(0), "the chair under the place's seat is its chair");
+            Assert.IsTrue(a.Send(spot, 0));
+            Assert.IsTrue(chair.Held && body.isKinematic, "held from the moment the place is taken");
+            yield return Until(() => a.Seated && State(a) == "Sit", 10f, "it sits");
+
+            body.AddForce(Vector3.forward * 20f, ForceMode.VelocityChange);
+            yield return new WaitForSeconds(0.5f);
+            Assert.IsFalse(chair.Displaced, "no blow moves a chair from under its sitter");
+
+            yield return Until(() => !a.Seated, 8f, "it gets up after its while");
+            Assert.IsFalse(chair.Held || body.isKinematic, "let go, the chair is loose again");
+            yield return Until(() => !a.Away, 8f, "and walks back to its route");
+
+            Knock(chair, new Vector3(1.2f, 0f, 0.4f));
+            yield return Until(() => body.IsSleeping(), 4f, "the knocked chair comes to rest");
+            Assert.IsTrue(chair.Displaced);
+            Assert.IsFalse(spot.SeatReady(0), "nobody sits on air");
+            Assert.IsTrue(spot.ChairNear(0) && spot.Usable(0), "near enough to set up");
+            Assert.IsTrue(a.Send(spot, 0));
+            var seen = new HashSet<string>();
+            var end = Time.time + 14f;
+            while (!(a.Seated && State(a) == "Sit") && Time.time < end)
+            {
+                seen.Add(State(a));
+                yield return null;
+            }
+
+            Assert.IsTrue(a.Seated, $"it sits at last: {string.Join(", ", seen)}");
+            Assert.IsTrue(seen.Contains("Gather2"), $"it stoops for the chair first: {string.Join(", ", seen)}");
+            Assert.IsFalse(chair.Displaced, "the chair stands in its place again");
+            Assert.IsTrue(chair.Held, "and is held under its sitter");
+        }
+
+        /// <summary>
+        /// A place whose chair lies far off is never taken (owner, 2026-11-12: nobody sits where a chair was); a person with
+        /// no route whose own chair is gone sits at another place of its spot.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator NobodySitsWhereAChairIsGone()
+        {
+            yield return Ground();
+            var spot = Spot(ActivitySpot.Activity.Sit, 4f, 2, true);
+            Chair(spot.PlaceAt(0));
+            var far = Chair(spot.PlaceAt(1));
+            var line = new[] { new Vector3(-6f, 0f, 4f), new Vector3(6f, 0f, 4f) };
+            var walker = Walker(ManWalker, line, line[0], 90f);
+            yield return new WaitForSeconds(0.3f);
+            Knock(far, new Vector3(4f, 0f, -3f));
+            yield return Until(() => far.GetComponent<Rigidbody>().IsSleeping(), 4f, "the knocked chair comes to rest");
+            Assert.IsFalse(spot.Usable(1), "a chair 5 m off leaves its place empty");
+            Assert.IsFalse(walker.Send(spot, 1), "nobody is sent where the chair was");
+            Assert.IsTrue(spot.Free(1));
+
+            var sitter = Walker(WomanWalker, new Vector3[0], new Vector3(1.2f, 0f, 2f));
+            sitter.SetHome(spot, 1);
+            yield return Until(() => sitter.Seated && State(sitter) == "Sit", 8f, "the one whose chair is gone sits at the other place");
+            Assert.IsFalse(spot.Free(0), "at the place with its chair");
+            Assert.IsTrue(spot.Free(1), "never where the chair was");
+        }
+
+        /// <summary>A loose prop knocked from its place stands there again one game hour, 60 ticks, after it came to rest (owner, 2026-11-12).</summary>
+        [UnityTest]
+        public IEnumerator ALooseChairGoesHomeAnHourAfterItWasKnocked()
+        {
+            yield return Ground();
+            var clock = GameDev.World.Timekeeping.GameClockDriver.Running;
+            Assert.IsNotNull(clock, "the scene keeps the world's time");
+            var chair = Chair(new ActivitySpot.Place { Seat = Area + new Vector3(3f, SeatHeight, -4f) });
+            var body = chair.GetComponent<Rigidbody>();
+            yield return new WaitForSeconds(0.3f);
+            Knock(chair, new Vector3(1f, 0f, 1f));
+            yield return Until(() => body.IsSleeping(), 4f, "the knocked chair comes to rest");
+            clock.AdvanceTicks(LooseProp.RestoreTicks - 1);
+            Assert.IsTrue(chair.Displaced, "it lies where it fell until the hour is out");
+            clock.AdvanceTicks(2);
+            Assert.IsFalse(chair.Displaced, "an hour on, it stands in its place again");
+            Assert.Less(Vector3.Distance(chair.transform.position, chair.HomePosition), 0.01f);
+        }
+
+        /// <summary>The owner's play test of 2026-11-12: the townsfolk stroll at a natural pace, and walk at their own quicker one only in a hurry.</summary>
+        [UnityTest]
+        public IEnumerator AWalkerStrollsAndHurriesOnlyWhenItMust()
+        {
+            yield return Ground();
+            var line = new[] { new Vector3(-14f, 0f, -8f), new Vector3(14f, 0f, -8f) };
+            var walker = Walker(ManWalker, line, line[0], 90f);
+            var animator = walker.GetComponentInChildren<Animator>();
+            Assert.Greater(walker.Speed, TownsfolkWalker.StrollSpeed, "its own pace is quicker than a stroll");
+            yield return new WaitForSeconds(0.5f);
+
+            var from = walker.transform.position;
+            var start = Time.time;
+            yield return new WaitForSeconds(2f);
+            var stroll = Vector3.ProjectOnPlane(walker.transform.position - from, Vector3.up).magnitude / (Time.time - start);
+            Assert.AreEqual(TownsfolkWalker.StrollSpeed, stroll, 0.15f, "a stroll");
+            Assert.AreEqual(TownsfolkWalker.StrollSpeed / walker.Speed, animator.speed, 0.02f, "the stride played slower, the feet on the ground");
+
+            walker.Hurry = true;
+            yield return new WaitForSeconds(0.2f);
+            from = walker.transform.position;
+            start = Time.time;
+            yield return new WaitForSeconds(1.5f);
+            var hurry = Vector3.ProjectOnPlane(walker.transform.position - from, Vector3.up).magnitude / (Time.time - start);
+            Assert.AreEqual(walker.Speed, hurry, 0.2f, "in a hurry, its own pace");
         }
     }
 }

@@ -4,6 +4,7 @@ using GameDev.Input;
 using GameDev.Items;
 using GameDev.Locomotion;
 using GameDev.Player.Progression;
+using GameDev.Slice.People;
 using GameDev.Slice.Stealth;
 using GameDev.UI;
 using UnityEngine;
@@ -109,6 +110,10 @@ namespace GameDev.Slice.Theft
                 var alert = _eyes != null && _eyes.Meter != null && _eyes.Meter.Alert;
                 var stood = Flat(transform.position);
                 _settled = false;
+
+                // A person who goes in at a door is gone, and the try fails as when it walks off (owner, 2026-11-12).
+                var walker = GetComponent<TownsfolkWalker>();
+                var why = "ui.theft.called_off";
                 _work.Begin(new WorkStroke
                 {
                     Clip = "Gather2",
@@ -116,12 +121,21 @@ namespace GameDev.Slice.Theft
                     CaptionKey = "ui.theft.caption",
                     PauseWorld = false,
                     Settle = Settle,
-                    CalledOff = () => Vector3.Distance(Flat(transform.position), stood) > CallOffDistance,
+                    CalledOff = () =>
+                    {
+                        if (walker != null && walker.Inside)
+                        {
+                            why = "ui.theft.went_in";
+                            return true;
+                        }
+
+                        return Vector3.Distance(Flat(transform.position), stood) > CallOffDistance;
+                    },
                     Ended = broken =>
                     {
                         if (broken && !_settled)
                         {
-                            Say(Loc.Get("ui.theft.called_off"));
+                            Say(Loc.Get(why));
                         }
                     },
                     Face = transform,

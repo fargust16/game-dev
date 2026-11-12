@@ -134,7 +134,7 @@ namespace GameDev.Slice.EditorTools
             var scene = EditorSceneManager.OpenScene(SlicePeople.ScenePath(SliceRoster.Veilmouth), OpenSceneMode.Single);
             var poi = AssetDatabase.LoadAssetAtPath<PoiDefinition>(PoiCPath);
             var dialogue = AssetDatabase.LoadAssetAtPath<DialogueDefinition>(SweepDialoguePath);
-            var body = AssetDatabase.LoadAssetAtPath<GameObject>(SlicePeopleModels.Townsman.Standing);
+            var body = AssetDatabase.LoadAssetAtPath<GameObject>(SlicePeopleModels.Gentleman.Standing);
             var portal = Object.FindObjectsByType<Portal>(FindObjectsInactive.Include).FirstOrDefault(p => p.Id == CellarStreetDoor);
             if (poi == null || dialogue == null || body == null || portal == null)
             {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GameDev.Slice.Kit;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -133,6 +134,55 @@ namespace GameDev.Slice.People
                 _taken[place] = null;
             }
         }
+
+        /// <summary>Authoring default, m: a loose seat whose home lies this near a place's seat point over the ground is that place's chair.</summary>
+        public const float ChairReach = 0.5f;
+
+        /// <summary>
+        /// Authoring default, m: a chair knocked no farther than this from its home is set back up by whoever comes to sit
+        /// there (owner, 2026-11-12); one farther off leaves its place empty until the hour brings it back.
+        /// </summary>
+        public const float FetchReach = 2.5f;
+
+        private LooseProp[] _chairs;
+
+        /// <summary>The loose chair of a place, found by its home under the place's seat; null for a fixed bench or pew, and for a spot that is no seat.</summary>
+        public LooseProp Chair(int place)
+        {
+            if (_chairs == null || _chairs.Length != places.Length)
+            {
+                _chairs = new LooseProp[places.Length];
+                for (var i = 0; activity == Activity.Sit && i < places.Length; i++)
+                {
+                    _chairs[i] = LooseProp.NearestHome(places[i].Seat, ChairReach);
+                }
+            }
+
+            return place >= 0 && place < _chairs.Length ? _chairs[place] : null;
+        }
+
+        /// <summary>Whether a place can be sat on now: a fixed seat, or its chair standing at home.</summary>
+        public bool SeatReady(int place)
+        {
+            var chair = Chair(place);
+            return chair == null || !chair.Displaced;
+        }
+
+        /// <summary>Whether the place's chair lies knocked near its home, for whoever comes to sit to set it up first.</summary>
+        public bool ChairNear(int place)
+        {
+            var chair = Chair(place);
+            if (chair == null || !chair.Displaced || chair.Held)
+            {
+                return false;
+            }
+
+            var off = chair.transform.position - chair.HomePosition;
+            return new Vector2(off.x, off.z).magnitude <= FetchReach;
+        }
+
+        /// <summary>Whether a person could sit at a place now: its seat ready, or its chair near enough to set up first.</summary>
+        public bool Usable(int place) => activity != Activity.Sit || SeatReady(place) || ChairNear(place);
 
         /// <summary>Whether someone other than the one at <paramref name="place"/> is at this spot now.</summary>
         public bool Company(int place)

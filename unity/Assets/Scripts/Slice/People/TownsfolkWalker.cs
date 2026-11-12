@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using GameDev.Slice.Kit;
 using GameDev.World.Timekeeping;
 using UnityEngine;
 
@@ -120,6 +121,19 @@ namespace GameDev.Slice.People
         private static readonly int NodState = Animator.StringToHash("Nod");
         private static readonly int ShakeHeadState = Animator.StringToHash("ShakeHead");
         private static readonly int DrinkState = Animator.StringToHash("Drink");
+        private static readonly int GatherState = Animator.StringToHash("Gather2");
+
+        /// <summary>
+        /// The gathering clip's length, s, with which a person sets a knocked chair back up: Gather2, its hands lowest,
+        /// 0.73 m, at 0.53 s, when the chair is put back (measured, clip_survey.txt).
+        /// </summary>
+        public const float FetchSeconds = 1f;
+
+        /// <summary>Authoring default, m: how far from a knocked chair a person stands to set it up.</summary>
+        public const float FetchStandOff = 0.6f;
+
+        /// <summary>Authoring default, s: how long a person with no route and no seat to sit on stands before it looks again.</summary>
+        public const float SeatWait = 5f;
 
         /// <summary>A stop's idle, one of four by the turn's hash (AN6): three of Kevin Iglesias' idles and Quaternius' folded arms.</summary>
         public static readonly string[] StopIdles = { "Idle", "Idle2", "Idle3", "FoldArms" };
@@ -149,7 +163,7 @@ namespace GameDev.Slice.People
         private int _turns;
         private bool _started;
         private bool _replay;
-        private int _state;
+        private int _state = WalkState; // the controller's default state, so a stroll paces its stride from the first step
         private float _k = 1f;
 
         // Seated, this body's own hips behind and beside its root, read once it first sits (LateUpdate); the measured man's,
@@ -167,13 +181,29 @@ namespace GameDev.Slice.People
         private bool _seated;
         private float _sinceGreet = GreetEvery;
         private TownsfolkWalker _partner;
+        private LooseProp _heldChair;
+        private LooseProp _fetch;
+        private int _fetchStage;
         private readonly List<(Behaviour part, bool was)> _hiddenParts = new List<(Behaviour, bool)>();
         private readonly List<(GameObject part, bool was)> _hiddenChildren = new List<(GameObject, bool)>();
         private readonly List<(Collider part, bool was)> _hiddenColliders = new List<(Collider, bool)>();
 
         public Vector3[] Route => route;
 
+        /// <summary>The walk clip's own pace, m/s, at which a walker in a hurry walks.</summary>
         public float Speed => speed;
+
+        /// <summary>
+        /// Authoring default, m/s: a person's unhurried walk through the city (owner, 2026-11-12: the people walked as if
+        /// they ran). The walk clips' own strides measure 1.7–1.9 m/s and play slower to match it.
+        /// </summary>
+        public const float StrollSpeed = 1.3f;
+
+        /// <summary>Whether the walker hurries, walking at the walk clip's own pace, as one sent for help does.</summary>
+        public bool Hurry { get; set; }
+
+        /// <summary>The pace the walker walks at now, m/s: a stroll, or <see cref="Speed"/> in a hurry.</summary>
+        public float WalkingSpeed => Hurry ? speed : Mathf.Min(speed, StrollSpeed);
 
         /// <summary>Seconds of walking the walker still owes the ticks a paused world was moved by.</summary>
         public float Owed => _owed;
@@ -302,10 +332,18 @@ namespace GameDev.Slice.People
             _k = up > 0.5f ? up / StandingHipsUp : capsule != null ? capsule.height / MeasuredStature : 1f;
             if (route.Length < 2)
             {
-                // A person with no route: seated or at the bar from the start.
-                Begin(home, homePlace, home.PlaceAt(homePlace).Stand);
-                Arrive();
-                Skip();
+                // A person with no route: seated or at the bar from the start; with its chair away, it looks for a seat.
+                var stand = home.PlaceAt(homePlace).Stand;
+                if (home.SeatReady(homePlace) && Begin(home, homePlace, stand))
+                {
+                    Arrive();
+                    Skip();
+                }
+                else
+                {
+                    SitAgain(stand);
+                }
+
                 return;
             }
 
@@ -394,7 +432,8 @@ namespace GameDev.Slice.People
                 seconds = Time.deltaTime;
             }
 
-            Pace(pace);
+            // The walk clip's stride played slower for a stroll, so the feet keep the ground.
+            Pace(_state == WalkState ? pace * WalkingSpeed / Mathf.Max(0.01f, speed) : pace);
             Advance(seconds);
         }
 
@@ -473,7 +512,7 @@ namespace GameDev.Slice.People
         private float Walk(float seconds)
         {
             var position = transform.position;
-            var step = speed * seconds;
+            var step = WalkingSpeed * seconds;
             var target = route[_next];
             var to = Flat(target - position);
             for (var guard = 0; to.magnitude <= step && guard < route.Length; guard++)
@@ -526,9 +565,37 @@ namespace GameDev.Slice.People
                 return 0f;
             }
 
-            _mode = Mode.Route;
+            // A person with no route who found no seat looks again.
+            _mode = route.Length < 2 ? Mode.Back : Mode.Route;
             Play(WalkState);
             return seconds - stood;
+        }
+
+        /// <summary>
+        /// A person with no route back at its spot: its own place if it can sit there, else another free one at the same
+        /// spot, its chair set up first where it lies near; with none, it stands a while and looks again (owner,
+        /// 2026-11-12: nobody sits where a chair was).
+        /// </summary>
+        private void SitAgain(Vector3 at)
+        {
+            var pick = home.Free(homePlace) && home.Usable(homePlace) ? homePlace : -1;
+            for (var i = 0; pick < 0 && i < home.Count; i++)
+            {
+                pick = home.Free(i) && home.Usable(i) ? i : -1;
+            }
+
+            if (pick < 0 || !Begin(home, pick, at))
+            {
+                _mode = Mode.Stand;
+                _standing = SeatWait;
+                Play(IdleState);
+                return;
+            }
+
+            if (pick == homePlace && _fetchStage == 0)
+            {
+                Arrive();
+            }
         }
 
         /// <summary>At a turn with visits, one turn in two: a free one, chosen by the hash.</summary>
@@ -542,7 +609,7 @@ namespace GameDev.Slice.People
             var free = 0;
             foreach (var v in _visits)
             {
-                free += v.turn == reached && v.spot != null && v.spot.isActiveAndEnabled && v.spot.Free(v.place) ? 1 : 0;
+                free += v.turn == reached && v.spot != null && v.spot.isActiveAndEnabled && v.spot.Free(v.place) && v.spot.Usable(v.place) ? 1 : 0;
             }
 
             if (free == 0)
@@ -553,7 +620,7 @@ namespace GameDev.Slice.People
             var pick = (int)(Fnv(_seed, (uint)turn ^ 0x5bd1e995u) % (uint)free);
             foreach (var v in _visits)
             {
-                if (v.turn == reached && v.spot != null && v.spot.isActiveAndEnabled && v.spot.Free(v.place) && pick-- == 0)
+                if (v.turn == reached && v.spot != null && v.spot.isActiveAndEnabled && v.spot.Free(v.place) && v.spot.Usable(v.place) && pick-- == 0)
                 {
                     at.y = GroundAt(at, at.y);
                     transform.position = at;
@@ -630,18 +697,33 @@ namespace GameDev.Slice.People
 
         // ------------------------------------------------------------------------------------------- visits
 
+        /// <summary>
+        /// Takes a place. A chair standing at home is held from now until the person leaves it, so nobody knocks it from
+        /// under the sitter (owner, 2026-11-12); a chair knocked near its home is set back up first; a place whose chair is
+        /// gone farther is never taken.
+        /// </summary>
         private bool Begin(ActivitySpot spot, int place, Vector3 back)
         {
-            if (spot == null || !spot.Take(place, this))
+            if (spot == null || !spot.Usable(place) || !spot.Take(place, this))
             {
                 return false;
             }
 
             _spot = spot;
             _place = place;
+            _fetch = null;
+            _fetchStage = 0;
             if (spot.Kind == ActivitySpot.Activity.Sit)
             {
-                IgnoreSeat(true);
+                if (spot.SeatReady(place))
+                {
+                    HoldSeat();
+                }
+                else
+                {
+                    _fetch = spot.Chair(place);
+                    _fetchStage = 1;
+                }
             }
 
             _back = back;
@@ -653,12 +735,86 @@ namespace GameDev.Slice.People
 
         private float Going(float seconds)
         {
+            if (_fetchStage > 0)
+            {
+                return Fetching(seconds);
+            }
+
             if (MoveTo(StandPoint(), ref seconds))
             {
                 Arrive();
             }
 
             return seconds;
+        }
+
+        /// <summary>
+        /// A knocked chair set up before the person sits: it walks to the chair, stoops as at gathering, and halfway through
+        /// the chair stands in its place again (owner, 2026-11-12); then it goes on to sit.
+        /// </summary>
+        private float Fetching(float seconds)
+        {
+            if (_fetch == null || (_fetchStage == 1 && !_fetch.Displaced))
+            {
+                _fetchStage = 0;
+                _fetch = null;
+                HoldSeat();
+                return seconds;
+            }
+
+            if (_fetchStage == 1)
+            {
+                var chair = Flat(_fetch.transform.position);
+                var from = Flat(transform.position) - chair;
+                var stand = chair + ((from.sqrMagnitude > 1e-4f ? from.normalized : -Flat(transform.forward).normalized) * FetchStandOff);
+                if (!MoveTo(new Vector3(stand.x, transform.position.y, stand.z), ref seconds))
+                {
+                    return seconds;
+                }
+
+                Face(chair - Flat(transform.position), 360f);
+                _fetchStage = 2;
+                _phase = FetchSeconds;
+                Play(GatherState);
+                return seconds;
+            }
+
+            var used = Mathf.Min(_phase, seconds);
+            _phase -= used;
+            if (_fetchStage == 2 && _phase <= FetchSeconds / 2f)
+            {
+                _fetch.PutBack();
+                _fetchStage = 3;
+            }
+
+            if (_phase > 0f)
+            {
+                return 0f;
+            }
+
+            _fetchStage = 0;
+            _fetch = null;
+            HoldSeat();
+            Play(WalkState);
+            return seconds - used;
+        }
+
+        /// <summary>The place's chair held still and the person's body clear of the seat, for the whole visit.</summary>
+        private void HoldSeat()
+        {
+            var chair = _spot != null ? _spot.Chair(_place) : null;
+            if (chair != null && chair != _heldChair)
+            {
+                if (_heldChair != null)
+                {
+                    _heldChair.Hold(false);
+                }
+
+                chair.Hold(true);
+                _heldChair = chair;
+            }
+
+            IgnoreSeat(true);
         }
 
         private void Arrive()
@@ -683,7 +839,7 @@ namespace GameDev.Slice.People
                 transform.position = SeatRoot();
                 _step = 2;
                 _phase = 4f;
-                Play(Talks() ? SitTalkState : SitState);
+                Play(SitState);
             }
             else if (_spot.Kind == ActivitySpot.Activity.Attend)
             {
@@ -783,7 +939,7 @@ namespace GameDev.Slice.People
 
                     _step = 2;
                     _phase = 4f;
-                    Play(Talks() ? SitTalkState : SitState);
+                    Play(SitState);
                     return seconds - used;
                 case 2:
                     // Onto its own seat root once its hips are read, at 0.5 m/s.
@@ -799,9 +955,9 @@ namespace GameDev.Slice.People
 
                     if (_phase <= 0f)
                     {
-                        // Every 4 s it looks whether someone sits beside it to talk to.
+                        // A seated person only sits: the sitting talk's hands moved oddly (owner, 2026-11-12).
                         _phase = 4f;
-                        Play(Talks() ? SitTalkState : SitState);
+                        Play(SitState);
                     }
 
                     return seconds - used;
@@ -816,8 +972,6 @@ namespace GameDev.Slice.People
                     return seconds - used;
             }
         }
-
-        private bool Talks() => !_spot.Quiet && _spot.Company(_place);
 
         /// <summary>Bargaining or drinking: its steps in turn until its while is over, the step under way finished first.</summary>
         private float Talking(float seconds, (int state, float seconds)[] steps)
@@ -868,8 +1022,7 @@ namespace GameDev.Slice.People
 
             if (home != null && route.Length < 2)
             {
-                Begin(home, homePlace, target);
-                Arrive();
+                SitAgain(target);
                 return seconds;
             }
 
@@ -926,6 +1079,16 @@ namespace GameDev.Slice.People
                 IgnoreSeat(false);
                 _spot = null;
             }
+
+            // A chair unloaded with its scene before the person is gone already: Unity's null, not the language's.
+            if (_heldChair != null)
+            {
+                _heldChair.Hold(false);
+            }
+
+            _heldChair = null;
+            _fetch = null;
+            _fetchStage = 0;
         }
 
         private readonly List<Collider> _seatParts = new List<Collider>();
@@ -1081,10 +1244,10 @@ namespace GameDev.Slice.People
         {
             var position = transform.position;
             var to = Flat(target - position);
-            var step = speed * seconds;
+            var step = WalkingSpeed * seconds;
             if (to.magnitude <= step)
             {
-                seconds -= to.magnitude / Mathf.Max(0.01f, speed);
+                seconds -= to.magnitude / Mathf.Max(0.01f, WalkingSpeed);
                 transform.position = new Vector3(target.x, GroundAt(target, target.y), target.z);
                 return true;
             }

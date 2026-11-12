@@ -1,12 +1,12 @@
 # Interior Furnishing Rules
 
-Version: 0.15
+Version: 0.16
 
 Status: Draft — the owner's remarks after play test VI-5 (2026-11-07), formalised by the agent; the owner's four decisions in §9; §7 built for the Dwellings in VI-6 (§7.1) and the seven in VI-7 (§7.2); the owner's Tripo pieces in §10 (2026-11-09, 2026-11-10); fireplaces and radiators in §10.1 (owner, 2026-11-10); every piece's size checked in §11 (owner's walk, 2026-11-10); the CC0 pieces in §12 (2026-11-11); seat sizes in §13 (owner, 2026-11-12)
 
 Created: 2026-11-07
 
-Last Updated: 2026-11-12 (§13, the owner kept the scaled kit seats after the trial; only the pew and the furniture kit's chair get new models. The earlier note is in the update history)
+Last Updated: 2026-11-12 (§13, by the owner's play test: a sitter's chair cannot be knocked away, a knocked chair is set up before anyone sits, and wrecked furniture is back in place an hour later. The earlier note is in the update history)
 
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [15 Procedural Building Generation](../../../15%20Procedural%20Building%20Generation.md), [VICTORIAN_INTERIORS_PLAN.md](VICTORIAN_INTERIORS_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md)
 
@@ -367,6 +367,12 @@ No high stool: the sitting clip keeps the feet on the floor. A seat's places are
 
 Measured after it (`Logs/SliceSurvey/seats.txt`): the street bench, the pew, the furniture kit's chair, the dark chair, the Victorian chair, the Tripo armchair and the settee 0.42 m; the Victorian armchair and sofas 0.40 m. Before it the street bench stood 0.54 m, the Victorian chair 0.50, the dark chair and the Tripo armchair 0.56, the furniture kit's chair 0.78 and the pew 0.85. Not sat on, and not scaled: the dark stool, 0.70 m, and the footstool, 0.34 m. The walker sits on seats 0.36–0.62 m over the ground under its place, and a seated walker's body ignores its seat's colliders, so that it no longer shoves a loose chair aside (`TownsfolkWalker.IgnoreSeat`). The tables stay at §11's 0.90 m. Having seen them, the owner kept the scaled seats, and only the pew and the furniture kit's chair, the Dungeon pack's two blocks, which look squat at that size, get new models (`SLICE_MODELS_WANTED.md`), wrapped and fitted the same way ([99](../../../99%20Open%20Questions.md) VS-SEAT); the renders before and after are `ActivityPlayTests.RenderTheKitSeats` and `RenderTheSeatsInPlace`, diagnostics run by name.
 
+**Knocked furniture** (owner's play test, 2026-11-12). The player could knock a chair out from under a seated person, who sat on in the air, and people walked to sit where a chair had stood. Since then:
+
+- a chair under a sitter, or under one on its way to sit, is held still, kinematic, so no push or blow moves it;
+- nobody sits where the chair is gone: a chair knocked within 2.5 m of its place (authoring default) is set back up by whoever comes to sit, stooping as at gathering, and a place whose chair lies farther stays empty;
+- every loose prop, a chair, a table or a set's thing, goes back to its place by itself one game hour, 60 ticks, after it came to rest away from it, so a room the player wrecked is in order an hour later (`LooseProp.RestoreTicks`). A prop counts as moved 0.1 m or 10° from its place (authoring defaults).
+
 ## Sources
 
 - CAMRA, *Pub Heritage* records of historic pub interiors, e.g. [pubheritage.camra.org.uk/pubs/141](https://pubheritage.camra.org.uk/pubs/141), [/pubs/240](https://pubheritage.camra.org.uk/pubs/240), [/pubs/582](https://pubheritage.camra.org.uk/pubs/582).
@@ -375,6 +381,7 @@ Measured after it (`Logs/SliceSurvey/seats.txt`): the street bench, the pew, the
 
 ## Update history
 
+- 2026-11-12 (v0.16): §13, the owner's play test: a sitter's chair held, a knocked chair set up first, wrecked furniture back in place an hour later.
 - 2026-11-12 (v0.15): §13, the owner kept the scaled kit seats; the pew and the furniture kit's chair get new models; a new seat is fitted by `FitSeat`.
 - 2026-11-12 (v0.14): §13, the owner's trial: the kit's seats leave the ×1.2 scale and are scaled so their top stands 0.42 m; the seated walker no longer shoves its seat.
 - 2026-11-12 (v0.13): §13, the owner's seat sizes in game metres, measured on the seated bodies; their game scale open as VS-SEAT; §11's table notes the exception.
