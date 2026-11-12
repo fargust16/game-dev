@@ -113,6 +113,14 @@ namespace GameDev.Slice.Tests
             Assert.Less(Vector3.Distance(seated[0].Home.PlaceAt(seated[0].HomePlace).Seat, seated[1].Home.PlaceAt(seated[1].HomePlace).Seat), 2f, "at one table");
             Assert.AreEqual(1, drinkers.Count(w => w.Home.Kind == ActivitySpot.Activity.Drink), "one at the bar");
 
+            // The player still walks up to Nell: nobody stands where the player talks to her from (ConversationTests).
+            var nell = Object.FindObjectsByType<PersonTalk>(FindObjectsSortMode.None).Single(t => t.Dialogue.Id == "nell").transform;
+            var before = Flat(nell.position + (nell.forward * 1.6f));
+            foreach (var w in drinkers)
+            {
+                Assert.Greater(Vector3.Distance(Flat(w.Home.PlaceAt(w.HomePlace).Stand), before), 1f, $"{w.name} clear of the place before Nell");
+            }
+
             EditorSceneManager.OpenScene(SliceActivities.ChapelScenePath, OpenSceneMode.Single);
             var worshippers = Object.FindObjectsByType<TownsfolkWalker>(FindObjectsSortMode.None).Where(w => w.Home != null).ToList();
             Assert.AreEqual(3, worshippers.Count);

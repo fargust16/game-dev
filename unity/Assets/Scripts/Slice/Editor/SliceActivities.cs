@@ -235,7 +235,8 @@ namespace GameDev.Slice.EditorTools
                 report.AppendLine($"The Soot & Bell: {chairs.Count} chairs clear of its people, {seats.Count} seats read: NO PAIR");
             }
 
-            // The bar: its customers' side away from the barkeep, a place 0.45 m before its front.
+            // The bar: its customers' side away from the barkeep, a place 0.45 m before its front, and at least 1.6 m along it
+            // from the place before her, so the player still walks up to her and talks (ConversationTests).
             var bar = Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(t => t.name == "Bar" && PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject));
             var nell = people.FirstOrDefault(p => p.Id == "nell");
             if (bar != null && nell != null)
@@ -244,7 +245,9 @@ namespace GameDev.Slice.EditorTools
                 var out_ = Snap(Flat(bounds.center - nell.transform.position));
                 var along = Vector3.Cross(Vector3.up, out_);
                 var front = bounds.center + (out_ * ((Mathf.Abs(out_.x) * bounds.extents.x) + (Mathf.Abs(out_.z) * bounds.extents.z) + 0.45f));
-                var places = new[] { front, front + (along * 0.8f), front - (along * 0.8f) }.Select(Grounded)
+                var length = (Mathf.Abs(along.x) * bounds.extents.x) + (Mathf.Abs(along.z) * bounds.extents.z);
+                var herAlong = Vector3.Dot(Flat(nell.transform.position - bounds.center), along);
+                var places = new[] { 2.4f, -2.4f, 1.6f, -1.6f }.Where(d => Mathf.Abs(herAlong + d) <= length + 0.2f).Select(d => Grounded(front + (along * (herAlong + d))))
                     .Where(p => !Physics.CheckCapsule(p + (Vector3.up * 0.75f), p + (Vector3.up * 1.45f), 0.25f, Blocking, QueryTriggerInteraction.Ignore))
                     .Select(p => new ActivitySpot.Place { Stand = p, Seat = p, Yaw = Yaw(-out_) }).ToArray();
                 var barSpot = Spot(root, "The bar", ActivitySpot.Activity.Drink, false, Tavern, places);
@@ -253,7 +256,7 @@ namespace GameDev.Slice.EditorTools
                     Resident(scene, SliceTownsfolk.PrefabPath, "Drinker at the bar", barSpot, 0);
                 }
 
-                report.AppendLine($"  the bar: {places.Length} places before it, {(places.Length > 0 ? "a drinker at the first" : "NO ROOM")}");
+                report.AppendLine($"  the bar: {length * 2f:0.0} m long, {places.Length} places before it 1.6 m or more along it from Nell, {(places.Length > 0 ? "a drinker at the first" : "NO ROOM")}");
             }
             else
             {

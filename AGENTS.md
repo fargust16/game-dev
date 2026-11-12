@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 1.99
+Version: 2.00
 
 Status: Draft
 
-Last Updated: 2026-11-12 (Kinds of fighter: two weapons, each blow struck with either hand at its own weapon's AP, checked by `build_sim.py`)
+Last Updated: 2026-11-12 (Animation: Quaternius' takes face backward and are turned round at import, their facing measured in play)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -422,7 +422,7 @@ An entry marked † is the short binding form. Its full text is in [91 Agent Dec
 ## Engine and terrain
 
 - † **Engine**: Unity (URP, C#, folder `unity/`). Free 3P overworld and interiors plus a custom Combat Grid; no marketplace tactics kit as architecture. Systems map: [17 Game Systems Architecture](17%20Game%20Systems%20Architecture.md). World gen: **Overworld V0** (shipped) per `unity/Assets/Plans/OVERWORLD_V0_PLAN.md`; the slice is a hand-built scene by its own plan; OrganicTown is pre-pivot archive. No monolithic managers; ScriptableObjects hold immutable data only; chunk size V0 = 64 m. Exterior shells follow the **Shell Non-Overlap Rule** (`unity/Assets/Plans/SHELL_NON_OVERLAP_RULE.md`), and `ShellOverlapGuard` must pass.
-- † **Animation** (owner, 2026-11-11; [ANIMATION_PIPELINE_PLAN.md](unity/Assets/Plans/ANIMATION_PIPELINE_PLAN.md)): every clip of the player and the NPCs comes from Kevin Iglesias' Human Animations, royalty-free under the Asset Store EULA (the reading of 2026-11-10 that it could not be used commercially was wrong), with Quaternius' Universal Animation Library (CC0) for what it lacks. The Mixamo and Blender clips leave the project. Every clip is Humanoid and checked on every model before use. The character faces the camera and moves in eight directions. Tripo's own clips are stand-ins only, never for combat or shooting.
+- † **Animation** (owner, 2026-11-11; [ANIMATION_PIPELINE_PLAN.md](unity/Assets/Plans/ANIMATION_PIPELINE_PLAN.md)): every clip of the player and the NPCs comes from Kevin Iglesias' Human Animations, royalty-free under the Asset Store EULA (the reading of 2026-11-10 that it could not be used commercially was wrong), with Quaternius' Universal Animation Library (CC0) for what it lacks. The Mixamo and Blender clips leave the project. Every clip is Humanoid and checked on every model before use. The character faces the camera and moves in eight directions. Tripo's own clips are stand-ins only, never for combat or shooting. Quaternius' takes face backward and are turned round at import; the editor's sampling leaves the turn out, so a clip's facing is measured in play.
 - **Colour space** (owner, 2026-11-08; [99 Open Questions](99%20Open%20Questions.md) VS-COLOR): the project renders in **Linear**. Materials, light and grades are tuned for Linear; never return to Gamma or tune a value for it.
 - **Localization** (owner, 2026-11-09; [17](17%20Game%20Systems%20Architecture.md) X.7): every player-facing string, lines, names and UI alike, is a key in the project's string tables with its Russian and English text; no player-facing literal in code, scenes or data assets. A new language is a new column, never new code.
 - † **Overworld terrain stack**: **TerrainGen is the terrain authority and Unity `TerrainData` is the representation.** `OverworldTerrainBake` is the one production path, writing 2×2 × 1400 m tiles through `OverworldTerrainBuilder`; nothing is read back from `TerrainData` into TerrainGen. The terrain material is URP TerrainLit; MicroSplat is out of the pipeline. Five surface layers keep `TerrainSurfaceLayer` order. V0 water is ocean only, at Sea Level 24 m. There is no second grass system. Architecture: `unity/Assets/Plans/OVERWORLD_TERRAIN_ARCHITECTURE.md`.
