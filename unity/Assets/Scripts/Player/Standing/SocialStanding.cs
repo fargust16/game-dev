@@ -16,6 +16,12 @@ namespace GameDev.Player.Standing
         CityLiberated,
         TheftNoticed,
         BreakInNoticed,
+
+        /// <summary>A blow at a person who was not fighting (10.2 §5c).</summary>
+        Assault,
+
+        /// <summary>The kill of a person who was not an enemy, known even unseen (10.2 §5c).</summary>
+        InnocentKilled,
     }
 
     /// <summary>The reading of the Deeds Record a Social Check takes (10.4 §4).</summary>
@@ -51,6 +57,10 @@ namespace GameDev.Player.Standing
         public const string ReputationKey = "deeds.reputation";
         public const string KillsKey = "deeds.kills";
         public const string LimitsKey = "deeds.limits";
+
+        /// <summary>10.4 §6 Accusation: a talk let the character off, and the Reputation at or below which a Warden accuses it again.</summary>
+        public const string LetOffKey = "accusation.letoff";
+        public const string LetOffBelowKey = "accusation.letoff.below";
 
         private const string AttitudePrefix = "attitude.";
         private const string LiePrefix = "lie.";
@@ -102,6 +112,30 @@ namespace GameDev.Player.Standing
         public void RecordKill() => Add(KillsKey, 1);
 
         public void RecordLimitReached() => Add(LimitsKey, 1);
+
+        /// <summary>10.4 §4, 10.2 §5c: an Assault's harm, the HP the people who were not the character's enemies lost over its fight.</summary>
+        public void RecordHarm(double hp) => Add(ReputationKey, -_rules.HarmPoints(hp));
+
+        /// <summary>10.4 §6: a Warden accuses the character: its Reputation is low, and no talk let it off at this level.</summary>
+        public bool Accused => ReputationPoints <= _rules.AccusationAt && (_state.Get(LetOffKey) == 0 || ReputationPoints <= _state.Get(LetOffBelowKey));
+
+        /// <summary>10.4 §6: an Accusation paid, by the fine, the lock-up or a bribe: Reputation rises to the settled level.</summary>
+        public void Settle()
+        {
+            if (ReputationPoints < _rules.SettledAt)
+            {
+                _state.Set(ReputationKey, _rules.SettledAt);
+            }
+
+            _state.Set(LetOffKey, 0);
+        }
+
+        /// <summary>10.4 §6: a talk lets the character off until its Reputation falls a few points lower.</summary>
+        public void LetOff()
+        {
+            _state.Set(LetOffKey, 1);
+            _state.Set(LetOffBelowKey, ReputationPoints - _rules.LetOff);
+        }
 
         /// <summary>How this person feels about the character, from −2 to +2; 0 for anyone never met.</summary>
         public int Attitude(string personId) => _state.Get(AttitudeKey(personId));

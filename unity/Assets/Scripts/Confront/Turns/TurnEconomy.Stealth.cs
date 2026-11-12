@@ -162,7 +162,8 @@ namespace GameDev.Confront.Turns
 
         /// <summary>
         /// 10.3 §7: a stealth attack opening the fight, before anyone's turn; it costs no AP of the attacker's first
-        /// turn, and Initiative orders the round after it, so an attacker who wins Initiative acts again.
+        /// turn, and Initiative orders the round after it, so an attacker who wins Initiative acts again. An attacker
+        /// who is not hidden strikes an ordinary blow, as an Assault's opening one (10.2 §5c).
         /// </summary>
         private void Ambush(Combatant attacker, Combatant target)
         {
@@ -174,7 +175,7 @@ namespace GameDev.Confront.Turns
 
             Face(attacker, target.Cell);
             var context = ContextFor(attacker, attacker.Cell, target);
-            context.Stealth = true;
+            context.Stealth = attacker.Hidden;
             attacker.Fired |= attacker.Fighter.Weapon.Ranged;
             var result = _rules.Strike(attacker.Fighter, target.Fighter, context, _rolls);
             Afflict(target, result);

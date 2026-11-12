@@ -281,7 +281,8 @@ namespace GameDev.Slice
             {
                 Arms = gameObject.AddComponent<PlayerArms>();
                 Arms.Configure(settings, Fights.WornFighter, () => Fights.InFight, () => Work.Busy || PageOpen());
-                Arms.People = PeopleAround;
+                Arms.People = PeopleAround.InSight;
+                Arms.Assault = (target, _) => Fights.StartAssault(target);
             }
             if (Bag != null && settings.Shops != null)
             {
@@ -727,12 +728,6 @@ namespace GameDev.Slice
             var hud = Hud();
             return hud != null && (hud.IsDialogueOpen || hud.IsReadingOpen || hud.IsBagOpen || hud.IsShopOpen || hud.IsMapOpen || hud.IsNotesOpen);
         }
-
-        // The people a blow can reach: the townsfolk and the named people of the loaded scenes.
-        private static IEnumerable<Transform> PeopleAround() =>
-            FindObjectsByType<TownsfolkWalker>(FindObjectsInactive.Exclude).Select(p => p.transform)
-                .Concat(FindObjectsByType<NamedPerson>(FindObjectsInactive.Exclude).Select(p => p.transform))
-                .Distinct();
 
         private HudView Hud()
         {

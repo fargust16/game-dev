@@ -89,6 +89,32 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(9, _standing.ReputationPoints);
         }
 
+        /// <summary>10.2 §5c, 10.4 §4 and §6 *Accusation*: −3 for an Assault, a point for every 5 HP of harm, −10 for a kill; a Warden accuses at −10, a talk lets off until 3 lower, and paying settles at −5.</summary>
+        [Test]
+        public void AnAssaultItsHarmAndAKillCostReputationAndPayingSettlesIt()
+        {
+            _standing.Record(Deed.Assault);
+            Assert.AreEqual(-3, _standing.ReputationPoints);
+            _standing.RecordHarm(12d);
+            Assert.AreEqual(-6, _standing.ReputationPoints, "12 HP of harm, rounded up to 3 points");
+            _standing.RecordHarm(0d);
+            _standing.RecordHarm(10d);
+            Assert.AreEqual(-8, _standing.ReputationPoints, "none for no harm, 2 for 10 HP");
+            Assert.IsFalse(_standing.Accused, "above −10 no Warden accuses");
+            _standing.Record(Deed.InnocentKilled);
+            Assert.AreEqual(-18, _standing.ReputationPoints);
+            Assert.IsTrue(_standing.Accused, "at −10 or lower a Warden accuses");
+            _standing.LetOff();
+            Assert.IsFalse(_standing.Accused, "a talk lets the character off");
+            _standing.RecordHarm(10d);
+            Assert.IsFalse(_standing.Accused, "while its Reputation stands within 3 points");
+            _standing.RecordHarm(1d);
+            Assert.IsTrue(_standing.Accused, "and no longer once it falls 3 lower");
+            _standing.Settle();
+            Assert.AreEqual(-5, _standing.ReputationPoints, "paid, the name rises to −5");
+            Assert.IsFalse(_standing.Accused);
+        }
+
         [Test]
         public void EachSkillAndListenerTakesItsReading()
         {

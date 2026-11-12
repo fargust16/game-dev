@@ -271,6 +271,7 @@ namespace GameDev.Slice.Fights
             if (!_lock.InConfront)
             {
                 ClearBodies();
+                WardensAfterAssault();
                 if (_died)
                 {
                     return;
@@ -534,6 +535,7 @@ namespace GameDev.Slice.Fights
                 return;
             }
 
+            ArriveWardens(round);
             foreach (var fighter in SliceFighter.All)
             {
                 var c = fighter.Combatant;

@@ -495,6 +495,7 @@ namespace GameDev.Slice.EditorTools
             }
             On(idle, talk, 0.25f, "Talking", true);
             On(talk, idle, 0.25f, "Talking", false);
+            State(machine, "Gather", Get("Gather2", female), new Vector3(560f, 120f)).iKOnFeet = true; // a Warden takes up the fallen (10.2 §5c)
             Fight(controller, idle, female);
             EditorUtility.SetDirty(controller);
             return controller;
@@ -506,11 +507,12 @@ namespace GameDev.Slice.EditorTools
         /// bargains or drinks. Walk, the four idles of a stop (Idle, Idle2, Idle3, FoldArms), Sit, SitTalk, TalkIdle and
         /// ShakeHead loop; StandToSit, SitToStand, Nod, Drink and Gather2, with which a knocked chair is set up, play once:
         /// Gather2, as its hands come down to 0.73 m at 0.53 s, where Gather's stay at 1.17 m (measured, clip_survey.txt).
-        /// Foot IK on every state.
+        /// Foot IK on every state. The fight from Idle, as a standing person's, since a resident struck fights back (10.2 §5c).
         /// </summary>
         public static AnimatorController Walker(string path, bool female)
         {
             var controller = Fresh(path);
+            FightParameters(controller);
             var machine = controller.layers[0].stateMachine;
             var uses = new[] { "Walk", "Idle", "Idle2", "Idle3", "FoldArms", "StandToSit", "Sit", "SitTalk", "SitToStand", "TalkIdle", "Nod", "ShakeHead", "Drink", "Gather2" };
             for (var i = 0; i < uses.Length; i++)
@@ -523,6 +525,7 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
+            Fight(controller, machine.states.First(s => s.state.name == "Idle").state, female);
             EditorUtility.SetDirty(controller);
             return controller;
         }

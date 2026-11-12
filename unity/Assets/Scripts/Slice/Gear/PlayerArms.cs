@@ -304,7 +304,7 @@ namespace GameDev.Slice.Gear
 
             foreach (var person in People())
             {
-                if (person != null && person.gameObject.activeInHierarchy && person != _player.transform)
+                if (person != null && person.gameObject.activeInHierarchy && !person.IsChildOf(_player.transform) && !_player.transform.IsChildOf(person))
                 {
                     yield return person;
                 }

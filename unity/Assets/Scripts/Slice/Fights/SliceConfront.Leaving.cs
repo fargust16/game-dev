@@ -179,6 +179,11 @@ namespace GameDev.Slice.Fights
             if (attacker == _playerCombatant && target != null && target.Fighter.Down && _killed.Add(target))
             {
                 Standing?.RecordKill();
+                if (Innocent(target))
+                {
+                    // 10.2 §5c: known even unseen, as the goddess tells the Wardens.
+                    Standing?.Record(Deed.InnocentKilled);
+                }
             }
         }
 
