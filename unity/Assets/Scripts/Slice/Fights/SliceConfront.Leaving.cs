@@ -173,6 +173,7 @@ namespace GameDev.Slice.Fights
                     if (c.Departure == Departure.BrokeAway && c.HelpAt is Vector3 help)
                     {
                         HelpRun.Begin(body, help, _clock); // it goes to find help (10.2 §5a)
+                        SendRunner(body, help); // the runner who fetches the post's Wardens (§5e)
                     }
                 }
 

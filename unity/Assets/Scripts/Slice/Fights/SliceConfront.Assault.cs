@@ -15,10 +15,10 @@ namespace GameDev.Slice.Fights
     /// <summary>
     /// 10.2 §5c: an Assault. A blow at a person who is not fighting starts a fight in place, the blow its opening strike;
     /// the one struck fights back with what 10.2 §5d gives it, a Warden its firearm and a resident its role's or its fists
-    /// (<see cref="Armed"/>). Its cry fetches the two Wardens
-    /// nearest the place: each joins on its side at the end of the round by which it has run there at 4.5 m/s, a round
-    /// moving the world one tick, and enters at the grid's edge on its side. A Warden still on its way when the fight is
-    /// over comes to the place, and if the character is within 20 m of it, fights it at once. A Warden left standing goes
+    /// (<see cref="Armed"/>). Its cry is an Alarm (10.2 §5e, PB8a): every free Warden within its 30 cells joins on its side
+    /// at the end of the round by which it has run there at 4.5 m/s, a round moving the world one tick, and enters at the
+    /// grid's edge on its side; others come by a whistle or a runner (<see cref="OnAlarm"/>). A Warden still on its way
+    /// when the fight is over comes to the place, and if the character is within 20 m of it, fights it at once. A Warden left standing goes
     /// back to its post once the character is out of sight of both. Reputation falls by the Assault, by the harm the people
     /// who were not enemies took, and by each kill of one of them, unseen too; their fallen lie a game day, or until the
     /// nearest free Warden walks to them and takes them up (<see cref="WardenErrand"/>).
@@ -28,8 +28,7 @@ namespace GameDev.Slice.Fights
         /// <summary>The ordinary residents of the city, as a fight's group.</summary>
         public const string Residents = "residents";
 
-        // Authoring defaults, 10.2 §5c: two Wardens answer, at 4.5 m/s; one come late fights a character within 20 m.
-        public const int AnsweringWardens = 2;
+        // Authoring defaults, 10.2 §5c, §5e: the Wardens run at 4.5 m/s; one come late fights a character within 20 m.
         public const float WardenRunSpeed = 4.5f;
         public const float LateWardenReach = 20f;
 
@@ -117,45 +116,29 @@ namespace GameDev.Slice.Fights
             var struck = Person(victim, warden ? Wardens : Residents, 1);
             _bodies[struck] = victim;
             combatants.Add(struck);
+            _nextId = 2;
+            _lastRound = 0;
+            Whistled = false;
+            _there.Clear();
+            if (warden)
+            {
+                _there.Add(struck);
+            }
+
+            // 10.2 §5e: the cry is an Alarm, and every free Warden who hears it runs to the place, joining at the end of
+            // the round by which it is there.
+            Assaulting = true;
+            SliceAlarm.Raise(new Alarm(AlarmKind.Call, _assaultAt, victim));
             if (!warden)
             {
-                // 10.2 §5a: a resident fights back only with a chance, and otherwise runs for help.
+                // 10.2 §5a: a resident fights back only with a chance, and otherwise runs for help to a post that did not answer.
                 struck.FightsAt = FightsBackAt;
                 struck.HelpAt = HelpFor(victim);
             }
 
-            // The cry fetches every Warden within the call and the two nearest beyond it; each joins at the end of the
-            // round by which it has run there.
-            var perTick = GameClockDriver.RealSecondsPerTick > 0f ? GameClockDriver.RealSecondsPerTick : FallbackSecondsPerTick;
-            var id = 2;
-            var beyond = 0;
-            foreach (var body in PeopleAround.Wardens(_assaultAt))
-            {
-                if (body == victim || _player.transform.IsChildOf(body) || Lying(body))
-                {
-                    continue;
-                }
-
-                if (!Heard(body.position) && beyond++ >= AnsweringWardens)
-                {
-                    break;
-                }
-
-                _returning.RemoveAll(r => r.Body == body);
-                var rounds = Mathf.Max(1, Mathf.CeilToInt(Vector3.Distance(body.position, _assaultAt) / (WardenRunSpeed * perTick)));
-                _coming.Add(new Coming
-                {
-                    Body = body,
-                    Combatant = Person(body, Wardens, id++),
-                    Round = rounds,
-                    Post = body.position,
-                    PostFacing = body.rotation,
-                });
-            }
-
             var lawful = new List<Fighter> { struck.Fighter };
             lawful.AddRange(_coming.ConvertAll(k => k.Combatant.Fighter));
-            var joined = JoinTheCall(player.Fighter, lawful, victim, ref id);
+            var joined = JoinTheCall(player.Fighter, lawful, victim, ref _nextId);
             Debug.Log($"[Confront] the call: {_coming.Count} Wardens coming, {joined} residents join.");
 
             // The blow is the fight's opening strike, a stealth attack only from Stealth Mode (10.3 §7).
@@ -165,13 +148,10 @@ namespace GameDev.Slice.Fights
                 Opener = player,
                 Target = struck,
             };
-            Assaulting = true;
-            _lastRound = 0;
             if (_lock.TryBegin(request))
             {
                 Standing?.Record(Deed.Assault);
                 _peopleEnded = AssaultOver;
-                CallForHelp(victim);
                 Assaulted?.Invoke(victim);
                 return true;
             }
@@ -242,6 +222,11 @@ namespace GameDev.Slice.Fights
                     Place(coming.Body, edge, _player.transform.position);
                 }
 
+                if (coming.Combatant != null)
+                {
+                    _there.Add(coming.Combatant);
+                }
+
                 _returning.Add(coming);
             }
         }
@@ -307,6 +292,7 @@ namespace GameDev.Slice.Fights
                 var way = Vector3.ProjectOnPlane(late.Post - _assaultAt, Vector3.up);
                 way = way.sqrMagnitude > 1e-4f ? way.normalized : Vector3.forward;
                 Place(late.Body, Ground(_assaultAt + (way * LateStandOff)), _player.transform.position);
+                late.LookUntil = (_clock != null ? _clock.Tick : 0) + FightSearch.LookTicks; // 10.2 §5e: it looks round
                 _returning.Add(late);
                 (arrived ??= new List<Transform>()).Add(late.Body);
             }
@@ -336,9 +322,9 @@ namespace GameDev.Slice.Fights
                     continue;
                 }
 
-                if (r.Body.TryGetComponent<FightSearch>(out _))
+                if (r.Body.TryGetComponent<FightSearch>(out _) || LooksRound(r))
                 {
-                    continue; // a searcher goes back by its own walk (10.2 §9)
+                    continue; // a searcher goes back by its own walk (10.2 §9), one come late after its look (§5e)
                 }
 
                 if ((r.Body.position - at).sqrMagnitude > PostReturnDistance * PostReturnDistance &&
@@ -471,6 +457,7 @@ namespace GameDev.Slice.Fights
             public Combatant Combatant;
             public int Round;
             public float Arrives;
+            public long LookUntil;
             public Vector3 Post;
             public Quaternion PostFacing;
         }

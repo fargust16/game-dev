@@ -141,7 +141,11 @@ namespace GameDev.Slice.Fights
             if (clock != null)
             {
                 clock.TickBoundary += OnTick;
+                clock.TickBoundary += OnAlarmTick;
             }
+
+            SliceAlarm.Raised -= OnAlarm;
+            SliceAlarm.Raised += OnAlarm;
             _grid = new CombatGridReader(1f);
             _turns = new TurnEconomy(settings.FightRules, _grid)
             {
@@ -569,6 +573,8 @@ namespace GameDev.Slice.Fights
                     _turns.Join(c);
                 }
             }
+
+            WeighTheFight();
         }
 
         /// <summary>The fight is decided; its last beats play out before free movement returns (<see cref="Finish"/>).</summary>
@@ -760,6 +766,11 @@ namespace GameDev.Slice.Fights
                 return;
             }
 
+            if (attacker.Fighter.Weapon != null && attacker.Fighter.Weapon.Ranged)
+            {
+                SliceAlarm.Raise(new Alarm(AlarmKind.Shot, body.position, body)); // a shot is an Alarm (10.2 §5e)
+            }
+
             _bodies.TryGetValue(target, out var targetBody);
             var motion = Motion(attacker.Fighter, result.OffHand);
             if (Mathf.RoundToInt(motion) == FightBeats.Fists)
@@ -937,7 +948,10 @@ namespace GameDev.Slice.Fights
             if (_clock != null)
             {
                 _clock.TickBoundary -= OnTick;
+                _clock.TickBoundary -= OnAlarmTick;
             }
+
+            SliceAlarm.Raised -= OnAlarm;
         }
 
         /// <summary>The grid's short sound as it forms: a low struck chord, made here until the owner picks a sound (authoring default).</summary>

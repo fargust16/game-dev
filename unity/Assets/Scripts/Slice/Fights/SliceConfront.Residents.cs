@@ -8,18 +8,15 @@ using UnityEngine;
 namespace GameDev.Slice.Fights
 {
     /// <summary>
-    /// 10.2 §5a, residents in a fight (owner, 2026-11-12; PB6). The one struck calls for help as the fight begins, its
-    /// line over its head for 3 s, and every person within 30 cells of it hears and shows a line of its own. Every Warden
-    /// among them comes from the next round, beside the two nearest beyond who come running (§5c). A resident who hears
-    /// joins the lawful side only when its own Force Estimate (21 §8) gives that side, with it, twice the character's
-    /// strength. A resident in the fight fights while its side's estimate holds at 1; below it, it walks away toward the
-    /// nearest Warden, breaks away (§9), and runs on to that Warden (<see cref="HelpRun"/>).
+    /// 10.2 §5a, residents in a fight (owner, 2026-11-12; PB6, PB8a). The one struck calls for help as the fight begins,
+    /// an Alarm (§5e, <see cref="SliceAlarm"/>): its line over its head for 3 s, and every person within 30 cells of it
+    /// hears and shows a line of its own. Every free Warden among them comes running (§5e). A resident who hears joins the
+    /// lawful side only when its own Force Estimate (21 §8) gives that side, with it, twice the character's strength. A
+    /// resident in the fight fights while its side's estimate holds at 1; below it, it walks away toward the nearest post
+    /// whose Wardens are at it, breaks away (§9), and runs on there (<see cref="HelpRun"/>) as the runner who fetches them.
     /// </summary>
     public sealed partial class SliceConfront
     {
-        /// <summary>Authoring defaults, 10.2 §5a: how far a call is heard, in cells counted as moves are.</summary>
-        public const int CallCells = 30;
-
         /// <summary>Authoring defaults, 10.2 §5a: the Force Estimate a resident fights at, and the one it joins at.</summary>
         public const double FightsBackAt = 1d;
 
@@ -28,21 +25,8 @@ namespace GameDev.Slice.Fights
         /// <summary>Authoring default: how long a call's line hangs over a head, s.</summary>
         public const float CallSeconds = 3f;
 
-        /// <summary>Whether a place is within the call's 30 cells of the one struck.</summary>
-        private bool Heard(Vector3 at) => Mathf.Max(Mathf.Abs(at.x - _assaultAt.x), Mathf.Abs(at.z - _assaultAt.z)) <= CallCells;
-
-        /// <summary>The one struck calls, and every person within 30 cells of it shows a line of its own.</summary>
-        private void CallForHelp(Transform victim)
-        {
-            Say(victim, "ui.fight.help.call");
-            foreach (var body in PeopleAround.InSight())
-            {
-                if (body != victim && !_player.transform.IsChildOf(body) && Heard(body.position) && !Lying(body))
-                {
-                    Say(body, PeopleAround.IsWarden(body) ? "ui.fight.help.warden" : "ui.fight.help.heard");
-                }
-            }
-        }
+        /// <summary>Whether a place is within the call's 30 cells of the one struck (10.2 §5e).</summary>
+        private bool Heard(Vector3 at) => SliceAlarm.Hears(_assaultAt, at);
 
         private static void Say(Transform body, string key)
         {
@@ -63,12 +47,15 @@ namespace GameDev.Slice.Fights
             eyes.Say(Loc.Get(key), CallSeconds);
         }
 
-        /// <summary>The nearest Warden standing, where a resident runs for help; null when there is none.</summary>
-        private static Vector3? HelpFor(Transform body)
+        /// <summary>
+        /// The nearest post whose Warden is at it and free, where a resident runs for help (10.2 §5e); null when there is
+        /// none, and the resident only walks away.
+        /// </summary>
+        private Vector3? HelpFor(Transform body)
         {
             foreach (var warden in PeopleAround.Wardens(body.position))
             {
-                if (warden != body && !Lying(warden))
+                if (warden != body && AtPost(warden))
                 {
                     return warden.position;
                 }
