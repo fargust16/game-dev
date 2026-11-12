@@ -63,6 +63,13 @@ namespace GameDev.Confront.Turns
                 return;
             }
 
+            // 10.2 §5a: a resident whose courage fails it flees instead of striking (PB6).
+            if (Flees(c))
+            {
+                Flee(c);
+                return;
+            }
+
             // S3b.2: a beast with no enemy inside its territory goes back to it; a beast takes no Wait.
             if (Withdraws(c) || (!c.Waited && !c.Beast && Waits(c) && Wait(c)))
             {
@@ -403,10 +410,19 @@ namespace GameDev.Confront.Turns
 
             var goalX = c.Cell.X + (RetreatGoal * Math.Sign(c.Cell.X - nearest.Cell.X));
             var goalZ = c.Cell.Z + (RetreatGoal * Math.Sign(c.Cell.Z - nearest.Cell.Z));
+            WalkToward(c, goalX, goalZ, ApLeft);
+        }
+
+        /// <summary>
+        /// Walks up to <paramref name="steps"/> cells toward a goal cell, each step to the free cell beside that comes
+        /// nearest it, stopping where none comes nearer: a shooter's step back (§5b), a resident's flight (§5a).
+        /// </summary>
+        private void WalkToward(Combatant c, int goalX, int goalZ, int steps)
+        {
             _route.Clear();
             var here = c.Cell;
             var size = _grid.CellSize;
-            for (var step = 0; step < ApLeft; step++)
+            for (var step = 0; step < steps; step++)
             {
                 var hereCost = (Chebyshev(here.X, here.Z, goalX, goalZ), Square(here.X, here.Z, goalX, goalZ));
                 var found = false;

@@ -170,6 +170,10 @@ namespace GameDev.Slice.Fights
                 if (_bodies.TryGetValue(c, out var body) && body != null)
                 {
                     Guard(c, body, false);
+                    if (c.Departure == Departure.BrokeAway && c.HelpAt is Vector3 help)
+                    {
+                        HelpRun.Begin(body, help, _clock); // it goes to find help (10.2 §5a)
+                    }
                 }
 
                 return;

@@ -148,7 +148,8 @@ namespace GameDev.Slice.Fights
                     spared++;
                 }
 
-                if (!pair.Key.Fighter.Down && pair.Key.Departure != Departure.None)
+                // Who left the fight alive leaves the scene, but for a resident gone to find help (10.2 §5a).
+                if (!pair.Key.Fighter.Down && pair.Key.Departure != Departure.None && body.GetComponent<HelpRun>() == null)
                 {
                     body.gameObject.SetActive(false);
                 }

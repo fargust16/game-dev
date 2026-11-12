@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GameDev.Confront.Grid;
 using GameDev.Confront.Rules;
 using GameDev.Confront.Stealth;
@@ -300,7 +301,62 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(Departure.None, shooter.Departure, "no step leaves the fight");
             Assert.AreEqual(CombatantState.Fighting, shooter.State);
             Assert.Greater(enemy.Cell.Z - shooter.Cell.Z, 8, "it stepped back from the enemy's eight cells");
+        }
 
+        [Test]
+        public void TheForceEstimateWeighsEachSidesKillsPerTurn()
+        {
+            Fighter[] Of(int n) => Enumerable.Range(0, n).Select(_ => Fighter()).ToArray();
+            Assert.AreEqual(1d, _rules.ForceEstimate(Of(1), Of(1)), 1e-9, "two alike");
+            Assert.AreEqual(2d, _rules.ForceEstimate(Of(2), Of(1)), 1e-9, "two against one");
+            Assert.AreEqual(0.5d, _rules.ForceEstimate(Of(1), Of(2)), 1e-9, "one against two");
+            Assert.That(_rules.ForceEstimate(Of(1), new[] { Fighter(shooter: true) }), Is.Not.EqualTo(1d), "what each carries counts");
+        }
+
+        [Test]
+        public void AResidentFightsWhileItsSidesEstimateHoldsAndFleesBelowIt()
+        {
+            var resident = At(0, 0, Fighter(100), 12, 10);
+            var enemy = At(1, 1, Fighter(), 3, 10);
+            Begin(resident, enemy);
+            var estimate = _turns.ForceEstimate(resident);
+            Assert.That(estimate, Is.GreaterThan(0d));
+            Assert.IsFalse(_turns.Flees(resident), "one with no courage set always fights");
+            resident.FightsAt = estimate;
+            Assert.IsFalse(_turns.Flees(resident), "at its courage it fights");
+            resident.FightsAt = estimate * 1.01;
+            Assert.IsTrue(_turns.Flees(resident), "below it, it flees");
+        }
+
+        [Test]
+        public void AFleeingResidentWalksAwayKeepingTheApOfСбежатьAndBreaksAwayAtFifteenCells()
+        {
+            var resident = At(0, 0, Fighter(100), 12, 10);
+            resident.FightsAt = 1000d; // a courage no side reaches
+            var enemy = At(1, 1, Fighter(), 3, 10);
+            Begin(resident, enemy);
+            var ap = _turns.ApLeft;
+            var hp = enemy.Fighter.Hp;
+            _turns.PlayTurn();
+            Assert.AreEqual(Departure.BrokeAway, resident.Departure, $"{ap - 2} cells away, then Сбежать");
+            Assert.AreEqual(hp, enemy.Fighter.Hp, "it strikes nobody");
+            Assert.IsFalse(_turns.IsRunning, "nobody is left to fight the enemy");
+        }
+
+        [Test]
+        public void AFleeingResidentNearerThanFifteenCellsRunsTowardItsHelpAndStaysIn()
+        {
+            var resident = At(0, 0, Fighter(100), 9, 10);
+            resident.FightsAt = 1000d;
+            resident.HelpAt = new Vector3(12.5f, 0f, 21.5f); // a Warden to the north
+            var enemy = At(1, 1, Fighter(), 6, 10);
+            Begin(resident, enemy);
+            var walk = _turns.ApLeft - _rules.BreakAwayAp;
+            _turns.PlayTurn();
+            Assert.AreEqual(Departure.None, resident.Departure, "still nearer than fifteen cells");
+            Assert.AreEqual(enemy, _turns.Acting, "its turn is over");
+            Assert.AreEqual(3 + walk, _turns.NearestEnemy(resident), "every step away, keeping the AP of Сбежать");
+            Assert.Greater(resident.Cell.Z, 10, "away from the enemy and toward the Warden");
         }
     }
 }

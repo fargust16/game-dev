@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GameDev.Confront;
+using GameDev.Confront.Rules;
 using GameDev.Confront.Turns;
 using GameDev.Locomotion;
 using GameDev.Player.Standing;
@@ -116,20 +117,28 @@ namespace GameDev.Slice.Fights
             var struck = Person(victim, warden ? Wardens : Residents, 1);
             _bodies[struck] = victim;
             combatants.Add(struck);
+            if (!warden)
+            {
+                // 10.2 §5a: a resident fights back only with a chance, and otherwise runs for help.
+                struck.FightsAt = FightsBackAt;
+                struck.HelpAt = HelpFor(victim);
+            }
 
-            // The cry fetches the Wardens nearest the place; each joins at the end of the round by which it has run there.
+            // The cry fetches every Warden within the call and the two nearest beyond it; each joins at the end of the
+            // round by which it has run there.
             var perTick = GameClockDriver.RealSecondsPerTick > 0f ? GameClockDriver.RealSecondsPerTick : FallbackSecondsPerTick;
             var id = 2;
+            var beyond = 0;
             foreach (var body in PeopleAround.Wardens(_assaultAt))
             {
-                if (_coming.Count >= AnsweringWardens)
-                {
-                    break;
-                }
-
                 if (body == victim || _player.transform.IsChildOf(body) || Lying(body))
                 {
                     continue;
+                }
+
+                if (!Heard(body.position) && beyond++ >= AnsweringWardens)
+                {
+                    break;
                 }
 
                 _returning.RemoveAll(r => r.Body == body);
@@ -144,6 +153,11 @@ namespace GameDev.Slice.Fights
                 });
             }
 
+            var lawful = new List<Fighter> { struck.Fighter };
+            lawful.AddRange(_coming.ConvertAll(k => k.Combatant.Fighter));
+            var joined = JoinTheCall(player.Fighter, lawful, victim, ref id);
+            Debug.Log($"[Confront] the call: {_coming.Count} Wardens coming, {joined} residents join.");
+
             // The blow is the fight's opening strike, a stealth attack only from Stealth Mode (10.3 §7).
             player.Hidden = Hiding != null && Hiding.Active;
             var request = new EncounterRequest(at, combatants, _seed.Fork(SliceSeedStreams.Combat, _fights), "assault")
@@ -157,6 +171,7 @@ namespace GameDev.Slice.Fights
             {
                 Standing?.Record(Deed.Assault);
                 _peopleEnded = AssaultOver;
+                CallForHelp(victim);
                 Assaulted?.Invoke(victim);
                 return true;
             }
@@ -171,9 +186,9 @@ namespace GameDev.Slice.Fights
         }
 
         /// <summary>A person of <paramref name="group"/> as a fighter with what it carries (<see cref="Armed"/>), out of its walk.</summary>
-        private Combatant Person(Transform body, string group, int id)
+        private Combatant Person(Transform body, string group, int id, Fighter fighter = null)
         {
-            var c = new Combatant(id, HostileSide, Armed(body, group), body.position) { AcceptsYield = TakesYield(group) };
+            var c = new Combatant(id, HostileSide, fighter ?? Armed(body, group), body.position) { AcceptsYield = TakesYield(group) };
             if (!body.TryGetComponent<SliceFighter>(out var part))
             {
                 part = body.gameObject.AddComponent<SliceFighter>();
@@ -251,7 +266,9 @@ namespace GameDev.Slice.Fights
         {
             foreach (var walker in _stopped)
             {
-                if (walker != null && walker.gameObject.activeInHierarchy && !Lying(walker.transform))
+                // A searcher and one gone for help walk again when they are done (10.2 §5a, §9).
+                if (walker != null && walker.gameObject.activeInHierarchy && !Lying(walker.transform)
+                    && walker.GetComponent<FightSearch>() == null && walker.GetComponent<HelpRun>() == null)
                 {
                     walker.enabled = true;
                 }

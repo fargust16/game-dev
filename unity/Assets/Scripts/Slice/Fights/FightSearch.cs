@@ -41,6 +41,9 @@ namespace GameDev.Slice.Fights
 
         private static readonly int RunState = Animator.StringToHash("Run");
         private static readonly int WalkState = Animator.StringToHash("Walk");
+
+        /// <summary>The Walk state's hash, played where a controller has no Run.</summary>
+        public static int WalkStateHash => WalkState;
         private static readonly int IdleState = Animator.StringToHash("Idle");
 
         private Animator _animator;
@@ -192,7 +195,22 @@ namespace GameDev.Slice.Fights
         /// <summary>A step toward <paramref name="target"/>; true once there, or once a wall stands in the way of a run.</summary>
         private bool Go(Vector3 target, float speed, float reach, int state)
         {
-            var at = transform.position;
+            if (Step(transform, target, speed, reach, state == RunState))
+            {
+                return true;
+            }
+
+            Play(_animator != null && _animator.HasState(0, state) ? state : WalkState);
+            return false;
+        }
+
+        /// <summary>
+        /// A body's step toward a place, straight, its feet on the ground under it; true once there, or, with
+        /// <paramref name="stopAtWall"/>, once a wall at knee height stands in the way.
+        /// </summary>
+        public static bool Step(Transform body, Vector3 target, float speed, float reach, bool stopAtWall)
+        {
+            var at = body.position;
             var way = Vector3.ProjectOnPlane(target - at, Vector3.up);
             if (way.magnitude <= reach + ArriveSlack)
             {
@@ -200,18 +218,17 @@ namespace GameDev.Slice.Fights
             }
 
             var knee = Vector3.up * KneeHeight;
-            if (state == RunState && Physics.Linecast(at + knee, target + knee, out var hit, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)
+            if (stopAtWall && Physics.Linecast(at + knee, target + knee, out var hit, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)
                 && !PeopleAround.IsPerson(hit.collider))
             {
-                return true; // it looks round from where it stands
+                return true; // it stops where it stands
             }
 
             var step = Mathf.Min(way.magnitude - reach, speed * Time.deltaTime);
             var next = at + (way.normalized * step);
             next = PeopleAround.Ground(new Vector3(next.x, at.y, next.z));
-            var turn = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(way.normalized, Vector3.up), TurnRate * Time.deltaTime);
-            transform.SetPositionAndRotation(next, turn);
-            Play(_animator != null && _animator.HasState(0, state) ? state : WalkState);
+            var turn = Quaternion.RotateTowards(body.rotation, Quaternion.LookRotation(way.normalized, Vector3.up), TurnRate * Time.deltaTime);
+            body.SetPositionAndRotation(next, turn);
             return false;
         }
 

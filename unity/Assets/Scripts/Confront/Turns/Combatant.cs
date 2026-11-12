@@ -143,6 +143,14 @@ namespace GameDev.Confront.Turns
 
         public Combatant SawWho { get; internal set; }
 
+        /// <summary>
+        /// A resident's courage (10.2 §5a, PB6): the Force Estimate of 21 §8 its side must reach for it to fight; below it,
+        /// it flees and breaks away. Null for one who always fights.
+        /// </summary>
+        public double? FightsAt { get; set; }
+
+        /// <summary>Where it runs for help when it flees, the nearest Warden on post; null for nowhere in particular.</summary>
+        public Vector3? HelpAt { get; set; }
 
         /// <summary>The pack it runs with, or −1 (10.2 *Beasts of the slice*): when the first of a pack falls, the rest flee.</summary>
         public int Pack { get; set; } = -1;

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Linq;
 using GameDev.Confront.Turns;
+using GameDev.Core.Localization;
 using GameDev.Items;
 using GameDev.Locomotion;
 using GameDev.Player.Progression;
@@ -9,6 +10,7 @@ using GameDev.Player.Standing;
 using GameDev.Slice.Fights;
 using GameDev.Slice.Gear;
 using GameDev.Slice.People;
+using GameDev.Slice.Stealth;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -51,14 +53,15 @@ namespace GameDev.Slice.Tests
                 yield return null;
             }
 
-            // A strong character with a sword and the leather set, its turns played by the rule: it stands against three.
+            // A strong character with a sword and the plate set, its turns played by the rule: it stands against the Wardens'
+            // firearms (10.2 §5b, plate beats shooters; PB6 brings every Warden within the call, and the one struck runs).
             var character = world.Character;
             character.Set(CharacterAttribute.Strength, 20);
             character.Set(CharacterAttribute.Endurance, 20);
             character.Set(CharacterAttribute.Dexterity, 10);
             character.Set(CharacterAttribute.Perception, 8);
             character.Set(CharacterSkill.MeleeSkill, 20);
-            foreach (var id in new[] { "sword", "leather_head", "leather_body", "leather_shoulders", "leather_gloves", "leather_trousers", "leather_boots" })
+            foreach (var id in new[] { "sword", "plate_head", "plate_body", "plate_shoulders", "plate_gloves", "plate_trousers", "plate_boots" })
             {
                 var piece = new ItemPiece(id);
                 Assert.IsTrue(world.Bag.AddPiece(piece), id);
@@ -78,8 +81,20 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(fights.InFight, "a blow at a resident starts a fight at once");
             Assert.IsTrue(fights.Assaulting, "an Assault");
             Assert.IsFalse(walker.enabled, "the one struck leaves its walk");
-            Assert.AreEqual(SliceConfront.AnsweringWardens, fights.WardensComing, "the two Wardens nearest the place come");
-            Assert.IsTrue(fights.Turns.Order.Any(c => c.Id == 1), "the one struck fights back");
+            Assert.That(fights.WardensComing, Is.GreaterThanOrEqualTo(SliceConfront.AnsweringWardens), "every Warden within the call and the two nearest beyond it come");
+            Assert.IsTrue(fights.Turns.Order.Any(c => c.Id == 1), "the one struck is in the fight");
+
+            // PB6, 10.2 §5a: a resident fights back only with a chance, runs for help otherwise, and calls; those near hear.
+            var struck = fights.Turns.Order.First(c => c.Id == 1);
+            Assert.AreEqual(SliceConfront.FightsBackAt, struck.FightsAt, "the one struck fights only with a chance");
+            Assert.IsTrue(struck.HelpAt.HasValue, "and knows where the nearest Warden is");
+            var cry = walker.GetComponentInChildren<StealthObserver>();
+            Assert.IsNotNull(cry, "the walker watches the city");
+            Assert.AreEqual(Loc.Get("ui.fight.help.call"), cry.Line, "the one struck calls for help");
+            Assert.Greater(cry.LineUntil, Time.time, "its line hangs over its head");
+            var heard = warden.GetComponentInChildren<StealthObserver>();
+            Assert.IsNotNull(heard, "the Warden watches the city");
+            Assert.AreEqual(Loc.Get("ui.fight.help.warden"), heard.Line, "the Warden four metres off hears it");
 
             var wardenFought = false;
             for (var t = 0f; t < 180f && (fights.InFight || fights.WardensComing > 0); t += Time.deltaTime)
