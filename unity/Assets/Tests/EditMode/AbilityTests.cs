@@ -6,6 +6,8 @@ using GameDev.Confront.Turns;
 using GameDev.Core.Localization;
 using GameDev.Player.Progression;
 using GameDev.Slice.EditorTools;
+using GameDev.Slice.Fights;
+using GameDev.World.Seed;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -18,9 +20,10 @@ namespace GameDev.Slice.Tests
     /// CR4, abilities in a fight (05.1 *Abilities of the slice*, 07.2 §3.3, §4.5, 10.2 §5f), on a floor of 20 × 20
     /// one-metre cells: Will Power and the Prepared slots by their formulas; the slice's sixteen abilities with their words
     /// and icons; Дрёма, Стой!, Укол разума, Столп, Не сдвинуть, Опора and Сокрушение as 05.1 has them; Infusion paid for
-    /// each blow and stopped by plate; the NPCs' Дрёма on the most dangerous and waking a sleeper beside; and CR5's four,
-    /// Пелена's haze, Гнёт's area, Рывок behind an enemy and Двойник's copy. Initiative is set apart by Dexterity and
-    /// Perception, 100 and 1.
+    /// each blow and stopped by plate; the NPCs' Дрёма on the most dangerous and waking a sleeper beside; CR5's four,
+    /// Пелена's haze, Гнёт's area, Рывок behind an enemy and Двойник's copy; and CR7's NPCs, preparing by the seed
+    /// and using the four and Не сдвинуть by the models' rules. Initiative is set apart by Dexterity and Perception, 100
+    /// and 1.
     /// </summary>
     public sealed class AbilityTests
     {
@@ -101,11 +104,21 @@ namespace GameDev.Slice.Tests
         [Test]
         public void WillPowerAndPreparedSlotsFollowTheirFormulas()
         {
+            var uninitiated = _rules.Fighter(Sheet(8), 9, Set(_pistol));
+            Assert.AreEqual(0d, uninitiated.MaxWillPower, 1e-9, "only the initiated have Will Power (COMBAT-7)");
+            Assert.AreEqual(0d, uninitiated.WillPower, 1e-9);
+            Assert.IsFalse(FightRules.CanPay(uninitiated, 1d, true), "the Uninitiated pays nothing: it has entered no Arcana");
+
             var nine = _rules.Fighter(Sheet(8), 9, Set(_pistol));
+            nine.Prepare(Arcana.Priestess, null, 0);
             Assert.AreEqual(20d + (0.8d * 8d), nine.MaxWillPower, 1e-5, "07.2 §3.3: (20 + 0.8 × Will) × S");
-            Assert.AreEqual(nine.MaxWillPower, nine.WillPower, 1e-9, "a fighter starts with all of it");
+            Assert.AreEqual(nine.MaxWillPower, nine.WillPower, 1e-9, "one entering an Arcana comes into all of it");
             var eight = _rules.Fighter(Sheet(8), 8, Set(_pistol));
+            eight.Prepare(Arcana.Priestess, null, 0);
             Assert.AreEqual(nine.MaxWillPower * _rules.LimitMultiplier(8), eight.MaxWillPower, 1e-5, "the same S as HP");
+            eight.WillPower = 5d;
+            eight.Prepare(Arcana.Priestess, null, 0);
+            Assert.AreEqual(5d, eight.WillPower, 1e-9, "preparing again gives none back");
 
             foreach (var (intelligence, will, slots) in new[] { (1, 1, 3), (8, 8, 4), (15, 15, 5), (50, 50, 10), (100, 100, 10) })
             {
@@ -113,8 +126,6 @@ namespace GameDev.Slice.Tests
                 sheet.Set(CharacterAttribute.Will, will);
                 Assert.AreEqual(slots, _rules.PreparedSlots(sheet), $"07.2 §4.5: Intelligence {intelligence} and Will {will}");
             }
-
-            Assert.IsFalse(FightRules.CanPay(nine, 1d, true), "the Uninitiated pays nothing: it has entered no Arcana");
         }
 
         [Test]
@@ -139,8 +150,6 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(16, all.Select(a => a.Key).Distinct().Count(), "and its own key");
             Assert.AreEqual(8, all.Count(a => a.Arcana == Arcana.Priestess));
             Assert.AreEqual(8, all.Count(a => a.Arcana == Arcana.Emperor));
-            CollectionAssert.AreEquivalent(new[] { "screen", "double", "dash", "press" }, all.Where(a => a.PlayerOnly).Select(a => a.Key).ToArray(),
-                "the four new abilities are the player's (COMBAT-8)");
             foreach (var a in all)
             {
                 foreach (var key in new[] { $"ability.{a.Key}.name", $"ability.{a.Key}.text" })
@@ -151,7 +160,12 @@ namespace GameDev.Slice.Tests
 
             var drowse = Ability("Drowse");
             Assert.AreEqual((AbilityEffect.Sleep, 0.33f, 2, 6, 0.4f, 1), (drowse.Effect, drowse.Cost, drowse.Ap, drowse.Range, drowse.Contest, drowse.Rounds), "05.1's numbers");
-            Assert.AreEqual(9f, Ability("MindSting").BaseDamage, 1e-6f, "the rework's base");
+            Assert.AreEqual(6f, Ability("MindSting").BaseDamage, 1e-6f, "the balance after the answers");
+            Assert.AreEqual(8, Ability("Halt").Range, "Стой! within 8 cells");
+            Assert.AreEqual(2, Ability("Screen").Rounds, "Пелена for 2 rounds");
+            Assert.AreEqual(4, Ability("Double").Ap, "Двойник for 4 AP");
+            Assert.AreEqual(2f, Ability("Press").BaseDamage, 1e-6f, "Гнёт base 2");
+            Assert.AreEqual(3d, _rules.SupportDefence, 1e-9, "Опора +3");
             Assert.AreEqual(1.5f, Ability("Crush").Multiplier, 1e-6f);
             Assert.AreEqual(0.5f, AssetDatabase.LoadAssetAtPath<FightArmour>(Data + "Armour/Chain.asset").Channel, 1e-6f, "chain halves Infusion");
             Assert.AreEqual(0f, AssetDatabase.LoadAssetAtPath<FightArmour>(Data + "Armour/Plate.asset").Channel, 1e-6f, "plate stops it");
@@ -224,7 +238,7 @@ namespace GameDev.Slice.Tests
             Begin(new ScriptedAlways(0.5d), caster, target);
             target.Fighter.Hp = 1000d;
             Assert.IsTrue(_turns.SubmitIntent(TurnIntent.UseAbility(0, target.Id)), "a target 10 cells off, in sight");
-            Assert.AreEqual(1000d - 9d, target.Fighter.Hp, 1e-9, "base 9, its roll in the middle, through no magical defence");
+            Assert.AreEqual(1000d - 6d, target.Fighter.Hp, 1e-9, "base 6, its roll in the middle, through no magical defence");
             Assert.AreEqual(1, target.Fighter.Disoriented, "disoriented for a round");
             Assert.IsTrue(_turns.SubmitIntent(TurnIntent.EndTurn));
             Assert.AreEqual(target, _turns.Acting);
@@ -401,7 +415,7 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
-        public void ScreenObscuresAShotThroughItAndFromInsideAndFadesAfterItsRounds()
+        public void ScreenObscuresAShotThroughOrIntoItAndFadesAfterItsRounds()
         {
             var caster = At(0, 0, Caster(Arcana.Priestess, 8, _pistol, Ability("Screen")), 5, 5, intents: true);
             var enemy = At(1, 1, Fighter(1, _fists), 12, 5, intents: true);
@@ -418,10 +432,10 @@ namespace GameDev.Slice.Tests
             Assert.IsTrue(_grid.Shot(enemy.Cell, caster.Cell).Obscured, "both ways");
             Assert.IsFalse(_grid.Shot(Cell(5, 9), Cell(12, 9)).Obscured, "a line beside it does not meet it");
 
-            EndRounds(2);
-            Assert.AreEqual(1, _turns.Clouds.Count, "two rounds ended, one left");
             EndRounds(1);
-            Assert.AreEqual(0, _turns.Clouds.Count, "gone after its three");
+            Assert.AreEqual(1, _turns.Clouds.Count, "one round ended, one left");
+            EndRounds(1);
+            Assert.AreEqual(0, _turns.Clouds.Count, "gone after its two");
             Assert.IsFalse(_grid.Shot(caster.Cell, enemy.Cell).Obscured, "and the line is open again");
 
             BuildThePlace();
@@ -429,8 +443,8 @@ namespace GameDev.Slice.Tests
             var foe = At(1, 1, Fighter(1, _fists), 12, 5, intents: true);
             Begin(new ScriptedAlways(0.5d), inside, foe);
             Assert.IsTrue(_turns.SubmitIntent(TurnIntent.UseAbilityAt(0, inside.Cell)), "on its own cell");
-            Assert.IsTrue(_grid.Shot(inside.Cell, foe.Cell).Obscured, "a shot from inside the haze passes through it too (COMBAT-12)");
-            Assert.IsTrue(_grid.Shot(foe.Cell, inside.Cell).Obscured, "and one into it");
+            Assert.IsFalse(_grid.Shot(inside.Cell, foe.Cell).Obscured, "a shot from inside the haze keeps its aim, as from a bush (COMBAT-12 (d))");
+            Assert.IsTrue(_grid.Shot(foe.Cell, inside.Cell).Obscured, "one into it aims worse");
         }
 
         [Test]
@@ -452,9 +466,9 @@ namespace GameDev.Slice.Tests
             var ap = _turns.ApLeft;
             Assert.IsTrue(_turns.SubmitIntent(TurnIntent.UseAbilityAt(0, Cell(6, 5))));
             Assert.AreEqual(ap - 5, _turns.ApLeft, "for 5 AP");
-            Assert.AreEqual(996d, east.Fighter.Hp, 1e-9, "base 4, its roll in the middle, through no magical defence");
-            Assert.AreEqual(996d, corner.Fighter.Hp, 1e-9);
-            Assert.AreEqual(996d, ally.Fighter.Hp, 1e-9, "its own people too");
+            Assert.AreEqual(998d, east.Fighter.Hp, 1e-9, "base 2, its roll in the middle, through no magical defence");
+            Assert.AreEqual(998d, corner.Fighter.Hp, 1e-9);
+            Assert.AreEqual(998d, ally.Fighter.Hp, 1e-9, "its own people too");
             Assert.AreEqual(1000d, far.Fighter.Hp, 1e-9, "nobody outside the area");
             Assert.AreEqual(1000d, caster.Fighter.Hp, 1e-9, "and never its caster, who stands in it");
             Assert.AreEqual(3, _used.Count(u => u.Ability == press && u.Target != null && u.Worked), "each struck told");
@@ -535,6 +549,142 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(0, caster.Fighter.Veiled, "seen again as its next turn ends");
             Assert.IsNull(caster.Double, "its copy gone with the veil");
             CollectionAssert.AreEqual(new[] { false }, ended);
+        }
+
+        [Test]
+        public void AnNpcPreparesByTheSeedFromEveryActiveAbilityOfItsLimits()
+        {
+            var all = AssetDatabase.LoadAssetAtPath<SliceSettings>(SliceConfrontSetup.SettingsPath).Abilities;
+            var seed = new WorldSeed(110201);
+            var eight = SliceConfront.Known(all, Arcana.Priestess, 8, "Warden#1", seed);
+            Assert.AreEqual(Ability("KeenEar"), eight[0], "its passive first");
+            CollectionAssert.AreEquivalent(new[] { Ability("Screen"), Ability("Double"), Ability("Drowse") }, eight.Skip(1).ToArray(),
+                "then every active one of Limits 9 and 8 a fight can use, Пелена and Двойник too (COMBAT-8 (c))");
+            CollectionAssert.AreEqual(eight, SliceConfront.Known(all, Arcana.Priestess, 8, "Warden#1", seed), "the same person, the same order");
+            var emperor = SliceConfront.Known(all, Arcana.Emperor, 8, "Warden#2", seed);
+            CollectionAssert.IsSubsetOf(new[] { Ability("Dash"), Ability("Press") }, emperor, "Рывок and Гнёт for Император");
+
+            // Six actives at Limit 7 of Император and four slots: the seed decides which the slots miss.
+            var slots = _rules.PreparedSlots(Sheet(8));
+            Assert.AreEqual(4, slots);
+            int with = 0, without = 0;
+            for (var i = 0; i < 40; i++)
+            {
+                var f = Fighter(8, _pistol, 7);
+                f.Prepare(Arcana.Emperor, SliceConfront.Known(all, Arcana.Emperor, 7, $"Cultist#{i}", seed), slots);
+                Assert.AreEqual(slots, f.Prepared.Count);
+                if (f.Prepared.Contains(Ability("Pillar")))
+                {
+                    with++;
+                }
+                else
+                {
+                    without++;
+                }
+            }
+
+            Assert.Greater(with, 0, "some prepare Столп");
+            Assert.Greater(without, 0, "and some miss it");
+        }
+
+        [Test]
+        public void AnNpcPressesWhereItStrikesEnoughEnemies()
+        {
+            var caster = At(0, 0, Caster(Arcana.Emperor, 8, _pistol, Ability("Press")), 5, 5);
+            var a = At(1, 1, Fighter(1, _pistol), 10, 5, intents: true);
+            var b = At(2, 1, Fighter(1, _pistol), 10, 6, intents: true);
+            var c = At(3, 1, Fighter(1, _pistol), 11, 5, intents: true);
+            Begin(new ScriptedAlways(0.5d), caster, a, b, c);
+            a.Fighter.Hp = b.Fighter.Hp = c.Fighter.Hp = 1000d;
+            Assert.AreEqual(caster, _turns.Acting);
+            _turns.PlayTurn();
+            Assert.IsTrue(_used.Exists(u => u.Ability.Effect == AbilityEffect.Press && u.Target == null && u.Worked), "it opens its turn with Гнёт");
+            Assert.AreEqual(3, _used.Count(u => u.Ability.Effect == AbilityEffect.Press && u.Target != null), "over all three");
+
+            BuildThePlace();
+            var other = At(0, 0, Caster(Arcana.Emperor, 8, _pistol, Ability("Press")), 5, 5);
+            var near = At(1, 1, Fighter(1, _pistol), 10, 5, intents: true);
+            var apart = At(2, 1, Fighter(1, _pistol), 10, 12, intents: true);
+            Begin(new ScriptedAlways(0.5d), other, near, apart);
+            near.Fighter.Hp = apart.Fighter.Hp = 1000d;
+            _turns.PlayTurn();
+            Assert.IsFalse(_used.Exists(u => u.Ability.Effect == AbilityEffect.Press), "one enemy in reach of an area is not worth it");
+        }
+
+        [Test]
+        public void AnNpcRaisesAScreenFromTheApLeftWhenAShooterCanFireAtIt()
+        {
+            var caster = At(0, 0, Caster(Arcana.Priestess, 9, _pistol, Ability("Screen")), 5, 5);
+            var shooter = At(1, 1, Fighter(1, _pistol), 9, 5, intents: true);
+            Begin(new ScriptedAlways(0.5d), caster, shooter);
+            shooter.Fighter.Hp = 1000d;
+            Assert.AreEqual(caster, _turns.Acting);
+            _turns.PlayTurn();
+            Assert.AreEqual(3, _struck.Count(s => s.Attacker == caster), "three shots of its 15 AP");
+            Assert.AreEqual(1, _turns.Clouds.Count, "then Пелена for the 3 AP left");
+            Assert.AreEqual(caster.Cell, _turns.Clouds[0].Center, "over itself");
+            Assert.AreEqual(shooter, _turns.Acting, "and its turn is over");
+        }
+
+        [Test]
+        public void AWoundedNpcKeepsItsApForADouble()
+        {
+            var shots = new int[2];
+            for (var wounded = 0; wounded < 2; wounded++)
+            {
+                BuildThePlace();
+                var caster = At(0, 0, Caster(Arcana.Priestess, 8, _pistol, Ability("Double")), 5, 5);
+                var shooter = At(1, 1, Fighter(1, _pistol), 9, 5, intents: true);
+                Begin(new ScriptedAlways(0.5d), caster, shooter);
+                shooter.Fighter.Hp = 1000d;
+                caster.Fighter.Hp = wounded == 1 ? 0.4d * caster.Fighter.MaxHp : caster.Fighter.MaxHp;
+                _turns.PlayTurn();
+                shots[wounded] = _struck.Count(s => s.Attacker == caster);
+                if (wounded == 1)
+                {
+                    Assert.IsNotNull(caster.Double, "wounded, it leaves a copy");
+                    Assert.Greater(caster.Fighter.Veiled, 0);
+                }
+                else
+                {
+                    Assert.IsNull(caster.Double, "whole, three shots leave 3 AP, short of Двойник's 4");
+                }
+            }
+
+            CollectionAssert.AreEqual(new[] { 3, 2 }, shots, "the wounded one keeps 4 AP back from its turn's start");
+        }
+
+        [Test]
+        public void AnNpcBracesWheneverAnEnemyCouldAttackItNext()
+        {
+            var caster = At(0, 0, Caster(Arcana.Emperor, 9, _pistol, Ability("Unmoved")), 5, 5);
+            var shooter = At(1, 1, Fighter(1, _pistol), 9, 5, intents: true);
+            Begin(new ScriptedAlways(0.5d), caster, shooter);
+            shooter.Fighter.Hp = 1000d;
+            _turns.PlayTurn();
+            Assert.IsTrue(caster.Fighter.Braced, "one enemy 4 cells off is enough since the balance after COMBAT-7");
+            Assert.IsTrue(_used.Exists(u => u.Ability.Effect == AbilityEffect.Brace));
+        }
+
+        [Test]
+        public void AnNpcDashesBehindAFarTargetAndStrikes()
+        {
+            var caster = At(0, 0, Caster(Arcana.Emperor, 9, _sword, Ability("Dash")), 5, 5);
+            var target = At(1, 1, Fighter(1, _pistol), 10, 5, intents: true);
+            Begin(new ScriptedAlways(0.5d), caster, target);
+            target.Fighter.Hp = 1000d;
+            _turns.PlayTurn();
+            Assert.IsTrue(_used.Exists(u => u.Ability.Effect == AbilityEffect.Dash), "a walk of 4 cells is worth Рывок");
+            Assert.AreEqual(Cell(11, 5), caster.Cell, "behind its target");
+            Assert.Greater(_struck.Count(s => s.Attacker == caster && s.Target == target), 0, "and it strikes");
+
+            BuildThePlace();
+            var other = At(0, 0, Caster(Arcana.Emperor, 9, _sword, Ability("Dash")), 5, 5);
+            var close = At(1, 1, Fighter(1, _pistol), 8, 5, intents: true);
+            Begin(new ScriptedAlways(0.5d), other, close);
+            close.Fighter.Hp = 1000d;
+            _turns.PlayTurn();
+            Assert.IsFalse(_used.Exists(u => u.Ability.Effect == AbilityEffect.Dash), "a walk of 2 cells is not");
         }
 
         /// <summary>Every draw the same value.</summary>

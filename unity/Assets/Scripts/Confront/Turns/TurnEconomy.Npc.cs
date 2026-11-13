@@ -84,6 +84,10 @@ namespace GameDev.Confront.Turns
                 return;
             }
 
+            // CR7, 05.1 Двойник: a wounded NPC keeps its AP back from the start (tactical_sim.py keeps_for_double).
+            var keep = KeepsForDouble(c);
+            ApLeft -= keep;
+
             var first = true;
             var stepped = false;
             for (var decision = 0; decision < MaxDecisions && IsRunning && Acting == c && ApLeft > 0; decision++)
@@ -159,8 +163,16 @@ namespace GameDev.Confront.Turns
                 Beside(c, _beside);
                 if (_beside.Count == 0 && Holds(c, c.Cell, ApLeft))
                 {
+                    ApLeft += keep;
                     Stand(c);
                     return;
+                }
+
+                // 05.1 Рывок: behind the target, when it saves a walk (tactical_sim.py dash).
+                if (TryDash(c, target, cost))
+                {
+                    first = false;
+                    continue;
                 }
 
                 if (_beside.Count > 0)
@@ -214,7 +226,19 @@ namespace GameDev.Confront.Turns
 
             if (IsRunning && Acting == c)
             {
+                ApLeft += keep;
                 Retreat(c);
+            }
+
+            // CR7: from the AP left, Пелена unless it kept AP for Двойник, then Двойник (tactical_sim.py turn).
+            if (IsRunning && Acting == c && keep == 0)
+            {
+                ScreenAtEnd(c);
+            }
+
+            if (IsRunning && Acting == c)
+            {
+                DoubleAtEnd(c);
             }
 
             if (IsRunning && Acting == c)

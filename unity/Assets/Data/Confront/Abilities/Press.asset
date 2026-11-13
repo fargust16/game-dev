@@ -21,10 +21,9 @@ MonoBehaviour:
   ap: 5
   endOfTurn: 0
   range: 10
-  baseDamage: 4
+  baseDamage: 2
   contest: 0
   rounds: 0
   area: 3
   multiplier: 1
-  playerOnly: 1
   icon: {fileID: -1544809838, guid: 132358e9bf26b60458b731bf001e31db, type: 3}

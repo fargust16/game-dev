@@ -94,8 +94,17 @@ namespace GameDev.Confront.Rules
         /// <summary>05.1: the Arcana it entered; <see cref="Arcana.None"/> for the Uninitiated and beasts.</summary>
         public Arcana Arcana { get; internal set; }
 
-        /// <summary>07.2 §3.3: `(20 + 0.8 × Will) × S`, and the items' share.</summary>
-        public double MaxWillPower { get; internal set; }
+        private double _willPowerPool;
+
+        /// <summary>
+        /// 07.2 §3.3: `(20 + 0.8 × Will) × S`, and the items' share; none for one who entered no Arcana, since only the
+        /// initiated have Will Power (owner, COMBAT-7).
+        /// </summary>
+        public double MaxWillPower
+        {
+            get => Arcana == Arcana.None ? 0d : _willPowerPool;
+            internal set => _willPowerPool = value;
+        }
 
         /// <summary>07.2 §3.3: what is left to spend on abilities and Infusion; it comes back slowly, so a fight is fought on it.</summary>
         public double WillPower { get; set; }
@@ -161,11 +170,13 @@ namespace GameDev.Confront.Rules
 
         /// <summary>
         /// 07.2 §4.5: what it knows of its Arcana for this fight: every passive one, and the active ones a fight can use,
-        /// as many as <paramref name="slots"/> hold, in the order given.
+        /// as many as <paramref name="slots"/> hold, in the order given. One entering an Arcana comes into its full Will Power.
         /// </summary>
         public void Prepare(Arcana arcana, IEnumerable<FightAbility> known, int slots)
         {
+            var entering = Arcana == Arcana.None && arcana != Arcana.None;
             Arcana = arcana;
+            WillPower = entering ? MaxWillPower : System.Math.Min(WillPower, MaxWillPower);
             _prepared.Clear();
             _passives.Clear();
             if (known == null)

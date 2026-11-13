@@ -57,8 +57,8 @@ namespace GameDev.Confront.Grid
                 var to = targetFeet + (Vector3.up * height);
                 if (Free(from, to, out var partial))
                 {
-                    // A shot from inside haze passes through it, which a line begun inside never meets (05.1 Пелена, CR5).
-                    return new ShotLine(true, partial || StandsIn(targetFeet) || StandsIn(shooterFeet, true), from, to);
+                    // A line begun inside a Partial Obstacle never meets it, so a shot out of a bush or haze keeps its aim (COMBAT-12).
+                    return new ShotLine(true, partial || StandsIn(targetFeet), from, to);
                 }
             }
 
@@ -94,17 +94,14 @@ namespace GameDev.Confront.Grid
             return free;
         }
 
-        /// <summary>
-        /// Whether a person standing at <paramref name="feet"/> stands in a Partial Obstacle; with
-        /// <paramref name="fromInside"/>, only in one that Obscures a shot from inside, as haze does.
-        /// </summary>
-        public static bool StandsIn(Vector3 feet, bool fromInside = false)
+        /// <summary>Whether a person standing at <paramref name="feet"/> stands in a Partial Obstacle.</summary>
+        public static bool StandsIn(Vector3 feet)
         {
             var count = Physics.OverlapCapsuleNonAlloc(feet + (Vector3.up * BodyRadius), feet + (Vector3.up * (Chest + 0.1f)), BodyRadius, Near,
                 1 << NoGridLayer, QueryTriggerInteraction.Collide);
             for (var i = 0; i < count; i++)
             {
-                if (Near[i] != null && Near[i].TryGetComponent<PartialObstacle>(out var partial) && (!fromInside || partial.FromInside))
+                if (Near[i] != null && Near[i].TryGetComponent<PartialObstacle>(out _))
                 {
                     return true;
                 }

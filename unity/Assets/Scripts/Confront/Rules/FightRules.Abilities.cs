@@ -48,7 +48,7 @@ namespace GameDev.Confront.Rules
         [SerializeField, Range(0f, 1f)] private float braceReduction = 0.25f;
 
         [Tooltip("05.1 Опора: physical defence lent to allies within its range.")]
-        [SerializeField] private float supportDefence = 5f;
+        [SerializeField] private float supportDefence = 3f;
 
         [Tooltip("05.1 Дрёма: the AP an ally beside spends to wake a sleeper (owner, 2026-11-03).")]
         [SerializeField, Min(0)] private int wakeAp = 6;

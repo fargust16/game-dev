@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GameDev.Confront.Grid;
+using GameDev.Confront.Rules;
 using GameDev.Confront.Stealth;
 using GameDev.Player.Progression;
 using UnityEngine;
@@ -34,8 +35,18 @@ namespace GameDev.Confront.Turns
         public bool CanHide(Combatant c) =>
             Stealth != null && c != null && c.Standing && !c.Hidden && ApLeft >= Stealth.EnterAp && Acting == c && Watcher(c) == null;
 
-        /// <summary>The AP a walk of this many steps costs the fighter: 3 for two cells crouching.</summary>
-        public int WalkAp(Combatant c, int steps) => c != null && c.Hidden && Stealth != null ? Stealth.CrouchAp(steps) : steps;
+        /// <summary>
+        /// The AP a walk of this many steps costs the fighter: 3 for two cells crouching, and twice that with a Heavy weapon
+        /// in hand, which halves its carrier's movement (10.2 §5f *Heavy weapons*).
+        /// </summary>
+        public int WalkAp(Combatant c, int steps)
+        {
+            var ap = c != null && c.Hidden && Stealth != null ? Stealth.CrouchAp(steps) : steps;
+            return c != null && HeavyInHand(c.Fighter) ? 2 * ap : ap;
+        }
+
+        private static bool HeavyInHand(Fighter f) =>
+            (f.Set.Weapon != null && f.Set.Weapon.Heavy) || (f.Set.OffWeapon != null && f.Set.OffWeapon.Heavy);
 
         private bool Hide(Combatant c)
         {

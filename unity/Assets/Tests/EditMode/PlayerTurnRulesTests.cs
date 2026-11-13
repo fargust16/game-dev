@@ -13,7 +13,7 @@ namespace GameDev.Slice.Tests
 {
     /// <summary>
     /// S3a.5's rules under the cursor: the blow's forecast against the rolls it stands for, the walk to a blow before the
-    /// click, and the walk told cell by cell for the bodies to follow.
+    /// click, the walk told cell by cell for the bodies to follow, and a Heavy weapon's walk at 2 AP a cell (10.2 §5f).
     /// </summary>
     public sealed class PlayerTurnRulesTests
     {
@@ -111,6 +111,38 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(0, turns.PathToStrike(player, enemy, path), "beside it, the blow reaches");
             Assert.IsFalse(turns.ContextFor(player, player.Cell, enemy).Beyond, "a blow from beside is not beyond the next cell");
             Assert.IsTrue(turns.ContextFor(player, new CombatCell(5, 5, 0), enemy).Beyond, "four cells off it is");
+        }
+
+        [Test]
+        public void AHeavyWeaponHalvesItsCarriersMovement()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            // Loaded after the new scene, which unloads an asset nothing in it holds.
+            var greatsword = AssetDatabase.LoadAssetAtPath<FightWeapon>(Data + "Weapons/Greatsword.asset");
+            Assert.IsTrue(greatsword.Heavy, "the greatsword carries Heavy (COMBAT-5 (c))");
+            var floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            floor.transform.position = new Vector3(10f, -0.5f, 10f);
+            floor.transform.localScale = new Vector3(20f, 1f, 20f);
+            Physics.SyncTransforms();
+            var grid = new CombatGridReader(1f);
+            Assert.IsTrue(grid.Follow(new Vector3(5.5f, 0.05f, 5.5f)), "the grid forms");
+            var turns = new TurnEconomy(_rules, grid);
+            var player = new Combatant(0, 0, _rules.Fighter(Peer(), 9, new WeaponSet(greatsword)), new Vector3(5.5f, 0f, 5.5f), takesIntents: true);
+            var enemy = new Combatant(1, 1, _rules.Fighter(Peer(), 9, new WeaponSet(_sword)), new Vector3(14.5f, 0f, 5.5f), takesIntents: true);
+            turns.BeginEncounter(new[] { player, enemy }, new Random(3));
+            if (turns.Acting != player)
+            {
+                Assert.IsTrue(turns.SubmitIntent(TurnIntent.EndTurn), "the enemy waits its turn");
+            }
+
+            Assert.AreEqual(6, turns.WalkAp(player, 3), "a step costs 2 AP a cell (10.2 §5f *Heavy weapons*)");
+            var ap = turns.ApLeft;
+            Assert.IsTrue(turns.SubmitIntent(TurnIntent.MoveTo(new CombatCell(8, 5, 0))), "the walk");
+            Assert.AreEqual(new CombatCell(8, 5, 0), player.Cell);
+            Assert.AreEqual(ap - 6, turns.ApLeft, "three cells for 6 AP");
+
+            var light = new Combatant(2, 0, _rules.Fighter(Peer(), 9, new WeaponSet(_sword)), new Vector3(5.5f, 0f, 9.5f));
+            Assert.AreEqual(3, turns.WalkAp(light, 3), "a light weapon walks at 1 AP a cell");
         }
     }
 }

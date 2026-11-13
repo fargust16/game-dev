@@ -6,7 +6,9 @@ using GameDev.Confront.Turns;
 using GameDev.Locomotion;
 using GameDev.Player.Progression;
 using GameDev.Slice.People;
+using GameDev.World.Seed;
 using UnityEngine;
+using Random = System.Random;
 
 namespace GameDev.Slice.Fights
 {
@@ -109,30 +111,51 @@ namespace GameDev.Slice.Fights
             var fighter = _settings.FightRules.Fighter(made.Sheet, made.Limit, Arms(made.Firearm), null, second);
             if (made.Limit is int limit)
             {
-                Ordain(fighter, Arcana.Priestess, limit); // a role's Limit is of Жрица (§5a *Roles*)
+                Ordain(fighter, Arcana.Priestess, limit, Who(body)); // a role's Limit is of Жрица (§5a *Roles*)
             }
 
             return Wounded(body, fighter);
         }
 
         /// <summary>
-        /// CR4, 05.1: an NPC of <paramref name="arcana"/> at <paramref name="limit"/> knows its Limit's abilities and the
-        /// Limits' above, the abilities of 2026-11-02 only (COMBAT-8), prepares those a fight can use, and pours Will
-        /// Power into its blows while it can spare it, as `tactical_sim.py`'s allies do.
+        /// CR4, 05.1: an NPC of <paramref name="arcana"/> at <paramref name="limit"/> knows every ability of its Limit and
+        /// the Limits above, the four new ones too, prepares as many of those a fight can use as its slots hold, chosen by
+        /// the seed from <paramref name="who"/> (owner, COMBAT-8 (c); CR7), and pours Will Power into its blows while it
+        /// can spare it, as `tactical_sim.py`'s allies do.
         /// </summary>
-        public void Ordain(Fighter fighter, Arcana arcana, int limit)
+        public void Ordain(Fighter fighter, Arcana arcana, int limit, string who)
+        {
+            fighter.Prepare(arcana, Known(_settings.Abilities, arcana, limit, who, _seed), _settings.FightRules.PreparedSlots(fighter.Values));
+            fighter.Infuses = true;
+        }
+
+        /// <summary>
+        /// What an NPC of <paramref name="arcana"/> at <paramref name="limit"/> knows, in the order it prepares: every
+        /// passive ability of that Limit and the Limits above, then the active ones a fight can use, shuffled by the seed
+        /// from <paramref name="who"/>, so the slots take the first of them (COMBAT-8 (c)).
+        /// </summary>
+        public static List<FightAbility> Known(IEnumerable<FightAbility> all, Arcana arcana, int limit, string who, IWorldSeed seed)
         {
             var known = new List<FightAbility>();
-            foreach (var a in _settings.Abilities ?? new FightAbility[0])
+            var actives = new List<FightAbility>();
+            foreach (var a in all ?? new FightAbility[0])
             {
-                if (a != null && a.Arcana == arcana && a.Limit >= limit && !a.PlayerOnly && (a.InFight || a.Passive))
+                if (a != null && a.Arcana == arcana && a.Limit >= limit)
                 {
-                    known.Add(a);
+                    (a.Passive ? known : a.InFight ? actives : null)?.Add(a);
                 }
             }
 
-            fighter.Prepare(arcana, known, _settings.FightRules.PreparedSlots(fighter.Values));
-            fighter.Infuses = true;
+            var key = StableHash.Of(who ?? string.Empty);
+            var rolls = seed != null ? seed.Fork(SliceSeedStreams.Prepared, key) : new Random(key);
+            for (var i = actives.Count - 1; i > 0; i--)
+            {
+                var j = rolls.Next(i + 1);
+                (actives[i], actives[j]) = (actives[j], actives[i]);
+            }
+
+            known.AddRange(actives);
+            return known;
         }
 
         private WeaponSet Arms(RoleFirearm firearm) => firearm switch

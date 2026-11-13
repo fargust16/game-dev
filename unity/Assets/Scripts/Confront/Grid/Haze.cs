@@ -3,9 +3,9 @@ using UnityEngine;
 namespace GameDev.Confront.Grid
 {
     /// <summary>
-    /// 05.1 Пелена in a fight (CR5): a cloud of haze over a square of cells, a Partial Obstacle that a shot from inside it
-    /// meets as well as one through it (10.1 *Shot Line*). It is a trigger on the NoGrid layer, so the grid, walkers and
-    /// cover never read it; the fight raises it and clears it.
+    /// 05.1 Пелена in a fight (CR5): a cloud of haze over a square of cells, a Partial Obstacle that Obscures a shot
+    /// through it or at one in it and, as a bush, spares a shot from inside it (10.1 *Shot Line*; owner, COMBAT-12 (d)).
+    /// It is a trigger on the NoGrid layer, so the grid, walkers and cover never read it; the fight raises it and clears it.
     /// </summary>
     public static class Haze
     {
@@ -20,7 +20,7 @@ namespace GameDev.Confront.Grid
             var box = haze.AddComponent<BoxCollider>();
             box.isTrigger = true;
             box.size = new Vector3(width, Height, width);
-            haze.AddComponent<PartialObstacle>().FromInside = true;
+            haze.AddComponent<PartialObstacle>();
             Physics.SyncTransforms();
             return haze;
         }

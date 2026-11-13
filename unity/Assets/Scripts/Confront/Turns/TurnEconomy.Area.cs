@@ -84,12 +84,29 @@ namespace GameDev.Confront.Turns
             Math.Abs(cell.X - center.X) <= half && Math.Abs(cell.Z - center.Z) <= half
             && Math.Abs(_grid.Center(cell).y - _grid.Center(center).y) <= AreaHeightBand;
 
-        /// <summary>05.1 Пелена: a cloud over the area for the ability's rounds, a Partial Obstacle a shot from inside meets too.</summary>
+        /// <summary>
+        /// 05.1 Пелена: a cloud over the area for the ability's rounds, a Partial Obstacle that, as a bush, spares a shot
+        /// from inside it (owner, COMBAT-12 (d)).
+        /// </summary>
         private void RaiseScreen(Combatant c, FightAbility ability, CombatCell center)
         {
             var size = Math.Max(1, ability.Area);
-            _screens.Add(new Cloud(c, center, Math.Max(1, ability.Rounds), Haze.Raise(_grid.Center(center), (size * _grid.CellSize) - HazeMargin)));
+            _screens.Add(new Cloud(c, center, Math.Max(1, ability.Rounds), size / 2, Haze.Raise(_grid.Center(center), (size * _grid.CellSize) - HazeMargin)));
             AbilityAt?.Invoke(c, ability, center);
+        }
+
+        /// <summary>Whether a cloud of Пелена covers <paramref name="cell"/>.</summary>
+        private bool Clouded(CombatCell cell)
+        {
+            foreach (var screen in _screens)
+            {
+                if (InArea(cell, screen.Center, screen.Half))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>A round has ended: each cloud has one less, and those with none left are gone.</summary>
@@ -228,17 +245,21 @@ namespace GameDev.Confront.Turns
         /// <summary>05.1 Пелена: one cloud of haze, its caster, its centre, the rounds it has left, and its Partial Obstacle.</summary>
         public sealed class Cloud
         {
-            internal Cloud(Combatant owner, CombatCell center, int rounds, GameObject body)
+            internal Cloud(Combatant owner, CombatCell center, int rounds, int half, GameObject body)
             {
                 Owner = owner;
                 Center = center;
                 RoundsLeft = rounds;
+                Half = half;
                 Body = body;
             }
 
             public Combatant Owner { get; }
 
             public CombatCell Center { get; }
+
+            /// <summary>The cells it reaches from its centre each way.</summary>
+            public int Half { get; }
 
             public int RoundsLeft { get; internal set; }
 

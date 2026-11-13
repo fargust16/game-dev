@@ -18,7 +18,7 @@ MonoBehaviour:
   passive: 0
   effect: 10
   cost: 0.33
-  ap: 3
+  ap: 4
   endOfTurn: 0
   range: 0
   baseDamage: 0
@@ -26,5 +26,4 @@ MonoBehaviour:
   rounds: 1
   area: 0
   multiplier: 1
-  playerOnly: 1
   icon: {fileID: -1005278575, guid: 132358e9bf26b60458b731bf001e31db, type: 3}

@@ -80,10 +80,14 @@ namespace GameDev.Slice
         /// <summary>Whether the god notices a death that makes two or more within the hour, one in two (10.2 §5e; PB8d); fork it with the death's number.</summary>
         public const string GodNotices = "slice.god.notices";
 
+        /// <summary>Which active abilities an NPC prepares when its slots hold fewer than it knows (07.2 §4.5; COMBAT-8 (c), CR7); fork it with the person's name hashed.</summary>
+        public const string Prepared = "slice.prepared";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
             ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens, Roles, Search, Shots, Boldness, News, GodNotices,
+            Prepared,
 
         };
     }

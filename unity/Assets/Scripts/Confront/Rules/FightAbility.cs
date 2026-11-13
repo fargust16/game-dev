@@ -97,9 +97,6 @@ namespace GameDev.Confront.Rules
         [Tooltip("05.1 (Сокрушение): what its blow's damage is multiplied by.")]
         [SerializeField, Min(0f)] private float multiplier = 1f;
 
-        [Tooltip("05.1, COMBAT-8: one of the slice's new abilities, the player's alone; NPCs keep the abilities of 2026-11-02.")]
-        [SerializeField] private bool playerOnly;
-
         [Tooltip("Its slot's icon on the fight's hotbar; SliceConfrontSetup sets it from the Modern GDR pack (asset map).")]
         [SerializeField] private Sprite icon;
 
@@ -117,7 +114,6 @@ namespace GameDev.Confront.Rules
         public int Rounds => rounds;
         public int Area => area;
         public float Multiplier => multiplier;
-        public bool PlayerOnly => playerOnly;
         public Sprite Icon => icon;
 
         /// <summary>Whether it can be used in a fight: an active ability with an effect there.</summary>

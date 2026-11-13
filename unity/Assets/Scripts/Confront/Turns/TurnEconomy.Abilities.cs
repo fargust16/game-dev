@@ -9,18 +9,34 @@ namespace GameDev.Confront.Turns
     /// CR4, abilities in a fight (10.2 §5f, 05.1 *Abilities of the slice*, 07.2 §3.3, §4.5): a fighter uses the active
     /// abilities it prepared, each for its AP and its share of maximum Will Power, which is their only limit; the passive
     /// ones always work. Infusion pours Will Power into each blow or shot for magical damage. The NPCs use theirs as
-    /// `tools/balance/tactical_sim.py` does: at a turn's start Дрёма on the most dangerous of two or more awake enemies,
-    /// Стой! on one near, Укол разума at the best target and Столп among two or more enemies beside; Сокрушение as a
-    /// melee blow; Не сдвинуть from the AP left at the end, with two enemies within 3 cells; an ally beside a sleeper wakes
-    /// it. CR5's Пелена and Гнёт are aimed at a cell (TurnEconomy.Area), Двойник leaves a copy and veils its caster
-    /// (TurnEconomy.Unseen), and Рывок steps behind an enemy; the slice's NPCs use none of the four (COMBAT-8). Завеса, an
-    /// NPC's of Limit 7 whom the slice's AI never uses, waits.
+    /// `tools/balance/tactical_sim.py` does (10.2 §5f *The balance after the answers*, CR7): at a turn's start Дрёма on the
+    /// most dangerous of two or more awake enemies, Стой! on one near, Гнёт where it strikes enemies enough more than its
+    /// own people, Укол разума at the best target and Столп among two or more enemies beside; Сокрушение as a melee
+    /// blow, and Рывок when it saves a walk of 3 cells or more; from the AP left at the end Пелена over its own people
+    /// when a shooter can fire at it, Двойник, and Не сдвинуть, the last two whenever an enemy could attack it in its next
+    /// turn; a wounded one keeps Двойник's AP from its turn's start; an ally beside a sleeper wakes it. CR5's Пелена and
+    /// Гнёт are aimed at a cell (TurnEconomy.Area), and Двойник leaves a copy and veils its caster (TurnEconomy.Unseen).
+    /// Завеса, an NPC's of Limit 7 whom the slice's AI never uses, waits.
     /// </summary>
     public sealed partial class TurnEconomy
     {
-        // tactical_sim.py: the AI's Не сдвинуть wants this many enemies within this many cells (authoring defaults).
-        private const int BraceEnemies = 2;
-        private const int BraceCells = 3;
+        // tactical_sim.py threatened: an enemy threatens a fighter from its weapon's reach and this many cells more
+        // (authoring default).
+        private const int ThreatCells = 6;
+
+        // tactical_sim.py screen: Пелена is worth it with an enemy shooter within its range and this many cells more.
+        private const int ScreenCells = 4;
+
+        // tactical_sim.py PRESS_FRIEND, PRESS_NET: Гнёт wants the enemies it strikes, less this much for each of its own,
+        // to come to this (authoring defaults).
+        private const double PressFriend = 1.5d;
+        private const double PressNet = 2d;
+
+        // tactical_sim.py dash: Рывок is worth it when the walk it saves is this many cells or more (authoring default).
+        private const int DashSaves = 3;
+
+        // tactical_sim.py DOUBLE_HP: at or under this share of its HP an NPC keeps Двойник's AP (authoring default).
+        private const double DoubleHp = 0.5d;
 
         // tactical_sim.py CONTROL_VALUE: what an ability adds to its knower's Threat, the harm of a turn it stands for.
         private static readonly Dictionary<AbilityEffect, double> ControlValue = new Dictionary<AbilityEffect, double>
@@ -30,6 +46,7 @@ namespace GameDev.Confront.Turns
         };
 
         private readonly List<Combatant> _around = new List<Combatant>();
+        private readonly List<CombatCell> _spots = new List<CombatCell>();
 
         /// <summary>Raised after an ability: who, at whom (null for none), which, whether it worked, and what a hit did.</summary>
         public event Action<Combatant, Combatant, FightAbility, bool, StrikeResult> AbilityUsed;
@@ -353,7 +370,7 @@ namespace GameDev.Confront.Turns
 
         /// <summary>
         /// tactical_sim.py control: an NPC's abilities at its turn's start, each while its AP and Will Power allow and
-        /// with something worth it: Дрёма, Стой!, Укол разума, Столп.
+        /// with something worth it: Дрёма, Стой!, Гнёт, Укол разума, Столп.
         /// </summary>
         private void Control(Combatant c)
         {
@@ -381,6 +398,12 @@ namespace GameDev.Confront.Turns
                 && MostDangerous(c, order) is Combatant ordered)
             {
                 Use(c, order, ordered);
+            }
+
+            if (IsRunning && Acting == c && f.Knows(AbilityEffect.Press) is FightAbility press && ApLeft >= press.Ap && Spare(f, press)
+                && PressSpot(c, press) is CombatCell spot)
+            {
+                Use(c, press, null, spot);
             }
 
             if (IsRunning && Acting == c && f.Knows(AbilityEffect.Sting) is FightAbility sting && ApLeft >= sting.Ap && Spare(f, sting))
@@ -460,28 +483,189 @@ namespace GameDev.Confront.Turns
             return false;
         }
 
-        /// <summary>tactical_sim.py brace: Не сдвинуть from the AP left, with two enemies within 3 cells.</summary>
+        /// <summary>
+        /// tactical_sim.py brace: Не сдвинуть from the AP left, whenever an enemy could attack it in its next turn (since the
+        /// balance after COMBAT-7, not only with two near).
+        /// </summary>
         private void Brace(Combatant c)
         {
             var f = c.Fighter;
-            if (!(f.Knows(AbilityEffect.Brace) is FightAbility brace) || ApLeft < brace.Ap || !Spare(f, brace))
+            if (!(f.Knows(AbilityEffect.Brace) is FightAbility brace) || ApLeft < brace.Ap || !Spare(f, brace) || !Threatened(c))
             {
                 return;
             }
 
-            var near = 0;
+            f.WillPower -= _rules.AbilityCost(f, brace);
+            ApLeft -= brace.Ap;
+            f.Braced = true;
+            AbilityUsed?.Invoke(c, null, brace, true, default);
+        }
+
+        /// <summary>
+        /// tactical_sim.py threatened: an awake enemy it sees could attack it in that enemy's next turn, standing within its
+        /// weapon's reach and <see cref="ThreatCells"/> more.
+        /// </summary>
+        private bool Threatened(Combatant c)
+        {
             foreach (var e in _order)
             {
-                near += e.Standing && e.Side != c.Side && Distance(e.Cell, c.Cell) <= BraceCells ? 1 : 0;
+                var weapon = e.Fighter.Weapon;
+                if (e.Standing && e.Side != c.Side && !e.Helpless && !Unseen(e) && weapon != null
+                    && Distance(e.Cell, c.Cell) <= (weapon.Ranged ? weapon.RangeCells : 1) + ThreatCells)
+                {
+                    return true;
+                }
             }
 
-            if (near >= BraceEnemies)
+            return false;
+        }
+
+        /// <summary>
+        /// tactical_sim.py screen: Пелена from the AP a turn leaves, over the caster and as many of its own people as it
+        /// can cover, when no cloud covers it yet and an awake enemy shooter it sees stands within its range and
+        /// <see cref="ScreenCells"/> more.
+        /// </summary>
+        private void ScreenAtEnd(Combatant c)
+        {
+            var f = c.Fighter;
+            if (!(f.Knows(AbilityEffect.Screen) is FightAbility screen) || ApLeft < screen.Ap || !Spare(f, screen) || Clouded(c.Cell))
             {
-                f.WillPower -= _rules.AbilityCost(f, brace);
-                ApLeft -= brace.Ap;
-                f.Braced = true;
-                AbilityUsed?.Invoke(c, null, brace, true, default);
+                return;
             }
+
+            var shooter = false;
+            foreach (var e in _order)
+            {
+                var weapon = e.Fighter.Weapon;
+                shooter |= e.Standing && e.Side != c.Side && !e.Helpless && !Unseen(e) && weapon != null && weapon.Ranged
+                    && Distance(e.Cell, c.Cell) <= weapon.RangeCells + ScreenCells;
+            }
+
+            if (shooter && ScreenSpot(c, screen) is CombatCell spot)
+            {
+                Use(c, screen, null, spot);
+            }
+        }
+
+        /// <summary>
+        /// tactical_sim.py screen_spot: of the centres whose cloud covers the caster, the one covering most of its own people
+        /// not yet in a cloud, each enemy covered counting twice against it; null if none covers more of them.
+        /// </summary>
+        private CombatCell? ScreenSpot(Combatant c, FightAbility screen)
+        {
+            var half = Math.Max(1, screen.Area) / 2;
+            AreaOf(c.Cell, screen, _spots); // the centres within half the area of the caster are those whose cloud covers it
+            CombatCell? spot = null;
+            var best = 0;
+            foreach (var center in _spots)
+            {
+                if (!AimsAt(c, screen, center))
+                {
+                    continue;
+                }
+
+                int mine = 0, foes = 0;
+                foreach (var e in _order)
+                {
+                    if (!e.Standing || !InArea(e.Cell, center, half))
+                    {
+                        continue;
+                    }
+
+                    if (e.Side != c.Side)
+                    {
+                        foes++;
+                    }
+                    else if (!Clouded(e.Cell))
+                    {
+                        mine++;
+                    }
+                }
+
+                var value = mine - (2 * foes);
+                if (mine > 0 && value > best)
+                {
+                    best = value;
+                    spot = center;
+                }
+            }
+
+            return spot;
+        }
+
+        /// <summary>
+        /// tactical_sim.py press_spot: of the cells round each enemy it sees and within reach, the one where the enemies Гнёт
+        /// strikes, less <see cref="PressFriend"/> for each of its own, come to most, and to <see cref="PressNet"/> at least.
+        /// </summary>
+        private CombatCell? PressSpot(Combatant c, FightAbility press)
+        {
+            CombatCell? spot = null;
+            var best = PressNet - 1e-9;
+            foreach (var e in _foes)
+            {
+                AreaOf(e.Cell, press, _spots);
+                foreach (var center in _spots)
+                {
+                    if (!AimsAt(c, press, center))
+                    {
+                        continue;
+                    }
+
+                    var (foes, friends) = PressCount(c, press, center);
+                    var value = foes - (PressFriend * friends);
+                    if (value > best)
+                    {
+                        best = value;
+                        spot = center;
+                    }
+                }
+            }
+
+            return spot;
+        }
+
+        /// <summary>
+        /// tactical_sim.py dash: Рывок puts a melee fighter behind its target, not beside it yet, when walking there takes
+        /// <see cref="DashSaves"/> cells or more and a blow is still paid for after.
+        /// </summary>
+        private bool TryDash(Combatant c, Combatant target, int cost)
+        {
+            var f = c.Fighter;
+            if (!(f.Knows(AbilityEffect.Dash) is FightAbility dash) || f.Weapon == null || f.Weapon.Ranged || target == null
+                || Beside(c.Cell, target.Cell) || ApLeft < dash.Ap + cost || !Usable(c, dash) || !Spare(f, dash) || !Aims(c, dash, target))
+            {
+                return false;
+            }
+
+            var walk = PathToStrike(c, target, null);
+            if (walk >= 0 && walk < DashSaves)
+            {
+                return false;
+            }
+
+            Use(c, dash, target);
+            return true;
+        }
+
+        /// <summary>tactical_sim.py double: Двойник from the AP a turn leaves, whenever an enemy could attack it in its next turn.</summary>
+        private void DoubleAtEnd(Combatant c)
+        {
+            var f = c.Fighter;
+            if (f.Knows(AbilityEffect.Double) is FightAbility copy && ApLeft >= copy.Ap && Usable(c, copy) && Spare(f, copy) && Threatened(c))
+            {
+                Use(c, copy, null);
+            }
+        }
+
+        /// <summary>
+        /// tactical_sim.py keeps_for_double: the AP a wounded NPC keeps back from its turn's start for Двойник, at or under
+        /// <see cref="DoubleHp"/> of its HP and threatened; none otherwise.
+        /// </summary>
+        private int KeepsForDouble(Combatant c)
+        {
+            var f = c.Fighter;
+            return f.Knows(AbilityEffect.Double) is FightAbility copy && f.Hp <= DoubleHp * f.MaxHp && Usable(c, copy) && Spare(f, copy)
+                && Threatened(c) ? Math.Min(copy.Ap, ApLeft) : 0;
         }
 
         /// <summary>tactical_sim.py threat: what a fighter's abilities add to the harm it does in a turn.</summary>
