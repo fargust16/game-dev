@@ -549,6 +549,81 @@ namespace GameDev.Slice.Beasts
             }
         }
 
+        /// <summary>
+        /// 18 §3 (S5c.2): outside the walls a beast finds a sleeper. The nearest pack at rest comes, its first beast beside the
+        /// sleeper and the rest round it, and the fight opens with that beast's blow, the pack hunting round the place. False
+        /// when no pack is there to come or the fight cannot begin.
+        /// </summary>
+        public bool FindSleeper(Vector3 at)
+        {
+            Pack nearest = null;
+            var best = float.MaxValue;
+            foreach (var pack in _packs.Values)
+            {
+                if (pack.Attacking || !pack.Present(out var first))
+                {
+                    continue;
+                }
+
+                var d = Flat(first.transform.position - at).sqrMagnitude;
+                if (d < best)
+                {
+                    best = d;
+                    nearest = pack;
+                }
+            }
+
+            if (nearest == null || _fights == null)
+            {
+                return false;
+            }
+
+            _fighting.Clear();
+            var k = 0;
+            foreach (var b in nearest.Members)
+            {
+                if (!b.isActiveAndEnabled || b.State != BeastState.Resting)
+                {
+                    continue;
+                }
+
+                b.Stop();
+                var place = SleeperSide(at, k++);
+                var toward = Flat(at - place);
+                b.transform.SetPositionAndRotation(place, Quaternion.LookRotation(toward.sqrMagnitude > 1e-4f ? toward : Vector3.forward));
+                _fighting.Add(b);
+            }
+
+            nearest.Chasing = false;
+            nearest.Noticed = true;
+            if (_fighting.Count == 0 || !_fights.StartBeastFight(_fighting, _rules, at))
+            {
+                return false;
+            }
+
+            nearest.Attacking = true;
+            Attacked?.Invoke(nearest.Number);
+            return true;
+        }
+
+        // The first beast beside the sleeper across a cell's side; the others two and three cells off, each where it can stand.
+        private static readonly Vector3[] Sides = { Vector3.right, Vector3.left, Vector3.forward, Vector3.back };
+
+        private static Vector3 SleeperSide(Vector3 at, int k)
+        {
+            var reach = k == 0 ? 1f : 1f + k;
+            for (var i = 0; i < Sides.Length; i++)
+            {
+                var place = at + (Sides[(k + i) % Sides.Length] * reach);
+                if (Standable(ref place))
+                {
+                    return place;
+                }
+            }
+
+            return at + (Sides[k % Sides.Length] * reach);
+        }
+
         /// <summary>After a beast fight: carcasses, a broken pack's flight, and the rest gone back to rest.</summary>
         private void OnFightEnded(IReadOnlyList<SliceBeast> fought)
         {

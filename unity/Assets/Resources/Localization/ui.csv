@@ -595,3 +595,22 @@ ability.drowse.outside,one person within 6 m sleeps about 10 ticks if Will gives
 ability.dream_touch.outside,"a sleeper's memory, a line in the notes","память спящего, строка в заметках"
 ability.double.outside,unseen for 1 tick or until you strike,невидимость на 1 тик или до удара
 ability.halt.outside,one person within 8 m freezes for 2 ticks and calls no help,человек в пределах 8 м замирает на 2 тика и не зовёт на помощь
+"# 18 §3, 11 *Sleep*: the page of sleep, the night and its visitors (SleepRun, SleepBed, S5c.2)"
+ui.sleep.title,Sleep,Сон
+ui.sleep.heading.room,"The let room: {0} a night, paid as you lie down","Комната внаём: {0} за ночь, плата — когда ложитесь"
+ui.sleep.heading.street,"In the street, on the cobbles. Veinmarket's people walk at night.","На улице, прямо на мостовой. По ночам здесь ходят люди Вейнмаркета."
+ui.sleep.heading.wild,"Under the open sky, outside the walls. Beasts roam here.","Под открытым небом, за стенами. Здесь бродят звери."
+ui.sleep.morning,Until 07:00 ({0} h),До 07:00 ({0} ч)
+ui.sleep.six,For {0} hours,На {0} часов
+ui.sleep.hint,A sleep of 6 hours or more is full: it clears tiredness and restores Will Power.,Сон от 6 часов — полный: снимает усталость и восстанавливает Силу воли.
+ui.sleep.asleep,You fall asleep.,Вы засыпаете.
+ui.sleep.woke,"You wake at {1}, after {0} h of sleep.","Вы просыпаетесь в {1}, проспав {0} ч."
+ui.sleep.woke_cut,"You wake with a start at {1}, after {0} h.","Вы вздрагиваете и просыпаетесь в {1}, проспав {0} ч."
+ui.sleep.robbed,Your purse is lighter: {0} gone.,Кошелёк полегчал: пропало {0}.
+ui.sleep.beast,A beast is upon you!,На вас бросается зверь!
+ui.sleep.fault.busy,Not now.,Не сейчас.
+ui.sleep.fault.alarm,Not now: there is an alarm around.,Не сейчас: вокруг тревога.
+ui.sleep.fault.here,You cannot sleep here.,Здесь не уснуть.
+ui.sleep.fault.indoors,"Sleep in the street, or in a room rented at the Soot & Bell.","Спать можно на улице или в комнате, снятой в «Саже и Колоколе»."
+ui.prompt.sleep_room,E  Rent the room for the night ({0}),E  Снять комнату на ночь ({0})
+ui.save.refused.sleep,Not while asleep.,Не во время сна.

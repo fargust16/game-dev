@@ -92,11 +92,14 @@ namespace GameDev.Slice
         /// <summary>A Will Contest of an ability out of a fight (05.1 *Вне боя*, S5b.8); fork it with the ability and the person hashed and the tick.</summary>
         public const string Abilities = "slice.abilities";
 
+        /// <summary>Who comes to a sleeper and when (18 §3, S5c.2); fork it with the sleep's start tick and its place.</summary>
+        public const string Sleep = "slice.sleep";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
             ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens, Roles, Search, Shots, Boldness, News, GodNotices,
-            Prepared, Alchemy, Abilities,
+            Prepared, Alchemy, Abilities, Sleep,
 
         };
     }

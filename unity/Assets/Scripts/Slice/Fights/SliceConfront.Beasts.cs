@@ -25,8 +25,11 @@ namespace GameDev.Slice.Fights
         /// <summary>A beast fight has ended and its last beat played: the beasts that fought, their combatants still set.</summary>
         public event Action<IReadOnlyList<SliceBeast>> BeastFightEnded;
 
-        /// <summary>The pack, or the beast alone, attacks the character.</summary>
-        public bool StartBeastFight(IReadOnlyList<SliceBeast> beasts, BeastRules rules)
+        /// <summary>
+        /// The pack, or the beast alone, attacks the character. A pack that found a sleeper (18 §3, S5c.2) hunts: its
+        /// territory in this fight lies round <paramref name="huntedAt"/>, and its first beast opens the fight with its blow.
+        /// </summary>
+        public bool StartBeastFight(IReadOnlyList<SliceBeast> beasts, BeastRules rules, Vector3? huntedAt = null)
         {
             _player = FindAnyObjectByType<PlayerLocomotion>();
             if (_lock == null || InFight || _died || _terms != null || _player == null || _player.InWater || beasts == null || beasts.Count == 0 || rules == null)
@@ -65,7 +68,7 @@ namespace GameDev.Slice.Fights
                 {
                     Beast = true,
                     Pack = b.Glowing ? -1 : b.Pack, // a glowing beast walks alone
-                    Home = b.Home,
+                    Home = huntedAt ?? b.Home,
                     Range = rules.TerritoryRadius,
                 };
                 b.Combatant = c;
@@ -76,7 +79,13 @@ namespace GameDev.Slice.Fights
             }
 
             var request = new EncounterRequest(at, combatants, _seed.Fork(SliceSeedStreams.Combat, _fights), "beasts");
-            if (Hiding != null && Hiding.Active)
+            if (huntedAt != null && combatants.Count > 1)
+            {
+                // 18 §3: the sleeper's Initiative does not keep the opening attack back.
+                request.Opener = combatants[1];
+                request.Target = player;
+            }
+            else if (Hiding != null && Hiding.Active)
             {
                 player.Hidden = true;
                 request.Opener = player;

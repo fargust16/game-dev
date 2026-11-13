@@ -199,6 +199,9 @@ namespace GameDev.Input
         /// <summary>10.2 §5c in free exploration: R draws the weapon and sheathes it; in a fight the same key waits.</summary>
         public bool DrawWeaponPressed => WaitTurnPressed;
 
+        /// <summary>18 §3 in free exploration (S5c.2): Z opens the page of sleep in the city; in a fight the same key is Сбежать.</summary>
+        public bool SleepPressed => BreakAwayPressed;
+
         /// <summary>10.2 §5c in free exploration: the left button strikes with the drawn weapon.</summary>
         public bool AttackPressed => ClickMovePressed;
 

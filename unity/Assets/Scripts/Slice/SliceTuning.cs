@@ -169,6 +169,10 @@ namespace GameDev.Slice
         [Range(1f, 60f)]
         public float AssimilationTicksPerSecond = 10f;
 
+        [Tooltip("Сон: сколько тиков мира (игровых минут) проходит за секунду, пока персонаж спит, а мир идёт. 360 тиков при 60 — шесть секунд.")]
+        [Range(1f, 240f)]
+        public float SleepTicksPerSecond = 60f;
+
         [Header("Рассудок")]
         [Tooltip("Шёпот, от лёгкого смятения и ниже: через сколько секунд он слышится снова — не раньше X и не позже Y.")]
         public Vector2 WhisperSeconds = new Vector2(35f, 80f);

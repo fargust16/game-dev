@@ -145,6 +145,12 @@ namespace GameDev.Slice
         /// <summary>Whether a conversation is open on the HUD.</summary>
         public bool TalkOpen => Hud() is HudView hud && hud.IsDialogueOpen;
 
+        /// <summary>The city's scene, where the character sleeps in the street (S5c.2).</summary>
+        public string CityScene => cityScene;
+
+        /// <summary>Sleep (S5c.2; 18 §3): the page, the passing night, its visitors and its recovery.</summary>
+        public GameDev.Slice.Mind.SleepRun Sleep { get; private set; }
+
         /// <summary>The character's Sanity (07.2 §3.4; S5b.5 spends it on the Limit potions).</summary>
         public GameDev.Slice.Mind.SliceSanity Sanity { get; private set; }
 
@@ -450,7 +456,7 @@ namespace GameDev.Slice
             if (Fights != null)
             {
                 // 05.1 *Вне боя* (S5b.8): the keys use the abilities only in free exploration.
-                Fights.OutsideBusy = () => (Work != null && Work.Busy) || PageOpen() || (Advancement != null && Advancement.Assimilating);
+                Fights.OutsideBusy = () => (Work != null && Work.Busy) || PageOpen() || (Advancement != null && Advancement.Assimilating) || (Sleep != null && Sleep.Sleeping);
             }
             Notes = new CharacterNotes(Tips);
             Notes.Added += _ => Refresh();
@@ -459,6 +465,9 @@ namespace GameDev.Slice
             Save = gameObject.AddComponent<SliceSave>();
             Save.Configure(this, cityScene);
             Save.Refusals.Add(() => Advancement != null && Advancement.Assimilating ? "ui.save.refused.settling" : null); // 05.1 *Assimilation*
+            Sleep = gameObject.AddComponent<GameDev.Slice.Mind.SleepRun>();
+            Sleep.Configure(this);
+            Save.Refusals.Add(() => Sleep.Sleeping ? "ui.save.refused.sleep" : null); // 17 X.3: not while asleep
             _offer = Save.ShouldOffer();
             Creation = gameObject.AddComponent<GameDev.Slice.Creation.CharacterCreation>();
             Creation.Configure(Character, settings.PlayerLooks);
@@ -1088,6 +1097,7 @@ namespace GameDev.Slice
             }
 
             added |= Alchemy != null && OpenBenches();
+            added |= OpenBed();
 
             var hud = Hud();
             if (added && hud != null)
@@ -1148,6 +1158,25 @@ namespace GameDev.Slice
 
                 block.gameObject.AddComponent<GameDev.Slice.Alchemy.AlchemyBench>().Configure(kind.Value);
                 added = true;
+            }
+
+            return added;
+        }
+
+        /// <summary>The Soot &amp; Bell's scene, whose let room's bed is rented for a night (S5c.2).</summary>
+        public const string TavernScene = "SootAndBell";
+
+        /// <summary>18 §3, 11 *Sleep* (S5c.2): the bed of the Soot &amp; Bell's let room is rented for a night; true when it was opened now.</summary>
+        private static bool OpenBed()
+        {
+            var added = false;
+            foreach (var block in FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude))
+            {
+                if (block.gameObject.scene.name == TavernScene && block.name.StartsWith("Kit_ViFurniture_Bed") && block.GetComponent<GameDev.Slice.Mind.SleepBed>() == null)
+                {
+                    block.gameObject.AddComponent<GameDev.Slice.Mind.SleepBed>();
+                    added = true;
+                }
             }
 
             return added;
