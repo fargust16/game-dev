@@ -1,12 +1,12 @@
 # Combat Rework Plan
 
-Version: 0.5
+Version: 0.6
 
 Status: Draft — §0 is the owner's concept as given and binds; the audit, the questions and the stages are the agent's working plan.
 
 Created: 2026-11-13
 
-Last Updated: 2026-11-13 (§3b: the owner's answers to COMBAT-1 … COMBAT-12; §5 and §7: what follows them. Earlier: §5: every stage done, the slice's milestones CR1–CR6 built; §6: the report. Earlier: §2a: the audit's resolutions; §5: stages 1–4 done, the slice's milestones CR1–CR6 next. Earlier: §3a: the owner's answers to Q1–Q11 and the main goal, a firearm first and melee once an enemy has closed in; Perception leaves accuracy for the critical chance. Earlier: first version: the owner's concept recorded as given, the working method, the first audit's contradictions, the questions put to the owner, the stages)
+Last Updated: 2026-11-13 (§7: the balance after the answers done, the slice's part as CR7. Earlier: §3b: the owner's answers to COMBAT-1 … COMBAT-12; §5 and §7: what follows them. Earlier: §5: every stage done, the slice's milestones CR1–CR6 built; §6: the report. Earlier: §2a: the audit's resolutions; §5: stages 1–4 done, the slice's milestones CR1–CR6 next. Earlier: §3a: the owner's answers to Q1–Q11 and the main goal, a firearm first and melee once an enemy has closed in; Perception leaves accuracy for the critical chance. Earlier: first version: the owner's concept recorded as given, the working method, the first audit's contradictions, the questions put to the owner, the stages)
 
 Depends On:
 [07.1](../../../07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2](../../../07.2%20Derived%20Character%20Statistics.md), [10.1](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2](../../../10.2%20Combat%20System%20Draft.md), [10.3](../../../10.3%20Stealth%20and%20Detection.md), [05.1](../../../05.1%20Arcana%20and%20Limits.md), [19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [17](../../../17%20Game%20Systems%20Architecture.md), [99](../../../99%20Open%20Questions.md) VS-RANGED
@@ -902,5 +902,5 @@ By the concept's §15 Stage 6. The owner's main goal holds in the models and the
 # 7. After the owner's answers (2026-11-13)
 
 1. **Documents.** The answers recorded in 99, 05.1, 07.2, 10.1, 10.2 §5f, 11, 21, 02, 90, this plan, `AGENTS.md` and 91.
-2. **Balance.** The models give every initiated fighter Infusion, the cult's followers worse attributes and gear until an allied fighter wins about 75 % of duels at the same Limit, Жрица and Император even at equal attributes, NPCs' abilities prepared by the seed with the four new ones, and enough cult followers that the slice stays at about 22 % and the campaign at 40/60.
-3. **The slice.** Will Power only with an Arcana; Пелена's haze sparing a shot from inside; Heavy on heavy melee; NPCs preparing by the seed and using the four new abilities; questioning a subdued cultist, with S6's invasion.
+2. **Balance.** The models give every initiated fighter Infusion, the cult's followers worse attributes and gear until an allied fighter wins about 75 % of duels at the same Limit, Жрица and Император even at equal attributes, NPCs' abilities prepared by the seed with the four new ones, and enough cult followers that the slice stays at about 22 % and the campaign at 40/60. **Done** (2026-11-13; [10.2](../../../10.2%20Combat%20System%20Draft.md) §5f *The balance after the answers*, [21](../../../21%20Cult%20Campaign%20and%20City%20Control.md) §8 *Campaign Numbers after the answers*): by the owner's follow-up the cult's base is a point lower and the lion's share of the gap is gear (Outfit V1); an allied fighter wins 74–77 % one on one; the four new abilities' numbers set with Жрица and Император even; the slice's cult brings 13–14 and the allies alone stop the ritual in about 20 %; the campaign stands at 40/58.
+3. **The slice.** Will Power only with an Arcana; Пелена's haze sparing a shot from inside; Heavy on heavy melee; NPCs preparing by the seed and using the four new abilities; questioning a subdued cultist, with S6's invasion. As CR7 of the slice's plan.

@@ -35,7 +35,7 @@ import combat_sim as c
 
 RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 3000
 SPELL_RANGE = 6
-ORDER_RANGE = 4
+ORDER_RANGE = 8  # 05.1 Стой!, 4 cells until the balance after COMBAT-7: an order heard at firearms' distance
 SUPPORT_RANGE = 2
 ESCAPE_AP = 0
 REACH_DISCOUNT = 0.7
@@ -47,7 +47,7 @@ SWAP_AP = 2
 SURROUND_HIT = c.SURROUND_HIT
 OBJECTIVE_BONUS = 3.0
 STING_AP = 4
-STING_BASE = 9  # 10.2 §5f: the old Intelligence factor of a Limit 7 caster taken into the base
+STING_BASE = 6  # 10.2 §5f: 9 with the old Intelligence factor taken in, 6 since the balance after COMBAT-7
 STING_RANGE = 12
 DISORIENT_HIT = 0.10
 PILLAR_AP = 4
@@ -69,7 +69,21 @@ COUNTER_AP = 2
 # beside it takes an empty place, and a circle short of hands for SHORT_TICKS rounds has failed.
 RITUAL_TICKS = 60
 SHORT_TICKS = 10
-CONTROL_VALUE = {"sleep": 6.0, "stand": 3.0, "crush": 3.0, "support": 2.0, "sting": 3.0, "pillar": 3.0}
+CONTROL_VALUE = {"sleep": 6.0, "stand": 3.0, "crush": 3.0, "support": 2.0, "sting": 3.0, "pillar": 3.0,
+                 "screen": 2.0, "double": 2.0, "press": 3.0}
+# 05.1's four new abilities (CR5), their numbers from 05.1's table. A cloud of Пелена is a Partial Obstacle: a targeted
+# attack through it or at someone in it is Obscured, once, but a shot from inside goes out unhindered (COMBAT-12). The
+# balance after COMBAT-7 (10.2 §5f) took Пелена from 3 rounds to 2, Двойник from 3 AP to 4 and Гнёт's base from 4 to 2.
+SCREEN_AP, SCREEN_RANGE, SCREEN_ROUNDS = 3, 8, 2
+OBSCURED = 0.20
+DOUBLE_AP = 4
+DASH_AP, DASH_RANGE = 3, 6
+PRESS_AP, PRESS_RANGE, PRESS_BASE = 5, 10, 2
+# How NPCs use them (authoring defaults, the game's NPCs the same): Двойник from the AP a turn leaves, the AP kept for
+# it below this share of HP; Гнёт where the enemies it strikes, less this weight for each of its own, come to PRESS_NET.
+DOUBLE_HP = 0.5
+PRESS_FRIEND = 1.5
+PRESS_NET = 2.0
 
 
 @dataclass(frozen=True)
@@ -117,6 +131,16 @@ class Rules:
     shield_cover: float = 0.0  # 10.2 §5f: a held shield hinders shots and targeted spells at its carrier, as cover
     cover: float = 0.0
     crit_pierce: float = c.CRIT_PIERCE
+    obscured: float = OBSCURED
+    press_base: float = PRESS_BASE
+    order_range: int = ORDER_RANGE
+    sting_base: float = STING_BASE
+    screen_rounds: int = SCREEN_ROUNDS
+    double_ap: int = DOUBLE_AP
+    support: float = c.SUPPORT_DEFENCE
+    screen_cost: float = c.ORDINARY
+    screen_ap: int = SCREEN_AP
+    double_hp: float = DOUBLE_HP
     reaction: bool = True
     room: int = 10
 
@@ -150,6 +174,7 @@ class Fight:
         self.front = depth
         self.length = 2 * depth + rules.gap + 1
         self.cells = {}
+        self.clouds = []
         for u in (b if wounded_a else a + b):
             u.reset()
         for side, left in ((a, True), (b, False)):
@@ -162,6 +187,7 @@ class Fight:
             u.fired = False
             u.reacted = False
             u.disoriented, u.dazed, u.taunter = 0, False, None
+            u.veiled, u.copy = 0, False
             u.threat = self.threat(u)
         self.leaders = [self.leader(a), self.leader(b)]
         self.circle = [(u.x, u.y) for u in b if u.conducting] if ritual else []
@@ -194,7 +220,33 @@ class Fight:
         base = w.base * c.stage_factor(w.stage) * self.r.damage_scale
         raw = base * (1 + a.gear.damage)
         share = a.gear.magic + (self.infusion(a) if a.infuse else 0)
-        return self.chance(a, t, 0.0) * a.aim() * (self.reduce(raw, t, w.ranged and cheb(a, t) > 1) + self.warded(share * base, t))
+        return self.chance(a, t, -self.obscured(a, t)) * a.aim() * (self.reduce(raw, t, w.ranged and cheb(a, t) > 1) + self.warded(share * base, t))
+
+    def seen(self, foes):
+        """05.1 Двойник: an enemy unseen with no copy left is not targeted; one whose copy stands is taken for it."""
+        return [f for f in foes if not f.veiled or f.copy]
+
+    def clouded(self, x, y):
+        return [k for k in self.clouds if abs(x - k[0]) <= 1 and abs(y - k[1]) <= 1]
+
+    def obscured(self, a, t):
+        """10.1 Obscured, once: a cell of the line past a, t's own included, in a cloud a does not stand in (COMBAT-12)."""
+        if not self.clouds:
+            return 0.0
+        own = self.clouded(a.x, a.y)
+        n = max(abs(t.x - a.x), abs(t.y - a.y))
+        for i in range(1, n + 1):
+            x, y = round(a.x + (t.x - a.x) * i / n), round(a.y + (t.y - a.y) * i / n)
+            if any(all(k is not o for o in own) for k in self.clouded(x, y)):
+                return self.r.obscured
+        return 0.0
+
+    def unveil(self, u):
+        u.veiled, u.copy = 0, False
+
+    def threatened(self, u):
+        """Someone awake on the other side could attack u in its next turn."""
+        return any(cheb(u, f) <= (f.weapon.range if f.weapon.ranged else 1) + 6 for f in alive(self.foes(u)) if not f.asleep and not f.skip)
 
     def threat(self, u):
         foes = self.foes(u)
@@ -208,7 +260,7 @@ class Fight:
     def defence(self, t):
         d = c.ARMOUR[t.armour][0] * c.stage_factor(t.armour_stage) * t.armour_share() + t.gear.defence
         if any("support" in u.abilities and u is not t and cheb(u, t) <= SUPPORT_RANGE for u in alive(self.own(t))):
-            d += c.SUPPORT_DEFENCE
+            d += self.r.support
         return d
 
     def warded(self, magic, t):
@@ -248,7 +300,13 @@ class Fight:
         if a.weapon.ranged and self.r.intercept and cheb(a, t) > 1:
             t = self.interceptor(a, t)
         share = a.gear.magic if reaction else self.infused(a)
-        bonus_hit = SURROUND_HIT.get(self.surrounded(t), 0.0)
+        if t.veiled and t.copy:
+            # 05.1 Двойник: the blow meets the copy, which breaks at its first hit and harms nobody.
+            if random.random() < self.chance(a, t, -self.obscured(a, t)) * a.aim():
+                t.copy = False
+                return True
+            return False
+        bonus_hit = SURROUND_HIT.get(self.surrounded(t), 0.0) - self.obscured(a, t)
         if t.exposed:
             bonus_hit += 0.10
             t.exposed = False
@@ -275,6 +333,8 @@ class Fight:
             if random.random() < guard:
                 damage *= 1 - t.weapon.guard_absorb
         t.hp -= damage
+        if damage > 0:
+            self.unveil(a)
         t.asleep = 0
         if t.hp <= 0:
             self.cells.pop((t.x, t.y), None)
@@ -394,7 +454,7 @@ class Fight:
         return ap
 
     def control(self, u, ap):
-        foes = alive(self.foes(u))
+        foes = self.seen(alive(self.foes(u)))
         awake = [f for f in foes if not f.asleep and not f.skip]
         if "sleep" in u.abilities and len(awake) >= 2 and ap >= SLEEP_AP and u.can_spend(SLEEP_COST):
             near = [f for f in awake if cheb(u, f) <= SPELL_RANGE]
@@ -407,7 +467,7 @@ class Fight:
                 else:
                     u.exposed = True
         if "stand" in u.abilities and ap >= ORDER_AP + u.weapon.ap and u.can_spend(ORDER_COST):
-            near = [f for f in awake if not f.asleep and not f.skip and cheb(u, f) <= ORDER_RANGE]
+            near = [f for f in awake if not f.asleep and not f.skip and cheb(u, f) <= self.r.order_range]
             if near:
                 target = max(near, key=lambda f: f.threat)
                 u.wp -= u.max_wp() * ORDER_COST
@@ -416,6 +476,12 @@ class Fight:
                     target.skip = 1
                 else:
                     u.exposed = True
+        if "press" in u.abilities and ap >= PRESS_AP and u.can_spend(c.POWERFUL):
+            spot = self.press_spot(u, foes)
+            if spot is not None:
+                u.wp -= u.max_wp() * c.POWERFUL
+                ap -= PRESS_AP
+                self.press(u, spot)
         if "sting" in u.abilities and ap >= STING_AP and u.can_spend(c.ORDINARY):
             near = [f for f in foes if cheb(u, f) <= STING_RANGE]
             if near:
@@ -436,17 +502,110 @@ class Fight:
         """Укол разума: a ranged magical attack. A hit disorients the target for its next turn, a miss the caster."""
         if self.r.intercept and cheb(u, t) > 1:
             t = self.interceptor(u, t)
-        p = 0.70 + (u.magic_accuracy() - t.evasion()) / 100 - (self.r.cover + self.shielded(t) if cheb(u, t) > 1 else 0.0)
+        p = 0.70 + (u.magic_accuracy() - t.evasion()) / 100 - (self.r.cover + self.shielded(t) if cheb(u, t) > 1 else 0.0) - self.obscured(u, t)
         hit = random.random() < min(0.95, max(0.05, p * (1 + u.luck / 100)))
         if not hit:
             u.disoriented = 1
             return
-        raw = STING_BASE * self.r.damage_scale * random.uniform(0.85, 1.15)
+        if t.veiled and t.copy:
+            t.copy = False
+            return
+        self.unveil(u)
+        raw = self.r.sting_base * self.r.damage_scale * random.uniform(0.85, 1.15)
         t.hp -= self.warded(raw, t)
         t.asleep = 0
         t.disoriented = 1
         if t.hp <= 0:
             self.cells.pop((t.x, t.y), None)
+
+    def screen_spot(self, u):
+        """05.1 Пелена: of the centres that cover the caster, the one that covers most of its own people not yet in a
+        cloud, an enemy covered counting twice against it; None if every one covers an enemy as much."""
+        own = [b for b in alive(self.own(u)) if not self.clouded(b.x, b.y)]
+        foes = alive(self.foes(u))
+        best, spot = 0, None
+        for x, y in {(u.x + dx, u.y + dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1)}:
+            if not (0 <= x < self.length and 0 <= y < self.r.width):
+                continue
+            mine = sum(1 for b in own if abs(b.x - x) <= 1 and abs(b.y - y) <= 1)
+            value = mine - 2 * sum(1 for f in foes if abs(f.x - x) <= 1 and abs(f.y - y) <= 1)
+            if mine and value > best:
+                best, spot = value, (x, y)
+        return spot
+
+    def press_spot(self, u, seen):
+        """05.1 Гнёт: the centre within reach where the enemies struck, less PRESS_FRIEND for each of u's own, are most."""
+        everyone = [f for f in alive(self.a + self.b) if f is not u]
+        own = self.own(u)
+        best, spot = PRESS_NET - 1e-9, None
+        for x, y in {(f.x + dx, f.y + dy) for f in seen for dx in (-1, 0, 1) for dy in (-1, 0, 1)}:
+            if not (0 <= x < self.length and 0 <= y < self.r.width) or cheb_xy(u.x, u.y, (x, y)) > PRESS_RANGE:
+                continue
+            value = sum((-PRESS_FRIEND if f in own else 1.0) for f in everyone if abs(f.x - x) <= 1 and abs(f.y - y) <= 1)
+            if value > best:
+                best, spot = value, (x, y)
+        return spot
+
+    def press(self, u, spot):
+        """05.1 Гнёт: magical harm to everyone in the area but its caster, its own people too, with no roll and no
+        critical hit; a copy in it breaks."""
+        harmed = False
+        for f in alive(self.a + self.b):
+            if f is u or abs(f.x - spot[0]) > 1 or abs(f.y - spot[1]) > 1:
+                continue
+            f.copy = False
+            damage = self.warded(self.r.press_base * self.r.damage_scale * random.uniform(0.85, 1.15), f)
+            f.hp -= damage
+            f.asleep = 0
+            harmed = harmed or damage > 0
+            if f.hp <= 0:
+                self.cells.pop((f.x, f.y), None)
+        if harmed:
+            self.unveil(u)
+
+    def dash(self, u, t, ap, cost):
+        """05.1 Рывок: at once into a free cell beside t, past it as u sees it, with no walk and so no Reaction Attack;
+        worth it when walking there costs 3 AP or more and a blow is still paid for."""
+        if ("dash" not in u.abilities or u.weapon.ranged or touch(u, t) or cheb(u, t) > DASH_RANGE or steps_to(u, t) < 3
+                or ap < DASH_AP + cost or not u.can_spend(c.ORDINARY)):
+            return False
+        dx, dy = (t.x > u.x) - (t.x < u.x), (t.y > u.y) - (t.y < u.y)
+        options = ((dx, 0), (0, dy)) if dx and dy else ((dx, dy), (dy, dx), (-dy, -dx))
+        for ox, oy in options:
+            x, y = t.x + ox, t.y + oy
+            if (ox or oy) and 0 <= x < self.length and 0 <= y < self.r.width and (x, y) not in self.cells:
+                u.wp -= u.max_wp() * c.ORDINARY
+                del self.cells[(u.x, u.y)]
+                u.x, u.y = x, y
+                self.cells[(x, y)] = u
+                return True
+        return False
+
+    def screen(self, u, ap):
+        """05.1 Пелена, from the AP a turn leaves: a cloud over the caster, where it ends its turn, and over as many of its
+        own as it can cover, when a shooter on the other side could fire at it and no cloud covers it yet."""
+        if "screen" not in u.abilities or ap < self.r.screen_ap or not u.can_spend(self.r.screen_cost) or self.clouded(u.x, u.y):
+            return ap
+        if not any(f.weapon.ranged and cheb(u, f) <= f.weapon.range + 4 for f in alive(self.foes(u)) if not f.asleep and not f.skip):
+            return ap
+        spot = self.screen_spot(u)
+        if spot is None:
+            return ap
+        u.wp -= u.max_wp() * self.r.screen_cost
+        self.clouds.append([spot[0], spot[1], self.r.screen_rounds])
+        return ap - self.r.screen_ap
+
+    def double(self, u, ap):
+        """05.1 Двойник, from the AP a turn leaves: unseen until its next turn, its copy taking the first hit."""
+        if "double" in u.abilities and ap >= self.r.double_ap and not u.veiled and u.can_spend(c.POWERFUL) and self.threatened(u):
+            u.wp -= u.max_wp() * c.POWERFUL
+            u.veiled, u.copy = 1, True
+            return ap - self.r.double_ap
+        return ap
+
+    def keeps_for_double(self, u):
+        return (self.r.double_ap if "double" in u.abilities and u.hp <= self.r.double_hp * u.max_hp() and u.can_spend(c.POWERFUL)
+                and self.threatened(u) else 0)
 
     def attack(self, u, t, ap):
         u.struck = True
@@ -557,6 +716,7 @@ class Fight:
 
     def turn(self, u, rnd):
         self.pending.discard(u)
+        self.unveil(u)  # 05.1 Двойник: seen again in its next turn, which is all the same here as at its end
         u.dazed, u.disoriented = u.disoriented > 0, max(0, u.disoriented - 1)
         taunter, u.taunter = u.taunter, None
         u.brace = u.reacted = False
@@ -580,10 +740,13 @@ class Fight:
         if self.r.turtle and u in self.a and any(touch(u, f) for f in alive(self.foes(u))):
             self.stand(u, ap)
             return
+        keep = self.keeps_for_double(u)
+        ap -= keep
         first = True
         while True:
             foes = alive(self.foes(u))
-            if not foes or ap < 1 or u.hp <= 0:
+            seen = self.seen(foes)
+            if not seen or ap < 1 or u.hp <= 0:
                 break
             if self.changes_set(u, foes, ap):
                 if ap < SWAP_AP:
@@ -592,9 +755,9 @@ class Fight:
                 u.weapon, u.second = u.second, u.weapon
                 continue
             cost = self.cost(u)
-            if u.intent not in foes or first:
-                u.intent = self.best(u, foes, ap)
-            if taunter in foes:
+            if u.intent not in seen or first:
+                u.intent = self.best(u, seen, ap)
+            if taunter in seen:
                 u.intent = taunter
             sleeper = next((b for b in alive(self.own(u)) if b.asleep and cheb(u, b) == 1), None) if WAKE_AP else None
             if sleeper and ap >= WAKE_AP:
@@ -602,7 +765,7 @@ class Fight:
                 ap -= WAKE_AP
                 continue
             t = u.intent
-            adjacent = [f for f in foes if touch(u, f)]
+            adjacent = [f for f in seen if touch(u, f)]
             if u.weapon.ranged:
                 if cheb(u, t) <= u.weapon.range:
                     if self.r.intercept and first:
@@ -634,8 +797,12 @@ class Fight:
                 first = False
                 continue
             if not adjacent and self.holds(u, ap):
-                self.stand(u, ap)
+                self.stand(u, ap + keep)
                 return
+            if self.dash(u, t, ap, cost):
+                ap -= DASH_AP
+                first = False
+                continue
             need = steps_to(u, t)
             if adjacent:
                 near = self.best(u, adjacent, ap)
@@ -656,7 +823,8 @@ class Fight:
                 break
             ap = left
             first = False
-        ap = self.retreat(u, ap)
+        ap = self.retreat(u, ap + keep)
+        ap = self.double(u, ap) if keep else self.double(u, self.screen(u, ap))
         u.reserve = self.brace(u, max(0, ap))
 
     def joins_circle(self, u):
@@ -705,8 +873,9 @@ class Fight:
         return ap
 
     def brace(self, u, ap):
-        """Не сдвинуть is paid from the AP left at the end of a turn, as a Defensive Stance is, never from a blow."""
-        if "brace" in u.abilities and ap >= BRACE_AP and u.can_spend(c.ORDINARY) and sum(1 for f in alive(self.foes(u)) if cheb(u, f) <= 3) >= 2:
+        """Не сдвинуть is paid from the AP left at the end of a turn, as a Defensive Stance is, never from a blow; since the
+        balance after COMBAT-7 an NPC braces whenever an enemy could attack it in its next turn, not only two near."""
+        if "brace" in u.abilities and ap >= BRACE_AP and u.can_spend(c.ORDINARY) and self.threatened(u):
             u.wp -= u.max_wp() * c.ORDINARY
             u.brace = True
             return ap - BRACE_AP
@@ -746,6 +915,9 @@ class Fight:
                 return rnd, self.a
             if self.circle and (winner := self.ritual_round()) is not None:
                 return rnd, winner
+            for k in self.clouds:
+                k[2] -= 1
+            self.clouds = [k for k in self.clouds if k[2] > 0]
             if self.r.morale:
                 sa, sb = self.strength(self.a, self.leaders[0]), self.strength(self.b, self.leaders[1])
                 if self.objective is None and sb < self.r.morale * sa:
@@ -764,13 +936,10 @@ def dist2(x, y, goal):
 
 
 def stronger(units, bonus):
+    """Adds bonus to the combat attributes and skills, the Arcana skill too, or takes a negative one away, never below 1."""
     for u in units:
-        u.str += bonus
-        u.end += bonus
-        u.dex += bonus
-        u.per += bonus
-        u.skill += bonus
-        u.ranged_skill += bonus
+        for name in ("str", "end", "dex", "per", "skill", "ranged_skill", "arcana"):
+            setattr(u, name, max(1, getattr(u, name) + bonus))
     return units
 
 
@@ -836,7 +1005,7 @@ def duel(rules, a_fn, b_fn, runs=None):
     return wins / (runs or RUNS) * 100
 
 
-V0 = Rules(width=4, enemy_bonus=1, ranged=True)
+V0 = Rules(width=4, ranged=True)
 PLAIN = Rules()
 LEVERS = {
     "no space (combat_sim.py): base 38, +club +31, +L9 +32, +L8 +50": None,

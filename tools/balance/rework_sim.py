@@ -5,16 +5,23 @@ adds damage; accuracy is the profile attribute of the weapon or attack and its s
 chance; Infusion adds a fixed share of the weapon's base; a Will Contest is won by Intelligence and the Arcana skill.
 Everyone in the slice carries a firearm (10.2 §5d), the Wardens a baton beside it, everyone else fists.
 
+The owner's answers to COMBAT-1 … COMBAT-12 (2026-11-13): only the initiated have Will Power and all of them infuse;
+NPCs prepare by the seed from every active fight ability of their Limits, the four new ones included; the cult is weaker
+one on one, an allied fighter winning about 75 % of duels at the same Limit, and wins by numbers. By the owner's
+follow-up the cult is a point lower in its base and the lion's share of the gap is gear: the allies are supplied by
+their faction's makers and the cult poorly (Outfit V1).
+
 It measures:
-- the slice's chain with no player, the allies against the main force and then the ritual (21 §8), with and without
-  people on a shot's line taking it (10.1 Shot Line), and with the player;
+- Жрица against Император at equal attributes and no items, alone and five against five, NPCs preparing by the seed
+  and with every ability prepared, as a player would choose, so that the Arcana are even;
+- an allied fighter against a cult fighter of the same Limit in Outfit V1, so that the ally wins about 75 %;
+- the slice's chain with no player, the allies against the main force and then the ritual (21 §8), people on a shot's
+  line taking it (10.1 Shot Line), so that it stays at about 22 %, and with the player;
 - what pays once an enemy stands beside a shooter, and duels of a melee fighter against shooters from several
   distances, so that a firearm is first at range and melee pays only once an enemy has closed in;
-- a Limit's step and the cult's small edge over an allied fighter of the same Limit (10.2 §5b: +1, 56–58 % of duels
-  between equals), and the duel across the Arcana, Император's kit against Жрица's (COMBAT-7);
 - the Prepared Abilities over the whole scale of Intelligence + Will, and how far a pool of Will Power goes.
 
-Run: python tools/balance/rework_sim.py [fights per line]
+Run: python tools/balance/rework_sim.py [fights per line] [levers]
 """
 import io
 import random
@@ -24,27 +31,49 @@ from dataclasses import replace
 from multiprocessing import Pool
 
 import combat_sim as c
+import item_sim as ims
 import tactical_sim as t
 
 RUNS = int(sys.argv[1]) if len(sys.argv) > 1 else 2000
 INTERCEPT = 0.60
-V1 = t.Rules(width=4, enemy_bonus=1)
+# Outfit V1 (owner's follow-up to COMBAT-7, 2026-11-13; 10.2 §5f): the Shop Skill each rank's set is made at. The allies'
+# faction makes their gear, the faction's Master supplying Limit 7; the cult makes do, its Limit 9 with makeshift gear.
+# Authoring defaults: about 15 points under the allies at Limits 9 and 8 and 25 at Limit 7 give the duels about 75 %.
+# The player buys at the city's shops.
+SUPPLY = {"allies": {9: 26, 8: 50, 7: 75}, "cult": {9: 10, 8: 36, 7: 50}, "player": {9: ims.CITY, 8: ims.CITY}}
+
+
+def dress(side):
+    def wear(u):
+        skill = SUPPLY[side].get(u.limit)
+        return ims.supplied(u, skill, ims.Items()) if skill else u
+    return wear
+
+
+# The slice: a main force of 6 or 7, half and half, its 2 Limit 8 and Limit 7 senior and the rest Limit 9, and a ritual
+# of a Limit 8 senior, 3 conductors and 3 guards (21 §4), 13 or 14 enemies in all.
+V1 = t.Rules(width=4, forces=(6, 7), guards=(3,), outfit=dress("cult"))
 LINE = replace(V1, intercept=INTERCEPT)
+EVEN = t.Rules(width=4, intercept=INTERCEPT)
 
 
 def prepared(intelligence, will, bonus=0):
-    """07.2 §4.5: 3 slots, one more for every 14 points of Intelligence + Will above 2, 10 at a sum of 100; items add."""
-    return min(10, 3 + max(0, intelligence + will - 2) // 14) + bonus
+    return c.prepared_slots(intelligence, will, bonus)
+
+
+def allies():
+    return [dress("allies")(u) for u in t.archers()]
 
 
 def player8():
-    """The player at Limit 8 as a shooter: Жрица's attributes after 9 free points, a rifle and a pistol set."""
-    return c.Unit("hero", 8, 3, 5, 12, 9, 10, will=4, intl=10, weapon=c.RIFLE, second=c.PISTOL, armour="leather", focus=True,
-                  abilities=("sleep",), infuse=True)
+    """The player at Limit 8 as a shooter: Жрица's attributes after 9 free points, a rifle and a pistol set, a city set."""
+    return dress("player")(c.Unit("hero", 8, 3, 5, 12, 9, 10, will=4, intl=10, weapon=c.RIFLE, second=c.PISTOL, armour="leather",
+                                  focus=True, abilities=("screen", "sleep", "double"), infuse=True))
 
 
 def player9():
-    return c.Unit("hero9", 9, 2, 3, 8, 6, 6, will=2, intl=6, weapon=c.PISTOL, second=c.FISTS, armour="leather", focus=True)
+    return dress("player")(c.Unit("hero9", 9, 2, 3, 8, 6, 6, will=2, intl=6, weapon=c.PISTOL, second=c.FISTS, armour="leather",
+                                  focus=True, abilities=("screen",), infuse=True))
 
 
 def seeded(name):
@@ -52,19 +81,53 @@ def seeded(name):
 
 
 SIDES = {
-    "allies alone": t.archers,
-    "allies alone, people on the line take shots": t.archers,
-    "+ allied Limit 8": lambda: t.archers() + [c.ally8()],
-    "+ player Limit 9": lambda: t.archers() + [player9()],
-    "+ player Limit 8": lambda: t.archers() + [player8()],
-    "+ two Wardens": lambda: t.archers() + [c.warden(), c.warden()],
+    "allies alone, no line": allies,
+    "allies alone": allies,
+    "+ allied Limit 8": lambda: allies() + [dress("allies")(c.ally8())],
+    "+ player Limit 9 in a city set": lambda: allies() + [player9()],
+    "+ player Limit 8 in a city set": lambda: allies() + [player8()],
+    "+ two Wardens": lambda: allies() + [c.warden(), c.warden()],
 }
 
 
 def chained(name):
     seeded(name)
-    rules = LINE if "line" in name or name.startswith("+") else V1
+    rules = V1 if "no line" in name else LINE
     return f"  {name:<46} {t.chain(rules, SIDES[name], runs=RUNS):5.1f} %"
+
+
+# The Император reference at a Limit before the cult's shortfall: the allied row, Will in place of Intelligence.
+PEER = {9: ((6, 6, 4, 4, 5), 6, c.PISTOL, "cloth"), 8: ((12, 10, 8, 6, 12), 12, c.PISTOL, "leather"),
+        7: ((20, 16, 12, 10, 20), 20, c.RIFLE, "leather")}
+ALLY = {9: c.ally9, 8: c.ally8, 7: c.ally7}
+CULT = {9: c.follower9, 8: c.follower8, 7: c.senior7}
+
+
+def emperor(limit, chosen=False):
+    row, will, weapon, armour = PEER[limit]
+    u = c.Unit(f"E{limit}", limit, *row, will=will, weapon=weapon, second=c.FISTS, armour=armour, infuse=True,
+               abilities=c.kit("emperor", limit, 3, will))
+    if chosen:
+        u.abilities = tuple(a for lim, (act, pas) in c.POOLS["emperor"].items() if lim >= limit for a in act + pas)
+    return u
+
+
+def parity(args):
+    limit, n, chosen = args
+    seeded(f"parity {limit} {n} {chosen}")
+    rules = replace(EVEN, gap=8 if n == 1 else 12)
+    win = t.duel(rules, lambda: [ALLY[limit]() for _ in range(n)], lambda: [emperor(limit, chosen) for _ in range(n)], runs=RUNS)
+    kind = "every ability prepared" if chosen else "by the seed"
+    return f"  Limit {limit}, {n} v {n}, Император {kind:<24} Жрица wins {win:5.1f} %"
+
+
+def gap(args):
+    limit, n = args
+    seeded(f"gap {limit} {n}")
+    rules = replace(EVEN, gap=8 if n == 1 else 12)
+    win = t.duel(rules, lambda: [dress("allies")(ALLY[limit]()) for _ in range(n)],
+                 lambda: [dress("cult")(CULT[limit]()) for _ in range(n)], runs=RUNS)
+    return f"  Limit {limit}, {n} v {n}{'':<28} allies win {win:5.1f} %"
 
 
 def harm(a, weapon, target, adjacent):
@@ -93,9 +156,10 @@ PAIRS = {
 
 
 def adjacent_table():
-    lines = ["What a turn of 10 AP does once an enemy stands beside a shooter (expected damage)"]
+    lines = ["What a turn of 10 AP does once an enemy stands beside a shooter (expected damage, no items)"]
     for name, (fa, ft) in PAIRS.items():
         a, tgt = fa(), ft()
+        a.gear, tgt.gear = c.Gear(), c.Gear()
         a.reset()
         tgt.reset()
         far = turn_harm(a, a.weapon, tgt, False)
@@ -122,32 +186,32 @@ DUELS = {
     "melee v rifleman, 6 cells": (melee_fighter, lambda: shooter(c.RIFLE, c.FISTS), 6),
     "melee v rifleman, 12 cells": (melee_fighter, lambda: shooter(c.RIFLE, c.FISTS), 12),
     "melee v rifleman with a sword set, 12 cells": (melee_fighter, lambda: shooter(c.RIFLE, c.SWORD), 12),
-    "cult L8 +1 v cult L8 (equals)": (lambda: t.stronger([c.follower8()], 1)[0], c.follower8, 8),
-    "cult L9 +1 v cult L9 (equals)": (lambda: t.stronger([c.follower9()], 1)[0], c.follower9, 8),
-    "cult L8 +1 v allied L8 (across the Arcana)": (lambda: t.stronger([c.follower8()], 1)[0], c.ally8, 8),
-    "cult L9 +1 v allied L9 (across the Arcana)": (lambda: t.stronger([c.follower9()], 1)[0], c.ally9, 8),
-    "cult L8 v two cult L9": (c.follower8, lambda: c.follower9(), 8),
-    "cult L7 v two cult L8": (c.senior7, lambda: c.follower8(), 8),
+    "cult L8 v two cult L9, Outfit V1": (lambda: dress("cult")(c.follower8()), lambda: dress("cult")(c.follower9()), 8),
+    "cult L7 v two cult L8, Outfit V1": (lambda: dress("cult")(c.senior7()), lambda: dress("cult")(c.follower8()), 8),
 }
 
 
 def duelled(name):
     seeded(name)
-    fa, fb, gap = DUELS[name]
-    rules = replace(LINE, gap=gap)
-    two = name.startswith("cult L8 v two") or name.startswith("cult L7 v two")
-    b = (lambda: [fb(), fb()]) if two else (lambda: [fb()])
+    fa, fb, distance = DUELS[name]
+    rules = replace(EVEN, gap=distance)
+    b = (lambda: [fb(), fb()]) if " two " in name else (lambda: [fb()])
     return f"  {name:<46} first side wins {t.duel(rules, lambda: [fa()], b, runs=RUNS):5.1f} %"
 
 
 def budget():
-    lines = ["Will Power of the slice's fighters (07.2 §3.3): uses of each cost from a full pool"]
-    for name, u in (("allied Limit 9", c.ally9()), ("allied Limit 8", c.ally8()), ("cult Limit 8", c.follower8()),
-                    ("cult Limit 7", c.senior7()), ("player Limit 8", player8())):
+    lines = ["Will Power of the slice's fighters (07.2 §3.3), no items: uses of each cost from a full pool"]
+    for name, u in (("allied Limit 9", c.ally9()), ("allied Limit 8", c.ally8()), ("cult Limit 9", c.follower9()),
+                    ("cult Limit 8", c.follower8()), ("cult Limit 7", c.senior7()), ("player Limit 8", player8()),
+                    ("Warden, no Arcana", c.warden())):
+        u.gear = c.Gear()
         u.reset()
         wp = u.max_wp()
+        if not wp:
+            lines.append(f"  {name:<18} WP   0.0  no Will Power, so no ability and no Infusion (COMBAT-7)")
+            continue
         infusion = c.INFUSION_COST * c.LIMIT_S[u.limit]
-        lines.append(f"  {name:<16} WP {wp:5.1f}  ordinary {int(wp // (wp * c.ORDINARY)):2d}  powerful {int(wp // (wp * c.POWERFUL)):2d}  Infusions {int(wp // infusion):2d}  in-fight recovery a round {wp * 0.001:4.2f}")
+        lines.append(f"  {name:<18} WP {wp:5.1f}  ordinary {int(wp // (wp * c.ORDINARY)):2d}  powerful {int(wp // (wp * c.POWERFUL)):2d}  Infusions {int(wp // infusion):2d}")
     return "\n".join(lines)
 
 
@@ -186,10 +250,10 @@ def levered(name):
     for duel in ("melee v pistol shooter, 2 cells", "melee v pistol shooter, 12 cells", "melee v rifleman, 12 cells",
                  "melee v rifleman with a sword set, 12 cells"):
         seeded(name + duel)
-        fa, fb, gap = DUELS[duel]
-        out.append(t.duel(replace(LINE, gap=gap), lambda: [fa()], lambda: [fb()], runs=RUNS))
+        fa, fb, distance = DUELS[duel]
+        out.append(t.duel(replace(EVEN, gap=distance), lambda: [fa()], lambda: [fb()], runs=RUNS))
     seeded(name)
-    chain = t.chain(LINE, t.archers, runs=RUNS)
+    chain = t.chain(LINE, allies, runs=RUNS)
     w, f = c.warden(), c.follower9()
     w.reset()
     f.reset()
@@ -210,7 +274,11 @@ def main():
     print()
     print(adjacent_table())
     with Pool() as pool:
-        print("\nThe slice's chain, the ritual stopped (21 §8), firearms first")
+        print("\nThe Arcana at equal attributes and no items (Жрица's row against Император's)")
+        print("\n".join(pool.map(parity, [(lim, n, ch) for lim in (9, 8, 7) for n in (1, 5) for ch in (False, True)])))
+        print("\nAn allied fighter against a cult fighter of the same Limit, Outfit V1")
+        print("\n".join(pool.map(gap, [(lim, n) for lim in (9, 8, 7) for n in (1, 5)])))
+        print("\nThe slice's chain, the ritual stopped (21 §8), firearms first, Outfit V1")
         print("\n".join(pool.map(chained, SIDES)))
         print("\nDuels on the grid, people on the line taking shots")
         print("\n".join(pool.map(duelled, DUELS)))

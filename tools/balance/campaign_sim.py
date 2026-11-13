@@ -9,6 +9,11 @@ A war ends in manifestation or with all three Cult Generals dead. Each city keep
 a ledger of followers per Limit, and a fight runs tick by tick from a kill table
 built with the Combat Numbers V0 of 10.2 §5b.
 
+Since the owner's answer to COMBAT-7 (2026-11-13) a cult follower is weaker than an
+allied fighter of the same Limit, a point lower in its base and poorly supplied
+(Outfit V1, 10.2 §5f), and the cult wins by numbers; only the Cult Generals are
+stronger than the Allied Generals.
+
 Numbers here are authoring defaults.
 Run: python tools/balance/campaign_sim.py [wars per setting, default 500]
 """
@@ -31,6 +36,13 @@ HORIZON_DAYS = 60
 
 ENGAGE = 0.62
 BATTLE_LUCK = 0.2
+# A fight of firearms on a street (2026-11-13, after the combat rework): not everyone gets a line, and those behind take
+# shots meant for those in front, so a side's followers fire as FRONTAGE of them once more stand in it, each at its
+# share; a General's power reaches over them. More followers still take longer to kill. Luck evens out in a big fight,
+# its spread falling with the root of the people in it from 0.2 at ten. Both are fitted to the tactical simulation of
+# Outfit V1 (validate()); authoring defaults.
+FRONTAGE = 5
+LUCK_FROM = 10
 MOST_TICKS = 240
 RITUAL_TICKS = 60
 APPROACH_TICKS = 5
@@ -41,17 +53,19 @@ RAID_ESCORT = 3
 HOLD_LEFT_BEHIND = 5
 FORCE_CAP = 30
 CITY_CAP = 30
-RATE_PER_CITY = 1.0
+# Each held city adds half the base rate again (2026-11-13, after the answers; it was the whole rate): street fights
+# under FRONTAGE make liberations last, and this keeps the median war near 20 days (CC-43).
+RATE_PER_CITY = 1.5
 GARRISON_TARGET = 10
 GARRISON_SHARE = 0.5
 FAILED_SORTIE_REST_DAYS = 1
 PURSUIT_TICKS = 8
 CULT_RETREAT_ESTIMATE = 0.15
 
-FINAL_DELAY_DAYS = 1
+FINAL_DELAY_DAYS = 0.5
 FINAL_RITUAL_GROUP = 12
 FINAL_GARRISON_SHARE = 0.6
-FINAL_RETRY_DAYS = 2
+FINAL_RETRY_DAYS = 1
 FINAL_RITUAL_SHARE = 0.25
 
 CITY_DEFENDERS = 10
@@ -96,6 +110,23 @@ REFERENCE = {
 }
 
 
+# The cult's followers (owner, 2026-11-13, COMBAT-7 and its follow-up): a point lower in their base and poorly supplied,
+# Outfit V1 of 10.2 §5f. Each Limit's shortfall in accuracy and evasion points and in the share of health and blow is set
+# so that the ledger matches the tactical simulation of Outfit V1 (validate(), rework_sim.py). Authoring defaults.
+CULT_SHORTFALL = {9: (5, 0.07), 8: (5, 0.07), 7: (8, 0.10), 6: (8, 0.10), 5: (8, 0.10)}
+
+
+def cult(limit):
+    """The ledger's key for a cult follower of a Limit, apart from an allied fighter of the same Limit."""
+    return f"c{limit}"
+
+
+def poorer(fighter, limit):
+    points, share = CULT_SHORTFALL[limit]
+    return dict(fighter, acc=fighter["acc"] - points, eva=fighter["eva"] - points, hp=fighter["hp"] * (1 - share),
+                blow=fighter["blow"] * (1 - share))
+
+
 def peer(limit):
     a = 5 + 10 * (9 - limit)
     return dict(acc=a, eva=a, hp=(20 + 0.8 * a) * LIMIT_S[limit], blow=5 * stage_factor(limit) * (1 + a / 50), attacks=(10 + a / 20) / 5 * 0.8, defence=16 * stage_factor(limit))
@@ -108,6 +139,7 @@ def general(a):
 def build_kill_table(cult_attribute, allied_attribute):
     """Expected kills per tick of one i on one j, capped at one kill per blow."""
     fighters = {limit: REFERENCE.get(limit) or peer(limit) for limit in (9, 8, 7, 6, 5, 4, 3, 2)}
+    fighters.update({cult(limit): poorer(fighters[limit], limit) for limit in CULT_SHORTFALL})
     fighters[CULT_GENERAL] = general(cult_attribute)
     fighters[ALLIED_GENERAL] = general(allied_attribute)
     table = {}
@@ -127,9 +159,16 @@ def size(side):
     return sum(side.values())
 
 
+def crowd(side):
+    """Each follower's share of its side's fire once more than FRONTAGE stand in it."""
+    followers = size(side) - side.get(CULT_GENERAL, 0) - side.get(ALLIED_GENERAL, 0)
+    return FRONTAGE / max(FRONTAGE, followers)
+
+
 def damage(attackers, targets):
     """Expected wounds per tick on each target. A General seeks out the rival General."""
     total = size(targets)
+    share = crowd(attackers)
     wounds = Counter()
     for i, n_i in attackers.items():
         if not n_i:
@@ -140,7 +179,7 @@ def damage(attackers, targets):
             continue
         for j, n_j in targets.items():
             if n_j:
-                wounds[j] += n_i * KILL[i, j] * n_j / total
+                wounds[j] += n_i * KILL[i, j] * n_j / total * (1 if rival else share)
     return wounds
 
 
@@ -166,8 +205,9 @@ def settle(side, wounds):
 def battle(a, b, ticks, a_flee=0.0, b_flee=0.0, blessing=1.0):
     """Returns the side left standing, 'a', 'b', or None, and the ticks it took."""
     wounds_a, wounds_b = Counter(), Counter()
-    luck_a = random.lognormvariate(0, BATTLE_LUCK) * blessing
-    luck_b = random.lognormvariate(0, BATTLE_LUCK)
+    spread = BATTLE_LUCK * (LUCK_FROM / max(2, size(a) + size(b))) ** 0.5
+    luck_a = random.lognormvariate(0, spread) * blessing
+    luck_b = random.lognormvariate(0, spread)
     for t in range(ticks):
         if not size(b):
             return "a", t
@@ -200,17 +240,29 @@ def take(side, n):
     return taken
 
 
-def validate():
-    print("Ledger against the tactical simulation of 10.2 §5b")
+# The tactical simulation of Outfit V1 (rework_sim.py, 1500 fights a line, 2026-11-13): five allies, two Limit 9
+# riflemen and three Limit 8, against the slice's main force of a size, and allies against cult followers of one Limit.
+TACTICAL_MAIN = {5: 61, 6: 44, 7: 34, 8: 21}
+TACTICAL_GROUPS = {9: (87, 40, 69), 8: (85, 26, 20), 7: (95, 60, 73)}
+
+
+def validate(setting):
+    global KILL
+    KILL = build_kill_table(setting.cult_general, setting.allied_general)
+    print("Ledger against the tactical simulation of Outfit V1 (10.2 §5f)")
+
+    def wins(a, b):
+        return sum(battle(Counter(a), Counter(b), 400)[0] == "a" for _ in range(3000)) / 30
+
     allies = {9: 2, 8: 3}
-    for name, cult, tactical in (("5 with L7", {9: 2, 8: 2, 7: 1}, 78), ("6 with L7", {9: 3, 8: 2, 7: 1}, 46), ("7 with L7", {9: 4, 8: 2, 7: 1}, 12)):
-        results = [battle(Counter(allies), Counter(cult), 200) for _ in range(3000)]
-        wins = sum(r[0] == "a" for r in results) / 30
-        print(f"  5 allies v {name}: ledger {wins:3.0f} %, tactical {tactical} %, estimate {force_estimate(Counter(allies), Counter(cult)):.2f}")
-    wins = sum(battle(Counter({5: 5}), Counter({CULT_GENERAL: 1}), 200)[0] == "a" for _ in range(3000)) / 30
-    print(f"  5 of Limit 5 v a General: ledger {wins:3.0f} %, tactical 87 %")
-    wins = sum(battle(Counter({ALLIED_GENERAL: 1}), Counter({CULT_GENERAL: 1}), 200)[0] == "a" for _ in range(3000)) / 30
-    print(f"  Limit 2 v Limit 2: ledger {wins:3.0f} %")
+    for n, tactical in TACTICAL_MAIN.items():
+        force = {cult(9): n - 3, cult(8): 2, cult(7): 1}
+        print(f"  5 allies v a main force of {n}: ledger {wins(allies, force):3.0f} %, tactical {tactical} %, estimate {force_estimate(Counter(allies), Counter(force)):.2f}")
+    for limit, (even, short, large) in TACTICAL_GROUPS.items():
+        print(f"  Limit {limit}, allies v cult: 5 v 5 ledger {wins({limit: 5}, {cult(limit): 5}):3.0f} % (tactical {even}), "
+              f"5 v 7 {wins({limit: 5}, {cult(limit): 7}):3.0f} % ({short}), 10 v 13 {wins({limit: 10}, {cult(limit): 13}):3.0f} % ({large})")
+    print(f"  5 allies of Limit 5 v a Cult General: ledger {wins({5: 5}, {CULT_GENERAL: 1}):3.0f} %")
+    print(f"  An Allied General v a Cult General: ledger {wins({ALLIED_GENERAL: 1}, {CULT_GENERAL: 1}):3.0f} %")
 
 
 @dataclass
@@ -247,7 +299,7 @@ class Setting:
     name: str
     pace: float
     shift: float = 0
-    cult_general: int = 75
+    cult_general: int = 79
     allied_general: int = 75
 
 
@@ -637,9 +689,9 @@ def run(setting):
                 f.fraction -= 1
                 weak = [c for c in world.held() if size(c.cult) < GARRISON_TARGET]
                 if weak and random.random() < GARRISON_SHARE:
-                    min(weak, key=lambda c: size(c.cult)).cult[draw(f.mix, setting.shift)] += 1
+                    min(weak, key=lambda c: size(c.cult)).cult[cult(draw(f.mix, setting.shift))] += 1
                 elif size(f.pool) < FORCE_CAP:
-                    f.pool[draw(f.mix, setting.shift)] += 1
+                    f.pool[cult(draw(f.mix, setting.shift))] += 1
             if f.strength() >= f.needed() and world.day >= f.rest_until and not world.ended:
                 targets = [c for c in world.free() if not c.capital and world.day - c.last_ritual >= RITUAL_WAIT_DAYS]
                 if targets:
@@ -688,6 +740,9 @@ def report(setting):
     cult = [r for r in runs if r["world"].ended == "cult"]
     print(f"\n{setting.name}: Cult Pace ×{setting.pace}, Limit shift {setting.shift:+.1f}, Generals {setting.cult_general}/{setting.allied_general}")
     print(f"  ALLIES WIN {len(allies) / RUNS * 100:.0f} %, day {mean([r['end'] for r in allies]):.1f}; CULT WINS {len(cult) / RUNS * 100:.0f} %, day {mean([r['end'] for r in cult]):.1f}; undecided at day {HORIZON_DAYS}: {(RUNS - len(allies) - len(cult)) / RUNS * 100:.0f} %")
+    ends = sorted(r["end"] for r in allies + cult)
+    if ends:
+        print(f"  A decided war ends: median day {ends[len(ends) // 2]:.1f}, 10th to 90th percentile days {ends[len(ends) // 10]:.1f}-{ends[len(ends) * 9 // 10]:.1f}")
     first = ", ".join(f"{name} {mean([r['world'].forces[i].first_sortie for r in runs]):.1f}" for i, name in enumerate(("Spirit", "Raiding", "Holding")))
     all_results = [x for r in runs for x in r["world"].results]
     upto = [sum(1 for x in r["world"].results if x[0] <= 18) for r in runs]
@@ -700,15 +755,15 @@ def report(setting):
 
 
 SETTINGS = (
-    Setting("Lowest", 0.5, -1, 55),
-    Setting("Low", 0.75, -0.5, 70),
+    Setting("Lowest", 0.5, -1, 59),
+    Setting("Low", 0.75, -0.5, 74),
     Setting("Middle", 1.0),
-    Setting("High", 1.25, 0.5),
-    Setting("Highest", 1.5, 1.25),
+    Setting("High", 1.25, 0.5, 80),
+    Setting("Highest", 1.5, 1.25, 82),
 )
 
 if __name__ == "__main__":
     random.seed(2026)
-    validate()
+    validate(SETTINGS[2])
     for s in SETTINGS:
         report(s)

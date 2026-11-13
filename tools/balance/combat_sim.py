@@ -23,7 +23,7 @@ SURROUND_HIT = {2: 0.10, 3: 0.20, 4: 0.20}
 ORDINARY = 0.15
 POWERFUL = 0.33
 BRACE_REDUCTION = 0.25
-SUPPORT_DEFENCE = 5
+SUPPORT_DEFENCE = 3  # 05.1 Опора, 5 until the balance after COMBAT-7 (10.2 §5f)
 SLEEP_ROUNDS = 1
 SLEEP_AP = 2
 CONDUCTING_AP = 3
@@ -212,6 +212,10 @@ class Unit:
         return (20 + 0.8 * self.end) * LIMIT_S[self.limit] * (1 + self.gear.hp)
 
     def max_wp(self):
+        """07.2 (owner, 2026-11-13, COMBAT-7): only a character with an Arcana has Will Power; without one, Will is
+        only its resistance."""
+        if self.limit is None:
+            return 0.0
         return (20 + 0.8 * self.will) * LIMIT_S[self.limit] * (1 + self.gear.wp)
 
     def ap(self):
@@ -419,30 +423,61 @@ def report(title, a, b, opener=None, objective=None):
     return wins / RUNS
 
 
+# 05.1: the fight abilities each Limit of the slice's two Arcana gives, as (actives, passives). Император's are the
+# cult's, Жрица's the allies'. Завеса (Жрица, Limit 7) is not modelled.
+POOLS = {
+    "emperor": {9: (("brace", "dash"), ()), 8: (("stand", "press"), ("support",)), 7: (("pillar", "crush"), ())},
+    "priestess": {9: (("screen",), ()), 8: (("sleep", "double"), ()), 7: (("sting",), ())},
+}
+
+
+def prepared_slots(intelligence, will, bonus=0):
+    """07.2 §4.5: 3 slots, one more for every 14 points of Intelligence + Will above 2, 10 at a sum of 100; items add."""
+    return min(10, 3 + max(0, intelligence + will - 2) // 14) + bonus
+
+
+def kit(arcana, limit, intelligence, will):
+    """05.1 (owner, 2026-11-13, COMBAT-2 and COMBAT-8): a Limit gives its whole pool, and an NPC prepares by the seed
+    from every active fight ability of its Limits, as many as its slots hold; passives need no slot."""
+    actives = [a for lim, (act, _) in POOLS[arcana].items() if lim >= limit for a in act]
+    passives = tuple(a for lim, (_, pas) in POOLS[arcana].items() if lim >= limit for a in pas)
+    return passives + tuple(random.sample(actives, min(prepared_slots(intelligence, will), len(actives))))
+
+
 # The slice's reference fighters, firearms first (10.2 §5d): a pistol, or the cult senior's rifle, with fists for
-# melee. The values are 10.2 §5b's reference table; the skill is that of every weapon each carries, and of its Arcana.
-def follower9():
-    return Unit("L9", 9, 6, 6, 4, 4, 5, will=6, weapon=PISTOL, second=FISTS, armour="cloth", abilities=("brace",))
+# melee. The allies' values are 10.2 §5b's reference table; the skill is that of every weapon each carries, and of its
+# Arcana. Everyone with Will Power infuses (COMBAT-7), and each prepares by the seed unless given its abilities.
+# The cult's followers (owner, 2026-11-13, COMBAT-7 and its follow-up): a point lower than the allied row in every
+# combat attribute, skill and Will, the Император row of 10.2 §5f; the lion's share of the gap is in their poor gear,
+# Outfit V1 in rework_sim.py, so that an allied fighter wins about 75 % of duels at the same Limit.
+def follower9(abilities=None):
+    return Unit("L9", 9, 5, 5, 3, 3, 4, will=5, weapon=PISTOL, second=FISTS, armour="cloth", infuse=True,
+                abilities=kit("emperor", 9, 3, 5) if abilities is None else abilities)
 
 
-def follower8(abilities=("stand", "brace", "support")):
-    return Unit("L8", 8, 12, 10, 8, 6, 12, will=12, weapon=PISTOL, second=FISTS, armour="leather", abilities=abilities)
+def follower8(abilities=None):
+    return Unit("L8", 8, 11, 9, 7, 5, 11, will=11, weapon=PISTOL, second=FISTS, armour="leather", infuse=True,
+                abilities=kit("emperor", 8, 3, 11) if abilities is None else abilities)
 
 
-def senior7():
-    return Unit("L7", 7, 20, 16, 12, 10, 20, will=20, weapon=RIFLE, second=FISTS, armour="leather", abilities=("stand", "brace", "support", "crush"))
+def senior7(abilities=None):
+    return Unit("L7", 7, 19, 15, 11, 9, 19, will=19, weapon=RIFLE, second=FISTS, armour="leather", infuse=True,
+                abilities=kit("emperor", 7, 3, 19) if abilities is None else abilities)
 
 
-def ally9():
-    return Unit("A9", 9, 6, 6, 4, 4, 5, will=4, intl=6, weapon=PISTOL, second=FISTS, armour="cloth", infuse=True)
+def ally9(abilities=None):
+    return Unit("A9", 9, 6, 6, 4, 4, 5, will=4, intl=6, weapon=PISTOL, second=FISTS, armour="cloth", infuse=True,
+                abilities=kit("priestess", 9, 6, 4) if abilities is None else abilities)
 
 
-def ally8():
-    return Unit("A8", 8, 12, 10, 8, 6, 12, will=6, intl=12, weapon=PISTOL, second=FISTS, armour="leather", abilities=("sleep",), infuse=True)
+def ally8(abilities=None):
+    return Unit("A8", 8, 12, 10, 8, 6, 12, will=6, intl=12, weapon=PISTOL, second=FISTS, armour="leather", infuse=True,
+                abilities=kit("priestess", 8, 12, 6) if abilities is None else abilities)
 
 
-def ally7():
-    return Unit("A7", 7, 20, 16, 12, 10, 20, will=12, intl=20, weapon=RIFLE, second=FISTS, armour="leather", abilities=("sleep",), infuse=True)
+def ally7(abilities=None):
+    return Unit("A7", 7, 20, 16, 12, 10, 20, will=12, intl=20, weapon=RIFLE, second=FISTS, armour="leather", infuse=True,
+                abilities=kit("priestess", 7, 20, 12) if abilities is None else abilities)
 
 
 def warden():
