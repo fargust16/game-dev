@@ -21,7 +21,27 @@ public static class CombatGridAngleCheck
     private const float WallHeight = 3f;
     private const float WallThickness = 0.5f;
     private static readonly float[] Widths = { 2f, 3f, 4f, 6f, 12f };
-    private static readonly float[] Angles = { 0f, 45f, 30f };
+    private static readonly float[] DefaultAngles = { 0f, 45f, 30f };
+
+    /// <summary>
+    /// The angles to measure, degrees. Batch: <c>-gridAngles 15,22.5,26.565,30</c> measures those in place of the three
+    /// of 2026-11-05 and writes <c>Logs/GridAngle/report_angles.txt</c>, so the first report stays (island redesign,
+    /// 2026-11-14: which turns a district's frame may take).
+    /// </summary>
+    private static float[] Angles
+    {
+        get
+        {
+            var args = System.Environment.GetCommandLineArgs();
+            var at = System.Array.IndexOf(args, "-gridAngles");
+            return at < 0 || at + 1 >= args.Length
+                ? DefaultAngles
+                : System.Array.ConvertAll(args[at + 1].Split(','), a => float.Parse(a, System.Globalization.CultureInfo.InvariantCulture));
+        }
+    }
+
+    private static string ReportPath =>
+        System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-gridAngles") < 0 ? "Logs/GridAngle/report.txt" : "Logs/GridAngle/report_angles.txt";
 
     [MenuItem("GameDev/Grid/Check Streets at 45°")]
     public static void Run()
@@ -37,12 +57,12 @@ public static class CombatGridAngleCheck
                 // the street's middle line passes through a grid node. Then the same street off the grid.
                 var onGrid = new Vector3(angle == 0f && width % 2f != 0f ? 0.5f : 0f, FloorY, 0f);
                 text.AppendLine(Measure(width, angle, onGrid, "grid"));
-                text.AppendLine(Measure(width, angle, new Vector3(0.37f, FloorY, 0.61f), "off"));
+                text.AppendLine(Measure(width, angle, new Vector3(0.37f, FloorY, 0.61f), "off"));
             }
         }
 
         Directory.CreateDirectory("Logs/GridAngle");
-        File.WriteAllText("Logs/GridAngle/report.txt", text.ToString());
+        File.WriteAllText(ReportPath, text.ToString());
         Debug.Log("GRIDANGLE\n" + text);
     }
 
@@ -135,7 +155,7 @@ public static class CombatGridAngleCheck
 
         var joined = nearEnd.Count > 0 && farEnd.Count > 0;
         var ratio = joined ? Moves(reader, window, nearEnd, farEnd, FloorY) : 0f;
-        return $"{width,5:0}  {angle,5:0}  {place,5}  {street,12}  {Share(standable, street),9}  {(joined ? "yes" : "NO"),11}  {(joined ? ratio.ToString("0.00") : "-"),14}  {wallCells,10}  {Share(covered, wallCells),10}";
+        return $"{width,5:0}  {angle,6:0.0}  {place,5}  {street,12}  {Share(standable, street),9}  {(joined ? "yes" : "NO"),11}  {(joined ? ratio.ToString("0.00") : "-"),14}  {wallCells,10}  {Share(covered, wallCells),10}";
     }
 
     /// <summary>Fewest grid moves (four sides and diagonals) from one end to the other, over the straight distance.</summary>

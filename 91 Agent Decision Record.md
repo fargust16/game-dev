@@ -306,6 +306,8 @@ The text below was moved from `AGENTS.md` word for word on 2026-11-02, from vers
 
 The notes of `AGENTS.md`, newest first.
 
+2026-11-13 (Next Design Priority: S5 done and accepted, S5.8; S6 waits for the owner's authorisation)
+
 2026-11-13 (Combat rework: Perception is also every attack's secondary attribute, adopted by S5b.3's measurement)
 
 2026-11-13 (Combat rework: the owner's answers built in the slice, CR7: Will Power only with an Arcana, NPCs preparing by the seed and using the four new abilities, a Heavy weapon's walk)

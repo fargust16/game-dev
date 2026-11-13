@@ -103,6 +103,13 @@ unity/TerrainGenDump/**/*_verify.txt
 unity/Assets/_Disabled/
 unity/Assets/_Disabled.meta
 
+# Island concepts (tools/slice/island): what build.py and the stamp decoder write again; the plans, the height maps
+# and the previews beside them are kept.
+tools/slice/island/_cache/
+unity/Documentation/Terrain/Concepts/*/preview.npz
+unity/Documentation/Terrain/Concepts/*/texture.png
+unity/Documentation/Terrain/Concepts/*/views.json
+
 # Test and editor logs
 unity/*.log
 unity/ShellTestLog.txt
