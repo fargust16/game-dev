@@ -445,3 +445,38 @@ ui.fight.log.press,{0}: {1} — {2},{0}: {1} — {2}
 ui.fight.log.press.none,"{0}: {1}, nobody struck","{0}: {1}, никого не задело"
 ui.fight.log.press.hit,{0} {1},{0} {1}
 ui.fight.log.press.down,"{0} {1}, falls","{0} {1}, падает"
+"# Character creation (S5b.1; 07 Creation choices in V1): the page at a new run's start, and the attributes' names"
+attribute.strength,Strength,Сила
+attribute.endurance,Endurance,Выносливость
+attribute.dexterity,Dexterity,Ловкость
+attribute.perception,Perception,Восприятие
+attribute.intelligence,Intelligence,Интеллект
+attribute.will,Will,Воля
+attribute.luck,Luck,Удача
+ui.create.title,A new character,Новый персонаж
+ui.create.name,Name:,Имя:
+ui.create.sex,Sex,Пол
+ui.create.sex.man,A man,Мужчина
+ui.create.sex.woman,A woman,Женщина
+ui.create.look,Body,Облик
+ui.create.look.line,Body {0} of {1},Облик {0} из {1}
+ui.create.archetype,An archetype or free points,Архетип или свои очки
+ui.create.archetype.line,{0}: {1}. {2},{0}: {1}. {2}
+ui.create.archetype.fighter,Fighter,Боец
+ui.create.archetype.fighter.who,Lives by the body,Живёт телом
+ui.create.archetype.sleuth,Sleuth,Сыщик
+ui.create.archetype.sleuth.who,Lives by noticing,Живёт наблюдательностью
+ui.create.archetype.ragamuffin,Ragamuffin,Оборванец
+ui.create.archetype.ragamuffin.who,Survived the street on stubbornness and luck,Выжил на улице упрямством и везением
+ui.create.points,"Free points: {0}, {1} left","Свои очки: {0}, осталось {1}"
+ui.create.attributes,Attributes (a click adds a point),Характеристики (щелчок добавляет очко)
+ui.create.attribute.line,{0}  {1},{0}  {1}
+ui.create.points.reset,Take the points back,Сбросить очки
+ui.create.begin,Begin,Начать
+ui.create.hint,"Firearms and leather armour ask Dexterity 3; chain asks Strength 5, plate Strength 7.","Огнестрел и кожаная броня требуют Ловкости 3, кольчуга — Силы 5, латы — Силы 7."
+ui.create.note.name,Give the character a name,Дайте персонажу имя
+ui.create.note.points,Free points left: {0},Осталось свободных очков: {0}
+ui.create.note.spent,Every free point is spent,Все свободные очки потрачены
+ui.create.note.points.wrong,The points do not add up,Очки не сходятся
+ui.create.mark.on,●,●
+ui.create.mark.off,○,○

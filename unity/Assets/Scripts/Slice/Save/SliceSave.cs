@@ -31,6 +31,7 @@ namespace GameDev.Slice.Save
         // Parts of the sections several systems share.
         private const string SheetPart = "sheet";
         private const string StaminaPart = "stamina";
+        private const string IdentityPart = "identity";
         private const string BagPart = "bag";
         private const string OutfitPart = "outfit";
         private const string ObjectsPart = "objects";
@@ -235,6 +236,7 @@ namespace GameDev.Slice.Save
             }
 
             var player = FindAnyObjectByType<PlayerLocomotion>();
+            _world.WearLook(player);
             if (player != null && place.placed)
             {
                 player.Teleport(place.at, Quaternion.Euler(0f, place.yaw, 0f));
@@ -318,7 +320,11 @@ namespace GameDev.Slice.Save
             }
 
             var sheet = new CharacterSheetSaveContributor(w.Character);
-            var character = new List<ISavePart> { new SavePart(SheetPart, sheet.CapturePayload, p => sheet.RestorePayload(sheet.SectionVersion, p)) };
+            var character = new List<ISavePart>
+            {
+                new SavePart(SheetPart, sheet.CapturePayload, p => sheet.RestorePayload(sheet.SectionVersion, p)),
+                new SavePart(IdentityPart, () => JsonUtility.ToJson(w.Identity), p => w.Identity = JsonUtility.FromJson<GameDev.Slice.Creation.CharacterIdentity>(p)),
+            };
             if (w.Stamina != null)
             {
                 character.Add(new SavePart(StaminaPart, w.Stamina.Capture, w.Stamina.Restore));

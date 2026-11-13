@@ -39,6 +39,14 @@ namespace GameDev.Slice.Gear
             return held != null ? held : body.gameObject.AddComponent<HeldWeapons>();
         }
 
+        /// <summary>The body changed under the root (S5b.1): the held models went with the old hands, and the next draw finds the new ones.</summary>
+        public void Rebind()
+        {
+            _animator = null;
+            _main = _off = _mainSource = _offSource = null;
+            Drawn = false;
+        }
+
         /// <summary>The set's models into the hands: the weapon in the right, a shield or the second weapon in the left; fists and a Cartridge Pouch show none.</summary>
         public void Draw(WeaponModels models, WeaponSet set)
         {

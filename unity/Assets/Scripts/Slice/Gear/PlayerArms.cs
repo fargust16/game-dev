@@ -226,7 +226,8 @@ namespace GameDev.Slice.Gear
 
         private bool Find()
         {
-            if (_player == null)
+            // A body changed at creation (S5b.1) is read again.
+            if (_player == null || _animator == null)
             {
                 _player = FindAnyObjectByType<PlayerLocomotion>();
                 _animator = _player != null ? _player.GetComponentInChildren<Animator>() : null;

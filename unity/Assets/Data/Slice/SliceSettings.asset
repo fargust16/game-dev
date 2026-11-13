@@ -71,3 +71,22 @@ MonoBehaviour:
   - {fileID: -607346249, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
   - {fileID: 381300419, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
   - {fileID: 798309987, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
+  playerLooks:
+  - id: man
+    female: 0
+    player: {fileID: 4441021498772251407, guid: 25d65436298b13847b922e6bfb0f5fc0, type: 3}
+  - id: gentleman
+    female: 0
+    player: {fileID: 5776854258900826840, guid: b0bbbdf9493874d489899c66187fe953, type: 3}
+  - id: dockworker
+    female: 0
+    player: {fileID: 7944637493620763085, guid: 52174fe71860cd34aabb9a8c0bfbd141, type: 3}
+  - id: woman
+    female: 1
+    player: {fileID: 2621293692740443636, guid: d8d37a10e64073840b038b7aaceae6f0, type: 3}
+  - id: lady
+    female: 1
+    player: {fileID: 4684712759486300486, guid: fbb17db384ca2fb4284c063332a9c9b4, type: 3}
+  - id: working_woman
+    female: 1
+    player: {fileID: 996923433036572468, guid: 6f1702021cf68ef45891b4ffa149a76b, type: 3}

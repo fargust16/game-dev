@@ -142,7 +142,16 @@ namespace GameDev.Slice
         /// <summary>Whether a conversation is open on the HUD.</summary>
         public bool TalkOpen => Hud() is HudView hud && hud.IsDialogueOpen;
 
+        /// <summary>07 *Creation choices in V1* (S5b.1): the page at a new run's start; null before the world starts.</summary>
+        public GameDev.Slice.Creation.CharacterCreation Creation { get; private set; }
+
+        /// <summary>Who the character is: the name, the sex and the body, chosen at creation and kept in the save.</summary>
+        public GameDev.Slice.Creation.CharacterIdentity Identity { get; set; } = new GameDev.Slice.Creation.CharacterIdentity();
+
+        private bool CreationOpen => Creation != null && Creation.IsOpen;
+
         private bool _offer;
+        private bool _create;
 
         /// <summary>The slice's one world seed; every random choice forks it by name (SliceSeedStreams).</summary>
         public GameDev.World.Seed.IWorldSeed Seed { get; private set; }
@@ -396,6 +405,20 @@ namespace GameDev.Slice
             Save = gameObject.AddComponent<SliceSave>();
             Save.Configure(this, cityScene);
             _offer = Save.ShouldOffer();
+            Creation = gameObject.AddComponent<GameDev.Slice.Creation.CharacterCreation>();
+            Creation.Configure(Character, settings.PlayerLooks);
+            Identity = new GameDev.Slice.Creation.CharacterIdentity { look = Creation.FirstLook(false)?.id ?? string.Empty };
+            _create = !_offer && GameDev.Slice.Creation.CharacterCreation.ShouldOffer();
+        }
+
+        /// <summary>The body <see cref="Identity"/> names worn on <paramref name="player"/> (a loaded run's city is new).</summary>
+        public void WearLook(PlayerLocomotion player)
+        {
+            var look = Creation != null ? Creation.Find(Identity?.look) : null;
+            if (look != null)
+            {
+                GameDev.Slice.Creation.PlayerBody.Wear(player, look);
+            }
         }
 
         // The pages belong to whichever scene's HUD is up; the keys work in every scene the world lives through.
@@ -433,8 +456,13 @@ namespace GameDev.Slice
                 _offer = false;
                 OpenStart(hud);
             }
+            else if (_create)
+            {
+                _create = false;
+                OpenCreation(hud);
+            }
 
-            if (_menuPaused && !hud.IsMenuOpen)
+            if (_menuPaused && !hud.IsMenuOpen && !CreationOpen)
             {
                 Unpause(); // the menu closed by its own line or with its scene
             }
@@ -503,9 +531,9 @@ namespace GameDev.Slice
         /// </summary>
         private void Escape(HudView hud)
         {
-            if (hud.IsStartOpen)
+            if (hud.IsStartOpen || CreationOpen)
             {
-                return; // the start's offer is answered by its lines
+                return; // the start's offer and the creation page are answered by their lines
             }
 
             if (hud.IsMenuOpen)
@@ -559,13 +587,43 @@ namespace GameDev.Slice
                 {
                     Save.Decline();
                     CloseMenu(hud);
+                    if (GameDev.Slice.Creation.CharacterCreation.ShouldOffer())
+                    {
+                        OpenCreation(hud);
+                    }
                 });
             PauseUnderMenu(hud);
         }
 
+        /// <summary>07 (S5b.1): the creation page, the world stopped under it as under the menu until the life begins.</summary>
+        private void OpenCreation(HudView hud)
+        {
+            if (Creation != null && Creation.Open(hud, Begun))
+            {
+                Hold();
+            }
+        }
+
+        private void Begun(GameDev.Slice.Creation.CharacterIdentity identity)
+        {
+            Identity = identity;
+            Unpause();
+            Debug.Log($"[Slice] A new character: {identity.name}, {(identity.female ? "a woman" : "a man")}, body {identity.look}, attributes "
+                      + string.Join(" ", Enum.GetValues(typeof(CharacterAttribute)).Cast<CharacterAttribute>().Select(a => Character.Get(a))) + ".");
+        }
+
         private void PauseUnderMenu(HudView hud)
         {
-            if (!hud.IsMenuOpen || _menuPaused)
+            if (hud.IsMenuOpen)
+            {
+                Hold();
+            }
+        }
+
+        /// <summary>The world stopped: its clock paused and the frame's time at a stand.</summary>
+        private void Hold()
+        {
+            if (_menuPaused)
             {
                 return;
             }

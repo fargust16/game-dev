@@ -257,7 +257,29 @@ namespace GameDev.Locomotion
             // model stands on it with, meet the ground (owner's play test of 2026-11-11: the feet hung over it).
             var centre = _controller.center;
             _controller.center = new Vector3(centre.x, (_controller.height / 2f) + _controller.skinWidth, centre.z);
+            Bind();
+            GameInputService.EnsureExists();
+        }
+
+        /// <summary>
+        /// Reads the body's Animator again once the body under the root has been changed (character creation, S5b.1):
+        /// its parameters, its arms, and the state it plays from.
+        /// </summary>
+        public void Rebind()
+        {
+            Bind();
+            if (_animator != null && isActiveAndEnabled)
+            {
+                _playing = 0;
+                Enter(State == Move.Airborne ? Move.Airborne : CrouchShare > 0f ? Move.Crouched : Move.Grounded, true);
+            }
+        }
+
+        private void Bind()
+        {
+            // An old body switched off on its way out is not found.
             _animator = GetComponentInChildren<Animator>();
+            _arms = null;
             if (_animator != null)
             {
                 _animator.applyRootMotion = false;
@@ -276,8 +298,6 @@ namespace GameDev.Locomotion
                     };
                 }
             }
-
-            GameInputService.EnsureExists();
         }
 
         private void OnEnable()

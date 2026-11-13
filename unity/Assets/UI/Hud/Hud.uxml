@@ -51,9 +51,11 @@
         <ui:VisualElement name="shop" class="hud__notes">
             <ui:Label name="shop-title" class="hud__notes-title" text="" picking-mode="Ignore" />
             <ui:Label name="shop-money" class="hud__note" text="" picking-mode="Ignore" />
+            <!-- S5b.1: a text field the page may show, the character's name at creation. -->
+            <ui:TextField name="shop-field" class="hud__field" style="display: none;" />
             <ui:ScrollView name="shop-list" class="hud__notes-list" />
             <ui:Label name="shop-note" class="hud__bag-note" text="" picking-mode="Ignore" />
-            <ui:Label class="hud__reading-close hud__loc" text="ui.hud.shop.close" picking-mode="Ignore" />
+            <ui:Label name="shop-close" class="hud__reading-close hud__loc" text="ui.hud.shop.close" picking-mode="Ignore" />
         </ui:VisualElement>
         <ui:VisualElement name="bag" class="hud__notes">
             <ui:Label class="hud__notes-title hud__loc" text="ui.hud.bag.title" picking-mode="Ignore" />

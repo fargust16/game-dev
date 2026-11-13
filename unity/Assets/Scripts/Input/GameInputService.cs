@@ -112,6 +112,37 @@ namespace GameDev.Input
             _ui?.Enable();
         }
 
+        private bool _typing;
+
+        /// <summary>
+        /// While true every game key is off (S5b.1: the name typed at creation), so a letter opens no page and moves
+        /// nobody; the UI's own text input and clicks go on.
+        /// </summary>
+        public bool Typing
+        {
+            get => _typing;
+            set
+            {
+                if (_typing == value)
+                {
+                    return;
+                }
+
+                _typing = value;
+                if (value)
+                {
+                    _player?.Disable();
+                    _camera?.Disable();
+                    _world?.Disable();
+                    _ui?.Disable();
+                }
+                else
+                {
+                    EnableGameplayMaps();
+                }
+            }
+        }
+
         public Vector2 MoveVector => _move != null ? _move.ReadValue<Vector2>() : Vector2.zero;
         public bool ClickMovePressed => _clickMove != null && _clickMove.WasPressedThisFrame();
         public bool InteractPressed => _interact != null && _interact.WasPressedThisFrame();

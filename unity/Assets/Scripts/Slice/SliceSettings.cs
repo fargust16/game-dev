@@ -87,6 +87,12 @@ namespace GameDev.Slice
         [Tooltip("The fight hotbar's icons (Modern GDR pack, asset map), one for each FightAction after None in its order: end turn, wait, Defensive Stance, change weapons, First Aid, Stealth, Сбежать, Yield, Spare, Infusion. SliceConfrontSetup sets them.")]
         [SerializeField] private Sprite[] fightIcons;
 
+        [Header("Character creation (S5b.1)")]
+        [Tooltip("07 *Creation choices in V1*: the player's bodies offered at creation, each a player prefab whose Model is worn, men and women. SlicePlayerBodies sets them.")]
+        [SerializeField] private GameDev.Slice.Creation.PlayerLook[] playerLooks = new GameDev.Slice.Creation.PlayerLook[0];
+
+        public GameDev.Slice.Creation.PlayerLook[] PlayerLooks => playerLooks;
+
         public int Seed => seed;
 
         public SocialCheckRules SocialChecks => socialChecks;

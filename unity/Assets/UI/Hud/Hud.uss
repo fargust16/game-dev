@@ -162,6 +162,19 @@
     margin-bottom: 6px;
 }
 
+/* S5b.1: a text field over a page's list, the name at creation. */
+.hud__field {
+    font-size: 18px;
+    margin: 0 0 10px 0;
+}
+
+.hud__field > .unity-base-text-field__input {
+    background-color: rgb(52, 46, 36);
+    color: rgb(236, 228, 210);
+    border-color: rgb(140, 120, 84);
+    padding: 4px 8px;
+}
+
 .hud__bag-note {
     font-size: 16px;
     white-space: normal;

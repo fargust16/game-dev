@@ -1,10 +1,10 @@
 # 07 Character Life
 
-Version: 0.11
+Version: 0.12
 
 Status: Draft
 
-Last Updated: 2026-11-13 (Creation choices in the slice: a name, the sex and one of two or three models of that sex, by the owner's answer to S5-4; the archetypes measured again after the combat rework. Earlier: 2026-11-02: 9 free points and three archetypes set. Earlier: every character starts Uninitiated and Factionless; attribute start and Character Archetypes recorded; the Starting Faction retired. Earlier: terms renamed to Arcana and Limit. Earlier: Last Free City Rule recorded. Earlier: manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
+Last Updated: 2026-11-13 (The archetypes measured again after the combat rework: the spreads stand, S5b.1. Earlier: Creation choices in the slice: a name, the sex and one of two or three models of that sex, by the owner's answer to S5-4; the archetypes measured again after the combat rework. Earlier: 2026-11-02: 9 free points and three archetypes set. Earlier: every character starts Uninitiated and Factionless; attribute start and Character Archetypes recorded; the Starting Faction retired. Earlier: terms renamed to Arcana and Limit. Earlier: Last Free City Rule recorded. Earlier: manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md)
@@ -126,7 +126,9 @@ In the slice (owner, 2026-11-13, the answer to S5-4) the player chooses:
 - the sex, which changes no rule, only the model and the words addressed to the character;
 - one of two or three models of that sex. The owner makes them in Tripo; until then the choice offers the slice's present Tripo people.
 
-Russian lines are written so that they do not depend on the character's sex, and where they cannot, they carry two variants (authoring rule). The archetypes' spreads are measured again after the combat rework (S5b.1), since with firearms first the Strength of a Боец gives little.
+Russian lines are written so that they do not depend on the character's sex, and where they cannot, they carry two variants (authoring rule).
+
+The archetypes' spreads were measured again after the combat rework (S5b.1, 2026-11-13, `tools/balance/archetype_sim.py`), since with firearms first the Strength of a Боец seemed to give little. Each start, uninitiated and with every skill at 1, fought a pistol duel with a Warden's like from 6 cells and a wolf from 8. In the same leather the three archetypes and a 9-point shooter win 42–50 % of the duels and about 90 % against the wolf, the Сыщик a little ahead by its critical chance. The Боец's Strength 6 is the only start that meets chain's Strength 5 with no Load penalty, and in chain it wins 66 %; in the clothes it starts in, 25 % against a Сыщик's 31 %. So Strength is not empty: it opens chain and the comfortable load, and the spreads stand (authoring defaults). A start that leaves Dexterity at 1 aims a firearm at a third and wins 4 %, so the creation page names the requirements: firearms and leather Dexterity 3, chain Strength 5, plate Strength 7.
 
 System-critical rules for V1:
 

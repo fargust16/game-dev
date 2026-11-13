@@ -53,6 +53,8 @@ namespace GameDev.UI
         private Label _shopMoney;
         private ScrollView _shopList;
         private Label _shopNote;
+        private TextField _shopField;
+        private System.Action<string> _shopFieldChanged;
         private readonly List<System.Action> _shopActions = new List<System.Action>();
         private readonly List<System.Action> _bagActions = new List<System.Action>();
         private CityMapElement _mapView;
@@ -550,8 +552,64 @@ namespace GameDev.UI
 
         public void CloseShop()
         {
+            HideShopField();
             _shop?.RemoveFromClassList(NotesVisible);
         }
+
+        /// <summary>The text field over the shop page's list, or null when hidden.</summary>
+        public string ShopFieldText => _shopField != null && _shopField.style.display != DisplayStyle.None ? _shopField.value : null;
+
+        /// <summary>
+        /// A text field over the shop page's list (S5b.1: the name at creation), with its value; each change is told to
+        /// <paramref name="changed"/>. Closing the page hides it.
+        /// </summary>
+        public void ShowShopField(string value, System.Action<string> changed)
+        {
+            if (!Bind() || _shopField == null)
+            {
+                return;
+            }
+
+            _shopFieldChanged = null;
+            _shopField.SetValueWithoutNotify(value ?? string.Empty);
+            _shopField.style.display = DisplayStyle.Flex;
+            _shopFieldChanged = changed;
+        }
+
+        /// <summary>Types into the shop page's field as the keyboard does; false when it is hidden.</summary>
+        public bool TypeShopField(string value)
+        {
+            if (ShopFieldText == null)
+            {
+                return false;
+            }
+
+            _shopField.value = value ?? string.Empty;
+            return true;
+        }
+
+        public void HideShopField()
+        {
+            _shopFieldChanged = null;
+            if (_shopField != null)
+            {
+                _shopField.style.display = DisplayStyle.None;
+            }
+
+            ShowShopClose(true);
+        }
+
+        /// <summary>Shows or hides the page's "Esc closes" line: a page Esc does not close (creation) hides it while it is open.</summary>
+        public void ShowShopClose(bool shown)
+        {
+            var close = _shop?.Q<Label>("shop-close");
+            if (close != null)
+            {
+                close.style.display = shown ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+        }
+
+        private void OnShopField(ChangeEvent<string> change) => _shopFieldChanged?.Invoke(change.newValue);
 
         /// <summary>Clicks the n-th line of the shop's list, as the mouse does; false if it has no action.</summary>
         public bool ClickShopLine(int index)
@@ -736,6 +794,13 @@ namespace GameDev.UI
             _shopMoney = root.Q<Label>("shop-money");
             _shopList = root.Q<ScrollView>("shop-list");
             _shopNote = root.Q<Label>("shop-note");
+            _shopField = root.Q<TextField>("shop-field");
+            if (_shopField != null)
+            {
+                _shopField.maxLength = 24;
+                _shopField.UnregisterValueChangedCallback(OnShopField);
+                _shopField.RegisterValueChangedCallback(OnShopField);
+            }
             _map = root.Q<VisualElement>("map");
             _dialogue = root.Q<VisualElement>("dialogue");
             _dialogueLines = root.Q<ScrollView>("dialogue-lines");
