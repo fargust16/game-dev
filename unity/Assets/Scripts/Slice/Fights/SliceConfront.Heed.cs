@@ -12,6 +12,9 @@ namespace GameDev.Slice.Fights
     /// </summary>
     public sealed partial class SliceConfront
     {
+        // The townsfolk who went to look at an Alarm since the fight began.
+        private readonly System.Collections.Generic.List<Transform> _lookers = new System.Collections.Generic.List<Transform>();
+
         /// <summary>The walkers the last Alarm sent to look and away.</summary>
         public int LastLooked { get; private set; }
 
@@ -44,6 +47,10 @@ namespace GameDev.Slice.Fights
                     if (look)
                     {
                         LastLooked++;
+                        if (!_lookers.Contains(body))
+                        {
+                            _lookers.Add(body); // one a whistling Warden may send running (10.2 §5e; S5c.7)
+                        }
                     }
                     else
                     {

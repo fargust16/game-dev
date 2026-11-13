@@ -159,6 +159,41 @@ namespace GameDev.Slice.Tests
             Debug.Log($"[AlarmCheck] {hearers.Count} walkers hear the shot: {looked} go to look, {away} walk away.");
         }
 
+        /// <summary>10.2 §5e (S5c.7): a whistling Warden sends the nearest who came to look running to a post beyond the whistle.</summary>
+        [UnityTest]
+        public IEnumerator AWhistleSendsOneWhoCameToLookRunningToAPostBeyondIt()
+        {
+            yield return ForgetTheWorld();
+            yield return LoadScene(Veilmouth);
+            var fights = SliceWorldDriver.Running.Fights;
+            yield return new WaitForSeconds(0.5f);
+            var walkers = Object.FindObjectsByType<TownsfolkWalker>(FindObjectsSortMode.InstanceID)
+                .Where(w => w.isActiveAndEnabled && !w.Inside && w.Route.Length >= 2 && !w.Away && !w.Seated).ToList();
+            Assert.IsFalse(fights.SendALooker(walkers[0].transform.position), "nobody came to look: only the whistle calls");
+
+            var at = Vector3.zero;
+            foreach (var w in walkers)
+            {
+                at = w.transform.position + new Vector3(3f, 0f, 3f);
+                SliceAlarm.Raise(new Alarm(AlarmKind.Shot, at, null));
+                if (fights.LastLooked > 0)
+                {
+                    break;
+                }
+            }
+
+            Assert.Greater(fights.LastLooked, 0, "someone went to look");
+            var lookers = walkers.Where(w => w.Heeding && w.GoesToLook).Select(w => w.transform).ToList();
+            Assert.IsTrue(fights.SendALooker(at), "a post stands beyond the whistle");
+            Assert.AreEqual(1, fights.Runners);
+            var run = Object.FindObjectsByType<HelpRun>(FindObjectsSortMode.None).Single();
+            Assert.IsTrue(lookers.Contains(run.transform), "the runner is one who came to look");
+            Assert.AreEqual(lookers.OrderBy(b => (b.position - at).sqrMagnitude).First(), run.transform, "the nearest of them");
+            var eyes = run.GetComponentInChildren<GameDev.Slice.Stealth.StealthObserver>();
+            Assert.IsNotNull(eyes);
+            Assert.AreEqual(GameDev.Core.Localization.Loc.Get("ui.fight.help.runner"), eyes.Line, "it says where it runs");
+        }
+
         /// <summary>Wolves converge on an Alarm in their territory, Alert; a boar runs to the far side of its own.</summary>
         [UnityTest]
         public IEnumerator WolvesConvergeOnAnAlarmAndABoarScatters()

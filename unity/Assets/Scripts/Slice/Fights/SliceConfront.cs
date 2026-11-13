@@ -562,6 +562,7 @@ namespace GameDev.Slice.Fights
             ShowAbilities(_playerCombatant);
             ResetLeaving();
             Whistled = false;
+            _lookers.Clear();
             foreach (var c in request.Combatants)
             {
                 _nextId = Mathf.Max(_nextId, c.Id + 1); // a Warden who comes takes an id nobody holds (10.2 §5e)

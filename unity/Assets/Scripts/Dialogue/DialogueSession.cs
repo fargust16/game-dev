@@ -52,6 +52,12 @@ namespace GameDev.Dialogue
 
         /// <summary>Spends that much bronze; true when paid.</summary>
         public Func<int, bool> Spend { get; set; }
+
+        /// <summary>
+        /// 09 *News Pool* (S5c.7): what a source tells of the pool now, given the tips it says, each a line that follows
+        /// the language; null for none.
+        /// </summary>
+        public Func<TipSource, IReadOnlyList<Tip>, IReadOnlyList<Func<string>>> News { get; set; }
     }
 
     /// <summary>
@@ -90,6 +96,9 @@ namespace GameDev.Dialogue
         public DialogueNode Node { get; private set; }
 
         public IReadOnlyList<Tip> Said { get; private set; } = new Tip[0];
+
+        /// <summary>The News items said on arriving, after the tips (S5c.7).</summary>
+        public IReadOnlyList<Func<string>> NewsSaid { get; private set; } = new Func<string>[0];
 
         public DialogueEnd? EndedHow { get; private set; }
 
@@ -287,6 +296,7 @@ namespace GameDev.Dialogue
             }
 
             Said = said;
+            NewsSaid = node.saysTips && _world.News != null ? _world.News(node.source, said) ?? new Func<string>[0] : new Func<string>[0];
         }
 
         /// <summary>Raises its keys, settles its POI, tells its tips, then lets its minutes pass; returns the tips told.</summary>
@@ -326,6 +336,7 @@ namespace GameDev.Dialogue
             _pause = null;
             Node = null;
             Said = new Tip[0];
+            NewsSaid = new Func<string>[0];
             EndedHow = how;
             _world.Clock.AdvanceTicks(1);
             Ended?.Invoke(how);

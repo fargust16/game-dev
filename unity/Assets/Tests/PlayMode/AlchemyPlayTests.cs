@@ -118,7 +118,11 @@ namespace GameDev.Slice.Tests
         /// <summary>Opens the bench's page, clicks the Limit 9 Priestess potion and stops each of the six bars in its perfect zone.</summary>
         private IEnumerator Brew(SliceWorldDriver world, AlchemyBench bench, int fee, string heading)
         {
-            world.Bag.Add("formula_priestess_9");
+            if (world.Bag.Count("formula_priestess_9") == 0)
+            {
+                world.Bag.Add("formula_priestess_9"); // a member has it from Faction Entry (S5c.4)
+            }
+
             world.Bag.Add("herb", 3);
             world.Bag.Add("wolf_fang", 1);
             world.Bag.Add("glow_essence_9", 1);

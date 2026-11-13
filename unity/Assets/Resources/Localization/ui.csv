@@ -155,6 +155,11 @@ ui.fight.noflee.near,An enemy is nearer than 15 cells,Враг ближе 15 к�
 ui.fight.help.call,Help! Help!,Помогите! На помощь!
 ui.fight.help.heard,What was that?,Что там такое?
 ui.fight.help.warden,Stop! Wardens!,Стоять! Стража!
+ui.fight.help.runner,"To the Wardens, quick!","Бегу за стражей!"
+ui.prompt.fallen.search,E  Search the body,E  Обыскать тело
+ui.fallen.nothing,"Nothing on the body worth taking.","На теле нет ничего, что стоило бы взять."
+ui.fallen.taken,"You take from the body: {0}.","Вы забираете с тела: {0}."
+ui.fallen.heavy,"Too heavy to carry: {0}.","Слишком тяжело, чтобы унести: {0}."
 ui.fight.whistle,*a whistle* To me! Wardens!,*свисток* Ко мне! Стража!
 ui.fight.shot.heard,A shot? This way!,Выстрел? Туда!
 ui.shot.graze,Grazed,Вскользь
@@ -372,6 +377,34 @@ news.ago.9,about nine hours ago,около девяти часов назад
 news.ago.10,about ten hours ago,около десяти часов назад
 news.place.town,Veilmouth,Вейлмут
 news.place.outside,outside the walls,за городскими стенами
+news.a.arrest.board,Warden action at Harrow & Tincture.,Стража проводит задержание в «Харроу и Тинктуре».
+news.a.arrest.nell,"They're at old Harrow's now, brass-numbers on the step.","Медные номера сейчас у старого Харроу, стоят на крыльце."
+news.a.arrest.kit,"Brass-numbers at Harrow's door, right now! A whole crowd watching!","Медные номера у дверей Харроу, прямо сейчас! Целая толпа глазеет!"
+news.a.arrest.note,Word in town: the Wardens came to arrest Harrow at his shop.,В городе говорят: стража пришла арестовать Харроу в его лавке.
+news.a.sealed.board,Harrow & Tincture sealed by order of the Wardens.,«Харроу и Тинктура» опечатана по приказу стражи.
+news.a.sealed.nell,They took Harrow. Seal on the door.,Харроу забрали. На двери печать.
+news.a.sealed.kit,"Wax on Harrow's door, and no Harrow.","На двери Харроу сургуч, а самого Харроу нет."
+news.a.sealed.note,Word in town: the Wardens took Harrow and sealed his shop.,В городе говорят: стража забрала Харроу и опечатала его лавку.
+news.a.defended.nell,Someone stood up for Harrow. Brass-numbers went off sour.,Кто-то вступился за Харроу. Медные номера ушли ни с чем.
+news.a.defended.kit,Harrow's still pouring. Wardens got told.,Харроу всё ещё торгует микстурами. Стражу отшили.
+news.a.defended.note,"Word in town: someone stood up for Harrow, and the Wardens left without him.","В городе говорят: кто-то вступился за Харроу, и стража ушла без него."
+news.a.gone.board,"Wanted for questioning: J. Harrow, apothecary.","Разыскивается для допроса: Дж. Харроу, аптекарь."
+news.a.gone.nell,"Harrow's gone out the back. Drawers empty, glass all over.","Харроу ушёл чёрным ходом. Ящики пустые, кругом битое стекло."
+news.a.gone.kit,"Harrow's flown, and somebody cleaned out his drawers!","Харроу сбежал, а кто-то выгреб его ящики!"
+news.a.gone.note,"Word in town: Harrow fled before the Wardens, and his drawers were emptied.","В городе говорят: Харроу сбежал от стражи, а его ящики выпотрошили."
+news.b.snatch.kit,"Coach on Draught Lane, no lamps.",В переулке Сквозняк карета без фонарей.
+news.b.snatch.note,Word in town: a coach with no lamps stood on Draught Lane at night.,В городе говорят: ночью в переулке Сквозняк стояла карета без фонарей.
+news.b.freed.nell,The mill girls came home last night. Someone saw the collectors off.,Фабричные девушки этой ночью вернулись домой. Кто-то прогнал сборщиков.
+news.b.freed.kit,Collectors got a bloody nose on Draught Lane.,Сборщикам расквасили нос в переулке Сквозняк.
+news.b.freed.note,"Word in town: someone saw the collectors off Draught Lane, and the mill girls came home.","В городе говорят: кто-то прогнал сборщиков из переулка Сквозняк, и фабричные девушки вернулись домой."
+news.b.taken.board,"Missing — two more mill girls, Draught Lane.","Пропали ещё две фабричные девушки, переулок Сквозняк."
+news.b.taken.nell,Two more girls gone off the Lane.,Из переулка пропали ещё две девушки.
+news.b.taken.kit,Two more mill girls gone! A coach took 'em!,Ещё две фабричные девчонки пропали! Карета увезла!
+news.b.taken.note,Word in town: the collectors took two more mill girls off Draught Lane.,В городе говорят: сборщики увели из переулка Сквозняк ещё двух фабричных девушек.
+news.b.spoiled.nell,The coach ran empty last night. Somebody spooked them.,Карета этой ночью уехала пустой. Кто-то их спугнул.
+news.b.spoiled.kit,Collectors ran with nothing.,Сборщики удрали ни с чем.
+news.b.spoiled.note,"Word in town: somebody spooked the collectors, and their coach ran empty.","В городе говорят: кто-то спугнул сборщиков, и их карета уехала пустой."
+news.death.note,"A body was found: {0}. Where: {1}, day {2}, about {3}.","Найдено тело: {0}. Место: {1}, день {2}, около {3}."
 ui.fight.god.came,The goddess has shown us this place!,Богиня указала нам это место!
 ability.keen_ear.name,Keen Ear,Чуткое ухо
 ability.keen_ear.text,"Passive. In a conversation you see that the speaker lies, though not about what.","Пассивная. В разговоре видно, что собеседник лжёт, но не видно, в чём."

@@ -133,7 +133,7 @@ namespace GameDev.Slice.Shops
                     var name = Loc.Get("ui.lesson." + l);
                     lines.Add(shops.Knows(l)
                         ? new PageLine(Loc.Format("ui.shop.lesson.known", name))
-                        : new PageLine(Loc.Format("ui.shop.lesson", name, Coins.Show(shops.Rules.LessonPrice)), () => Act(shops.Learn(Keeper, l), "ui.shop.learned", null, name)));
+                        : new PageLine(Loc.Format("ui.shop.lesson", name, Coins.Show(shops.LessonPrice(Keeper))), () => Act(shops.Learn(Keeper, l), "ui.shop.learned", null, name)));
                 }
             }
 
@@ -163,7 +163,7 @@ namespace GameDev.Slice.Shops
                 }
             }
 
-            var title = Loc.Format("ui.shop.title", Loc.Get(GameDev.Slice.People.SliceRoster.NameKey(Keeper)));
+            var title = Loc.Format("ui.shop.title", Loc.Get(GameDev.Slice.People.SliceRoster.NameKey(shops.Keeper(Keeper)))); // Pip's, when he keeps it (S5c.7)
             _hud.ShowShop(title, BagPage.Money(world.Bag), lines, _note ?? Loc.Get("ui.shop.hint"));
         }
 

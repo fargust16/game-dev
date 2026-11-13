@@ -40,6 +40,9 @@ namespace GameDev.Player.Progression
         /// <summary>The XP a Hidden Cache found gives Luck, beside Perception's check (07.1 §3).</summary>
         public const double CacheLuckXp = 2;
 
+        /// <summary>The XP a searched body's recovery roll gives Luck, its only attribute (19 §6; S5c.7).</summary>
+        public const double RecoveryLuckXp = 2;
+
         /// <summary>Levels 1–9 are stage 9, 10–19 stage 8, and so on to 90–99 at stage 0.</summary>
         public static int Stage(int level) => 9 - Math.Min(9, Math.Max(0, level) / 10);
 

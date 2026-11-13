@@ -31,7 +31,7 @@ namespace GameDev.Slice
         private PlayerLocomotion _player;
         private HudView _hud;
         private IReadOnlyList<Tip> _shown = new Tip[0];
-        private IReadOnlyList<GameDev.Slice.News.SliceNews.Item> _news = new GameDev.Slice.News.SliceNews.Item[0];
+        private IReadOnlyList<System.Func<string>> _news = new System.Func<string>[0];
         private long _readAt;
 
         public TipSource Source => source;
@@ -69,9 +69,11 @@ namespace GameDev.Slice
             }
 
             _shown = world.Tips.Read(source, world.Clock.Tick);
-            // 09 *News Pool* (PB8d): the board pins what the city is talking about, the newest first, after its notices.
+            // 09 *News Pool* (PB8d, S5c.7): the board pins what the city is talking about, the newest first, after its
+            // notices, leaving out an outcome one of its notices already tells.
             _readAt = world.Clock.Tick;
-            _news = source == TipSource.NoticeBoard && world.News != null ? world.News.Told(_readAt) : new GameDev.Slice.News.SliceNews.Item[0];
+            var shown = _shown;
+            _news = world.News != null ? world.News.Tell(source, _readAt, key => GameDev.Slice.News.SliceNews.ToldBy(shown, key)) : new System.Func<string>[0];
             IsOpen = true;
             Show();
         }
@@ -81,7 +83,7 @@ namespace GameDev.Slice
         {
             if (IsOpen)
             {
-                var lines = _shown.Select(t => t.Line).Concat(_news.Select(n => GameDev.Slice.News.SliceNews.Line(n, _readAt))).ToList();
+                var lines = _shown.Select(t => t.Line).Concat(_news.Select(n => n())).ToList();
                 Hud()?.ShowReading(Loc.Get(titleKey), lines.Count > 0 ? string.Join("\n\n", lines) : Loc.Get(nothingKey));
             }
         }

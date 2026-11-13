@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using GameDev.Confront.Rules;
 using GameDev.Confront.Turns;
 using GameDev.Locomotion;
 using GameDev.Slice.News;
@@ -183,6 +185,34 @@ namespace GameDev.Slice.Fights
             }
 
             PersonDied(body.position, VictimOf(body, Group(target)), seen ? KillerOf(attacker) : NewsKiller.Unseen);
+            Recovery?.Leave(body, GearOf(target.Fighter));
+        }
+
+        /// <summary>19 §6 (S5c.7): a fallen person's equipment, recovered piece by piece when its body is searched; set by the world.</summary>
+        public SliceRecovery Recovery { get; set; }
+
+        /// <summary>The items of a fighter's equipment, both sets, by id: those the catalogue makes, so neither fists nor the baton.</summary>
+        public List<string> GearOf(Fighter fighter)
+        {
+            var ids = new List<string>();
+            if (fighter == null || _settings == null || _settings.Items == null)
+            {
+                return ids;
+            }
+
+            foreach (var set in new[] { fighter.Set, fighter.Second })
+            {
+                foreach (var part in new ScriptableObject[] { set.Weapon, set.OffHand, set.OffWeapon })
+                {
+                    var item = part != null ? _settings.Items.Items.FirstOrDefault(i => i != null && i.fight == part) : null;
+                    if (item != null)
+                    {
+                        ids.Add(item.id);
+                    }
+                }
+            }
+
+            return ids;
         }
 
         /// <summary>The Aimed Shot killed a person: seen if anyone else in sight sees the character, out of Stealth Mode.</summary>
@@ -202,7 +232,9 @@ namespace GameDev.Slice.Fights
                 }
             }
 
-            PersonDied(body.position, VictimOf(body, PeopleAround.IsWarden(body) ? Wardens : Residents), seen ? NewsKiller.Character : NewsKiller.Unseen);
+            var group = PeopleAround.IsWarden(body) ? Wardens : Residents;
+            PersonDied(body.position, VictimOf(body, group), seen ? NewsKiller.Character : NewsKiller.Unseen);
+            Recovery?.Leave(body, GearOf(Armed(body, group))); // what it would have fought with (19 §6, S5c.7)
         }
 
         private NewsKiller KillerOf(Combatant attacker)

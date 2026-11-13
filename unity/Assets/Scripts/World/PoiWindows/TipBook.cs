@@ -83,6 +83,17 @@ namespace GameDev.World.Poi
 
         public bool HasHeard(Tip tip) => _state.IsSet(HeardKey(tip));
 
+        /// <summary>Its place in the order things were heard; 0 while unheard.</summary>
+        public int PlaceOf(Tip tip) => _state.Get(HeardKey(tip));
+
+        /// <summary>The next place in the order things are heard, which the News Pool's items share (09 reading 5; S5c.7).</summary>
+        public int TakePlace()
+        {
+            var place = _state.Get(HeardCount) + 1;
+            _state.Set(HeardCount, place);
+            return place;
+        }
+
         /// <summary>Every heard tip, first heard first.</summary>
         public IReadOnlyList<Tip> HeardInOrder() =>
             _tips.Where(HasHeard).OrderBy(t => _state.Get(HeardKey(t))).ToList();
@@ -94,9 +105,7 @@ namespace GameDev.World.Poi
                 return;
             }
 
-            var place = _state.Get(HeardCount) + 1;
-            _state.Set(HeardCount, place);
-            _state.Set(HeardKey(tip), place);
+            _state.Set(HeardKey(tip), TakePlace());
             Discover(tip);
             Heard?.Invoke(tip);
         }

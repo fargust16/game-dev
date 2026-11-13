@@ -118,11 +118,14 @@ namespace GameDev.Slice
 
         public const string CacheLocks = "slice.caches.locks";
 
+        /// <summary>19 §6 (S5c.7): a fallen person's equipment recovered piece by piece, forked with its body.</summary>
+        public const string Recovery = "slice.recovery";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
             ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens, Roles, Search, Shots, Boldness, News, GodNotices,
-            Prepared, Alchemy, Abilities, Sleep, FactionGift, Locks, Residents, Stash, TheftAnswer, Caches, CacheLocks,
+            Prepared, Alchemy, Abilities, Sleep, FactionGift, Locks, Residents, Stash, TheftAnswer, Caches, CacheLocks, Recovery,
 
         };
     }

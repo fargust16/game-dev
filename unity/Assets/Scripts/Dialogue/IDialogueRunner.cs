@@ -74,6 +74,9 @@ namespace GameDev.Dialogue
         /// <summary>The tips said on arriving at the node (09; S2.4); with none, the node's own line is said.</summary>
         IReadOnlyList<Tip> Said { get; }
 
+        /// <summary>The News items said after the tips on arriving at the node (09 § News Pool; S5c.7), each read when shown.</summary>
+        IReadOnlyList<Func<string>> NewsSaid { get; }
+
         /// <summary>How it ended, once it has.</summary>
         DialogueEnd? EndedHow { get; }
 

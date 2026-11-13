@@ -195,13 +195,13 @@ namespace GameDev.Slice
             return value < 0 ? "−" + (-value).ToString(CultureInfo.InvariantCulture) : "0";
         }
 
-        // The tips said on arriving take the place of the node's line; the line is said when there are none.
+        // The tips said on arriving, then the News (S5c.7), take the place of the node's line; the line is said when there are none.
         private void Hear()
         {
             var node = _talk.Node;
             var speaker = dialogue.Listener(node.speaker)?.nameKey;
             Func<string> name = () => string.IsNullOrEmpty(speaker) ? null : Loc.Get(speaker);
-            if (_talk.Said.Count == 0)
+            if (_talk.Said.Count == 0 && _talk.NewsSaid.Count == 0)
             {
                 _history.Add(() => (name(), Heard(dialogue, node)));
                 return;
@@ -210,6 +210,11 @@ namespace GameDev.Slice
             foreach (var tip in _talk.Said)
             {
                 _history.Add(() => (name(), tip.Line));
+            }
+
+            foreach (var news in _talk.NewsSaid)
+            {
+                _history.Add(() => (name(), news()));
             }
         }
 

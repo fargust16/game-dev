@@ -81,11 +81,23 @@ namespace GameDev.Slice.Shops
         /// </summary>
         public Func<string, bool> KeeperAtWork { get; set; }
 
-        /// <summary>A shop and its workshop are open in the shops' hours while their keeper is at work: never while it is away, asleep or hiding.</summary>
-        public bool IsOpenFor(string keeper) => IsOpen && (KeeperAtWork == null || KeeperAtWork(keeper));
+        /// <summary>
+        /// 11 *Shops and Masters* (S5c.7): who keeps a shop now, given its keeper: the keeper, or one who took the shop
+        /// over when the keeper was lost (<see cref="ShopStandIn"/>); the driver sets it, and with none every keeper keeps its own.
+        /// </summary>
+        public Func<string, string> KeptBy { get; set; }
+
+        /// <summary>The one who keeps <paramref name="keeper"/>'s shop now.</summary>
+        public string Keeper(string keeper) => KeptBy?.Invoke(keeper) ?? keeper;
+
+        /// <summary>11: a lesson costs the shops' price, and twice that from one who took a shop over.</summary>
+        public int LessonPrice(string keeper) => Keeper(keeper) == keeper ? _rules.LessonPrice : _rules.LessonPrice * ShopStandIn.LessonFactor;
+
+        /// <summary>A shop and its workshop are open in the shops' hours while the one who keeps it is at work: never while it is away, asleep or hiding.</summary>
+        public bool IsOpenFor(string keeper) => IsOpen && (KeeperAtWork == null || KeeperAtWork(Keeper(keeper)));
 
         /// <summary>The hour a keeper's shop opens, as its closed sign shows it: its work's by its hours, else the shops'.</summary>
-        public int Opens(string keeper) => GameDev.Slice.People.SliceHours.WorkOpens(keeper) ?? _rules.Opens;
+        public int Opens(string keeper) => GameDev.Slice.People.SliceHours.WorkOpens(Keeper(keeper)) ?? _rules.Opens;
 
         /// <summary>19 §6.1 World Age: the Shop Skill of today's shelves.</summary>
         public int ShopSkill => _rules.ShopSkill + (_rules.SkillPerDay * (ShelfDay - 1));
@@ -233,7 +245,7 @@ namespace GameDev.Slice.Shops
                 return "ui.shop.fault.known";
             }
 
-            if (!_bag.Spend(_rules.LessonPrice))
+            if (!_bag.Spend(LessonPrice(keeper)))
             {
                 return "ui.shop.fault.money";
             }

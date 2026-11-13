@@ -135,6 +135,7 @@ namespace GameDev.Slice.Fights
             _nextId = 2;
             _lastRound = 0;
             Whistled = false;
+            _lookers.Clear();
             _there.Clear();
             if (warden)
             {

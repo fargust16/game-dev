@@ -2,7 +2,7 @@
 
 Status: Draft — written by the agent on 2026-11-13 as authoring defaults on the owner's grant of autonomous work for S5, with no review stop; shown to the owner in S5's final report. Every name, line and number here may be changed by the owner.
 Created: 2026-11-13
-Last Updated: 2026-11-13 (§5.2: the Hidden Caches as built in S5c.6, the agent's readings in 99 VS-CACHES. Earlier: §1.6: the trial as built in S5c.4, the agent's readings in 99 VS-TRIAL. Earlier: §1.5, §4: the benches as built in S5b.4: the faction's in its archive, the house having one storey; the den in the warehouse by Tipsy Pier; Kit tells of it every day; no keeper stands at the den's bench (99 VS-BREW). Earlier: first version, D1)
+Last Updated: 2026-11-13 (§6.1: the News of POI A and B as built in S5c.7, the agent's readings in 99 VS-NEWS. Earlier: §5.2: the Hidden Caches as built in S5c.6, the agent's readings in 99 VS-CACHES. Earlier: §1.6: the trial as built in S5c.4, the agent's readings in 99 VS-TRIAL. Earlier: §1.5, §4: the benches as built in S5b.4: the faction's in its archive, the house having one storey; the den in the warehouse by Tipsy Pier; Kit tells of it every day; no keeper stands at the den's bench (99 VS-BREW). Earlier: first version, D1)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md) *Limited forms* and *The first-day trial*, [05.1 Arcana and Limits](../../../05.1%20Arcana%20and%20Limits.md), [19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.2–6.3, [20 Alchemy and Potioncraft](../../../20%20Alchemy%20and%20Potioncraft.md) §3, [09 Information Sources](../../../09%20Information%20Sources.md) § News Pool, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) S5b, S5c and §5
 Related: [SLICE_PEOPLE.md](SLICE_PEOPLE.md) (the people, their schedules and Чужой сон's lines), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §21, §29 (places)
 
@@ -259,3 +259,7 @@ The News Pool's items for POI A's and B's outcomes (09 § News Pool; owner, NEWS
 | POI B, the snatch spoiled | — | Nell: "The coach ran empty last night. Somebody spooked them." Kit: "Collectors ran with nothing." | Nell, Kit |
 
 A Warden's whistle or a fight seen at either POI also adds its deaths as 10.2 §5e's items do.
+
+### 6.1 As built in S5c.7
+
+The agent's readings, in 99 VS-NEWS. The table's lines are the game's, with three for Kit it left blank, written by the agent: the arrest under way ("Brass-numbers at Harrow's door, right now! A whole crowd watching!"), Harrow gone ("Harrow's flown, and somebody cleaned out his drawers!") and the girls taken ("Two more mill girls gone! A coach took 'em!"). Each item also has a note, the fact it leaves in the Character Notes, «В городе говорят: …». An item enters a tick after its Aftermath key or its POI's opening and is told for 8 game hours: by the board after its notices, by Nell and Kit after their tips, present items first and then the newest. An item a teller's own tip already tells is left out: a tip of that outcome, or the teller's tip of the POI under way, as Nell's of the arrest tonight. Strings: `news.<event>.<board|nell|kit|note>` in `ui`.

@@ -59,8 +59,14 @@ namespace GameDev.Slice
 
         public TipBook Tips { get; private set; }
 
-        /// <summary>Veilmouth's News Pool (09; PB8d): what the city is talking about, told by the Notice Board.</summary>
+        /// <summary>Veilmouth's News Pool (09; PB8d, S5c.7): what the city is talking about, told by the board, Nell and Kit.</summary>
         public GameDev.Slice.News.SliceNews News { get; private set; }
+
+        /// <summary>11 (S5c.7): Pip Vance keeping Harrow's shop once Harrow is lost.</summary>
+        public ShopStandIn StandIn { get; private set; }
+
+        /// <summary>19 §6 (S5c.7): what a fallen person carried, recovered piece by piece when its body is searched.</summary>
+        public GameDev.Slice.People.SliceRecovery Recovery { get; private set; }
 
         public IWorldClock Clock { get; private set; }
 
@@ -388,6 +394,9 @@ namespace GameDev.Slice
             {
                 Shops = new SliceShops(settings.Shops, settings.Items, seed, Clock, Bag, State);
                 Shops.KeeperAtWork = Hours.AtWork;
+                StandIn = new ShopStandIn(State, Hours.Gone); // 11: Pip keeps Harrow's shop once Harrow is lost (S5c.7)
+                Shops.KeptBy = keeper => StandIn.KeptBy(keeper, Clock.Tick);
+                Clock.TickBoundary += NoticeStandIn;
                 Workshop = new SliceWorkshop(Shops, settings.Items, seed, Clock, Bag, State, Character);
                 Alchemy = new GameDev.Slice.Alchemy.SliceAlchemy(Shops, settings.Items, seed, Clock, Bag, State, Character);
                 OpenCounters();
@@ -489,9 +498,18 @@ namespace GameDev.Slice
             if (Bag != null)
             {
                 Debts = new YieldDebts(State, Bag, Outfit, BreakIns); // S5c.7: a Yield's terms paid from the bag
+                if (settings.Items != null)
+                {
+                    // 19 §6 (S5c.7): a fallen person's equipment, recovered when its body is searched.
+                    Recovery = new SliceRecovery(State, seed, Bag, Character, settings.Items);
+                    gameObject.AddComponent<BodySearch>();
+                    Hud()?.FindPromptSources();
+                }
+
                 if (Fights != null)
                 {
                     Fights.Debts = Debts;
+                    Fights.Recovery = Recovery;
                 }
             }
 
@@ -512,6 +530,10 @@ namespace GameDev.Slice
                 Checked = TalkChecked,
                 Purse = () => Bag != null ? Bag.Bronze : 0, // S5c.7: an Exchange in coin
                 Spend = bronze => Bag != null && Bag.Spend(bronze),
+                // 09 *News Pool* (S5c.7): the bartender and Street Rumour tell it after their tips, an outcome a tip of theirs tells left out.
+                News = (source, said) => this.News != null
+                    ? this.News.Tell(source, Clock.Tick, key => GameDev.Slice.News.SliceNews.ToldBy(said, key))
+                    : new Func<string>[0],
             };
             if (Fights != null)
             {
@@ -520,6 +542,15 @@ namespace GameDev.Slice
             }
             Notes = new CharacterNotes(Tips);
             Notes.Added += _ => Refresh();
+            if (News != null)
+            {
+                // 09 reading 5 (S5c.7): a heard News item is a fact noted in the order things are heard.
+                News.Place = Tips.TakePlace;
+                Notes.Include(News.Notes);
+                News.Heard += Notes.Noted;
+                Clock.TickBoundary += NoticeNews;
+            }
+
             State.Changed += (_, _, _) => Refresh();
             Loc.Changed += Refresh;
             Save = gameObject.AddComponent<SliceSave>();
@@ -545,6 +576,12 @@ namespace GameDev.Slice
         public GameDev.Slice.Creation.CharacterPage Page { get; private set; }
 
         private void SettlePotion(long tick) => Advancement?.Settle();
+
+        // 09 *News Pool* (S5c.7): an outcome enters the pool on the tick its Aftermath is raised.
+        private void NoticeNews(long tick) => News?.Notice(tick);
+
+        // 11 (S5c.7): the morning Pip opens is reckoned from the tick Harrow was lost.
+        private void NoticeStandIn(long tick) => StandIn?.Notice(tick);
 
         /// <summary>The character's Conduct Progress toward the next Limit (S5b.7; 05.1).</summary>
         public GameDev.Slice.Alchemy.SliceConduct Conduct { get; private set; }
@@ -1421,6 +1458,8 @@ namespace GameDev.Slice
                 if (Clock != null)
                 {
                     Clock.TickBoundary -= SettlePotion;
+                    Clock.TickBoundary -= NoticeNews;
+                    Clock.TickBoundary -= NoticeStandIn;
                 }
 
                 Standing?.Dispose();

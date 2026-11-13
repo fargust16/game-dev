@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using GameDev.Confront.Turns;
 using GameDev.Slice.People;
 using GameDev.World.Timekeeping;
@@ -236,6 +237,7 @@ namespace GameDev.Slice.Fights
                 {
                     Whistled = true;
                     SliceAlarm.Raise(new Alarm(AlarmKind.Whistle, body.position, body));
+                    SendALooker(body.position);
                 }
 
                 return; // only the first Warden there weighs it
@@ -243,14 +245,55 @@ namespace GameDev.Slice.Fights
         }
 
         /// <summary>
+        /// 10.2 §5e (S5c.7): the whistling Warden also sends a resident who came to look running to the nearest post
+        /// beyond the whistle's hearing whose Wardens are at it; with nobody come to look, only the whistle calls. Like
+        /// any runner it runs straight, and its coming is reckoned in ticks. Whether one was sent.
+        /// </summary>
+        public bool SendALooker(Vector3 place)
+        {
+            _lookers.RemoveAll(b => b == null || !b.gameObject.activeInHierarchy || Lying(b) || _peopleInFight.Contains(b)
+                                    || b.GetComponent<HelpRun>() != null || _runners.Exists(r => r.Body == b));
+            if (_lookers.Count == 0)
+            {
+                return false;
+            }
+
+            Transform post = null;
+            foreach (var warden in PeopleAround.Wardens(place))
+            {
+                if (!SliceAlarm.Hears(place, warden.position) && AtPost(warden))
+                {
+                    post = warden; // the nearest beyond the whistle, Wardens(place) being nearest first
+                    break;
+                }
+            }
+
+            if (post == null)
+            {
+                return false;
+            }
+
+            var looker = _lookers.OrderBy(b => (b.position - place).sqrMagnitude).First();
+            _lookers.Remove(looker);
+            HelpRun.Begin(looker, post.position, _clock);
+            SendRunner(looker, post.position, place);
+            Say(looker, "ui.fight.help.runner");
+            Debug.Log($"[Confront] {looker.name}, come to look, runs for the Wardens at {post.position}.");
+            return true;
+        }
+
+        /// <summary>
         /// A resident who broke away runs for help to the post it fled toward: the runner (10.2 §5a, §5e). It is there
         /// after the ticks a run of 4.5 m/s takes, and the post's Wardens set out unless it fell on its way.
         /// </summary>
-        public void SendRunner(Transform body, Vector3 post)
+        public void SendRunner(Transform body, Vector3 post) => SendRunner(body, post, _assaultAt);
+
+        /// <summary>A runner sent for the fight at <paramref name="place"/> (S5c.7: one come to look, sent by a whistling Warden).</summary>
+        public void SendRunner(Transform body, Vector3 post, Vector3 place)
         {
             if (_clock != null && body != null)
             {
-                _runners.Add(new Runner { Body = body, Post = post, Due = _clock.Tick + TicksToRun(body.position, post) });
+                _runners.Add(new Runner { Body = body, Post = post, Place = place, ForAssault = Assaulting, Due = _clock.Tick + TicksToRun(body.position, post) });
             }
         }
 
@@ -282,7 +325,7 @@ namespace GameDev.Slice.Fights
 
                     if (AtPost(warden))
                     {
-                        SetOut(warden);
+                        SetOut(warden, runner.Place, runner.ForAssault);
                         set++;
                     }
                 }
@@ -291,22 +334,27 @@ namespace GameDev.Slice.Fights
             }
         }
 
-        /// <summary>A post's Warden sets out for the Assault's place: into its fight while it lasts, or late.</summary>
-        private void SetOut(Transform warden)
+        /// <summary>
+        /// A post's Warden sets out for the runner's place: into its fight while it lasts, against the character in an
+        /// Assault and beside it against the cult, the Veinmarket or beasts; or late, to look round, when it is over.
+        /// </summary>
+        private void SetOut(Transform warden, Vector3 place, bool forAssault)
         {
-            if (Assaulting && InFight)
+            var side = !InFight ? -1 : Assaulting ? HostileSide : WardensJoinTheCharacter() ? PlayerSide : -1;
+            if (side >= 0)
             {
-                Come(warden, _assaultAt, HostileSide);
+                Come(warden, place, side);
                 return;
             }
 
             _late.Add(new Coming
             {
                 Body = warden,
-                Arrives = Time.time + (TicksToRun(warden.position, _assaultAt) * SecondsPerTick),
-                To = _assaultAt,
+                Arrives = Time.time + (TicksToRun(warden.position, place) * SecondsPerTick),
+                To = place,
                 Post = warden.position,
                 PostFacing = warden.rotation,
+                OnlyLooks = !forAssault, // late to an Assault it fights the character near the place; to any other fight it only looks
             });
             Say(warden, "ui.fight.help.warden");
         }
@@ -331,6 +379,8 @@ namespace GameDev.Slice.Fights
         {
             public Transform Body;
             public Vector3 Post;
+            public Vector3 Place;
+            public bool ForAssault;
             public long Due;
         }
     }
