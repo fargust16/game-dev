@@ -33,6 +33,8 @@ MODIFIERS = 12
 SCALE = 0.75
 GAPS = (6, 9, 12)
 AVERAGE_COVER = 0.10
+INTERCEPT = 0.60  # 10.1 Shot Line: each person on a shot's line takes it in this share of shots (combat rework)
+SHIELD_COVER = 0.15  # 10.2 §5f: a held shield is Half Cover against shots and targeted spells at its carrier
 TEMPO = ("crit", "crit_damage", "initiative")
 
 
@@ -58,13 +60,16 @@ ARCANA = {
     "Жрица": {9: (), 8: ("sleep",), 7: ("sting",)},
 }
 
-# Strength, Endurance, Dexterity, Perception, Intelligence, Will: 51 points each.
+# Strength, Endurance, Dexterity, Perception, Intelligence, Will: 51 points each. Since the combat rework (10.2 §5f) the
+# points go where the rules pay: accuracy by the profile attribute (Dexterity for a sword, a dagger or a firearm,
+# Strength for a greatsword), Perception for the critical chance, no Strength in damage, no Intelligence in Infusion.
+# Before it: plate 15 11 6 6 3 10, crit 9 9 11 16 3 3, rifle 5 9 15 15 3 4, mage 4 9 6 8 14 10.
 STATS = {
-    "plate": (15, 11, 6, 6, 3, 10),
+    "plate": (14, 11, 10, 6, 3, 7),
     "attack": (17, 13, 9, 6, 3, 3),
-    "crit": (9, 9, 11, 16, 3, 3),
-    "rifle": (5, 9, 15, 15, 3, 4),
-    "mage": (4, 9, 6, 8, 14, 10),
+    "crit": (4, 9, 16, 16, 3, 3),
+    "rifle": (5, 9, 18, 12, 3, 4),
+    "mage": (4, 9, 12, 8, 8, 10),
 }
 MAIN = tuple(STATS)
 
@@ -160,7 +165,7 @@ def fighter(build):
 def cell(job):
     a, b, n, gap = job
     random.seed(zlib.crc32(f"{a} {b} {n} {gap}".encode()))
-    rules = t.Rules(gap=gap, cover=AVERAGE_COVER)
+    rules = t.Rules(gap=gap, cover=AVERAGE_COVER, intercept=INTERCEPT, shield_cover=SHIELD_COVER)
     return t.duel(rules, lambda: [fighter(a) for _ in range(n)], lambda: [fighter(b) for _ in range(n)], RUNS)
 
 

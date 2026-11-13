@@ -1,6 +1,9 @@
 """Combat balance check for 10.2 Combat System Draft.
 
-Monte Carlo over the Combat Numbers V0. It has no grid: melee fighters spend the
+Monte Carlo over the combat numbers. Since the combat rework (owner, 2026-11-13, 10.2 §5f) no attribute adds
+damage: accuracy is the profile attribute of the weapon or attack and its skill, Perception sets the critical
+chance, Infusion adds a fixed share of the weapon's base, and a Will Contest is won by Intelligence and the
+Arcana skill against the target's Will. It has no grid: melee fighters spend the
 AP of their first turn on closing in, and later turns on attacks. It checks hits
 to kill, fight length, and the balance of the slice's fights.
 
@@ -30,7 +33,8 @@ ARMOUR_RANGED = 2.0
 ADJACENT = 0.10
 CRIT_PIERCE = 0.5
 INFUSION_COST = 5.0
-INFUSION_DIVISOR = 24.0
+# 10.2 §5f: Infusion adds this share of the weapon's base as magical damage, with no attribute in it.
+INFUSION_SHARE = 0.40
 INFUSION_ARMOUR = {"chain": 0.5, "plate": 0.0}
 ARMOUR_WEIGHT = {"none": 0.0, "cloth": 5.7, "leather": 11.3, "chain": 21.2, "plate": 31.8}
 CARRIED = 3.0
@@ -60,6 +64,11 @@ class Weapon:
     cleave: float = 0.0
     req: tuple = ()
     off: object = None
+    # 10.2 §5f: the attribute that aims it, Dexterity for a light weapon and Strength for a heavy one; a heavy
+    # weapon (heavy firearms) halves movement; a subduing one (the Wardens' baton) leaves its victim unconscious.
+    profile: str = "dex"
+    heavy: bool = False
+    subdue: bool = False
 
 
 SHIELD_BLOCK = 0.50
@@ -74,13 +83,20 @@ def shielded(w):
 # and a mace hits hardest, finds the fewest, and may stun. A greatsword also catches a second enemy.
 # Attribute Requirements (10.2 §5b), at stage 9; an item asks (10 − stage) times as much, so stage 8 asks double.
 # Below them a weapon hits and armour defends in proportion: at half the requirement, half as well.
-DAGGER = Weapon("dagger", 3, 3, guard="parry", guard_chance=0.30, guard_absorb=1.0, stealth_mult=1.0, weight=1.0, accuracy=10, crit=0.25, req=(("dex", 4),))
-SWORD = Weapon("sword", 5, 4, guard="parry", guard_chance=0.40, guard_absorb=1.0, accuracy=5, req=(("str", 2), ("dex", 2)))
-AXE = Weapon("axe", 5, 5, guard="parry", guard_chance=0.30, guard_absorb=1.0, weight=2.2, crit=0.20, req=(("str", 4), ("dex", 3)))
-MACE = Weapon("mace", 6.5, 5, guard="parry", guard_chance=0.30, guard_absorb=1.0, weight=2.5, crit=-0.03, stun=0.05, req=(("str", 5),))
-GREATSWORD = Weapon("greatsword", 8.5, 6, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=4.5, accuracy=5, cleave=0.5, req=(("str", 6), ("dex", 3)))
-GREATAXE = Weapon("greataxe", 8.5, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=5.0, crit=0.22, req=(("str", 7),))
-MAUL = Weapon("maul", 10.5, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=6.0, crit=-0.03, stun=0.08, req=(("str", 8),))
+# 10.2 §5f: Strength no longer adds damage, so the melee bases take in the old Strength factor of their users, light
+# weapons × 1.25 and heavy ones × 1.35 of V0, while the firearms rise more (pistol 6.5, rifle 9), so that a firearm is
+# first at range (rework_sim.py) and the triangle of build_sim.py holds with a shield as Half Cover against shots. A
+# one-handed weapon is light and aims by Dexterity, a two-handed one heavy and by Strength, and each asks only that.
+DAGGER = Weapon("dagger", 3.75, 3, guard="parry", guard_chance=0.30, guard_absorb=1.0, stealth_mult=1.0, weight=1.0, accuracy=10, crit=0.25, req=(("dex", 4),))
+SWORD = Weapon("sword", 6.25, 4, guard="parry", guard_chance=0.40, guard_absorb=1.0, accuracy=5, req=(("dex", 3),))
+AXE = Weapon("axe", 6.25, 5, guard="parry", guard_chance=0.30, guard_absorb=1.0, weight=2.2, crit=0.20, req=(("dex", 4),))
+MACE = Weapon("mace", 8.1, 5, guard="parry", guard_chance=0.30, guard_absorb=1.0, weight=2.5, crit=-0.03, stun=0.05, req=(("dex", 5),))
+GREATSWORD = Weapon("greatsword", 11.5, 6, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=4.5, accuracy=5, cleave=0.5, req=(("str", 7),), profile="str")
+GREATAXE = Weapon("greataxe", 11.5, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=5.0, crit=0.22, req=(("str", 7),), profile="str")
+MAUL = Weapon("maul", 14.2, 7, guard="block", guard_chance=0.40, guard_absorb=0.6, weight=6.0, crit=-0.03, stun=0.08, req=(("str", 8),), profile="str")
+# 10.2 §5f: the Wardens' baton subdues, and fists are the dagger's numbers at half damage (§5c), with no guard.
+BATON = Weapon("baton", 5, 4, guard="parry", guard_chance=0.30, guard_absorb=1.0, weight=1.0, accuracy=5, req=(("dex", 3),), subdue=True)
+FISTS = Weapon("fists", 1.875, 3, weight=0.0, accuracy=10, crit=0.25)
 ONE_HAND = SWORD
 TWO_HAND = GREATSWORD
 SHIELDED = shielded(SWORD)
@@ -93,8 +109,8 @@ def paired(main, off):
     better weapon; both weights count in Load, and each weapon keeps its requirements. Checked by build_sim.py."""
     return replace(main, name=f"{main.name} and {off.name}", off=off, weight=main.weight + off.weight,
                    guard_chance=max(main.guard_chance, off.guard_chance))
-RIFLE = Weapon("rifle", 6.75, 6, True, range=16, weight=4.0, req=(("per", 3),))
-PISTOL = Weapon("pistol", 5, 4, True, range=6, weight=1.2, accuracy=-10, req=(("dex", 3),))
+RIFLE = Weapon("rifle", 9, 6, True, range=16, weight=4.0, req=(("dex", 3),))
+PISTOL = Weapon("pistol", 6.5, 4, True, range=6, weight=1.2, accuracy=-10, req=(("dex", 3),))
 
 ARMOUR = {"none": (0, 0), "cloth": (2, 20), "leather": (8, 8), "chain": (16, 3), "plate": (24, 0)}
 ARMOUR_REQ = {"leather": (("dex", 3),), "chain": (("str", 5),), "plate": (("str", 7),)}
@@ -165,11 +181,15 @@ class Unit:
     gear: Gear = field(default_factory=Gear)
     ranged_skill: int | None = None
     gear_stage: int | None = None
+    arcana: int | None = None
 
     def __post_init__(self):
-        """skill is the Melee Skill; a fighter given no Ranged Skill shoots with the same value."""
+        """skill is the skill of the melee weapon it carries; a fighter given no firearm skill shoots with the same
+        value, and one given no Arcana skill (10.2 §5f) casts with it too."""
         if self.ranged_skill is None:
             self.ranged_skill = self.skill
+        if self.arcana is None:
+            self.arcana = self.skill
 
     def reset(self):
         self.burden = self.load()
@@ -203,17 +223,20 @@ class Unit:
         return (self.dex + self.per) / 2 + self.gear.initiative + random.randint(1, 20)
 
     def accuracy(self):
-        if self.weapon.ranged:
-            return ((self.dex + self.per) / 2 + self.ranged_skill) / 2 + self.gear.accuracy + self.weapon.accuracy
-        return ((self.str + self.dex + self.per) / 3 + self.skill) / 2 + self.gear.accuracy + self.weapon.accuracy
+        """10.2 §5f: the weapon's profile attribute and the skill of its kind, halved; Perception aims no more."""
+        w = self.weapon
+        return (getattr(self, w.profile) + (self.ranged_skill if w.ranged else self.skill)) / 2 + self.gear.accuracy + w.accuracy
+
+    def magic_accuracy(self):
+        """10.2 §5f: a targeted ability aims by Intelligence and the Arcana skill; Will never aims."""
+        return (self.intl + self.arcana) / 2 + self.gear.accuracy
 
     def evasion(self):
         return 0 if self.asleep else (self.dex + self.per) / 2 + self.gear.evasion - self.burden[0]
 
     def damage_roll(self):
         w = self.weapon
-        power = 1 if w.ranged else 1 + self.str / 50
-        return w.base * stage_factor(w.stage) * power * (1 + self.gear.damage) * random.uniform(0.85, 1.15)
+        return w.base * stage_factor(w.stage) * (1 + self.gear.damage) * random.uniform(0.85, 1.15)
 
     def crit_raw(self):
         return (0.05 + 0.90 * (self.per - 1) / 99 + self.gear.crit + self.weapon.crit) * (1 + self.luck / 100)
@@ -258,7 +281,9 @@ CONTEST_SCALE = 100
 
 
 def resist_check(a, t, will_only=False, base=0.50):
-    power = a.will if will_only else max(a.intl, a.will)
+    """10.2 §5f Will Contest: the caster's magical accuracy against the target's Will. will_only is kept for the
+    levers of before the rework and now means the same."""
+    power = a.magic_accuracy()
     p = base + (power - t.will - t.gear.will) / CONTEST_SCALE
     return random.random() < min(0.95, max(0.05, p * (1 + a.luck / 100)))
 
@@ -394,28 +419,35 @@ def report(title, a, b, opener=None, objective=None):
     return wins / RUNS
 
 
+# The slice's reference fighters, firearms first (10.2 §5d): a pistol, or the cult senior's rifle, with fists for
+# melee. The values are 10.2 §5b's reference table; the skill is that of every weapon each carries, and of its Arcana.
 def follower9():
-    return Unit("L9", 9, 6, 6, 4, 4, 5, will=6, weapon=ONE_HAND, armour="cloth", abilities=("brace",))
+    return Unit("L9", 9, 6, 6, 4, 4, 5, will=6, weapon=PISTOL, second=FISTS, armour="cloth", abilities=("brace",))
 
 
 def follower8(abilities=("stand", "brace", "support")):
-    return Unit("L8", 8, 12, 10, 8, 6, 12, will=12, weapon=ONE_HAND, armour="leather", abilities=abilities)
+    return Unit("L8", 8, 12, 10, 8, 6, 12, will=12, weapon=PISTOL, second=FISTS, armour="leather", abilities=abilities)
 
 
 def senior7():
-    return Unit("L7", 7, 20, 16, 12, 10, 20, will=20, weapon=TWO_HAND, armour="leather", abilities=("stand", "brace", "support", "crush"))
+    return Unit("L7", 7, 20, 16, 12, 10, 20, will=20, weapon=RIFLE, second=FISTS, armour="leather", abilities=("stand", "brace", "support", "crush"))
 
 
 def ally9():
-    return Unit("A9", 9, 6, 6, 4, 4, 5, will=4, intl=6, weapon=ONE_HAND, armour="cloth", infuse=True)
+    return Unit("A9", 9, 6, 6, 4, 4, 5, will=4, intl=6, weapon=PISTOL, second=FISTS, armour="cloth", infuse=True)
 
 
 def ally8():
-    return Unit("A8", 8, 12, 10, 8, 6, 12, will=6, intl=12, weapon=ONE_HAND, armour="leather", abilities=("sleep",), infuse=True)
+    return Unit("A8", 8, 12, 10, 8, 6, 12, will=6, intl=12, weapon=PISTOL, second=FISTS, armour="leather", abilities=("sleep",), infuse=True)
 
 
 def ally7():
-    return Unit("A7", 7, 20, 16, 12, 10, 20, will=12, intl=20, weapon=TWO_HAND, armour="leather", abilities=("sleep",), infuse=True)
+    return Unit("A7", 7, 20, 16, 12, 10, 20, will=12, intl=20, weapon=RIFLE, second=FISTS, armour="leather", abilities=("sleep",), infuse=True)
+
+
+def warden():
+    """A Warden (10.2 §5a): no Limit, 07.1's starting attributes and a few points, a pistol and the baton."""
+    return Unit("W", None, 4, 4, 4, 3, 5, will=3, weapon=PISTOL, second=BATON, armour="leather")
 
 
 KIT = ("stand", "brace", "support")
@@ -447,7 +479,7 @@ def main():
     for limit in (9, 8, 7, 5, 3, 2, 0):
         u = peer(limit)
         u.reset()
-        blow = u.weapon.base * stage_factor(u.weapon.stage) * (1 + u.str / 50) * (1 - mitigation(u.defence()))
+        blow = u.weapon.base * stage_factor(u.weapon.stage) * (1 - mitigation(u.defence()))
         print(f"  Limit {limit}: HP {u.max_hp():5.0f}  blow {blow:5.1f}  reduction {mitigation(u.defence()) * 100:3.0f} %  hit {hit_chance(u, u) * 100:3.0f} %  hits to kill {u.max_hp() / blow:4.1f}")
 
     print("\nDuels of peers")
@@ -559,7 +591,7 @@ def main():
     print("\nThe Spirit General, Limit 2")
     g = general()
     g.reset()
-    print(f"  HP {g.max_hp():.0f}, reduction {mitigation(g.defence()) * 100:.0f} %, blow on the hero {g.weapon.base * stage_factor(2) * (1 + g.str / 50) * (1 - mitigation(ARMOUR['chain'][0] * stage_factor(8))):.0f}")
+    print(f"  HP {g.max_hp():.0f}, reduction {mitigation(g.defence()) * 100:.0f} %, blow on the hero {g.weapon.base * stage_factor(2) * (1 - mitigation(ARMOUR['chain'][0] * stage_factor(8))):.0f}")
     report("Hero L8, best gear v General", [hero(TWO_HAND, "chain", 8)], [general()])
     report("5 allies + hero v General", allies() + [hero()], [general()])
     report("5 peers L5 v General", [peer(5) for _ in range(5)], [general()])

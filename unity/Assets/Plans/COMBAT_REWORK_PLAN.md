@@ -1,12 +1,12 @@
 # Combat Rework Plan
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft — §0 is the owner's concept as given and binds; the audit, the questions and the stages are the agent's working plan.
 
 Created: 2026-11-13
 
-Last Updated: 2026-11-13 (§3a: the owner's answers to Q1–Q11 and the main goal, a firearm first and melee once an enemy has closed in; Perception leaves accuracy for the critical chance. Earlier: first version: the owner's concept recorded as given, the working method, the first audit's contradictions, the questions put to the owner, the stages)
+Last Updated: 2026-11-13 (§2a: the audit's resolutions; §5: stages 1–4 done, the slice's milestones CR1–CR6 next. Earlier: §3a: the owner's answers to Q1–Q11 and the main goal, a firearm first and melee once an enemy has closed in; Perception leaves accuracy for the critical chance. Earlier: first version: the owner's concept recorded as given, the working method, the first audit's contradictions, the questions put to the owner, the stages)
 
 Depends On:
 [07.1](../../../07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2](../../../07.2%20Derived%20Character%20Statistics.md), [10.1](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2](../../../10.2%20Combat%20System%20Draft.md), [10.3](../../../10.3%20Stealth%20and%20Detection.md), [05.1](../../../05.1%20Arcana%20and%20Limits.md), [19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [17](../../../17%20Game%20Systems%20Architecture.md), [99](../../../99%20Open%20Questions.md) VS-RANGED
@@ -774,7 +774,7 @@ Willpower определяет отдельный расходуемый рес�
 
 # 2. First audit (2026-11-13)
 
-Read for the questions: 07.1 §1–§7, 07.2 §2–§5, 10.2 §1, §5b (*Attack*, *Damage*, *Firearms*, *Infusion*, *Attribute Requirements*), §5d, 05.1 (*What a Limit grants*, *Abilities of the slice*), 99 VS-RANGED and CC-41. The full audit of Stage 1 covers every document the concept names and is recorded here when done.
+Read for the questions: 07.1 §1–§7, 07.2 §2–§5, 10.2 §1, §5b (*Attack*, *Damage*, *Firearms*, *Infusion*, *Attribute Requirements*), §5d, 05.1 (*What a Limit grants*, *Abilities of the slice*), 99 VS-RANGED and CC-41. The full audit of Stage 1 covers every document the concept names; its resolutions are §2a.
 
 | Where | Today | The concept | Settled by |
 |---|---|---|---|
@@ -799,6 +799,32 @@ Read for the questions: 07.1 §1–§7, 07.2 §2–§5, 10.2 §1, §5b (*Attack*
 | 10.1, 10.2 §5e | In a fight a shot is rolled on the grid by sight and cover; out of a fight a seen projectile is rolled on touch | One collision rule for physical and magical projectiles; interception by people and objects (§7) | Question Q10 |
 | 10.2 §5b *Firearms* | Point-Blank Shot −10 | Kept (§2.2) | Kept |
 | 10.2 §5b *Load in a Fight* | Load lowers Evasion and AP | Heavy weapons halve movement for the same AP (§9) | The concept; applied while the heavy weapon is the set in hand (working reading) |
+
+## 2a. Resolutions (2026-11-13)
+
+Stage 1 read every document the concept names and the others that use combat attributes or resources: 05.1, 07, 07.1, 07.2, 10.1, 10.2, 10.3, 10.4, 11, 19, 20, 21 §8, 17, 90, 99 and the balance tools. 07 (the archetypes' spreads), 10.3 (Perception against Stealth), 10.4, 20 and 21 needed no change: none of them sets accuracy, damage or ability limits. Each row of §2:
+
+| Row | Resolution | Where |
+|---|---|---|
+| Melee damage by Strength, magical damage by Intelligence and Will | Gone; the melee bases take in the old Strength factor (light × 1.25, heavy × 1.35), the firearms rise more (pistol 6.5, rifle 9), Укол разума 9 | 10.2 §5f *Damage* |
+| Infusion by Intelligence | `0.40 × weapon base × Stage Factor`, Q7 (a) | 10.2 §5f, 07.2 §3.3 |
+| Melee, ranged and magical accuracy | `(profile attribute + skill) / 2`; a targeted ability `(Intelligence + Arcana Skill) / 2`, Q1 | 10.2 §5f, 07.2 §4.1 |
+| Perception the universal critical attribute | Kept, and the critical chance's attribute alone; it aims nothing, Q1; Evasion and Initiative keep it | 07.1 §2, 10.2 §5f, COMBAT-6 |
+| Luck in the hit chance | Kept, Q2 (a) | 10.2 §5f |
+| Melee Skill and Ranged Skill | Five skills, the two renamed in place, Q3 (a) | 07.1 §10, 10.2 §5f |
+| Requirements | The profile attribute only, each the higher of the old pair, Q4 (b) | 10.2 §5f, 19 §4.2 |
+| Two abilities a Limit | An Ability Pool; the slice's player pools of three, two picked, Q5 (b) | 05.1, COMBAT-1, COMBAT-2 |
+| No prepared abilities | 3 to 10 slots by Intelligence + Will, Q6 | 07.2 §4.5 |
+| The Will Contest's caster | `(Intelligence + Arcana Skill) / 2` | 10.2 §5f |
+| Сокрушение by Strength and Will | Aims as its weapon | 05.1 |
+| Will Power's slow return, no cooldowns | Kept | 07.2 §3.3 |
+| Cartridges | Endless; a kind is a pouch, Q8 (c) | 10.2 §5f, 19 §4.2 |
+| Melee out of the slice | The Wardens' baton that subdues, fists and beasts; shields and other melee designed, built later, Q9 (a) | 10.2 §5f, 19 §4.2, COMBAT-9, COMBAT-10 |
+| Shots rolled on the grid and on touch | One Shot Line; solid obstacles block, partial ones Obscure, people intercept, Q10 (a) | 10.1 *Shot Line*, COMBAT-3, COMBAT-4 |
+| Point-Blank Shot | Kept | 10.2 §5b |
+| Load in a Fight | Kept; Heavy halves movement while its set is in hand | 10.2 §5f, COMBAT-5 |
+
+What the documents cannot settle is COMBAT-1 … COMBAT-11 in 99, each with options, a recommendation and the working reading the slice follows. The measurements are in 10.2 §5f *What the simulation shows*.
 
 # 3. Questions put to the owner (2026-11-13)
 
@@ -841,3 +867,7 @@ The owner answered every question and set the rework's main goal: **in a fight a
 4. **Formulas and balance.** Calculated and checked by the balance tools (`tools/balance/`), labelled authoring defaults.
 5. **Implementation in the slice.** By the slice's plan, a milestone of its own, each step tested.
 6. **Report** to the owner, by the concept's §15 Stage 6.
+
+# 5. Status (2026-11-13)
+
+Stages 1–4 are done: the audit and its resolutions (§2a), the documents, and the formulas checked by simulation. Stage 5 is the slice's milestones CR1–CR6 (`VERTICAL_SLICE_IMPLEMENTATION_PLAN.md`); Stage 6, the report, follows them.

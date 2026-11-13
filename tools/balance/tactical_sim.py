@@ -47,7 +47,7 @@ SWAP_AP = 2
 SURROUND_HIT = c.SURROUND_HIT
 OBJECTIVE_BONUS = 3.0
 STING_AP = 4
-STING_BASE = 7
+STING_BASE = 9  # 10.2 §5f: the old Intelligence factor of a Limit 7 caster taken into the base
 STING_RANGE = 12
 DISORIENT_HIT = 0.10
 PILLAR_AP = 4
@@ -111,7 +111,10 @@ class Rules:
     ranged_armour: float = c.ARMOUR_RANGED
     point_blank: float = c.ADJACENT
     infusion_cost: float = c.INFUSION_COST
-    infusion_divisor: float = c.INFUSION_DIVISOR
+    infusion_share: float = c.INFUSION_SHARE
+    # 10.2 §5f: each person on a shot's line takes it in this share of shots, nearest first; 0 turns it off.
+    intercept: float = 0.0
+    shield_cover: float = 0.0  # 10.2 §5f: a held shield hinders shots and targeted spells at its carrier, as cover
     cover: float = 0.0
     crit_pierce: float = c.CRIT_PIERCE
     reaction: bool = True
@@ -189,7 +192,7 @@ class Fight:
     def expected_blow(self, a, t):
         w = a.weapon
         base = w.base * c.stage_factor(w.stage) * self.r.damage_scale
-        raw = base * (1 if w.ranged else 1 + a.str / 50) * (1 + a.gear.damage)
+        raw = base * (1 + a.gear.damage)
         share = a.gear.magic + (self.infusion(a) if a.infuse else 0)
         return self.chance(a, t, 0.0) * a.aim() * (self.reduce(raw, t, w.ranged and cheb(a, t) > 1) + self.warded(share * base, t))
 
@@ -212,7 +215,7 @@ class Fight:
         return magic * (1 - c.mitigation(c.ARMOUR[t.armour][1] * c.stage_factor(t.armour_stage) * t.armour_share() + t.gear.ward))
 
     def infusion(self, a):
-        return a.intl / self.r.infusion_divisor * c.INFUSION_ARMOUR.get(a.armour, 1.0)
+        return self.r.infusion_share * c.INFUSION_ARMOUR.get(a.armour, 1.0)
 
     def infused(self, a):
         """The share of a weapon's base a blow adds as magical damage. Pouring Will Power in stops short of exhaustion."""
@@ -242,6 +245,8 @@ class Fight:
         return hit
 
     def landed(self, a, t, bonus_crit, crit_extra, mult, unguarded, reaction=False):
+        if a.weapon.ranged and self.r.intercept and cheb(a, t) > 1:
+            t = self.interceptor(a, t)
         share = a.gear.magic if reaction else self.infused(a)
         bonus_hit = SURROUND_HIT.get(self.surrounded(t), 0.0)
         if t.exposed:
@@ -250,7 +255,7 @@ class Fight:
         if a.weapon.ranged and any(touch(a, f) for f in alive(self.foes(a))):
             bonus_hit -= self.r.point_blank
         if a.weapon.ranged and cheb(a, t) > 1:
-            bonus_hit -= self.r.cover
+            bonus_hit -= self.r.cover + self.shielded(t)
         if t.stance:
             bonus_hit -= self.r.stance_evasion * t.reserve
         if random.random() >= self.chance(a, t, bonus_hit) * a.aim():
@@ -276,6 +281,55 @@ class Fight:
             t.skip = max(t.skip, 1)
         return True
 
+    def line(self, a, t, at=None):
+        """The people standing on the cells between a (or the cell at) and t, nearest first (10.1 Shot Line)."""
+        x0, y0 = at if at is not None else (a.x, a.y)
+        n = max(abs(t.x - x0), abs(t.y - y0))
+        people = []
+        for i in range(1, n):
+            cell = (round(x0 + (t.x - x0) * i / n), round(y0 + (t.y - y0) * i / n))
+            u = self.cells.get(cell)
+            if u is not None and u is not a and u is not t and u.hp > 0 and u not in people:
+                people.append(u)
+        return people
+
+    def shielded(self, t):
+        return self.r.shield_cover if t.weapon.name.endswith("and shield") else 0.0
+
+    def friends_on_line(self, u, t, at=None):
+        own = self.own(u)
+        return [b for b in self.line(u, t, at) if b in own]
+
+    def clear_step(self, u, t, ap):
+        """A shooter whose line to t has its own people on it steps to a free cell beside it with no friend on the
+        line, in range and beside no enemy, when the AP still buy the shot (10.2 §5f). Returns the AP left, or None."""
+        if ap < 1 + u.weapon.ap or not self.friends_on_line(u, t):
+            return None
+        foes = alive(self.foes(u))
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                x, y = u.x + dx, u.y + dy
+                if not (dx or dy) or not (0 <= x < self.length and 0 <= y < self.r.width) or (x, y) in self.cells:
+                    continue
+                if max(abs(x - t.x), abs(y - t.y)) > u.weapon.range or any(max(abs(x - f.x), abs(y - f.y)) <= 1 for f in foes):
+                    continue
+                if self.friends_on_line(u, t, (x, y)):
+                    continue
+                left = [f for f in foes if touch(u, f)]
+                del self.cells[(u.x, u.y)]
+                u.x, u.y = x, y
+                self.cells[(x, y)] = u
+                return self.reactions(u, left, ap - 1)
+        return None
+
+    def interceptor(self, a, t):
+        """10.1 Shot Line: each person on the line, nearest first, takes the shot in this share of shots before t is
+        rolled; the shot is then rolled against whoever took it."""
+        for u in self.line(a, t):
+            if random.random() < self.r.intercept:
+                return u
+        return t
+
     def score(self, u, e, ap):
         targeting = self.r.a_targeting if u in self.a and self.r.a_targeting else self.r.targeting
         if targeting == "random":
@@ -292,6 +346,8 @@ class Fight:
             value *= ASLEEP_FACTOR
         if sum(1 for b in alive(self.own(u)) if b is not u and touch(b, e)) >= 3:
             value *= CROWD_FACTOR
+        if u.weapon.ranged and self.r.intercept:
+            value *= (1 - self.r.intercept) ** len(self.friends_on_line(u, e))
         if e is self.objective or (self.r.circle_first and u in self.a and e.conducting):
             value *= OBJECTIVE_BONUS
         return value
@@ -377,13 +433,14 @@ class Fight:
 
     def sting(self, u, t):
         """Укол разума: a ranged magical attack. A hit disorients the target for its next turn, a miss the caster."""
-        main, u.weapon = u.weapon, c.PISTOL
-        hit = random.random() < self.chance(u, t, -self.r.cover if cheb(u, t) > 1 else 0.0)
-        u.weapon = main
+        if self.r.intercept and cheb(u, t) > 1:
+            t = self.interceptor(u, t)
+        p = 0.70 + (u.magic_accuracy() - t.evasion()) / 100 - (self.r.cover + self.shielded(t) if cheb(u, t) > 1 else 0.0)
+        hit = random.random() < min(0.95, max(0.05, p * (1 + u.luck / 100)))
         if not hit:
             u.disoriented = 1
             return
-        raw = STING_BASE * c.stage_factor(u.weapon.stage) * (1 + u.intl / 50) * self.r.damage_scale * random.uniform(0.85, 1.15)
+        raw = STING_BASE * self.r.damage_scale * random.uniform(0.85, 1.15)
         t.hp -= self.warded(raw, t)
         t.asleep = 0
         t.disoriented = 1
@@ -462,15 +519,35 @@ class Fight:
             return False
         return any(f in self.pending and not f.weapon.ranged and steps_to(u, f) - 1 <= self.full_ap(f) - f.weapon.ap for f in foes)
 
-    def changes_set(self, u, foes):
-        """A firearm gives way to the melee set: after its first shot for one carried to open a fight,
-        and for a shooter once an enemy stands beside it. A shooter takes the firearm back when free."""
+    def changes_set(self, u, foes, ap=10):
+        """A firearm gives way to the melee set: after its first shot for one carried to open a fight, and, by the
+        combat rework (10.2 §5f), for a shooter once an enemy stands beside it only if the melee set does more harm
+        over the AP left, the change paid, than shooting point blank. A shooter takes the firearm back when free."""
         if u.second is None:
             return False
-        touched = any(touch(u, f) and not f.asleep and not f.skip for f in foes)
+        beside = [f for f in foes if touch(u, f) and not f.asleep and not f.skip]
         if u.weapon.ranged and not u.second.ranged:
-            return u.fired if u.opener else touched
-        return not u.weapon.ranged and u.second.ranged and not u.opener and not touched
+            if u.opener:
+                return u.fired
+            if not beside:
+                return False
+            t = max(beside, key=lambda f: f.threat)
+            shots = ap // u.weapon.ap * self.expected_blow(u, t) * self.point_blank_share(u, t)
+            main, u.weapon = u.weapon, u.second
+            blows = max(0, ap - SWAP_AP) // u.weapon.ap * self.expected_blow(u, t)
+            u.weapon = main
+            return blows > shots
+        return not u.weapon.ranged and u.second.ranged and not u.opener and not beside
+
+    def point_blank_share(self, u, t):
+        """How much of a shot's expected harm stays at point blank: the aim lost, armour plain and not doubled."""
+        far = self.chance(u, t, 0.0)
+        near = self.chance(u, t, -self.r.point_blank)
+        w = u.weapon
+        raw = w.base * c.stage_factor(w.stage) * self.r.damage_scale * (1 + u.gear.damage)
+        doubled = self.reduce(raw, t, True)
+        plain = self.reduce(raw, t, False)
+        return near / max(1e-9, far) * plain / max(1e-9, doubled)
 
     def stand(self, u, ap):
         """Defence: no attack this turn, and the AP left pay for it until the next one."""
@@ -507,7 +584,7 @@ class Fight:
             foes = alive(self.foes(u))
             if not foes or ap < 1 or u.hp <= 0:
                 break
-            if self.changes_set(u, foes):
+            if self.changes_set(u, foes, ap):
                 if ap < SWAP_AP:
                     break
                 ap -= SWAP_AP
@@ -527,7 +604,11 @@ class Fight:
             adjacent = [f for f in foes if touch(u, f)]
             if u.weapon.ranged:
                 if cheb(u, t) <= u.weapon.range:
-                    if ap < cost:
+                    if self.r.intercept and first:
+                        stepped = self.clear_step(u, t, ap)
+                        if stepped is not None:
+                            ap = stepped
+                    if ap < cost or u.hp <= 0:
                         break
                     self.strike(u, t)
                     ap -= cost
