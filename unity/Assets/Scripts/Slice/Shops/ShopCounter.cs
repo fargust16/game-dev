@@ -163,8 +163,59 @@ namespace GameDev.Slice.Shops
                 }
             }
 
+            Orders(world, lines);
             var title = Loc.Format("ui.shop.title", Loc.Get(GameDev.Slice.People.SliceRoster.NameKey(shops.Keeper(Keeper)))); // Pip's, when he keeps it (S5c.7)
             _hud.ShowShop(title, BagPage.Money(world.Bag), lines, _note ?? Loc.Get("ui.shop.hint"));
+        }
+
+        /// <summary>
+        /// The Master's orders of SLICE_TRIAL §3.2 (S5c.7): one offered to take, one held that is ready to hand in here, or
+        /// one held that still wants its things or is handed in elsewhere.
+        /// </summary>
+        private void Orders(SliceWorldDriver world, List<PageLine> lines)
+        {
+            var tasks = world.Tasks;
+            if (tasks == null)
+            {
+                return;
+            }
+
+            var tick = world.Clock.Tick;
+            var mine = GameDev.Slice.Tasks.SliceTasks.All.Where(t => t.Who == Keeper && (tasks.Held(t.Id) || tasks.Offered(t, tick))).ToList();
+            if (mine.Count == 0)
+            {
+                return;
+            }
+
+            lines.Add(new PageLine(Loc.Get("ui.shop.orders"), heading: true));
+            foreach (var task in mine)
+            {
+                var t = task;
+                var text = Loc.Get(t.TextKey);
+                var pay = Coins.Show(t.Pay);
+                if (!tasks.Held(t.Id))
+                {
+                    lines.Add(new PageLine(Loc.Format("ui.shop.order", text, pay), () =>
+                    {
+                        tasks.Take(t.Id, world.Clock.Tick);
+                        _note = Loc.Format("ui.shop.order.took", text);
+                        Show();
+                    }));
+                }
+                else if (t.HandAt == null && tasks.Ready(t))
+                {
+                    lines.Add(new PageLine(Loc.Format("ui.shop.order.give", text, pay), () =>
+                    {
+                        var paid = tasks.HandIn(t.Id, world.Clock.Tick);
+                        _note = paid > 0 ? Loc.Format("ui.task.paid", Coins.Show(paid)) : Loc.Get("ui.task.late");
+                        Show();
+                    }));
+                }
+                else
+                {
+                    lines.Add(new PageLine(Loc.Format("ui.shop.order.taken", text, pay)));
+                }
+            }
         }
 
         private void Act(string fault, string done, ItemDefinition item, string name = null)

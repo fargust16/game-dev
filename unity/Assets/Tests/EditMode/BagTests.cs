@@ -39,7 +39,7 @@ namespace GameDev.Slice.Tests
                 Assert.IsTrue(Loc.Exists(item.NameKey), item.NameKey);
             }
 
-            Assert.AreEqual(67, _catalogue.Items.Count, "19's resources, ingredients, tools, supplies and equipment bases, Lockpicks, plain clothes, the two broken tools (19 §4.3), the four formulas and four Limit potions (S5b.4), and Thomas Wren's key and the letter of introduction (S5c.4)");
+            Assert.AreEqual(71, _catalogue.Items.Count, "19's resources, ingredients, tools, supplies and equipment bases, Lockpicks, plain clothes, the two broken tools (19 §4.3), the four formulas and four Limit potions (S5b.4), Thomas Wren's key and the letter of introduction (S5c.4), and the paid tasks' locket, letter, crate and censer (S5c.7)");
             var settings = AssetDatabase.LoadAssetAtPath<SliceSettings>("Assets/Data/Slice/SliceSettings.asset");
             Assert.AreSame(_catalogue, settings.Items, "the slice's settings carry the catalogue");
         }

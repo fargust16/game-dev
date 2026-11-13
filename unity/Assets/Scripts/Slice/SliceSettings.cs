@@ -107,6 +107,9 @@ namespace GameDev.Slice
         [Tooltip("VS-HOURS (f): each named person's model at home, by roster id. SliceResidentsSetup sets them by the asset map's looks.")]
         [SerializeField] private NamedLook[] namedLooks = new NamedLook[0];
 
+        [Tooltip("SLICE_TRIAL §3.3 (S5c.7): Dace's conversation, given at runtime to his body at each of his posts.")]
+        [SerializeField] private GameDev.Dialogue.DialogueDefinition daceDialogue;
+
         public GameDev.Slice.Creation.PlayerLook[] PlayerLooks => playerLooks;
 
         /// <summary>Who may live in a home of the wealth: 0 poor, 1 middling, 2 rich.</summary>
@@ -177,6 +180,8 @@ namespace GameDev.Slice
         public Texture2D[] FightCursors => fightCursors;
 
         public Sprite[] FightIcons => fightIcons;
+
+        public GameDev.Dialogue.DialogueDefinition DaceDialogue => daceDialogue;
 
         public IWorldSeed CreateSeed()
         {

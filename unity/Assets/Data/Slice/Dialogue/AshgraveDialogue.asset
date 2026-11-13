@@ -281,6 +281,252 @@ MonoBehaviour:
         tells: []
         minutes: 0
         fights: 0
+    - id: censer_take
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: 
+      - task.censer.offer
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: censer
+        raises: 
+        - task.censer.taken
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: censer_give
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: 
+      - task.censer.ready
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: paid
+        raises: 
+        - task.censer.handed
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: chalk_take
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: 
+      - task.chalk.offer
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: chalk
+        raises: 
+        - task.chalk.taken
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: chalk_give
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: 
+      - task.chalk.ready
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: paid
+        raises: 
+        - task.chalk.handed
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: dace_take
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: 
+      - task.dace.offer
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: dace
+        raises: 
+        - task.dace.taken
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: dace_give
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: 
+      - task.dace.ready
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: paid
+        raises: 
+        - task.dace.handed
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
     - id: leave
       approach: 0
       kind: 0
@@ -552,6 +798,186 @@ MonoBehaviour:
     lies: 0
     options:
     - id: step_thanks
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: censer
+    speaker: ashgrave
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: censer_ok
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: chalk
+    speaker: ashgrave
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: chalk_ok
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: dace
+    speaker: ashgrave
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: dace_ok
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: paid
+    speaker: ashgrave
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: paid_ok
       approach: 0
       kind: 0
       arguments: []

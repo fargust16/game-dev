@@ -40,6 +40,9 @@ namespace GameDev.Items
         /// <summary>A potion's bad results of its six brewing checks (20 §3); 0 for equipment.</summary>
         public int bad;
 
+        /// <summary>Made at an anvil by the character (S5c.7): a Master's order for a piece of one's own making wants such a one.</summary>
+        public bool made;
+
         public ItemPiece(string itemId, int itemStage = 9)
         {
             item = itemId;

@@ -808,6 +808,50 @@ MonoBehaviour:
     fight: {fileID: 0}
     recipe: []
     arcana: 0
+  - id: locket
+    kind: 2
+    weight: 0
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 9
+    family: 
+    fight: {fileID: 0}
+    recipe: []
+    arcana: 0
+  - id: letter_hamlet
+    kind: 2
+    weight: 0
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 9
+    family: 
+    fight: {fileID: 0}
+    recipe: []
+    arcana: 0
+  - id: crate
+    kind: 2
+    weight: 8
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 9
+    family: 
+    fight: {fileID: 0}
+    recipe: []
+    arcana: 0
+  - id: censer
+    kind: 2
+    weight: 1.5
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 9
+    family: 
+    fight: {fileID: 0}
+    recipe: []
+    arcana: 0
   - id: letter_introduction
     kind: 5
     weight: 0

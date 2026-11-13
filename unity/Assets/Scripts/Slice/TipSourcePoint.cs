@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameDev.Core.Localization;
 using GameDev.Input;
+using GameDev.Items;
 using GameDev.Locomotion;
 using GameDev.UI;
 using GameDev.World.Poi;
@@ -32,6 +33,7 @@ namespace GameDev.Slice
         private HudView _hud;
         private IReadOnlyList<Tip> _shown = new Tip[0];
         private IReadOnlyList<System.Func<string>> _news = new System.Func<string>[0];
+        private IReadOnlyList<(GameDev.Slice.Tasks.PaidTask Task, bool New)> _tasks = new (GameDev.Slice.Tasks.PaidTask, bool)[0];
         private long _readAt;
 
         public TipSource Source => source;
@@ -69,6 +71,7 @@ namespace GameDev.Slice
             }
 
             _shown = world.Tips.Read(source, world.Clock.Tick);
+            _tasks = source == TipSource.NoticeBoard ? BoardTasks(world) : new (GameDev.Slice.Tasks.PaidTask, bool)[0];
             // 09 *News Pool* (PB8d, S5c.7): the board pins what the city is talking about, the newest first, after its
             // notices, leaving out an outcome one of its notices already tells.
             _readAt = world.Clock.Tick;
@@ -83,9 +86,36 @@ namespace GameDev.Slice
         {
             if (IsOpen)
             {
-                var lines = _shown.Select(t => t.Line).Concat(_news.Select(n => n())).ToList();
+                var tasks = _tasks.Select(t => Loc.Format(t.New ? "ui.board.task" : "ui.board.task.taken", Loc.Get(t.Task.TextKey), Coins.Show(t.Task.Pay)));
+                var lines = tasks.Concat(_shown.Select(t => t.Line)).Concat(_news.Select(n => n())).ToList();
                 Hud()?.ShowReading(Loc.Get(titleKey), lines.Count > 0 ? string.Join("\n\n", lines) : Loc.Get(nothingKey));
             }
+        }
+
+        /// <summary>
+        /// SLICE_TRIAL §3.1 (S5c.7): reading the board takes each paid notice it offers now, as one takes a slip; the ones
+        /// taken before and not yet done stay pinned, marked taken.
+        /// </summary>
+        private static IReadOnlyList<(GameDev.Slice.Tasks.PaidTask, bool)> BoardTasks(SliceWorldDriver world)
+        {
+            var tasks = world.Tasks;
+            if (tasks == null)
+            {
+                return new (GameDev.Slice.Tasks.PaidTask, bool)[0];
+            }
+
+            var tick = world.Clock.Tick;
+            var held = GameDev.Slice.Tasks.SliceTasks.All.Where(t => t.Giver == GameDev.Slice.Tasks.TaskGiver.Board && tasks.Held(t.Id))
+                .Select(t => (t, false)).ToList();
+            foreach (var task in tasks.OfferedBy(GameDev.Slice.Tasks.SliceTasks.Board, tick).ToList())
+            {
+                if (tasks.Take(task.Id, tick))
+                {
+                    held.Add((task, true));
+                }
+            }
+
+            return held;
         }
 
         private void OnEnable()

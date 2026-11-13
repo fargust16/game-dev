@@ -172,6 +172,9 @@ namespace GameDev.Slice
         /// <summary>The run's Hidden Caches (S5c.6; SLICE_TRIAL §5); null without the bag.</summary>
         public GameDev.Slice.Caches.SliceCaches Caches { get; private set; }
 
+        /// <summary>The paid tasks of the Notice Board, the Masters and the faction (S5c.7; SLICE_TRIAL §3).</summary>
+        public GameDev.Slice.Tasks.SliceTasks Tasks { get; private set; }
+
         /// <summary>The page of the Faction Gift after a conversation with Ashgrave (S5c.4; 19 §6.2).</summary>
         public GameDev.Slice.Trial.TrialRun TrialRun { get; private set; }
 
@@ -430,7 +433,16 @@ namespace GameDev.Slice
                 {
                     PlaceCaches(SceneManager.GetSceneAt(i));
                 }
+                Tasks = new GameDev.Slice.Tasks.SliceTasks(State, Bag, () => Clock.Tick); // S5c.7
+                Clock.TickBoundary += KeepTasks;
+                Tasks.Paid += TaskPaid;
+                for (var i = 0; i < SceneManager.sceneCount; i++)
+                {
+                    PlaceTasks(SceneManager.GetSceneAt(i));
+                }
+
                 Conduct = new GameDev.Slice.Alchemy.SliceConduct(State, Advancement);
+                Tasks.Unnoticed = who => Conduct.Deed(GameDev.Slice.Alchemy.ConductDeed.Unnoticed, who);
                 Conduct.Felt += key => Hud()?.ShowMessage(Loc.Get(key)); // 05.1: one short line, no counter
                 if (Fights != null)
                 {
@@ -582,6 +594,50 @@ namespace GameDev.Slice
 
         // 11 (S5c.7): the morning Pip opens is reckoned from the tick Harrow was lost.
         private void NoticeStandIn(long tick) => StandIn?.Notice(tick);
+
+        // SLICE_TRIAL §3 (S5c.7): what a conversation reads of the tasks, kept each tick.
+        private void KeepTasks(long tick) => Tasks?.Keep();
+
+        // 10.4 §4: a task done for the faction, +3 Reputation; the Board's and the Masters' are paid in coin alone.
+        private void TaskPaid(GameDev.Slice.Tasks.PaidTask task)
+        {
+            if (task.Giver == GameDev.Slice.Tasks.TaskGiver.Faction)
+            {
+                Standing?.Record(GameDev.Player.Standing.Deed.FactionTask);
+            }
+        }
+
+        /// <summary>S5c.7: the task places in the city's scene once it stands, and Dace's conversation at each of his posts.</summary>
+        private void PlaceTasks(Scene scene)
+        {
+            if (Tasks == null || !scene.IsValid() || !scene.isLoaded)
+            {
+                return;
+            }
+
+            if (scene.name == cityScene)
+            {
+                GameDev.Slice.Tasks.TaskSpot.Place(scene);
+            }
+
+            var talked = false;
+            foreach (var root in scene.GetRootGameObjects())
+            {
+                foreach (var person in root.GetComponentsInChildren<GameDev.Slice.People.NamedPerson>(true))
+                {
+                    if (person.Id == "dace" && settings.DaceDialogue != null && person.GetComponent<PersonTalk>() == null)
+                    {
+                        person.gameObject.AddComponent<PersonTalk>().Configure(settings.DaceDialogue, 2f);
+                        talked = true;
+                    }
+                }
+            }
+
+            if (talked)
+            {
+                Hud()?.FindPromptSources();
+            }
+        }
 
         /// <summary>The character's Conduct Progress toward the next Limit (S5b.7; 05.1).</summary>
         public GameDev.Slice.Alchemy.SliceConduct Conduct { get; private set; }
@@ -1096,6 +1152,7 @@ namespace GameDev.Slice
             }
 
             PlaceCaches(scene);
+            PlaceTasks(scene);
             if (Debts != null)
             {
                 WardensDesk.Place(scene); // S5c.7: the fine paid at the lock-up's desk
@@ -1460,11 +1517,13 @@ namespace GameDev.Slice
                     Clock.TickBoundary -= SettlePotion;
                     Clock.TickBoundary -= NoticeNews;
                     Clock.TickBoundary -= NoticeStandIn;
+                    Clock.TickBoundary -= KeepTasks;
                 }
 
                 Standing?.Dispose();
                 Director?.Dispose();
                 Trial?.Detach();
+                Tasks?.Detach();
                 _running = null;
             }
         }

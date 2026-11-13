@@ -235,6 +235,7 @@ namespace GameDev.Slice.Shops
             var chance = ItemMaker.Chance(_character.Get(CharacterSkill.ItemCreation), _character.Get(CharacterAttribute.Perception),
                 _character.Get(CharacterAttribute.Luck));
             piece = ItemMaker.Make(item, stage, chance, _seed.Fork(SliceSeedStreams.Workshop, made, 0));
+            piece.made = true;
             _bag.AddPiece(piece);
             Made?.Invoke(piece);
             return CraftOutcome.Made;

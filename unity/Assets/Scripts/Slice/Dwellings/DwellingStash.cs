@@ -64,7 +64,9 @@ namespace GameDev.Slice.Dwellings
                 return null;
             }
 
-            return Loc.Get(world.BreakIns.StashTaken(Place) ? "ui.prompt.stash.empty" : "ui.prompt.stash");
+            // The faction's censer (SLICE_TRIAL §3.3, S5c.7) lies in its chest even when the chest was gone through before.
+            var censer = world.Tasks != null && world.Tasks.CenserIn(Place);
+            return Loc.Get(world.BreakIns.StashTaken(Place) && !censer ? "ui.prompt.stash.empty" : "ui.prompt.stash");
         }
 
         private void Update()
@@ -92,10 +94,11 @@ namespace GameDev.Slice.Dwellings
         public void Open(SliceWorldDriver world)
         {
             var held = world.BreakIns.TakeStash(Place, (int)_key.Wealth, _tradeItem, _tradePrice);
+            var censer = world.Tasks != null && world.Tasks.TakeCenser(Place);
             _hud = _hud != null ? _hud : FindAnyObjectByType<HudView>();
             if (held == null)
             {
-                _hud?.ShowMessage(Loc.Get("ui.stash.empty"));
+                _hud?.ShowMessage(Loc.Get(censer ? "ui.stash.censer.only" : "ui.stash.empty"));
                 return;
             }
 
@@ -108,6 +111,11 @@ namespace GameDev.Slice.Dwellings
             if (h.Papers > 0)
             {
                 line += "\n" + Loc.Get($"ui.stash.papers.{h.Papers}");
+            }
+
+            if (censer)
+            {
+                line += "\n" + Loc.Get("ui.stash.censer");
             }
 
             _hud?.ShowMessage(line);

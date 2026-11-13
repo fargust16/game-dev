@@ -708,3 +708,39 @@ ui.cache.bronze,Hidden coins: {0}.,Спрятанные монеты: {0}.
 ui.cache.goods,Hidden here: {0}.,Здесь спрятано: {0}.
 ui.cache.part,{0} × {1},{0} × {1}
 ui.cache.note,"A note: ""{0}""","Записка: «{0}»"
+ui.board.task,{0} Pay: {1}.,{0} Оплата: {1}.
+ui.board.task.taken,{0} Pay: {1}. (Taken.),{0} Оплата: {1}. (Взято.)
+task.firewood.text,Firewood wanted at the Brothers' House: 4 bundles of wood to the porter.,В Братский дом нужны дрова: 4 вязанки — привратнику.
+task.locket.text,"Lost on Widows' Row: a widow's locket, last seen in Last Turning Cemetery by the angel. Reward on its return to her door.","Потерян на Вдовьем Ряду: вдовий медальон, в последний раз его видели на кладбище у Последнего Поворота, возле ангела. Вознаграждение — при возврате к её двери."
+task.letter.text,"A letter to Crooked Hamlet, paid on delivery: collect it at the Customs House and take it to the farmer.","Письмо в Кривую Слободу, оплата по доставке: забрать в Таможне и отнести фермеру."
+task.infirmary.text,Herbs for the Brothers' infirmary: 5 herbs to the porter.,Травы для лазарета Братского дома: 5 трав — привратнику.
+task.edda.ore.text,3 iron ore,3 железной руды
+task.edda.jerkin.text,A leather jerkin of your own making,Кожаная куртка вашей работы
+task.ada.herbs.text,6 herbs,6 трав
+task.silas.fangs.text,2 wolf fangs and 1 boar tusk,2 волчьих клыка и 1 кабаний клык
+task.harrow.herbs.text,4 herbs and 2 flax,4 травы и 2 льна
+task.tobias.crate.text,A crate carried to a warehouse on Fishlip Quay within half an hour,Отнести ящик на склад на Рыбьей Губе за полчаса
+task.censer.text,The stolen censer,Украденная кадильница
+task.chalk.text,The chalk on the doors,Мел на дверях
+task.dace.text,A word with Dace,Слово с Дейсом
+ui.shop.orders,Order,Заказ
+ui.shop.order,{0}. Pay: {1}. Take the order,{0}. Оплата: {1}. Взять заказ
+ui.shop.order.taken,{0}. Pay: {1}. Taken,{0}. Оплата: {1}. Взят
+ui.shop.order.give,{0}. Pay: {1}. Hand it in,{0}. Оплата: {1}. Сдать
+ui.shop.order.took,Order taken: {0}.,Заказ взят: {0}.
+ui.task.paid,Paid: {0}.,Получено: {0}.
+ui.task.late,Too late: nobody pays for it now.,Слишком поздно: теперь за это никто не заплатит.
+ui.task.heavy,Too heavy to carry.,"Слишком тяжело, не унести."
+ui.prompt.task.firewood.give,E  Hand the firewood to the porter,E  Отдать дрова привратнику
+ui.prompt.task.infirmary.give,E  Hand the herbs to the porter,E  Отдать травы привратнику
+ui.prompt.task.locket.pick,E  Take the locket,E  Взять медальон
+ui.prompt.task.locket.give,E  Return the locket,E  Вернуть медальон
+ui.prompt.task.letter.pick,E  Collect the letter,E  Забрать письмо
+ui.prompt.task.letter.give,E  Deliver the letter,E  Отдать письмо
+ui.prompt.task.tobias.crate.give,E  Hand over the crate,E  Сдать ящик
+ui.task.locket.noticed,Something glints by the angel's plinth.,У подножия ангела что-то блестит.
+ui.task.locket.picked,You take the locket.,Вы берёте медальон.
+ui.task.letter.picked,The clerk hands you the letter.,Писарь отдаёт вам письмо.
+ui.task.chalk.door,A chalk mark on the door: a circle crossed by three strokes.,"На двери мелом: круг, перечёркнутый тремя чертами."
+ui.stash.censer,"And a church censer, wrapped in a rag.","И церковная кадильница, завёрнутая в тряпицу."
+ui.stash.censer.only,"A church censer, wrapped in a rag.","Церковная кадильница, завёрнутая в тряпицу."
