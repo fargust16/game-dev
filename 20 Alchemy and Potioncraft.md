@@ -87,8 +87,8 @@ Brewing keeps its own floor so that the hardest check stays passable: its good z
 2. Must a character personally brew each advancement potion, or may they commission or obtain one after learning Alchemy?
 3. How does Alchemy skill progress, and which attributes, skills, tools, stations, and conditions affect each capability?
 4. How are formulas discovered and decoded, ingredients identified, and ingredient locations found?
-5. Resolved, 2026-11-03: Reaction Checks once a tick, which change the Sanity cost and attribute rise (§3). Resolved, 2026-11-04 (authoring default): an interrupted brewing loses its ordinary ingredients and keeps the magical one (§3).
-6. Resolved, 2026-11-03: the checks run within the six ticks, and the clock does not pause.
+5. Resolved, 2026-11-03: Reaction Checks once a tick, which change the Sanity cost and attribute rise (§3). The rule of 2026-11-04 that an interrupted brewing loses its ordinary ingredients is retired: since the owner's answer of 2026-11-13 (S5-2) the six checks run with the world paused and nothing interrupts them, and 6 ticks pass after them (§3).
+6. Resolved, 2026-11-03: the checks run within the six ticks, and the clock does not pause. Superseded by the owner, 2026-11-13 (S5-2): the checks pause the world, and the six ticks pass after them (§3).
 7. Which potion categories beyond Arcana advancement exist, if any, and how do they respect the current prohibition on HP-restoring potions? The owner rejected a thrown Alchemical Flask on 2026-11-02: no consumable may change a battle's result that much (CC-46).
 8. Resolved, 2026-11-03: the slice brews only Limit potions and the substitute base for Основа ритуала, and the formulas of Limits 9 and 8 come as [11 Vertical Slice](11%20Vertical%20Slice.md) describes. Limit 7 is for NPCs only.
 9. What recipe costs, station requirements, ingredient quantities, and numeric balance values should the later balance pass propose? The slice's stations and fees are in §3 *Where brewing is done* (owner and authoring defaults, 2026-11-13).

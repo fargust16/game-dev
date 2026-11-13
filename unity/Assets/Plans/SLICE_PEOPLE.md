@@ -2,7 +2,7 @@
 
 Status: Draft — proposed by the agent on 2026-11-06 and **accepted by the owner on 2026-11-07**: all fourteen, with the agent's placeholder names, which stay mutable.
 Created: 2026-11-06
-Last Updated: 2026-11-13 (by the owner's answer to S5-9: Nell Garrow takes the tavern keeper's model, and the pawnbroker is Mortimer Kettle, a gentleman, in place of Ruth Kettle. Earlier: 2026-11-10: since C5 the market and its Masters, with Kit, stand at Bawling Row round Stone Grandad on the Penny (city plan §29.6). Earlier: names since C4: Bell Street is the Black Puddle, Loom Lane Draught Lane, the Market square Bawling Square; the records keep their day's names (city plan §28.10). Earlier: S2.7: Nell's lie and her day-2 lines by outcome, authoring defaults. Earlier: S2.4: Nell and Kit are talked to; Nell's Approaches, their Arguments and the Exchange, authoring defaults. Earlier: S2.0: the names, roles and lines are in the string tables, in English and Russian. Earlier: accepted by the owner: the roster and the placeholder names. Earlier: first draft for the owner)
+Last Updated: 2026-11-13 (§4, §5: the named people's schedules and Чужой сон's lines, and Father Ambrose Hale, who vouches at Faction Entry, C5 authoring defaults (D1). Earlier: by the owner's answer to S5-9: Nell Garrow takes the tavern keeper's model, and the pawnbroker is Mortimer Kettle, a gentleman, in place of Ruth Kettle. Earlier: 2026-11-10: since C5 the market and its Masters, with Kit, stand at Bawling Row round Stone Grandad on the Penny (city plan §29.6). Earlier: names since C4: Bell Street is the Black Puddle, Loom Lane Draught Lane, the Market square Bawling Square; the records keep their day's names (city plan §28.10). Earlier: S2.7: Nell's lie and her day-2 lines by outcome, authoring defaults. Earlier: S2.4: Nell and Kit are talked to; Nell's Approaches, their Arguments and the Exchange, authoring defaults. Earlier: S2.0: the names, roles and lines are in the string tables, in English and Russian. Earlier: accepted by the owner: the roster and the placeholder names. Earlier: first draft for the owner)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](../../../11.1%20Vertical%20Slice%20POIs.md), [09 Information Sources](../../../09%20Information%20Sources.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §5
 Related: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1 (colours), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §21 (places)
 
@@ -34,9 +34,10 @@ Every person below is required by a document above; none is new content. The pla
 | 12 | The missing person's sister | Lottie Wren | yellow | The Soot & Bell in the evening, her tenement by day | Reports the disappearance, so the trial has a door in; can be Сомневающийся's kin at the tavern (11) |
 | 13 | Veinmarket's contact | Dace | brown | A table in the Soot & Bell; Loom Lane at night | Sells the senior's paper (Грязная тайна); POI A and B's other side |
 | 14 | Newsboy, carries Street Rumour | Kit Mallow | yellow | The Market square | Street Rumour's two or three lines a day, moved there by the owner (11.1) |
+| 15 | The old priest of the old chapel | Father Ambrose Hale | — | Before the old chapel's rostrum | Vouches for the character at Faction Entry (11, S5-5; [SLICE_TRIAL.md](SLICE_TRIAL.md) §1.4). Added in C5, 2026-11-13 |
 | — | The missing person | Thomas Wren, mill clerk | — | His room in the tenement, Loom Lane | Left to join the General; his cache holds the Император formulas (11). Absent |
 
-Masters keep 08:00–20:00 (11); other schedules come in S5c, and until then each stands at the place above.
+Masters keep 08:00–20:00 (11); the schedules are in §4, built in S5c.3, and until then each stands at the place above. Since S5-9 (2026-11-13) a nameless old market trader keeps Bawling Row's food stall, in the model that was the innkeeper's.
 
 ## 2. What each source says in S1
 
@@ -66,3 +67,55 @@ At most one rumour a day may be false, never about a Ritual Weak Point (09). The
 ## 3. The owner's answers
 
 Owner, 2026-11-07: all fourteen; the agent's placeholder names, which the owner may change at any time. Schedules, what each person knows beyond §2, and the traces they carry come with their milestones (S5c, S2, S6).
+
+## 4. Schedules (C5, 2026-11-13)
+
+Authoring defaults by the owner's direction of 2026-11-04 (18 *Townsfolk in the slice*): home, work, tavern and sleep, interrupted by events. A home is a dwelling door of the class named, chosen in S5c.3 near the person's work; at home and asleep a person is indoors, out of sight, and a Чужой сон touch reaches it only in the Dwelling scene. POI A at 14:00 and POI B at 23:00 take their people from these hours, and at the invasion ordinary people hide.
+
+| Person | Home | Day | Evening | Asleep |
+|---|---|---|---|---|
+| Nell Garrow | Above the Soot & Bell | 10:00–02:00 behind the bar | — | 02:00–10:00 |
+| Josiah Harrow | Behind his shop | 08:00–20:00 the shop | 20:00–22:00 at home | 22:00–06:00 |
+| Pip Vance | The apothecary's back room | 08:00–20:00 the shop | 20:00–22:30 the Soot & Bell | 23:00–07:00 |
+| Edda Brann | Middling, Sleepy Quarter | 08:00–20:00 her stall and anvil | 20:00–22:00 at home | 22:00–06:00 |
+| Silas Quill | Middling, Salt End | 08:00–20:00 his stall | 20:00–23:00 the Soot & Bell | 23:30–07:00 |
+| Ada Merrow | Middling, Parsons' End | 08:00–20:00 her stall | 20:00–22:00 the Brothers' House | 22:30–06:30 |
+| Tobias Penn | Poor, Lower Veil | 08:00–20:00 his stall | 20:00–22:00 the Soot & Bell | 22:30–06:30 |
+| Mortimer Kettle | Rich, Salt End | 09:00–19:00 the pawnshop | 19:30–23:00 at home | 23:00–07:00 |
+| Madame Ilse | Poor, Parsons' End | 08:00–20:00 her counter | 20:00–21:00 the old chapel's forecourt | 23:00–07:00 |
+| Sergeant Coyle | Middling, Sleepy Quarter | 06:00–18:00 the Wardens' station | 18:30–22:00 at home | 22:30–05:30 |
+| Mr Ashgrave | The faction's house | 07:00–23:00 the faction's house | — | 23:00–07:00 |
+| Lottie Wren | Poor, Draught Lane | 08:00–17:30 her tenement's door and the lane | 18:00–22:00 the Soot & Bell | 22:30–07:00 |
+| Dace | Poor, the Reek | 14:00–18:00 the quay | 18:00–23:00 the Soot & Bell; 23:00–05:00 Draught Lane and the den | 05:00–13:00 |
+| Kit Mallow | The Brothers' House dormitory | 07:00–19:00 Bawling Row | 19:00–21:00 the Soot & Bell's door | 21:30–06:30 |
+| Father Ambrose Hale | The old chapel's vestry | 06:00–20:00 the old chapel | 20:00–22:00 the old chapel | 22:00–05:30 |
+| The old market trader | Poor, Lower Veil | 08:00–18:00 the food stall | 18:00–21:00 at home | 21:00–06:00 |
+
+The Wardens keep their posts and errands as built (10.2 §5e); the walking townsfolk walk with no schedule, fewer at night (18).
+
+## 5. Чужой сон's lines (C5, 2026-11-13)
+
+A touch on a sleeper with Чужой сон gives a fragment of its memory, one line in the Character Notes (05.1 *Вне боя*). Authoring defaults; never a Weak Point's trace, which is C6's.
+
+| Sleeper | Line |
+|---|---|
+| Nell Garrow | Bottles, a hundred bottles, and every one of them asking for credit. |
+| Josiah Harrow | Drawers sliding open by themselves, and a voice counting doses in the dark. |
+| Pip Vance | Old Harrow's hands on his, steadying the pestle. Then the hands are gone. |
+| Edda Brann | A hammer that rings true for once, and she weeps for it. |
+| Silas Quill | Something glowing in a jar, wanting out, and wanting him to open it. |
+| Ada Merrow | A wound that will not close however tight she binds it. |
+| Tobias Penn | Coins rolling under a stall, forever. |
+| Mortimer Kettle | A brass token warm as a coal. A man with no face pawned it and never came back. |
+| Madame Ilse | An hour on a clock face, and the clock has no hands. |
+| Sergeant Coyle | Brass numbers falling off his coat one by one, and nobody noticing. |
+| Mr Ashgrave | A list of names, and his own at the bottom, crossed out. |
+| Lottie Wren | Thomas at the door, soaked, saying he's sorry, saying the woods are warm. |
+| Dace | Chalk hooks on every door in the city, and none of them his. |
+| Kit Mallow | Shouting the news, and no sound coming out. |
+| Father Ambrose Hale | The old chapel full to the doors, and every face turned the wrong way. |
+| A townsman | A day's wages, counted twice. |
+| A townswoman | The kettle boiling over, and nobody coming. |
+| A Warden | A whistle that won't blow. |
+| A dock or works hand | The tide coming in over the quay. |
+| A drunkard | A full glass that never empties, and a thirst that never ends. |
