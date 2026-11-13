@@ -76,6 +76,28 @@ namespace GameDev.Slice.EditorTools
             ("WoodenShield", Blink + "/FreeRPGWeapons/_PREFABS/Shield_Basic.prefab", Shape.Shield, 0.65f, 0f, 0),
         };
 
+        private const string BatonFolder = "Assets/Art/Slice/Baton";
+
+        /// <summary>
+        /// 10.2 §5f: the Wardens' baton, a turned wooden truncheon of our own, since no pack in the project has one
+        /// (<see cref="BatonModel"/>): 0.45 m, held 0.18 of its length up from the butt (authoring defaults).
+        /// </summary>
+        private static readonly (string Asset, string Source, Shape Shape, float Length, float Grip, int End) Baton =
+            ("WardensBaton", BatonFolder + "/Baton.prefab", Shape.Haft, 0.45f, 0.18f, 0);
+
+        /// <summary>
+        /// The baton's turned profile from the butt, (height, radius) in metres: a knob, the grip, a ring, and a body that
+        /// thickens toward a rounded end, the end the haft's frame reads as its head (authoring defaults).
+        /// </summary>
+        private static readonly Vector2[] BatonProfile =
+        {
+            new Vector2(0f, 0f), new Vector2(0f, 0.012f), new Vector2(0.005f, 0.02f), new Vector2(0.014f, 0.022f), new Vector2(0.022f, 0.016f),
+            new Vector2(0.13f, 0.016f), new Vector2(0.138f, 0.021f), new Vector2(0.15f, 0.021f), new Vector2(0.158f, 0.017f),
+            new Vector2(0.4f, 0.025f), new Vector2(0.43f, 0.023f), new Vector2(0.445f, 0.015f), new Vector2(0.45f, 0f),
+        };
+
+        private const int BatonSides = 16;
+
         public static void Run()
         {
             SlicePeopleModels.ClipsAndControllers();
@@ -100,17 +122,111 @@ namespace GameDev.Slice.EditorTools
 
         // ------------------------------------------------------------------------------------------- the held prefabs
 
-        public static void Build(StringBuilder report)
+        public static void Build(StringBuilder report) => Build(report, null);
+
+        /// <summary>
+        /// Batch: -executeMethod GameDev.Slice.EditorTools.SliceWeapons.BuildBaton. The baton's model, its held prefab and
+        /// its entry among the held models (10.2 §5f, CR3); every other held prefab and the firearms' sights stay as built.
+        /// </summary>
+        public static void BuildBaton()
+        {
+            var report = new StringBuilder();
+            BatonModel(report);
+            Build(report, Baton.Asset);
+            Directory.CreateDirectory(Output);
+            File.WriteAllText($"{Output}/baton.txt", report.ToString());
+            Debug.Log($"[SliceWeapons] baton\n{report}");
+        }
+
+        /// <summary>
+        /// The baton turned from <see cref="BatonProfile"/> round +Y, in dark polished wood, as a mesh, a material and a
+        /// prefab in <see cref="BatonFolder"/>, the source <see cref="Build"/> reads like any pack's model.
+        /// </summary>
+        private static void BatonModel(StringBuilder report)
+        {
+            Directory.CreateDirectory(BatonFolder);
+            var vertices = new List<Vector3>();
+            var triangles = new List<int>();
+            for (var ring = 0; ring < BatonProfile.Length; ring++)
+            {
+                for (var side = 0; side <= BatonSides; side++)
+                {
+                    var angle = side * Mathf.PI * 2f / BatonSides;
+                    var r = BatonProfile[ring].y;
+                    vertices.Add(new Vector3(Mathf.Cos(angle) * r, BatonProfile[ring].x, Mathf.Sin(angle) * r));
+                }
+            }
+
+            const int row = BatonSides + 1;
+            for (var ring = 0; ring + 1 < BatonProfile.Length; ring++)
+            {
+                for (var side = 0; side < BatonSides; side++)
+                {
+                    var a = (ring * row) + side;
+                    var b = a + row;
+                    triangles.AddRange(new[] { a, b, a + 1, a + 1, b, b + 1 });
+                }
+            }
+
+            var meshPath = $"{BatonFolder}/Baton.asset";
+            var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
+            if (mesh == null)
+            {
+                mesh = new Mesh { name = "Baton" };
+                AssetDatabase.CreateAsset(mesh, meshPath);
+            }
+
+            mesh.Clear();
+            mesh.SetVertices(vertices);
+            mesh.SetTriangles(triangles, 0);
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            EditorUtility.SetDirty(mesh);
+
+            var materialPath = $"{BatonFolder}/Baton_Wood.mat";
+            var material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+            if (material == null)
+            {
+                material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                material.SetColor("_BaseColor", new Color(0.2f, 0.12f, 0.07f)); // dark stained oak, as WORLD_STYLE_GUIDE's woods
+                material.SetFloat("_Smoothness", 0.45f);
+                AssetDatabase.CreateAsset(material, materialPath);
+            }
+
+            var root = new GameObject("Baton");
+            root.AddComponent<MeshFilter>().sharedMesh = mesh;
+            root.AddComponent<MeshRenderer>().sharedMaterial = material;
+            PrefabUtility.SaveAsPrefabAsset(root, Baton.Source);
+            Object.DestroyImmediate(root);
+            AssetDatabase.SaveAssets();
+            report.AppendLine($"baton model: {vertices.Count} vertices, {triangles.Count / 3} triangles, {BatonProfile[BatonProfile.Length - 1].x:0.00} m long");
+        }
+
+        /// <summary>
+        /// The held prefabs, each built from its source, or only <paramref name="only"/>'s with the rest kept as they stand.
+        /// A source no longer in the project, as the melee packs since firearms came first, keeps its held prefab.
+        /// </summary>
+        private static void Build(StringBuilder report, string only)
         {
             Directory.CreateDirectory(HeldFolder);
             var entries = new List<(Object Fight, GameObject Held)>();
-            foreach (var (asset, source, shape, length, grip, end) in Models)
+            foreach (var (asset, source, shape, length, grip, end) in Models.Append(Baton))
             {
-                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(source);
+                var prefab = only == null || asset == only ? AssetDatabase.LoadAssetAtPath<GameObject>(source) : null;
                 var fight = AssetDatabase.LoadAssetAtPath<Object>($"{Weapons}/{asset}.asset");
                 if (prefab == null || fight == null)
                 {
-                    report.AppendLine($"{asset}: NO {(prefab == null ? source : asset + ".asset")}");
+                    var kept = fight != null ? AssetDatabase.LoadAssetAtPath<GameObject>($"{HeldFolder}/Held_{asset}.prefab") : null;
+                    if (kept != null)
+                    {
+                        entries.Add((fight, kept));
+                    }
+
+                    if (only == null || asset == only)
+                    {
+                        report.AppendLine($"{asset}: NO {(prefab == null ? source : asset + ".asset")}{(kept != null ? ", its held prefab kept" : string.Empty)}");
+                    }
+
                     continue;
                 }
 
@@ -192,7 +308,10 @@ namespace GameDev.Slice.EditorTools
             EditorUtility.SetDirty(settings);
             AssetDatabase.SaveAssets();
             report.AppendLine($"{entries.Count} held models in {ModelsPath}, on {SliceConfrontSetup.SettingsPath}");
-            Sights(report);
+            if (only == null)
+            {
+                Sights(report);
+            }
         }
 
         // ------------------------------------------------------------------------------------------- the sights

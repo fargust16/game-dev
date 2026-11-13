@@ -64,6 +64,12 @@ namespace GameDev.Slice.Fights
         private readonly List<GameObject> _left = new List<GameObject>();
         private bool _brokeAway;
         private bool _yielded;
+
+        // 10.2 §5f: the character was subdued by a Warden's baton, and goes to the lock-up once the fight's beats are over.
+        private bool _subdued;
+
+        /// <summary>Authoring default, HP: what a subdued character wakes with, the Wardens binding its wound (COMBAT-9).</summary>
+        private const double SubduedHp = 1d;
         private bool _died;
         private string _yieldedTo;
         private string _terms;

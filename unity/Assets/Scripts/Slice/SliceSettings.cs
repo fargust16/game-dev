@@ -53,6 +53,9 @@ namespace GameDev.Slice
         [Tooltip("10.2 §5d (owner, 2026-11-12: firearms first): the pistol, with the Cartridge Pouch, of every fighter who carries one, the development kit's too.")]
         [SerializeField] private FightWeapon peoplePistol;
 
+        [Tooltip("10.2 §5f: the Wardens' baton, every Warden's second set beside its firearm; it subdues.")]
+        [SerializeField] private FightWeapon wardensBaton;
+
         [Tooltip("The Combat Grid's cell outlines.")]
         [SerializeField] private Material gridMaterial;
 
@@ -111,6 +114,8 @@ namespace GameDev.Slice
         public GameObject OpponentModel => opponentModel;
 
         public FightWeapon PeoplePistol => peoplePistol;
+
+        public FightWeapon WardensBaton => wardensBaton;
 
         public GameObject[] ChurchPeople => churchPeople;
 

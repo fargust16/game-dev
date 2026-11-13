@@ -53,6 +53,7 @@ namespace GameDev.Slice.EditorTools
             so.FindProperty("stealthRules").objectReferenceValue = Load<GameDev.Confront.Stealth.StealthRules>($"{Data}/StealthRules.asset");
             so.FindProperty("beastRules").objectReferenceValue = Load<GameDev.Slice.Beasts.BeastRules>("Assets/Data/Slice/BeastRules.asset");
             so.FindProperty("peoplePistol").objectReferenceValue = Load<FightWeapon>($"{Data}/Weapons/Pistol.asset");
+            so.FindProperty("wardensBaton").objectReferenceValue = Load<FightWeapon>($"{Data}/Weapons/WardensBaton.asset");
             so.FindProperty("kitRifle").objectReferenceValue = Load<FightWeapon>($"{Data}/Weapons/Rifle.asset");
             so.FindProperty("kitPouch").objectReferenceValue = Load<FightOffHand>($"{Data}/Weapons/CartridgePouch.asset");
             so.FindProperty("kitArmour").objectReferenceValue = Load<FightArmour>($"{Data}/Armour/Leather.asset");

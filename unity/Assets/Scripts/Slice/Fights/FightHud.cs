@@ -144,7 +144,7 @@ namespace GameDev.Slice.Fights
                     Math.Max(0, (int)Math.Round(result.Damage)));
             if (result.Downed)
             {
-                line += "  " + Loc.Format("ui.fight.log.down", whom);
+                line += "  " + Loc.Format(target.Subdued ? "ui.fight.log.subdued" : "ui.fight.log.down", whom);
             }
 
             _log.text = line;

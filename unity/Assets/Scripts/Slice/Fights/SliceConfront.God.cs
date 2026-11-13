@@ -159,10 +159,13 @@ namespace GameDev.Slice.Fights
             return null;
         }
 
-        /// <summary>A fighter brought down by a blow or a shot in a fight: a death, once, unless it is the character or a beast.</summary>
+        /// <summary>
+        /// A fighter brought down by a blow or a shot in a fight: a death, once, unless it is the character, a beast, or one
+        /// a Warden's baton subdued, who is taken away alive (10.2 §5f).
+        /// </summary>
         private void FightDeath(Combatant attacker, Combatant target)
         {
-            if (target == null || target == _playerCombatant || target.Beast || !target.Fighter.Down || !_dead.Add(target)
+            if (target == null || target == _playerCombatant || target.Beast || !target.Fighter.Down || target.Subdued || !_dead.Add(target)
                 || !_bodies.TryGetValue(target, out var body) || body == null)
             {
                 return;

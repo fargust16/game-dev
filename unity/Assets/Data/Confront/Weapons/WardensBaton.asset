@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ed45406196a4791949c5d860dc79e62, type: 3}
+  m_Name: WardensBaton
+  m_EditorClassIdentifier:
+  section: 10.2 §5f The Wardens' baton, Attribute Requirements
+  baseDamage: 5
+  attackAp: 4
+  twoHanded: 0
+  ranged: 0
+  heavy: 0
+  range: 1
+  toHit: 5
+  critical: 0
+  guard: 1
+  guardChance: 0.3
+  guardStops: 1
+  stun: 0
+  cleave: 0
+  stealthCritical: 0
+  takesShield: 0
+  bleedsOnCritical: 0
+  poisonOnHit: 0
+  unarmed: 0
+  subdues: 1
+  weight: 1
+  stage: 9
+  requirements:
+  - attribute: 2
+    atStageNine: 3

@@ -592,6 +592,14 @@ namespace GameDev.Slice.Fights
             _yieldedTo = null;
             if (_playerCombatant != null)
             {
+                // 10.2 §5f: a Warden's baton subdues: the character wakes in the Arrest's lock-up, its wound bound (COMBAT-9).
+                _subdued = _playerCombatant.Subdued;
+                if (_subdued)
+                {
+                    _playerCombatant.Fighter.Hp = SubduedHp;
+                    _playerCombatant.Fighter.Bleeding = false;
+                }
+
                 Unequip(_playerCombatant);
                 _died = _playerCombatant.Fighter.Down;
                 foreach (var pair in _groups)
@@ -649,6 +657,11 @@ namespace GameDev.Slice.Fights
             _groups.Clear();
             _punches.Clear();
             _playerCombatant = null;
+            if (_subdued)
+            {
+                _subdued = false;
+                GoToLockUp();
+            }
         }
 
         /// <summary>
@@ -876,7 +889,7 @@ namespace GameDev.Slice.Fights
                 return FightBeats.Shield;
             }
 
-            return weapon.TakesShield ? FightBeats.OneHand : FightBeats.Dagger;
+            return weapon.TakesShield || weapon.Subdues ? FightBeats.OneHand : FightBeats.Dagger; // the baton swings as a one-handed weapon
         }
 
         /// <summary>Two free cells the given distance from the player, as far apart as the ring gives, into <see cref="_ring"/>.</summary>

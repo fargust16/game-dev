@@ -20,6 +20,70 @@ namespace GameDev.Confront.Turns
 
         public int PeopleOnLine(Combatant attacker, CombatCell from, Combatant target) => OnLine(attacker, from, target);
 
+        /// <summary>10.2 §5f *The AI*: how many of <paramref name="attacker"/>'s own people stand on its line from <paramref name="from"/>.</summary>
+        private int FriendsOnLine(Combatant attacker, CombatCell from, Combatant target)
+        {
+            var count = OnLine(attacker, from, target);
+            var friends = 0;
+            for (var i = 0; i < count; i++)
+            {
+                friends += _onLine[i].Who.Side == attacker.Side ? 1 : 0;
+            }
+
+            return friends;
+        }
+
+        /// <summary>
+        /// 10.2 §5f *The AI*: a shooter whose line to its target has its own people on it steps to a free cell beside it
+        /// with no friend on the line, the shot clear and in range from there and no enemy at its sides or corners, when
+        /// the AP still buy the shot after the step (`tactical_sim.py` clear_step). The step draws a Reaction Attack as
+        /// any step does. False when no such cell is found or the AP do not stretch.
+        /// </summary>
+        private bool StepAside(Combatant c, Combatant target)
+        {
+            var weapon = c.Fighter.Weapon;
+            if (!weapon.Ranged || c.Fighter.LegBroken || ApLeft < 1 + weapon.AttackAp || FriendsOnLine(c, c.Cell, target) == 0)
+            {
+                return false;
+            }
+
+            var here = c.Cell;
+            var size = _grid.CellSize;
+            for (var dx = -1; dx <= 1; dx++)
+            {
+                for (var dz = -1; dz <= 1; dz++)
+                {
+                    if ((dx == 0 && dz == 0)
+                        || !_grid.TryCellAt(new UnityEngine.Vector3((here.X + dx + 0.5f) * size, _grid.Center(here).y, (here.Z + dz + 0.5f) * size), out var cell)
+                        || !_grid.CanStep(here, cell) || _grid.OccupantAt(cell) >= 0 || NearAnEnemy(c, cell)
+                        || !ReachesFrom(c, cell, target) || FriendsOnLine(c, cell, target) > 0)
+                    {
+                        continue;
+                    }
+
+                    _route.Clear();
+                    _route.Add(cell);
+                    return Walk(c, _route, 1, null) == 1;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>An enemy standing at a side or a corner of <paramref name="cell"/>.</summary>
+        private bool NearAnEnemy(Combatant c, CombatCell cell)
+        {
+            foreach (var f in _order)
+            {
+                if (f.Standing && f.Side != c.Side && Math.Max(Math.Abs(f.Cell.X - cell.X), Math.Abs(f.Cell.Z - cell.Z)) <= 1)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>Whoever takes <paramref name="attacker"/>'s shot from <paramref name="from"/> at <paramref name="target"/>: someone on the line, or the target.</summary>
         private Combatant ShotTaker(Combatant attacker, CombatCell from, Combatant target)
         {

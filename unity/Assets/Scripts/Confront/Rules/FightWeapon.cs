@@ -69,6 +69,9 @@ namespace GameDev.Confront.Rules
         [Tooltip("10.2 §5c: fists, a character's empty hands; no model is held and the fists' clips are played.")]
         [SerializeField] private bool unarmed;
 
+        [Tooltip("10.2 §5f The Wardens' baton: a person it brings to 0 HP is subdued, unconscious and not dead, and arrested; a beast dies.")]
+        [SerializeField] private bool subdues;
+
         [Tooltip("10.2 §5b Load in a Fight: kg.")]
         [SerializeField] private float weight = 2f;
 
@@ -106,6 +109,9 @@ namespace GameDev.Confront.Rules
         public float PoisonOnHit => poisonOnHit;
         public float Weight => weight;
         public bool Unarmed => unarmed;
+
+        /// <summary>10.2 §5f The Wardens' baton: a person it brings to 0 HP falls unconscious, not dead.</summary>
+        public bool Subdues => subdues;
         public int Stage => stage;
         public IReadOnlyList<AttributeRequirement> Requirements => requirements;
     }

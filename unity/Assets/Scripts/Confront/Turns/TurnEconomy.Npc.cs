@@ -11,8 +11,9 @@ namespace GameDev.Confront.Turns
     /// `tools/balance/tactical_sim.py` plays them. It scores each enemy by Target Impact and goes for the best. A melee
     /// fighter strikes the enemy beside it when it will not reach its target this turn. A shooter shoots its best target
     /// in range and steps back with the AP left. A melee fighter waits when an enemy still to act will walk into its
-    /// reach, and holds back in a Defensive Stance rather than walk into such an enemy's reach. A firearm carried to open
-    /// the fight gives way to the melee set after its shot.
+    /// reach, and holds back in a Defensive Stance rather than walk into such an enemy's reach. Since the combat rework
+    /// (10.2 §5f *The AI*) a firearm comes first: a shooter takes its melee set only beside an enemy and when it pays, weighs
+    /// its own people on a Shot Line and steps aside from them, and a Warden takes its baton beside an enemy.
     /// </summary>
     public sealed partial class TurnEconomy
     {
@@ -77,6 +78,7 @@ namespace GameDev.Confront.Turns
             }
 
             var first = true;
+            var stepped = false;
             for (var decision = 0; decision < MaxDecisions && IsRunning && Acting == c && ApLeft > 0; decision++)
             {
                 Foes(c, _foes);
@@ -104,6 +106,16 @@ namespace GameDev.Confront.Turns
                 var target = c.Intent;
                 if (Reaches(c, target))
                 {
+                    // 10.2 §5f: a shooter's own people on the line, once a turn, before its first shot.
+                    if (first && !stepped && c.Fighter.Weapon.Ranged)
+                    {
+                        stepped = true;
+                        if (StepAside(c, target))
+                        {
+                            continue;
+                        }
+                    }
+
                     if (!Strike(c, target))
                     {
                         break;
@@ -228,7 +240,22 @@ namespace GameDev.Confront.Turns
                 }
             }
 
-            return crowd >= _rules.CrowdAllies ? value * _rules.CrowdFactor : value;
+            if (crowd >= _rules.CrowdAllies)
+            {
+                value *= _rules.CrowdFactor;
+            }
+
+            // 10.2 §5f *The AI*: a target behind the shooter's own people counts (1 - the interception share) as much for each.
+            if (c.Fighter.Weapon != null && c.Fighter.Weapon.Ranged && _rules.Intercept > 0f)
+            {
+                var friends = FriendsOnLine(c, from, e);
+                if (friends > 0)
+                {
+                    value *= Math.Pow(1d - _rules.Intercept, friends);
+                }
+            }
+
+            return value;
         }
 
         /// <summary>The enemy that scores highest, the first in Initiative's order on a tie.</summary>
@@ -346,9 +373,11 @@ namespace GameDev.Confront.Turns
         }
 
         /// <summary>
-        /// 10.2 §5b Weapon Sets: a firearm gives way to the melee set after its first shot when it was carried to open the
-        /// fight, and for a shooter once an enemy stands beside it; a shooter takes the firearm back when none does. A
-        /// shooter is a fighter whose Ranged Skill is above its Melee Skill (S3a.8 working reading).
+        /// 10.2 §5f *The AI: a firearm first*: a shooter takes its melee set only when an enemy stands beside it and that
+        /// set's harm over the AP left, the change paid, beats its point-blank shots, and takes the firearm back when none
+        /// does; a Warden takes its baton beside an enemy and its firearm back when free; a melee build that opened with a
+        /// firearm gives way to its melee set after its first shot (§5b). A shooter is a fighter whose Light Firearms is
+        /// above its Light Melee (S3a.8 working reading).
         /// </summary>
         private bool ChangesSet(Combatant c)
         {
@@ -358,19 +387,45 @@ namespace GameDev.Confront.Turns
                 return false;
             }
 
-            var touched = false;
+            Combatant near = null;
             foreach (var f in _foes)
             {
-                touched |= !f.Helpless && Beside(c.Cell, f.Cell);
+                if (!f.Helpless && Beside(c.Cell, f.Cell) && (near == null || Threat(f) > Threat(near)))
+                {
+                    near = f;
+                }
             }
 
             var shooter = Shooter(c);
             if (c.Fighter.Weapon.Ranged && !second.Weapon.Ranged)
             {
-                return shooter ? touched : c.Fired;
+                if (second.Weapon.Subdues)
+                {
+                    return near != null;
+                }
+
+                return shooter ? near != null && MeleePays(c, near) : c.Fired;
             }
 
-            return !c.Fighter.Weapon.Ranged && second.Weapon.Ranged && shooter && !touched;
+            return !c.Fighter.Weapon.Ranged && second.Weapon.Ranged && (shooter || c.Fighter.Weapon.Subdues) && near == null;
+        }
+
+        /// <summary>
+        /// 10.2 §5f: whether the melee set's blows with the AP left after the change beat the firearm's shots at
+        /// <paramref name="near"/> from here, which aim worse beside an enemy and meet its armour plain
+        /// (<see cref="ContextFor"/>), as `tactical_sim.py` changes_set weighs them.
+        /// </summary>
+        private bool MeleePays(Combatant c, Combatant near)
+        {
+            var shots = (ApLeft / Math.Max(1, c.Fighter.Weapon.AttackAp)) * ExpectedBlow(c, c.Cell, near);
+            if (!c.Fighter.SwapSets())
+            {
+                return false;
+            }
+
+            var blows = (Math.Max(0, ApLeft - _rules.WeaponSetAp) / Math.Max(1, c.Fighter.BlowAp)) * ExpectedBlow(c, c.Cell, near);
+            c.Fighter.SwapSets();
+            return blows > shots;
         }
 
         /// <summary>

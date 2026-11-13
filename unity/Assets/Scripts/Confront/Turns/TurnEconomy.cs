@@ -660,6 +660,7 @@ namespace GameDev.Confront.Turns
                 c.Fighter.Reserve = ApLeft;
                 var result = _rules.Strike(e.Fighter, c.Fighter, ContextFor(e, e.Cell, c), _rolls);
                 Afflict(c, result);
+                Subdue(e, c);
                 ApLeft = c.Fighter.Reserve;
                 c.Fighter.Reserve = 0;
                 if (c.Fighter.Down)
@@ -700,6 +701,7 @@ namespace GameDev.Confront.Turns
             var context = ContextFor(c, c.Cell, target);
             context.Stealth = c.Hidden; // 10.3 §7: an attack from Stealth Mode, which it ends
             var result = _rules.Strike(c.Fighter, target.Fighter, context, _rolls);
+            Subdue(c, target);
             result.OffHand = c.Fighter.OffHand;
             c.LastOffHand = result.OffHand;
             c.Fighter.OffHand = false;
@@ -799,6 +801,7 @@ namespace GameDev.Confront.Turns
             Face(defender, attacker.Cell);
             var result = _rules.Strike(defender.Fighter, attacker.Fighter, ContextFor(defender, defender.Cell, attacker), _rolls);
             Afflict(attacker, result);
+            Subdue(defender, attacker);
             if (attacker.Fighter.Down)
             {
                 _grid.Vacate(attacker.Id);
@@ -808,6 +811,18 @@ namespace GameDev.Confront.Turns
         }
 
         /// <summary>10.2 *Beasts of the slice*: a beast's critical hit makes its target bleed, and a glowing bite may poison it.</summary>
+        /// <summary>
+        /// 10.2 §5f The Wardens' baton: a person the striking weapon subdues, brought to 0 HP by it, lies unconscious and
+        /// not dead; a beast dies. Read before the other hand's flag is cleared, so the weapon is the one that struck.
+        /// </summary>
+        private static void Subdue(Combatant attacker, Combatant target)
+        {
+            if (target.Fighter.Down && !target.Beast && attacker.Fighter.Weapon != null && attacker.Fighter.Weapon.Subdues)
+            {
+                target.Subdued = true;
+            }
+        }
+
         private static void Afflict(Combatant target, StrikeResult result)
         {
             target.Fighter.Bleeding |= result.Bleeds;

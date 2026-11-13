@@ -186,6 +186,7 @@ namespace GameDev.Confront.Turns
             attacker.Fired |= attacker.Fighter.Weapon.Ranged;
             var result = _rules.Strike(attacker.Fighter, target.Fighter, context, _rolls);
             Afflict(target, result);
+            Subdue(attacker, target);
             if (target.Fighter.Down)
             {
                 _grid.Vacate(target.Id);

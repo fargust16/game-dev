@@ -97,13 +97,15 @@ namespace GameDev.Slice.Fights
         /// from who it is. A Warden carries a pistol, or a rifle one in three, and the cult and the Veinmarket's collectors
         /// a pistol, each keeping the numbers it fights with; a resident fights with its role's attributes, Limit and
         /// firearm (§5a *Roles*), with its fists when the role carries none. Every firearm comes with its Cartridge Pouch,
-        /// and nobody carries a melee weapon. The cult's senior with a rifle waits for the ritual's fight.
+        /// and nobody carries a melee weapon but the Wardens, whose second set is the baton that subdues (§5f). The cult's
+        /// senior with a rifle waits for the ritual's fight.
         /// </summary>
         private Fighter Armed(Transform body, string group)
         {
             var role = group == Wardens ? ResidentRole.Warden : group == Residents ? PersonRole.Of(body) : ResidentRole.Cult;
             var made = ResidentRoles.Make(role, Who(body), _seed);
-            return Wounded(body, _settings.FightRules.Fighter(made.Sheet, made.Limit, Arms(made.Firearm)));
+            var second = role == ResidentRole.Warden && _settings.WardensBaton != null ? new WeaponSet(_settings.WardensBaton) : default;
+            return Wounded(body, _settings.FightRules.Fighter(made.Sheet, made.Limit, Arms(made.Firearm), null, second));
         }
 
         private WeaponSet Arms(RoleFirearm firearm) => firearm switch

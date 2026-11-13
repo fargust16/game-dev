@@ -90,6 +90,12 @@ namespace GameDev.Confront.Turns
         /// </summary>
         public Vector2Int Facing { get; internal set; }
 
+        /// <summary>
+        /// 10.2 §5f The Wardens' baton: a subduing blow brought it to 0 HP, so it lies unconscious, not dead, and is
+        /// arrested; never a beast, which a baton kills.
+        /// </summary>
+        public bool Subdued { get; internal set; }
+
         /// <summary>It has fired in this fight, so a firearm carried to open the fight gives way to its melee set (10.2 §5b).</summary>
         internal bool Fired { get; set; }
 
