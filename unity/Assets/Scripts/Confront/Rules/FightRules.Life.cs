@@ -106,7 +106,8 @@ namespace GameDev.Confront.Rules
         /// 10.1 Success and Failure: an Environment Action's chance on the curve of 07.1, the attribute alone against the
         /// band's D (Climbing and Jumping are candidate skills), with its secondaries and Luck. It has no critical outcome.
         /// </summary>
-        public double EnvironmentChance(ICharacterValues values, EnvironmentActionKind kind, EnvironmentActionBand band)
+        /// <param name="shift">Points on the preparation, as a troubled mind takes (07.2 §3.4).</param>
+        public double EnvironmentChance(ICharacterValues values, EnvironmentActionKind kind, EnvironmentActionBand band, int shift = 0)
         {
             var secondary = EnvironmentSecondary[(int)kind];
             if (_secondaryLevels == null || _secondaryLevels.Length != secondary.Length)
@@ -119,13 +120,13 @@ namespace GameDev.Confront.Rules
                 _secondaryLevels[i] = values.Get(secondary[i]);
             }
 
-            return ActionCheck.Chances(checks, values.Get(EnvironmentAttribute[(int)kind]), BandDifficulty(band),
+            return ActionCheck.Chances(checks, values.Get(EnvironmentAttribute[(int)kind]) + shift, BandDifficulty(band),
                 values.Get(CharacterAttribute.Perception), values.Get(CharacterAttribute.Luck), false, _secondaryLevels).Success;
         }
 
         /// <summary>10.2 First Aid in the slice: `Δ = (Dexterity + First Aid skill) / 2 − D` on the curve of 07.1, with Luck.</summary>
-        public double TreatmentChance(ICharacterValues values, Treatment treatment) =>
-            ActionCheck.Chances(checks, ActionCheck.Preparation(values.Get(CharacterAttribute.Dexterity), values.Get(CharacterSkill.FirstAid)),
+        public double TreatmentChance(ICharacterValues values, Treatment treatment, int shift = 0) =>
+            ActionCheck.Chances(checks, ActionCheck.Preparation(values.Get(CharacterAttribute.Dexterity), values.Get(CharacterSkill.FirstAid)) + shift,
                 treatmentDifficulty[(int)treatment], values.Get(CharacterAttribute.Perception), values.Get(CharacterAttribute.Luck), false).Success;
 
         /// <summary>Whether the fighter has the condition the treatment ends.</summary>

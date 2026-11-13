@@ -198,6 +198,57 @@ namespace GameDev.Slice.Fights
             }
         }
 
+        /// <summary>The character's mind (S5b.6): Will Power's return, and what full exhaustion costs and gives.</summary>
+        public GameDev.Slice.Mind.SliceMind Mind { get; set; }
+
+        private Fighter _wpFighter;
+        private double _wpSeen;
+
+        /// <summary>
+        /// 07.2 §3.3–3.4 (S5b.6): Will Power the player's fighter spent since the last look counts toward its episode, and
+        /// reaching zero through its use, an ability's or Infusion's, is full exhaustion: Sanity damage, and Will's XP once an
+        /// episode that spent 30 % of the maximum. Only the fighter's own use spends its Will Power, so a fall is a use.
+        /// </summary>
+        private void WatchWillPower()
+        {
+            var f = _playerCombatant != null ? _playerCombatant.Fighter : null;
+            if (Mind == null || f == null || f.MaxWillPower <= 0d)
+            {
+                _wpFighter = null;
+                return;
+            }
+
+            if (f != _wpFighter)
+            {
+                _wpFighter = f;
+                _wpSeen = f.WillPower;
+                return;
+            }
+
+            if (f.WillPower < _wpSeen)
+            {
+                Mind.Spent(_wpSeen - f.WillPower, f.MaxWillPower);
+                if (f.WillPower <= 0d && _wpSeen > 0d)
+                {
+                    Exhausted(f);
+                }
+            }
+
+            _wpSeen = f.WillPower;
+        }
+
+        private void Exhausted(Fighter f)
+        {
+            var (damage, reward) = Mind.Exhaust(f.Values.Get(CharacterAttribute.Will), _settings.FightRules.LimitMultiplier(f.Limit));
+            if (reward && _character != null)
+            {
+                _character.Gain(CharacterAttribute.Will, Growth.ExhaustionWillXp);
+            }
+
+            Debug.Log($"[Slice] full exhaustion: Sanity −{damage}, Will XP {(reward ? Growth.ExhaustionWillXp : 0)}.");
+            _hud?.Line(Loc.Format("ui.fight.log.exhausted", Name(_playerCombatant)));
+        }
+
         /// <summary>Keeps the Will Power the fighter has left.</summary>
         private void SaveWillPower(Fighter fighter)
         {

@@ -27,6 +27,9 @@ namespace GameDev.Slice
 
         public bool Running => _done != null;
 
+        /// <summary>The share Fatigue and Sanity narrow every bar's zones to (07.2 §3.3–3.4, S5b.6); null for none.</summary>
+        public Func<double> Narrowing { get; set; }
+
         public ReactionBar Bar => _bar;
 
         /// <summary>Where the marker is now, from 0 to 1.</summary>
@@ -46,7 +49,7 @@ namespace GameDev.Slice
 
             _hold = hold;
 
-            _bar = bar;
+            _bar = Narrowing != null ? bar.Narrowed(Narrowing()) : bar;
             _done = done;
             _elapsed = 0d;
             _caption = Loc.Get(captionKey);

@@ -227,13 +227,17 @@ namespace GameDev.Slice.Gear
         /// The character as a fighter in what it wears and holds; <paramref name="fists"/> in a set with no weapon, and at
         /// <paramref name="limit"/>, null for the Uninitiated (05.1).
         /// </summary>
-        public Fighter Fighter(FightRules rules, ICharacterValues values, FightWeapon fists, int? limit = null)
+        /// <param name="mind">What a troubled mind and Fatigue take: points to hit and a share of Will Power (07.2 §3.3–3.4, S5b.6).</param>
+        public Fighter Fighter(FightRules rules, ICharacterValues values, FightWeapon fists, int? limit = null, FightModifiers mind = default)
         {
             var first = SetOf(WearSlot.WeaponOne, WearSlot.OffHandOne) ?? new WeaponSet(fists);
             var second = SetOf(WearSlot.WeaponTwo, WearSlot.OffHandTwo) ?? default(WeaponSet);
             var armour = Armour(rules, values);
             var held = first.Weight + second.Weight + (armour != null ? armour.Weight : 0f);
-            return rules.Fighter(values, limit, first, armour, second, Modifiers(values), Math.Max(0d, _bag.Weight - held));
+            var modifiers = Modifiers(values);
+            modifiers.accuracy += mind.accuracy;
+            modifiers.willPower += mind.willPower;
+            return rules.Fighter(values, limit, first, armour, second, modifiers, Math.Max(0d, _bag.Weight - held));
         }
 
         /// <summary>

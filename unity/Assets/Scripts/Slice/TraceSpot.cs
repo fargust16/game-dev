@@ -114,13 +114,14 @@ namespace GameDev.Slice
         /// The close look's chance (07.1 §4–6): Perception alone against the difficulty, Intelligence its secondary
         /// attribute, Luck; it has no critical outcome.
         /// </summary>
-        public static double LookChance(ActionCheckRules rules, ICharacterValues character, int difficulty) =>
-            ActionCheck.Chances(rules, character.Get(CharacterAttribute.Perception), difficulty, character.Get(CharacterAttribute.Perception),
+        /// <param name="shift">Points on the preparation, as a troubled mind takes (07.2 §3.4).</param>
+        public static double LookChance(ActionCheckRules rules, ICharacterValues character, int difficulty, int shift = 0) =>
+            ActionCheck.Chances(rules, character.Get(CharacterAttribute.Perception) + shift, difficulty, character.Get(CharacterAttribute.Perception),
                 character.Get(CharacterAttribute.Luck), false, new[] { character.Get(CharacterAttribute.Intelligence) }).Success;
 
         /// <summary>Whether the close look succeeds, one draw from <paramref name="rolls"/>.</summary>
-        public static bool LookSucceeds(ActionCheckRules rules, ICharacterValues character, int difficulty, Random rolls) =>
-            rolls.NextDouble() < LookChance(rules, character, difficulty);
+        public static bool LookSucceeds(ActionCheckRules rules, ICharacterValues character, int difficulty, Random rolls, int shift = 0) =>
+            rolls.NextDouble() < LookChance(rules, character, difficulty, shift);
 
         public bool InReach(Vector3 position) => InteractReach.Within(transform, position, interactRadius);
 
@@ -180,7 +181,7 @@ namespace GameDev.Slice
         private string TakeCloseLook(SliceWorldDriver world)
         {
             var rolls = world.Seed.Fork(SliceSeedStreams.ActionChecks, GameDev.World.Seed.StableHash.Of(tip), (int)world.Clock.Tick);
-            var told = LookSucceeds(world.ActionChecks, world.Character, lookDifficulty, rolls) ? linkTip : misreadTip;
+            var told = LookSucceeds(world.ActionChecks, world.Character, lookDifficulty, rolls, world.Mind != null ? world.Mind.CheckPenalty : 0) ? linkTip : misreadTip;
             world.State.Raise(lookedKey);
             world.Tips.Tell(told, world.Clock.Tick);
             if (lookMinutes > 0)

@@ -37,6 +37,9 @@ namespace GameDev.Dialogue
 
         /// <summary>What the sources say and the player has heard (09); null hides every option that asks for a tip.</summary>
         public TipBook Tips { get; set; }
+
+        /// <summary>Points a troubled mind and Fatigue put on every Social Check (07.2 §3.3–3.4, S5b.6); null for none.</summary>
+        public Func<int> MindPenalty { get; set; }
     }
 
     /// <summary>
@@ -102,7 +105,8 @@ namespace GameDev.Dialogue
             var attitude = _world.Standing.Attitude(listener.id);
             var standing = _world.Standing.Reading(option.skill, listener.enemy);
             var arguments = Math.Min(2, Math.Max(0, option.arguments.Count(_world.State.IsSet) - 1));
-            var modifiers = SocialCheck.Modifiers(rules, attitude + standing.Modifier + arguments);
+            var mind = _world.MindPenalty != null ? _world.MindPenalty() : 0;
+            var modifiers = SocialCheck.Modifiers(rules, attitude + standing.Modifier + arguments + mind);
             var luck = _world.Character.Get(CharacterAttribute.Luck);
             var chance = SocialCheck.Chance(rules, characterValue, modifiers, difficulty, luck);
             return new CheckPreview(chance, characterValue, listenerValue, difficulty, attitude, standing, arguments, modifiers);

@@ -75,6 +75,59 @@ namespace GameDev.Slice.Stealth
 
         private void Awake() => _stealth = GetComponent<SliceStealth>();
 
+        private Mark _phantom;
+        private Vector3 _phantomAt;
+        private float _phantomFrom;
+        private float _phantomFill = 1f;
+        private float _phantomUntil = -1f;
+
+        /// <summary>
+        /// 07.2 §3.4, Severe disturbance and below (S5b.6): a Notice Meter fills over <paramref name="at"/>, where nobody
+        /// is, in <paramref name="fill"/> seconds, and goes after <paramref name="seconds"/>. A symptom: no observer reads
+        /// it, and it shows whatever the character's Perception, since the mind makes it.
+        /// </summary>
+        public void ShowPhantom(Vector3 at, float fill, float seconds)
+        {
+            _phantomAt = at;
+            _phantomFrom = Time.unscaledTime;
+            _phantomFill = Mathf.Max(0.1f, fill);
+            _phantomUntil = _phantomFrom + Mathf.Max(fill, seconds);
+        }
+
+        /// <summary>Whether the false meter is drawn now (for tests).</summary>
+        public bool ShowsPhantom => _phantom != null && _phantom.Box.style.display == DisplayStyle.Flex;
+
+        private void PlacePhantom(Camera camera, Vector3 eye)
+        {
+            if (_phantom == null)
+            {
+                if (Time.unscaledTime >= _phantomUntil)
+                {
+                    return;
+                }
+
+                _phantom = NewMark();
+            }
+
+            var now = Time.unscaledTime;
+            var on = now < _phantomUntil && (_phantomAt - eye).sqrMagnitude < MarkReach * MarkReach
+                     && Vector3.Dot(camera.transform.forward, _phantomAt - eye) > 0f;
+            _phantom.Box.style.display = on ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!on)
+            {
+                return;
+            }
+
+            var fill = Mathf.Clamp01((now - _phantomFrom) / _phantomFill);
+            _phantom.Bar.style.display = DisplayStyle.Flex;
+            _phantom.Line.style.display = DisplayStyle.None;
+            _phantom.Fill.style.width = Length.Percent(fill * 100f);
+            _phantom.Fill.style.backgroundColor = fill >= 1f ? Blood : Color.Lerp(Parchment, Brass, fill);
+            var point = RuntimePanelUtils.CameraTransformWorldToPanel(_root.panel, _phantomAt, camera);
+            _phantom.Box.style.left = point.x;
+            _phantom.Box.style.top = point.y;
+        }
+
         private void LateUpdate()
         {
             var camera = Camera.main;
@@ -92,6 +145,8 @@ namespace GameDev.Slice.Stealth
             {
                 Place(Of(o), o, camera, eye, showMeter);
             }
+
+            PlacePhantom(camera, eye);
 
             _gone.Clear();
             foreach (var pair in _marks)
@@ -151,7 +206,14 @@ namespace GameDev.Slice.Stealth
                 return mark;
             }
 
-            mark = new Mark { Box = new VisualElement(), Bar = new VisualElement(), Fill = new VisualElement(), Line = new Label() };
+            mark = NewMark();
+            _marks[o] = mark;
+            return mark;
+        }
+
+        private Mark NewMark()
+        {
+            var mark = new Mark { Box = new VisualElement(), Bar = new VisualElement(), Fill = new VisualElement(), Line = new Label() };
             var box = mark.Box.style;
             box.position = Position.Absolute;
             box.alignItems = Align.Center;
@@ -180,7 +242,6 @@ namespace GameDev.Slice.Stealth
             mark.Box.Add(mark.Bar);
             mark.Box.pickingMode = PickingMode.Ignore;
             _layer.Add(mark.Box);
-            _marks[o] = mark;
             return mark;
         }
 
@@ -201,6 +262,7 @@ namespace GameDev.Slice.Stealth
 
             _root = document.rootVisualElement;
             _marks.Clear();
+            _phantom = null;
             _layer = new VisualElement { name = "stealth", pickingMode = PickingMode.Ignore };
             _layer.style.position = Position.Absolute;
             _layer.style.left = _layer.style.top = _layer.style.right = _layer.style.bottom = 0;

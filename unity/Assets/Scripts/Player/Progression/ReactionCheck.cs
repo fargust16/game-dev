@@ -20,13 +20,15 @@ namespace GameDev.Player.Progression
     /// </summary>
     public readonly struct ReactionBar
     {
-        public ReactionBar(double goodStart, double goodWidth, double perfectStart = 0d, double perfectWidth = 0d, double seconds = ReactionCheck.Seconds)
+        public ReactionBar(double goodStart, double goodWidth, double perfectStart = 0d, double perfectWidth = 0d, double seconds = ReactionCheck.Seconds,
+            double floor = ReactionCheck.LeastWidth)
         {
             GoodStart = goodStart;
             GoodWidth = goodWidth;
             PerfectStart = perfectStart;
             PerfectWidth = perfectWidth;
             Seconds = seconds;
+            Floor = floor;
         }
 
         public double GoodStart { get; }
@@ -39,6 +41,27 @@ namespace GameDev.Player.Progression
 
         /// <summary>How long the marker takes to cross the bar.</summary>
         public double Seconds { get; }
+
+        /// <summary>The narrowest its good zone may become: 07.1 §8a's 5 %, or brewing's own 12 % (20 §3).</summary>
+        public double Floor { get; }
+
+        /// <summary>
+        /// The bar with its zones narrowed to <paramref name="share"/> about their middles, by Fatigue and Sanity (07.2 §3.3–3.4),
+        /// the good zone held at <see cref="Floor"/> and the perfect zone keeping its share of it.
+        /// </summary>
+        public ReactionBar Narrowed(double share)
+        {
+            if (share >= 1d || GoodWidth <= 0d)
+            {
+                return this;
+            }
+
+            var width = Math.Min(GoodWidth, Math.Max(Floor, GoodWidth * Math.Max(0d, share)));
+            var start = GoodStart + ((GoodWidth - width) / 2d);
+            var inner = PerfectWidth * (width / GoodWidth);
+            var perfectStart = PerfectWidth > 0d ? PerfectStart + ((PerfectWidth - inner) / 2d) : 0d;
+            return new ReactionBar(start, width, perfectStart, inner, Seconds, Floor);
+        }
 
         /// <summary>The marker's place after <paramref name="elapsed"/> seconds, from 0; past 1 it has left the bar.</summary>
         public double MarkerAt(double elapsed) => Seconds > 0d ? elapsed / Seconds : 1d;

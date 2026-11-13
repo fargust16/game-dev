@@ -133,6 +133,9 @@ namespace GameDev.Confront.Rules
         /// </summary>
         public int Defenceless { get; set; }
 
+        /// <summary>07.2 §3.4: points on the preparation of its Action Checks, a troubled mind's (S5b.6); 0 for an NPC.</summary>
+        public int CheckShift { get; set; }
+
         /// <summary>05.1 Укол разума: Disorientation, which aims its next turn worse.</summary>
         public int Disoriented { get; set; }
 

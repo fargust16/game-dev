@@ -62,6 +62,7 @@ namespace GameDev.Slice.Fights
                 : _settings.FightRules.Fighter(_character, PlayerLimit, Arms(RoleFirearm.Pistol), _settings.KitArmour, Arms(RoleFirearm.Rifle));
             Initiate(fighter); // CR4: its Arcana, Prepared abilities and Will Power
             fighter.Defenceless = Defenceless != null ? Defenceless() : 0; // 20 §3: Stunned while a potion settles
+            fighter.CheckShift = Mind != null ? Mind.CheckPenalty : 0; // 07.2 §3.4: a troubled mind's Action Checks
             if (_state != null)
             {
                 fighter.Hp = fighter.MaxHp * (1d - (Mathf.Clamp(_state.Get(HpLostKey), 0, 1000) / 1000d));
@@ -127,7 +128,11 @@ namespace GameDev.Slice.Fights
                 return;
             }
 
-            RestoreWillPower();
+            if (Mind == null || Mind.WillPowerReturns(tick))
+            {
+                RestoreWillPower(); // 07.2 §3.3–3.4: slower below Stable, none Very tired
+            }
+
             if (Healthy)
             {
                 return;

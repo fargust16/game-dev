@@ -39,7 +39,17 @@ namespace GameDev.Slice.Fights
         private GUIStyle _button;
         private GUIStyle _note;
 
+        public const string DeathTitle = "ui.death.title";
+
+        /// <summary>The title of a run ended by Sanity lost (07.2 §3.4).</summary>
+        public const string SanityTitle = "ui.death.sanity";
+
+        private string _titleKey = DeathTitle;
+
         public static bool Shown => _shown != null;
+
+        /// <summary>The shown panel's title key, or null (for tests).</summary>
+        public static string ShownTitle => _shown != null ? _shown._titleKey : null;
 
         /// <summary>True from Start again until the new scene has loaded.</summary>
         public bool Restarting => _restarting;
@@ -47,7 +57,8 @@ namespace GameDev.Slice.Fights
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics() => _shown = null;
 
-        public static void Show(IWorldClock clock)
+        /// <param name="titleKey">What ended the run: death, or Sanity lost (07.2 §3.4, S5b.6).</param>
+        public static void Show(IWorldClock clock, string titleKey = DeathTitle)
         {
             if (_shown != null)
             {
@@ -57,6 +68,7 @@ namespace GameDev.Slice.Fights
             var go = new GameObject("Death screen");
             DontDestroyOnLoad(go);
             _shown = go.AddComponent<SliceDeathScreen>();
+            _shown._titleKey = titleKey ?? DeathTitle;
             _shown._pause = clock?.Pause();
             _shown._world = FindAnyObjectByType<SliceWorldDriver>();
             Cursor.lockState = CursorLockMode.None;
@@ -181,7 +193,7 @@ namespace GameDev.Slice.Fights
             _note.normal.textColor = new Color(0.66f, 0.62f, 0.55f);
             _button.fontSize = Mathf.RoundToInt(28f * scale);
             _button.normal.textColor = TitleColour;
-            GUI.Label(new Rect(panel.x, panel.y + (40f * scale), panel.width, 120f * scale), Loc.Get("ui.death.title"), _title);
+            GUI.Label(new Rect(panel.x, panel.y + (40f * scale), panel.width, 120f * scale), Loc.Get(_titleKey), _title);
 
             if (_restarting)
             {

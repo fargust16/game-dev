@@ -197,7 +197,8 @@ namespace GameDev.Slice.People
             var difficulty = SocialCheck.Difficulty(rules, RequestSize.Ordinary, listenerValue, false);
             var attitude = _world.Standing.Attitude(Listener);
             var standing = _world.Standing.Reading(skill, false);
-            var modifiers = SocialCheck.Modifiers(rules, attitude + standing.Modifier);
+            var mind = _world.Mind != null ? _world.Mind.SocialPenalty : 0; // 07.2 §3.3–3.4
+            var modifiers = SocialCheck.Modifiers(rules, attitude + standing.Modifier + mind);
             var chance = SocialCheck.Chance(rules, characterValue, modifiers, difficulty, _world.Character.Get(CharacterAttribute.Luck));
             return new CheckPreview(chance, characterValue, listenerValue, difficulty, attitude, standing, 0, modifiers);
         }

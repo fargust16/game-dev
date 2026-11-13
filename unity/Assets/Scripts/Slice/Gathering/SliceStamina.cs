@@ -74,6 +74,9 @@ namespace GameDev.Slice.Gathering
             }
         }
 
+        /// <summary>The share of its ordinary pace Stamina comes back at: half Tired or Very tired (07.2 §3.3, S5b.6); null for all of it.</summary>
+        public Func<double> RecoveryShare { get; set; }
+
         /// <summary>While true, Stamina does not come back (07.2 §3.2: recovery pauses during exertion).</summary>
         public bool Exerting
         {
@@ -147,7 +150,8 @@ namespace GameDev.Slice.Gathering
                 var spent = Spent;
                 if (spent > 0d)
                 {
-                    _state.Set(SpentKey, (int)Math.Max(0d, Math.Round(spent - ((now - from) * _rules.StaminaRecovery * Whole))));
+                    var share = RecoveryShare != null ? RecoveryShare() : 1d;
+                    _state.Set(SpentKey, (int)Math.Max(0d, Math.Round(spent - ((now - from) * _rules.StaminaRecovery * share * Whole))));
                 }
             }
 

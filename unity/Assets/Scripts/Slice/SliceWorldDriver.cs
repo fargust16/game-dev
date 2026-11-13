@@ -314,7 +314,7 @@ namespace GameDev.Slice
             if (Fights != null && Outfit != null && settings.Fists != null)
             {
                 Outfit.Locked = () => Fights.InFight;
-                Fights.WornFighter = () => Outfit.Fighter(settings.FightRules, Character, settings.Fists, Fights.PlayerLimit);
+                Fights.WornFighter = () => Outfit.Fighter(settings.FightRules, Character, settings.Fists, Fights.PlayerLimit, Mind != null ? Mind.FightShift : default);
             }
 
             if (Fights != null && Bag != null)
@@ -353,6 +353,16 @@ namespace GameDev.Slice
             }
 
             Sanity = new GameDev.Slice.Mind.SliceSanity(State);
+            Mind = new GameDev.Slice.Mind.SliceMind(State, Clock, Sanity);
+            Mind.Lost += LostMind;
+            Reaction.Narrowing = () => Mind.ReactionShare;
+            if (Fights != null)
+            {
+                Fights.Mind = Mind;
+            }
+
+            Symptoms = gameObject.AddComponent<GameDev.Slice.Mind.MindSymptoms>();
+            Symptoms.Configure(this, seed);
             if (Bag != null)
             {
                 Advancement = new GameDev.Slice.Alchemy.SliceAdvancement(State, Clock, Bag, Character, Sanity, Standing, () => Fights != null && Fights.InFight);
@@ -386,6 +396,7 @@ namespace GameDev.Slice
             if (Bag != null && settings.Gathering != null && settings.ActionChecks != null)
             {
                 Stamina = new SliceStamina(settings.Gathering, State, Clock, Character, GameClockDriver.RealSecondsPerTick);
+                Stamina.RecoveryShare = () => Mind.StaminaShare;
                 Gathering = new SliceGathering(settings.Gathering, Bag, State, Clock, Character, Stamina, seed);
                 if (Workshop != null)
                 {
@@ -424,6 +435,7 @@ namespace GameDev.Slice
                 Director = Director,
                 Tips = Tips,
                 Withheld = new HashSet<Approach> { Approach.Veil },
+                MindPenalty = () => Mind.SocialPenalty,
             };
             Notes = new CharacterNotes(Tips);
             Notes.Added += _ => Refresh();
@@ -438,7 +450,7 @@ namespace GameDev.Slice
             Identity = new GameDev.Slice.Creation.CharacterIdentity { look = Creation.FirstLook(false)?.id ?? string.Empty };
             _create = !_offer && GameDev.Slice.Creation.CharacterCreation.ShouldOffer();
             Page = gameObject.AddComponent<GameDev.Slice.Creation.CharacterPage>();
-            Page.Configure(Character, Fights, () => Identity?.name);
+            Page.Configure(Character, Fights, () => Identity?.name, Mind);
             Character.AttributeGrew += (a, level) => Grew(GameDev.Slice.Creation.CharacterPage.AttributeName(a), level);
             Character.SkillGrew += (s, level) => Grew(PersonTalk.SkillName(s), level);
         }
@@ -447,6 +459,25 @@ namespace GameDev.Slice
         public GameDev.Slice.Creation.CharacterPage Page { get; private set; }
 
         private void SettlePotion(long tick) => Advancement?.Settle();
+
+        /// <summary>The character's Sanity, its band and Fatigue, and what they take away (S5b.6; 07.2 §3.3–3.4).</summary>
+        public GameDev.Slice.Mind.SliceMind Mind { get; private set; }
+
+        /// <summary>The symptoms a troubled mind perceives (S5b.6).</summary>
+        public GameDev.Slice.Mind.MindSymptoms Symptoms { get; private set; }
+
+        /// <summary>07.2 §3.4: at Sanity 0 the character is no longer the player's, and the run ends.</summary>
+        private void LostMind()
+        {
+            var player = FindAnyObjectByType<PlayerLocomotion>();
+            if (player != null)
+            {
+                player.enabled = false;
+            }
+
+            Debug.Log("[Slice] Sanity reached 0: the run ends.");
+            GameDev.Slice.Fights.SliceDeathScreen.Show(Clock, GameDev.Slice.Fights.SliceDeathScreen.SanityTitle);
+        }
 
         /// <summary>A Limit potion settled (S5b.5): a Screen Message names the Arcana and the Limit reached (07.1 §11).</summary>
         private void Advanced(Arcana arcana, int limit, int cost)

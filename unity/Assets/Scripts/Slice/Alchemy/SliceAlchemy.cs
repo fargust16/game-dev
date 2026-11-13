@@ -142,7 +142,7 @@ namespace GameDev.Slice.Alchemy
         {
             var bar = ReactionCheck.Place(Math.Max(LeastWidth, ReactionCheck.Width(delta)), rolls, Math.Max(FastestSeconds, ReactionCheck.Pace(delta)));
             var inner = bar.GoodWidth * ReactionCheck.PerfectShare;
-            return new ReactionBar(bar.GoodStart, bar.GoodWidth, bar.GoodStart + ((bar.GoodWidth - inner) / 2d), inner, bar.Seconds);
+            return new ReactionBar(bar.GoodStart, bar.GoodWidth, bar.GoodStart + ((bar.GoodWidth - inner) / 2d), inner, bar.Seconds, LeastWidth);
         }
 
         /// <summary>The bar of a brewing's check <paramref name="check"/>, 0 to 5, placed by the seed and the potions brewed.</summary>

@@ -42,11 +42,30 @@ namespace GameDev.Slice.Creation
 
         public bool IsOpen => _open && _hud != null && _hud.IsShopOpen;
 
-        public void Configure(CharacterSheet sheet, SliceConfront fights, Func<string> name)
+        private GameDev.Slice.Mind.SliceMind _mind;
+
+        public void Configure(CharacterSheet sheet, SliceConfront fights, Func<string> name, GameDev.Slice.Mind.SliceMind mind = null)
         {
             _sheet = sheet;
             _fights = fights;
             _name = name;
+            _mind = mind;
+        }
+
+        /// <summary>07.2 §3.3–3.4 (S5b.6): Sanity as its band's words, never a number, and Fatigue's words when it is felt.</summary>
+        public static IEnumerable<string> MindLines(GameDev.Slice.Mind.SliceMind mind)
+        {
+            if (mind == null)
+            {
+                yield break;
+            }
+
+            yield return Loc.Format("ui.character.mind", Loc.Get(GameDev.Slice.Mind.SliceMind.BandKey(mind.Band)));
+            var fatigue = GameDev.Slice.Mind.SliceMind.FatigueKey(mind.Fatigue);
+            if (fatigue != null)
+            {
+                yield return Loc.Format("ui.character.fatigue", Loc.Get(fatigue));
+            }
         }
 
         /// <summary>Opens the page, as L does; false in a fight, under another window, or with no HUD.</summary>
@@ -83,6 +102,11 @@ namespace GameDev.Slice.Creation
         private void Show()
         {
             var lines = new List<PageLine> { new PageLine(Standing(), heading: true) };
+            foreach (var line in MindLines(_mind))
+            {
+                lines.Add(new PageLine(line));
+            }
+
             lines.Add(new PageLine(Loc.Get("ui.character.attributes"), heading: true));
             foreach (CharacterAttribute a in Enum.GetValues(typeof(CharacterAttribute)))
             {

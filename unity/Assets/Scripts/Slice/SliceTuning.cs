@@ -169,6 +169,31 @@ namespace GameDev.Slice
         [Range(1f, 60f)]
         public float AssimilationTicksPerSecond = 10f;
 
+        [Header("Рассудок")]
+        [Tooltip("Шёпот, от лёгкого смятения и ниже: через сколько секунд он слышится снова — не раньше X и не позже Y.")]
+        public Vector2 WhisperSeconds = new Vector2(35f, 80f);
+
+        [Tooltip("Тень на краю экрана, от сильного смятения и ниже: через сколько секунд — не раньше X и не позже Y.")]
+        public Vector2 GlimpseSeconds = new Vector2(50f, 110f);
+
+        [Tooltip("Сколько секунд тень стоит, если камера не повернулась.")]
+        [Range(1f, 10f)]
+        public float GlimpseHold = 4f;
+
+        [Tooltip("Ложная тревога, от тяжёлого смятения и ниже: шкала замечания заполняется ни от кого; через сколько секунд — не раньше X и не позже Y.")]
+        public Vector2 FalseAlarmSeconds = new Vector2(70f, 140f);
+
+        [Tooltip("На грани: шёпот поверх реплик разговора; через сколько секунд — не раньше X и не позже Y.")]
+        public Vector2 DialogueWhisperSeconds = new Vector2(5f, 10f);
+
+        [Tooltip("Громкость шёпота, от 0 до 1.")]
+        [Range(0f, 1f)]
+        public float WhisperVolume = 0.3f;
+
+        [Tooltip("На грани мир теряет цвет: насыщенность, от 0 (как есть) до −100 (серый мир).")]
+        [Range(-100f, 0f)]
+        public float ColourDrain = -85f;
+
         [Header("Интерфейс")]
         public Interface Ui = new Interface();
 

@@ -50,6 +50,9 @@ namespace GameDev.Slice
         /// <summary>A brewing check's bar (S5b.4; 20 §3); fork it with the count of potions brewed before and the check's number.</summary>
         public const string Alchemy = "slice.alchemy";
 
+        /// <summary>When a symptom of a troubled mind comes and where (S5b.6; 07.2 §3.4); fork it with the symptom and its count.</summary>
+        public const string Mind = "slice.mind";
+
         /// <summary>A gathering cycle (S5a.5; 19 §6.4); fork it with the tick and the node's id hashed.</summary>
         public const string Gathering = "slice.gathering";
 

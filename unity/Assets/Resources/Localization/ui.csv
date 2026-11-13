@@ -547,3 +547,16 @@ ui.drink.fault.order,Not your next Limit.,Это не ваш следующий 
 ui.drink.fault.ready,It is too early for you to drink it.,Вам ещё рано его пить.
 ui.save.refused.settling,Not while a potion settles.,Не во время усвоения зелья.
 ui.limit.reached,"The potion has settled. {0}, Limit {1}.","Зелье усвоилось. {0}, Предел {1}."
+"# The character's mind (SliceMind, CharacterPage, S5b.6; 07.2 §3.3–3.4): Sanity's band in words, never a number"
+ui.character.mind,Mind: {0},Рассудок: {0}
+ui.character.fatigue,Fatigue: {0},Усталость: {0}
+ui.mind.band.stable,clear,ясный
+ui.mind.band.mild,mild disturbance,лёгкое смятение
+ui.mind.band.significant,significant disturbance,сильное смятение
+ui.mind.band.severe,severe disturbance,тяжёлое смятение
+ui.mind.band.critical,on the edge,на грани
+ui.mind.band.lost,lost,утрачен
+ui.mind.fatigue.tired,tired,утомление
+ui.mind.fatigue.verytired,very tired,сильное утомление
+ui.death.sanity,You are no longer yourself,Вы больше не принадлежите себе
+ui.fight.log.exhausted,{0}: Will Power is spent,{0}: Сила воли иссякла

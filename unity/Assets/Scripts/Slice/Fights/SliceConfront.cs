@@ -308,6 +308,7 @@ namespace GameDev.Slice.Fights
                 return;
             }
 
+            WatchWillPower();
             _beats.Tick(Time.deltaTime);
             var settled = !_beats.Busy;
             var acting = _turns.Acting;
@@ -630,6 +631,8 @@ namespace GameDev.Slice.Fights
                     _playerCombatant.Fighter.Bleeding = false;
                 }
 
+                WatchWillPower(); // the fight's last spending
+                _wpFighter = null;
                 Unequip(_playerCombatant);
                 _died = _playerCombatant.Fighter.Down;
                 foreach (var pair in _groups)

@@ -922,7 +922,7 @@ namespace GameDev.Confront.Turns
             option.Band = tag.Band;
             option.Tag = tag;
             option.Ap = _rules.EnvironmentAp(tag.Action);
-            option.Chance = _rules.EnvironmentChance(combatant.Fighter.Values, tag.Action, tag.Band);
+            option.Chance = _rules.EnvironmentChance(combatant.Fighter.Values, tag.Action, tag.Band, combatant.Fighter.CheckShift);
             option.Landing = from;
             if (tag.Action == EnvironmentActionKind.KickBreach)
             {
@@ -1015,7 +1015,7 @@ namespace GameDev.Confront.Turns
             }
 
             ApLeft -= _rules.TreatmentAp(treatment);
-            var success = decided ?? (_rolls.NextDouble() < _rules.TreatmentChance(c.Fighter.Values, treatment));
+            var success = decided ?? (_rolls.NextDouble() < _rules.TreatmentChance(c.Fighter.Values, treatment, c.Fighter.CheckShift));
             if (success)
             {
                 FightRules.Cure(patient.Fighter, treatment);
