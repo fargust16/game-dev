@@ -64,8 +64,8 @@ namespace GameDev.Slice.Tests
 
             sheet.Set(CharacterAttribute.Dexterity, quick);
             sheet.Set(CharacterAttribute.Perception, quick);
-            sheet.Set(CharacterSkill.MeleeSkill, 8);
-            sheet.Set(CharacterSkill.RangedSkill, 8);
+            sheet.Set(CharacterSkill.LightMelee, 8);
+            sheet.Set(CharacterSkill.LightFirearms, 8);
             var set = weapon.Ranged ? new WeaponSet(weapon, _pouch) : new WeaponSet(weapon);
             return _rules.Fighter(sheet, 9, set, null, second);
         }

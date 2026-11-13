@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed45406196a4791949c5d860dc79e62, type: 3}
   m_Name: Mace
   m_EditorClassIdentifier:
-  section: 10.2 §5b Damage, Blocks and parries, Attribute Requirements, Load in a Fight
-  baseDamage: 6.5
+  section: 10.2 §5b Damage, Blocks and parries, Attribute Requirements, Load in a Fight; 10.2 §5f combat rework
+  baseDamage: 8.1
   attackAp: 5
   twoHanded: 0
   ranged: 0
+  heavy: 0
   range: 1
   toHit: 0
   critical: -3
@@ -32,5 +33,5 @@ MonoBehaviour:
   weight: 2.5
   stage: 9
   requirements:
-  - attribute: 0
+  - attribute: 2
     atStageNine: 5

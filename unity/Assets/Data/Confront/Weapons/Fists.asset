@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed45406196a4791949c5d860dc79e62, type: 3}
   m_Name: Fists
   m_EditorClassIdentifier:
-  section: S5a.2 working reading, a character with no weapon, the dagger's numbers at half damage
-  baseDamage: 1.5
+  section: S5a.2 working reading, a character with no weapon, the dagger's numbers at half damage; 10.2 §5f combat rework
+  baseDamage: 1.875
   attackAp: 3
   twoHanded: 0
   ranged: 0
+  heavy: 0
   range: 1
   toHit: 10
   critical: 25

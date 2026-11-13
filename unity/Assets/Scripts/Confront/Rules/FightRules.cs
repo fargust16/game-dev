@@ -7,9 +7,9 @@ using Random = System.Random;
 namespace GameDev.Confront.Rules
 {
     /// <summary>
-    /// The fight's numbers, Combat Numbers V0 of 10.2 §5b, as one service: a fighter's values from its character sheet
-    /// and gear, the hit, the critical hit, damage and armour, blocks and parries, stun and cleave, Load in a Fight and
-    /// Attribute Requirements. The formulas follow `tools/balance/combat_sim.py` and `tactical_sim.py`; every number
+    /// The fight's numbers, Combat Numbers V0 of 10.2 §5b with the combat rework of §5f, as one service: a fighter's
+    /// values from its character sheet and gear, the hit, the critical hit, damage and armour, blocks and parries, stun
+    /// and cleave, Load in a Fight and Attribute Requirements. The formulas follow `tools/balance/combat_sim.py` and `tactical_sim.py`; every number
     /// is an authoring default of 10.2 and lives in this asset. The asset holds no fight's state: that is the
     /// <see cref="Fighter"/>'s. A fight's rolls come from the slice seed's `slice.combat` stream forked with the
     /// fight's number.
@@ -40,9 +40,6 @@ namespace GameDev.Confront.Rules
         [Header("10.2 §5b Damage")]
         [Tooltip("Stage Factor = 1 + stageStep × (9 − item stage).")]
         [SerializeField] private float stageStep = 0.35f;
-
-        [Tooltip("A melee blow's damage × (1 + Strength / strengthDivisor); a firearm takes no Strength.")]
-        [SerializeField] private float strengthDivisor = 50f;
 
         [Tooltip("Damage is rolled within ± this share.")]
         [SerializeField, Range(0f, 1f)] private float spread = 0.15f;
@@ -255,15 +252,15 @@ namespace GameDev.Confront.Rules
         public double Initiative(Fighter fighter, Random rolls) =>
             (fighter.Get(CharacterAttribute.Dexterity) + fighter.Get(CharacterAttribute.Perception)) / 2d + fighter.Modifiers.initiative + rolls.Next(1, initiativeDie + 1);
 
-        /// <summary>10.2 §5b Attack: melee or ranged accuracy by the weapon in hand, its to-hit and the modifiers added.</summary>
+        /// <summary>
+        /// 10.2 §5f Accuracy: `(profile attribute + the skill of the weapon's kind) / 2`, Dexterity for a light weapon and
+        /// Strength for a heavy one, with the weapon's to-hit and the modifiers added; Perception aims nothing.
+        /// </summary>
         public double Accuracy(Fighter fighter)
         {
-            var dexterity = fighter.Get(CharacterAttribute.Dexterity);
-            var perception = fighter.Get(CharacterAttribute.Perception);
-            var own = fighter.Weapon.Ranged
-                ? ((dexterity + perception) / 2d + fighter.Get(CharacterSkill.RangedSkill)) / 2d
-                : ((fighter.Get(CharacterAttribute.Strength) + dexterity + perception) / 3d + fighter.Get(CharacterSkill.MeleeSkill)) / 2d;
-            return own + fighter.Modifiers.accuracy + fighter.Weapon.ToHit;
+            var weapon = fighter.Weapon;
+            var own = (fighter.Get(weapon.ProfileAttribute) + fighter.Get(weapon.Skill)) / 2d;
+            return own + fighter.Modifiers.accuracy + weapon.ToHit;
         }
 
         /// <summary>
@@ -338,12 +335,11 @@ namespace GameDev.Confront.Rules
             return critical ? defence * (1d - criticalPierce) : defence;
         }
 
-        /// <summary>10.2 §5b Damage: `weapon base × Stage Factor × (1 + Strength / 50)` and the modifiers, before the roll; a firearm takes no Strength.</summary>
+        /// <summary>10.2 §5f Damage: `weapon base × Stage Factor` and the modifiers, before the roll; no attribute adds to it.</summary>
         public double BaseDamage(Fighter attacker)
         {
             var weapon = attacker.Weapon;
-            var strength = weapon.Ranged ? 1d : 1d + attacker.Get(CharacterAttribute.Strength) / strengthDivisor;
-            return weapon.BaseDamage * StageFactor(weapon.Stage) * strength * (1d + attacker.Modifiers.damage);
+            return weapon.BaseDamage * StageFactor(weapon.Stage) * (1d + attacker.Modifiers.damage);
         }
 
         /// <summary>

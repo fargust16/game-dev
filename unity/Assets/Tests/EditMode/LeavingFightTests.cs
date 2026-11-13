@@ -64,8 +64,8 @@ namespace GameDev.Slice.Tests
             }
 
             sheet.Set(CharacterAttribute.Perception, perception);
-            sheet.Set(CharacterSkill.MeleeSkill, shooter ? 1 : 8);
-            sheet.Set(CharacterSkill.RangedSkill, shooter ? 8 : 1);
+            sheet.Set(CharacterSkill.LightMelee, shooter ? 1 : 8);
+            sheet.Set(CharacterSkill.LightFirearms, shooter ? 8 : 1);
             return shooter
                 ? _rules.Fighter(sheet, 9, new WeaponSet(_rifle, _pouch), null, new WeaponSet(_sword))
                 : _rules.Fighter(sheet, 9, new WeaponSet(_sword), null, default);

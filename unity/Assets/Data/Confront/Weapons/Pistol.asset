@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed45406196a4791949c5d860dc79e62, type: 3}
   m_Name: Pistol
   m_EditorClassIdentifier:
-  section: 10.2 §5b Damage, Firearms, Attribute Requirements, Load in a Fight
-  baseDamage: 5
+  section: 10.2 §5b Damage, Firearms, Attribute Requirements, Load in a Fight; 10.2 §5f combat rework
+  baseDamage: 6.5
   attackAp: 4
   twoHanded: 0
   ranged: 1
+  heavy: 0
   range: 6
   toHit: -10
   critical: 0

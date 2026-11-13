@@ -16,17 +16,22 @@ namespace GameDev.Player.Progression
     }
 
     /// <summary>
-    /// The character's skills. The slice starts with the three of the Social Checks (10.4 §2) and the two weapon skills
-    /// of a fight (10.2 §5b *Attack*); the rest of 07.1's catalogue joins with the system that uses it. A new skill goes
-    /// at the end, because dialogue assets store a skill by its number.
+    /// The character's skills. The slice starts with the three of the Social Checks (10.4 §2) and the combat skills
+    /// (07.1 §10, 10.2 §5f); the rest of 07.1's catalogue joins with the system that uses it. A new skill goes at the end,
+    /// because dialogue assets store a skill by its number; a renamed one keeps its number, and a save's old name is read
+    /// by <see cref="CharacterSheet.Restore"/>.
     /// </summary>
     public enum CharacterSkill
     {
         Persuasion,
         Deception,
         Intimidation,
-        MeleeSkill,
-        RangedSkill,
+
+        /// <summary>10.2 §5f: the dagger, sword, axe, mace, the Wardens' baton, fists and natural weapons; Melee Skill until the combat rework.</summary>
+        LightMelee,
+
+        /// <summary>10.2 §5f: the pistol and the rifle; Ranged Skill until the combat rework.</summary>
+        LightFirearms,
 
         /// <summary>10.2 First Aid in the slice: a treatment's check takes `(Dexterity + First Aid) / 2` (S3a.7).</summary>
         FirstAid,
@@ -51,6 +56,15 @@ namespace GameDev.Player.Progression
 
         /// <summary>10.3 §6: theft from a person and a lock, `(Dexterity + Theft) / 2` against Perception or the lock (S5a.8).</summary>
         Theft,
+
+        /// <summary>10.2 §5f: the greatsword, greataxe and maul, aimed by Strength.</summary>
+        HeavyMelee,
+
+        /// <summary>10.2 §5f: heavy firearms, none yet, aimed by Strength.</summary>
+        HeavyFirearms,
+
+        /// <summary>10.2 §5f, 05.1: the abilities of the character's own Arcana, aimed with Intelligence.</summary>
+        Arcana,
     }
 
     /// <summary>What a check reads of a character.</summary>
@@ -98,7 +112,17 @@ namespace GameDev.Player.Progression
             return state;
         }
 
-        /// <summary>Values are saved by name, so a value a save lacks starts at 1 and a name this build lacks is skipped.</summary>
+        /// <summary>The skills' names before the combat rework (10.2 §5f), read from older saves.</summary>
+        private static readonly Dictionary<string, CharacterSkill> Renamed = new Dictionary<string, CharacterSkill>
+        {
+            ["MeleeSkill"] = CharacterSkill.LightMelee,
+            ["RangedSkill"] = CharacterSkill.LightFirearms,
+        };
+
+        /// <summary>
+        /// Values are saved by name, so a value a save lacks starts at 1 and a name this build lacks is skipped; a skill
+        /// renamed since is read by its old name.
+        /// </summary>
         public void Restore(CharacterSheetState state)
         {
             Array.Fill(_attributes, Lowest);
@@ -116,6 +140,10 @@ namespace GameDev.Player.Progression
                 if (Enum.IsDefined(typeof(CharacterSkill), entry.name))
                 {
                     Set((CharacterSkill)Enum.Parse(typeof(CharacterSkill), entry.name), entry.value);
+                }
+                else if (entry.name != null && Renamed.TryGetValue(entry.name, out var skill))
+                {
+                    Set(skill, entry.value);
                 }
             }
         }

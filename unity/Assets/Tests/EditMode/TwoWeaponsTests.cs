@@ -43,7 +43,7 @@ namespace GameDev.Slice.Tests
                 sheet.Set(a, 8);
             }
 
-            sheet.Set(CharacterSkill.MeleeSkill, 8);
+            sheet.Set(CharacterSkill.LightMelee, 8);
             return sheet;
         }
 

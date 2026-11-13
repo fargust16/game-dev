@@ -58,7 +58,7 @@ namespace GameDev.Slice.Tests
             sheet.Set(CharacterAttribute.Perception, perception);
             sheet.Set(CharacterAttribute.Dexterity, dexterity);
             sheet.Set(CharacterSkill.Stealth, stealth);
-            sheet.Set(CharacterSkill.MeleeSkill, 8);
+            sheet.Set(CharacterSkill.LightMelee, 8);
             return _rules.Fighter(sheet, 9, new WeaponSet(weapon ? weapon : _sword), null, default);
         }
 

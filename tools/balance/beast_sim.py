@@ -10,6 +10,11 @@ physical defence, and a weapon above its user aims worse. combat_sim.strike pred
 A tie in Initiative goes to the higher Dexterity, then at random. The table of 10.2 *Beasts of the
 slice* is this script's output at seed 7, and the C# parity test lands within 3 points of it.
 
+Since the combat rework (10.2 §5f) no attribute adds damage and a light weapon aims by Dexterity and its skill, so a
+natural weapon takes in its beast's old Strength factor, base × (1 + Strength / 50), and its To hit makes up the
+change in aim, ((Strength + Dexterity + Perception) / 3 − Dexterity) / 2: the beasts fight as before. The glowing
+wolf's bite has its own base; the glowing boar keeps the boar's tusks and loses 3 % of its harm.
+
 Run: python tools/balance/beast_sim.py
 """
 import random
@@ -23,12 +28,15 @@ cs.ARMOUR["thick hide"] = (8, 0)
 cs.ARMOUR_WEIGHT["hide"] = 0.0
 cs.ARMOUR_WEIGHT["thick hide"] = 0.0
 
-BITE = Weapon("bite", 5, 6, weight=0.0, crit=0.05)
-TUSK = Weapon("tusk", 5.5, 5, weight=0.0)
+BITE = Weapon("bite", 5.4, 6, weight=0.0, crit=0.05, accuracy=-0.5)
+GLOWING_BITE = Weapon("glowing bite", 5.9, 6, weight=0.0, crit=0.05, accuracy=-0.5)
+TUSK = Weapon("tusk", 6.4, 5, weight=0.0, accuracy=1.0)
 
 
 def wolf(glowing=False):
     u = Unit("wolf", None, 4, 3, 6, 5, 4, will=3, weapon=BITE, armour="hide")
+    if glowing:
+        u.weapon = GLOWING_BITE
     return glow(u, 5, 1.0) if glowing else u
 
 
@@ -123,8 +131,9 @@ def report(title, make_a, make_b):
 
 
 def new_character():
-    """A new character with the 9 free points spread for a fight and a club, no armour."""
-    return [Unit("new", None, 5, 4, 3, 2, 1, will=1, weapon=Weapon("club", 4, 5), armour="none", focus=True)]
+    """A new character with the 9 free points spread for a fight and a club, no armour; since the combat rework the
+    club's base is 5, light melee × 1.25 as 10.2 §5f."""
+    return [Unit("new", None, 5, 4, 3, 2, 1, will=1, weapon=Weapon("club", 5, 5), armour="none", focus=True)]
 
 
 def new_armed():

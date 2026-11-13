@@ -28,13 +28,13 @@ namespace GameDev.Slice.Tests
             _assets.Clear();
             _rules = Asset<FightRules>("FightRules.asset");
 
-            // beast_sim.py's new character fights with a club, base 4 and 5 AP. 10.2 has no club among its iron
-            // weapons, so it lives only in this test.
+            // beast_sim.py's new character fights with a club, base 5 since the combat rework (light melee × 1.25, 10.2
+            // §5f) and 5 AP. 10.2 has no club among its iron weapons, so it lives only in this test.
             _club = ScriptableObject.CreateInstance<FightWeapon>();
             _club.name = "Club";
             var club = new SerializedObject(_club);
             club.FindProperty("section").stringValue = "10.2 §5b Beasts of the slice, the new character's club in beast_sim.py";
-            club.FindProperty("baseDamage").floatValue = 4f;
+            club.FindProperty("baseDamage").floatValue = 5f;
             club.FindProperty("attackAp").intValue = 5;
             club.FindProperty("weight").floatValue = 2f;
             club.ApplyModifiedPropertiesWithoutUndo();
@@ -63,7 +63,7 @@ namespace GameDev.Slice.Tests
             sheet.Set(CharacterAttribute.Endurance, endurance);
             sheet.Set(CharacterAttribute.Dexterity, dexterity);
             sheet.Set(CharacterAttribute.Perception, perception);
-            sheet.Set(CharacterSkill.MeleeSkill, melee);
+            sheet.Set(CharacterSkill.LightMelee, melee);
             return sheet;
         }
 
@@ -113,14 +113,15 @@ namespace GameDev.Slice.Tests
                 ("Glowing boar", () => new[] { GlowingBoar() }),
             };
 
-            // The table of 10.2 §5b *Beasts of the slice*, beast_sim.py at seed 7 and 40,000 fights a line.
+            // The table of 10.2 §5b *Beasts of the slice*, beast_sim.py at seed 7 and 40,000 fights a line, on the combat
+            // rework's rules (§5f).
             double[,] table =
             {
-                { 11, 1, 6, 1, 0 },
-                { 66, 23, 65, 55, 27 },
-                { 75, 30, 70, 66, 35 },
-                { 94, 63, 90, 84, 59 },
-                { 98, 82, 97, 94, 80 },
+                { 20, 2, 11, 2, 1 },
+                { 78, 36, 75, 65, 41 },
+                { 81, 39, 75, 69, 43 },
+                { 94, 64, 90, 85, 67 },
+                { 98, 79, 96, 93, 80 },
             };
 
             var report = new StringBuilder($"{Fights} fights a cell, C# against 10.2:\n");

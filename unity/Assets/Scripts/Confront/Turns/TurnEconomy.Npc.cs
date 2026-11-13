@@ -494,7 +494,7 @@ namespace GameDev.Confront.Turns
 
         private static bool Melee(Combatant f) => f.Fighter.Weapon != null && !f.Fighter.Weapon.Ranged;
 
-        private static bool Shooter(Combatant c) => c.Fighter.Get(CharacterSkill.RangedSkill) > c.Fighter.Get(CharacterSkill.MeleeSkill);
+        private static bool Shooter(Combatant c) => c.Fighter.Get(CharacterSkill.LightFirearms) > c.Fighter.Get(CharacterSkill.LightMelee);
 
         /// <summary>
         /// Steps from a cell to a side of another in open ground, a diagonal step costing one: the estimate Waiting and

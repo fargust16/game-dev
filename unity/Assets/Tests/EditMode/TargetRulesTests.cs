@@ -58,8 +58,8 @@ namespace GameDev.Slice.Tests
             }
 
             sheet.Set(CharacterAttribute.Perception, perception);
-            sheet.Set(CharacterSkill.MeleeSkill, melee);
-            sheet.Set(CharacterSkill.RangedSkill, ranged);
+            sheet.Set(CharacterSkill.LightMelee, melee);
+            sheet.Set(CharacterSkill.LightFirearms, ranged);
             if (shooter || opener)
             {
                 return _rules.Fighter(sheet, 9, new WeaponSet(_rifle, _pouch), null, new WeaponSet(_sword));

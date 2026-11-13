@@ -53,8 +53,8 @@ namespace GameDev.Slice.Tests
             sheet.Set(CharacterAttribute.Dexterity, dexterity);
             sheet.Set(CharacterAttribute.Perception, perception);
             sheet.Set(CharacterAttribute.Luck, luck);
-            sheet.Set(CharacterSkill.MeleeSkill, melee);
-            sheet.Set(CharacterSkill.RangedSkill, ranged);
+            sheet.Set(CharacterSkill.LightMelee, melee);
+            sheet.Set(CharacterSkill.LightFirearms, ranged);
             return sheet;
         }
 
@@ -120,9 +120,9 @@ namespace GameDev.Slice.Tests
 
             // The same through whole strikes: a hit, no critical, the middle of the ±15 % roll.
             var blow = _rules.Strike(swordsman, plate, default, Scripted(0, 0.99, 0.5));
-            Assert.AreEqual(5 * (1 + 12 / 50d) * (1 - 24d / 74d), blow.Damage, Tight);
+            Assert.AreEqual(6.25 * (1 - 24d / 74d), blow.Damage, Tight, "10.2 §5f: no attribute adds damage");
             var shot = _rules.Strike(rifleman, plate, new StrikeContext { Beyond = true }, Scripted(0, 0.99, 0.5));
-            Assert.AreEqual(6.75 * (1 - 48d / 98d), shot.Damage, Tight, "a firearm takes no Strength");
+            Assert.AreEqual(9 * (1 - 48d / 98d), shot.Damage, Tight, "the rifle's base 9");
             Assert.AreEqual(plate.MaxHp - blow.Damage - shot.Damage, plate.Hp, Tight);
         }
 
@@ -246,17 +246,18 @@ namespace GameDev.Slice.Tests
             Assert.IsFalse(_rules.Strike(wolf, parrying, default, Scripted(0, 0, 0.5, 0.1)).Bleeds, "a parried critical bite draws none");
         }
 
-        [TestCase("Dagger", 3, 3, 10, 25, Guard.Parry, 0.30, 1.0, 0, 0, false, false, 1)]
-        [TestCase("Sword", 5, 4, 5, 0, Guard.Parry, 0.40, 1.0, 0, 0, false, false, 1)]
-        [TestCase("Axe", 5, 5, 0, 20, Guard.Parry, 0.30, 1.0, 0, 0, false, false, 1)]
-        [TestCase("Mace", 6.5, 5, 0, -3, Guard.Parry, 0.30, 1.0, 0.05, 0, false, false, 1)]
-        [TestCase("Greatsword", 8.5, 6, 5, 0, Guard.Block, 0.40, 0.6, 0, 0.5, true, false, 1)]
-        [TestCase("Greataxe", 8.5, 7, 0, 22, Guard.Block, 0.40, 0.6, 0, 0, true, false, 1)]
-        [TestCase("Maul", 10.5, 7, 0, -3, Guard.Block, 0.40, 0.6, 0.08, 0, true, false, 1)]
-        [TestCase("Pistol", 5, 4, -10, 0, Guard.None, 0, 0, 0, 0, false, true, 6)]
-        [TestCase("Rifle", 6.75, 6, 0, 0, Guard.None, 0, 0, 0, 0, true, true, 16)]
-        [TestCase("Bite", 5, 6, 0, 5, Guard.None, 0, 0, 0, 0, false, false, 1)]
-        [TestCase("Tusks", 5.5, 5, 0, 0, Guard.None, 0, 0, 0, 0, false, false, 1)]
+        // 10.2 §5f: the combat rework's bases; a beast's natural weapon takes in its old Strength factor and aim.
+        [TestCase("Dagger", 3.75, 3, 10, 25, Guard.Parry, 0.30, 1.0, 0, 0, false, false, 1)]
+        [TestCase("Sword", 6.25, 4, 5, 0, Guard.Parry, 0.40, 1.0, 0, 0, false, false, 1)]
+        [TestCase("Axe", 6.25, 5, 0, 20, Guard.Parry, 0.30, 1.0, 0, 0, false, false, 1)]
+        [TestCase("Mace", 8.1, 5, 0, -3, Guard.Parry, 0.30, 1.0, 0.05, 0, false, false, 1)]
+        [TestCase("Greatsword", 11.5, 6, 5, 0, Guard.Block, 0.40, 0.6, 0, 0.5, true, false, 1)]
+        [TestCase("Greataxe", 11.5, 7, 0, 22, Guard.Block, 0.40, 0.6, 0, 0, true, false, 1)]
+        [TestCase("Maul", 14.2, 7, 0, -3, Guard.Block, 0.40, 0.6, 0.08, 0, true, false, 1)]
+        [TestCase("Pistol", 6.5, 4, -10, 0, Guard.None, 0, 0, 0, 0, false, true, 6)]
+        [TestCase("Rifle", 9, 6, 0, 0, Guard.None, 0, 0, 0, 0, true, true, 16)]
+        [TestCase("Bite", 5.4, 6, -0.5, 5, Guard.None, 0, 0, 0, 0, false, false, 1)]
+        [TestCase("Tusks", 6.4, 5, 1, 0, Guard.None, 0, 0, 0, 0, false, false, 1)]
         public void TheWeaponTableHoldsItsValues(string name, double damage, int ap, double hit, double critical, Guard guard, double chance,
             double stops, double stun, double cleave, bool twoHanded, bool ranged, int range)
         {
@@ -342,14 +343,17 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(0.5, FightRules.Fit(Sheet(4, 1, 1, 1, 1), maul.Requirements, 9), Tight, "half the requirement, half the item");
             Assert.AreEqual(1, FightRules.Fit(Sheet(9, 1, 1, 1, 1), maul.Requirements, 9), Tight, "no more than the whole");
             Assert.AreEqual(0.5, FightRules.Fit(Sheet(8, 1, 1, 1, 1), maul.Requirements, 8), Tight, "stage 8 asks double");
-            Assert.AreEqual(1d / 3d, FightRules.Fit(Sheet(6, 1, 1, 1, 1), Weapon("Greatsword").Requirements, 9), Tight,
-                "Strength 6 of 6 and Dexterity 1 of 3: the furthest counts");
+            Assert.AreEqual(6d / 7d, FightRules.Fit(Sheet(6, 1, 1, 1, 1), Weapon("Greatsword").Requirements, 9), Tight,
+                "Strength 6 of 7: since the combat rework a weapon asks only its profile attribute");
+            var dexterous = new CharacterSheet();
+            dexterous.Set(CharacterAttribute.Dexterity, 3);
+            Assert.AreEqual(1, FightRules.Fit(dexterous, Weapon("Rifle").Requirements, 9), Tight, "the rifle asks Dexterity 3, Perception no more");
 
             var weak = Armed(Sheet(4, 10, 10, 10, 10), "Maul");
-            var mace = Armed(Sheet(4, 10, 10, 10, 10), "Mace");
+            var mace = Armed(Sheet(10, 10, 4, 10, 10), "Mace");
             var target = Armed(Sheet(10, 10, 10, 10, 10), "Axe");
             Assert.AreEqual(0.5, FightRules.Aim(weak), Tight);
-            Assert.AreEqual(0.8, FightRules.Aim(mace), Tight, "four fifths of a mace's Strength 5");
+            Assert.AreEqual(0.8, FightRules.Aim(mace), Tight, "four fifths of a mace's Dexterity 5");
             var unaided = Math.Min(0.95, (0.70 + (_rules.Accuracy(weak) - _rules.Evasion(target)) / 100) * 1.01);
             Assert.AreEqual(unaided * 0.5, _rules.HitChance(weak, target), Tight, "a weapon above its user aims worse");
 
@@ -424,11 +428,45 @@ namespace GameDev.Slice.Tests
         public void ACharacterSheetCarriesBothWeaponSkills()
         {
             var sheet = Sheet(1, 1, 1, 1, melee: 12, ranged: 3);
-            Assert.AreEqual((12, 3), (sheet.Get(CharacterSkill.MeleeSkill), sheet.Get(CharacterSkill.RangedSkill)));
+            Assert.AreEqual((12, 3), (sheet.Get(CharacterSkill.LightMelee), sheet.Get(CharacterSkill.LightFirearms)));
             var swordsman = Armed(Sheet(6, 6, 6, 6, melee: 12, ranged: 3), "Sword");
             var shooter = Armed(Sheet(6, 6, 6, 6, melee: 12, ranged: 3), "Pistol", offHand: "CartridgePouch");
-            Assert.AreEqual((6 + 12) / 2d + 5, _rules.Accuracy(swordsman), Tight, "melee: ((S + D + P) / 3 + Melee Skill) / 2");
-            Assert.AreEqual((6 + 3) / 2d - 10, _rules.Accuracy(shooter), Tight, "ranged: ((D + P) / 2 + Ranged Skill) / 2");
+            Assert.AreEqual((6 + 12) / 2d + 5, _rules.Accuracy(swordsman), Tight, "light melee: (Dexterity + Light Melee) / 2");
+            Assert.AreEqual((6 + 3) / 2d - 10, _rules.Accuracy(shooter), Tight, "light firearms: (Dexterity + Light Firearms) / 2");
+        }
+
+        [Test]
+        public void AccuracyIsTheProfileAttributeAndTheSkillAndNoAttributeAddsDamage()
+        {
+            // 10.2 §5f: a light weapon aims by Dexterity, a heavy one by Strength, each with its own skill; Perception aims nothing.
+            var sheet = Sheet(14, 6, 4, 60, melee: 2, ranged: 3);
+            sheet.Set(CharacterSkill.HeavyMelee, 10);
+            Assert.AreEqual((14 + 10) / 2d + 5, _rules.Accuracy(Armed(sheet, "Greatsword")), Tight, "heavy melee: (Strength + Heavy Melee) / 2");
+            Assert.AreEqual((4 + 2) / 2d + 5, _rules.Accuracy(Armed(sheet, "Sword")), Tight, "light melee: (Dexterity + Light Melee) / 2");
+            Assert.AreEqual((4 + 3) / 2d, _rules.Accuracy(Armed(sheet, "Rifle", offHand: "CartridgePouch")), Tight, "Perception 60 aims no shot");
+            Assert.IsTrue(Weapon("Greatsword").Heavy && Weapon("Greataxe").Heavy && Weapon("Maul").Heavy, "the heavy melee weapons");
+            Assert.IsFalse(Weapon("Rifle").Heavy || Weapon("Pistol").Heavy || Weapon("Sword").Heavy, "the firearms are light");
+            Assert.AreEqual(CharacterSkill.HeavyMelee, Weapon("Maul").Skill);
+            Assert.AreEqual(CharacterSkill.LightFirearms, Weapon("Rifle").Skill);
+            Assert.AreEqual(CharacterAttribute.Dexterity, Weapon("Rifle").ProfileAttribute);
+
+            var strong = Armed(Sheet(90, 6, 6, 6, 6), "Sword");
+            var weak = Armed(Sheet(1, 6, 6, 6, 6), "Sword");
+            Assert.AreEqual(_rules.BaseDamage(weak), _rules.BaseDamage(strong), Tight, "Strength adds no damage");
+            Assert.AreEqual(6.25, _rules.BaseDamage(strong), Tight);
+        }
+
+        [Test]
+        public void ASaveOfOldSkillNamesKeepsTheTrainedValues()
+        {
+            // Melee Skill and Ranged Skill were renamed Light Melee and Light Firearms by the combat rework (07.1 §10).
+            var state = new CharacterSheetState();
+            state.skills.Add(new CharacterValueEntry { name = "MeleeSkill", value = 14 });
+            state.skills.Add(new CharacterValueEntry { name = "RangedSkill", value = 9 });
+            var sheet = new CharacterSheet();
+            sheet.Restore(state);
+            Assert.AreEqual((14, 9), (sheet.Get(CharacterSkill.LightMelee), sheet.Get(CharacterSkill.LightFirearms)));
+            Assert.AreEqual(1, sheet.Get(CharacterSkill.HeavyMelee), "a skill the save lacks starts at 1");
         }
 
         private static Random Scripted(params double[] draws) => new ScriptedRolls(draws);

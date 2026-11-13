@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed45406196a4791949c5d860dc79e62, type: 3}
   m_Name: Rifle
   m_EditorClassIdentifier:
-  section: 10.2 §5b Damage, Firearms, Attribute Requirements, Load in a Fight
-  baseDamage: 6.75
+  section: 10.2 §5b Damage, Firearms, Attribute Requirements, Load in a Fight; 10.2 §5f combat rework
+  baseDamage: 9
   attackAp: 6
   twoHanded: 1
   ranged: 1
+  heavy: 0
   range: 16
   toHit: 0
   critical: 0
@@ -32,5 +33,5 @@ MonoBehaviour:
   weight: 4.0
   stage: 9
   requirements:
-  - attribute: 3
+  - attribute: 2
     atStageNine: 3

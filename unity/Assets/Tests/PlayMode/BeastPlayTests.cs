@@ -61,7 +61,7 @@ namespace GameDev.Slice.Tests
             character.Set(CharacterAttribute.Endurance, 10);
             character.Set(CharacterAttribute.Dexterity, 6);
             character.Set(CharacterAttribute.Perception, 5);
-            character.Set(CharacterSkill.MeleeSkill, 10);
+            character.Set(CharacterSkill.LightMelee, 10);
 
             // It fights with what it carries (S5a.2): a sword and the leather set.
             foreach (var id in new[] { "sword", "leather_head", "leather_body", "leather_shoulders", "leather_gloves", "leather_trousers", "leather_boots" })
@@ -295,7 +295,7 @@ namespace GameDev.Slice.Tests
             character.Set(CharacterAttribute.Endurance, 10);
             character.Set(CharacterAttribute.Dexterity, 6);
             character.Set(CharacterAttribute.Perception, 5);
-            character.Set(CharacterSkill.MeleeSkill, 10);
+            character.Set(CharacterSkill.LightMelee, 10);
             foreach (var id in new[] { "sword", "leather_head", "leather_body", "leather_shoulders", "leather_gloves", "leather_trousers", "leather_boots" })
             {
                 var piece = new ItemPiece(id);

@@ -122,7 +122,7 @@ namespace GameDev.Slice.Beasts
             sheet.Set(CharacterAttribute.Endurance, v.endurance);
             sheet.Set(CharacterAttribute.Dexterity, v.dexterity);
             sheet.Set(CharacterAttribute.Perception, v.perception);
-            sheet.Set(CharacterSkill.MeleeSkill, v.meleeSkill);
+            sheet.Set(CharacterSkill.LightMelee, v.meleeSkill);
             return rules.Fighter(sheet, null, new WeaponSet(v.weapon), v.armour, modifiers: new FightModifiers { hp = v.hpAdded });
         }
     }

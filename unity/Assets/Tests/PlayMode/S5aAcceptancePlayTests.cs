@@ -64,7 +64,7 @@ namespace GameDev.Slice.Tests
             character.Set(CharacterAttribute.Endurance, 14);
             character.Set(CharacterAttribute.Dexterity, 30);
             character.Set(CharacterAttribute.Perception, 5);
-            character.Set(CharacterSkill.MeleeSkill, 14);
+            character.Set(CharacterSkill.LightMelee, 14);
             character.Set(CharacterSkill.Theft, 30);
             character.Set(CharacterSkill.Stealth, 30);
             character.Set(CharacterSkill.FirstAid, 30);

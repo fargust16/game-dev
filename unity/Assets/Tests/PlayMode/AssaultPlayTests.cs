@@ -62,7 +62,7 @@ namespace GameDev.Slice.Tests
             character.Set(CharacterAttribute.Endurance, 20);
             character.Set(CharacterAttribute.Dexterity, 10);
             character.Set(CharacterAttribute.Perception, 8);
-            character.Set(CharacterSkill.MeleeSkill, 20);
+            character.Set(CharacterSkill.LightMelee, 20);
             foreach (var id in new[] { "sword", "plate_head", "plate_body", "plate_shoulders", "plate_gloves", "plate_trousers", "plate_boots" })
             {
                 var piece = new ItemPiece(id);

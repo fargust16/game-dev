@@ -12,13 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ed45406196a4791949c5d860dc79e62, type: 3}
   m_Name: Tusks
   m_EditorClassIdentifier:
-  section: 10.2 §5b Beasts of the slice
-  baseDamage: 5.5
+  section: 10.2 §5b Beasts of the slice; 10.2 §5f combat rework
+  baseDamage: 6.4
   attackAp: 5
   twoHanded: 0
   ranged: 0
+  heavy: 0
   range: 1
-  toHit: 0
+  toHit: 1
   critical: 0
   guard: 0
   guardChance: 0

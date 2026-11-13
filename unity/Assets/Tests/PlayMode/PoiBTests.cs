@@ -114,7 +114,7 @@ namespace GameDev.Slice.Tests
             character.Set(CharacterAttribute.Endurance, 14);
             character.Set(CharacterAttribute.Dexterity, 12);
             character.Set(CharacterAttribute.Perception, 12);
-            character.Set(CharacterSkill.RangedSkill, 12);
+            character.Set(CharacterSkill.LightFirearms, 12);
             var pistol = new GameDev.Items.ItemPiece("pistol");
             Assert.IsTrue(world.Bag.AddPiece(new GameDev.Items.ItemPiece("cartridge_pouch")) && world.Bag.AddPiece(pistol), "the pistol and its pouch in the bag");
             Assert.IsNull(world.Outfit.Wear(pistol), "the pistol in hand, the pouch beside it");

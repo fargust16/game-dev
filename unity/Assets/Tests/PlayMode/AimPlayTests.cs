@@ -101,7 +101,7 @@ namespace GameDev.Slice.Tests
             Assert.Less(turned, 15f, $"the shoulders keep the aim while the side walk turns the hips to the step: standing {standing:0}°, walking{samples}");
 
             // A click fires, and the pistol loads; a good shot hits.
-            world.Character.Set(CharacterSkill.RangedSkill, 20);
+            world.Character.Set(CharacterSkill.LightFirearms, 20);
             world.Character.Set(CharacterAttribute.Perception, 10);
             world.Character.Set(CharacterAttribute.Dexterity, 10);
             yield return LookAt(camera, walker.transform.position + (Vector3.up * Chest), 0.4f);

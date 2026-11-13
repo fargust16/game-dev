@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GameDev.Player.Progression;
 using UnityEngine;
 
 namespace GameDev.Confront.Rules
@@ -6,7 +7,9 @@ namespace GameDev.Confront.Rules
     /// <summary>
     /// One kind of weapon, or a beast's natural weapon, with the values 10.2 §5b gives it: the weapon table (*Damage*),
     /// its guard (*Blocks and parries*), its Attribute Requirements, and the weight that counts in *Load in a Fight*.
-    /// The values are 10.2's authoring defaults, checked by `tools/balance/build_sim.py` and `beast_sim.py`.
+    /// Since the combat rework (§5f) a weapon is light or heavy: a light one aims by Dexterity and Light Melee or Light
+    /// Firearms, a heavy one by Strength and Heavy Melee or Heavy Firearms, and no attribute adds to its damage.
+    /// The values are 10.2's authoring defaults, checked by `tools/balance/build_sim.py`, `rework_sim.py` and `beast_sim.py`.
     /// </summary>
     [CreateAssetMenu(menuName = "GameDev/Confront/Fight Weapon", fileName = "Weapon")]
     public sealed class FightWeapon : ScriptableObject
@@ -14,7 +17,7 @@ namespace GameDev.Confront.Rules
         [Tooltip("The sections of 10.2 that set these values.")]
         [SerializeField] private string section = "10.2 §5b Damage";
 
-        [Tooltip("10.2 §5b Damage: base damage before the Stage Factor and Strength.")]
+        [Tooltip("10.2 §5b, §5f Damage: base damage before the Stage Factor; no attribute adds to it.")]
         [SerializeField] private float baseDamage = 5f;
 
         [Tooltip("10.2 §5b Damage: AP of one attack; a firearm's shot includes its loading (Firearms).")]
@@ -22,8 +25,11 @@ namespace GameDev.Confront.Rules
 
         [SerializeField] private bool twoHanded;
 
-        [Tooltip("10.2 §5b Firearms: a firearm takes no Strength, meets doubled armour beyond the next cell, and is held only with a Cartridge Pouch.")]
+        [Tooltip("10.2 §5b Firearms: a firearm meets doubled armour beyond the next cell and is held only with a Cartridge Pouch.")]
         [SerializeField] private bool ranged;
+
+        [Tooltip("10.2 §5f: a heavy weapon aims by Strength and Heavy Melee or Heavy Firearms; a light one by Dexterity and Light Melee or Light Firearms.")]
+        [SerializeField] private bool heavy;
 
         [Tooltip("10.2 §5b Damage: cells; a melee weapon reaches across a cell's side only (Position).")]
         [SerializeField] private int range = 1;
@@ -77,6 +83,15 @@ namespace GameDev.Confront.Rules
         public int AttackAp => attackAp;
         public bool TwoHanded => twoHanded;
         public bool Ranged => ranged;
+        public bool Heavy => heavy;
+
+        /// <summary>10.2 §5f: the Profile Attribute that aims it and that its Attribute Requirement asks.</summary>
+        public CharacterAttribute ProfileAttribute => heavy ? CharacterAttribute.Strength : CharacterAttribute.Dexterity;
+
+        /// <summary>10.2 §5f: the combat skill of its kind.</summary>
+        public CharacterSkill Skill => ranged
+            ? heavy ? CharacterSkill.HeavyFirearms : CharacterSkill.LightFirearms
+            : heavy ? CharacterSkill.HeavyMelee : CharacterSkill.LightMelee;
         public int RangeCells => range;
         public float ToHit => toHit;
         public float Critical => critical;

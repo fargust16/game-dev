@@ -44,7 +44,7 @@ namespace GameDev.Slice.Tests
             sheet.Set(CharacterAttribute.Endurance, endurance);
             sheet.Set(CharacterAttribute.Dexterity, dexterity);
             sheet.Set(CharacterAttribute.Perception, perception);
-            sheet.Set(CharacterSkill.MeleeSkill, melee);
+            sheet.Set(CharacterSkill.LightMelee, melee);
             return sheet;
         }
 
