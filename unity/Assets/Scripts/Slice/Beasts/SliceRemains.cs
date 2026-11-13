@@ -170,6 +170,10 @@ namespace GameDev.Slice.Beasts
         public int Finish(string beast, BeastKind kind, bool glowing, ReactionResult result)
         {
             var leather = LeatherOf(kind, glowing, result == ReactionResult.Bad ? CheckOutcome.Failure : CheckOutcome.Normal);
+
+            // Every hide grows Skinning and Dexterity, its difficulty read on §1's bands (07.1 §3, S5-1).
+            _character.Train(CharacterSkill.Skinning, Growth.StageOfDifficulty(_rules.SkinningDifficulty), Growth.Of(result),
+                new[] { CharacterAttribute.Dexterity });
             if (leather > 0)
             {
                 _bag.Add(_rules.HideItem, leather);

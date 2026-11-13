@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GameDev.Player.Progression;
 using GameDev.Confront.Turns;
 using GameDev.Core.Localization;
 using GameDev.Slice.Stealth;
@@ -37,6 +38,13 @@ namespace GameDev.Slice.Fights
 
         private void OnConeChecked(Combatant observer, Combatant hider, double chance, bool stays)
         {
+            // Each look the hidden character meets is a use of Stealth, the observer's Perception its difficulty (07.1 §3).
+            if (_character != null && hider != null && hider.Id == PlayerId && observer != null)
+            {
+                _character.Train(CharacterSkill.Stealth, Growth.StageOfDifficulty(observer.Fighter.Get(CharacterAttribute.Perception)),
+                    stays ? CheckOutcome.Normal : CheckOutcome.Failure, new[] { CharacterAttribute.Dexterity });
+            }
+
             if (stays)
             {
                 _hud.Line(Loc.Format("ui.fight.log.unseen", Name(hider), Name(observer)));

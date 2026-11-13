@@ -9,8 +9,9 @@ import random
 
 K = {-3: 0.0, -2: 0.1, -1: 0.4, 0: 1.0}
 ABOVE = 0.8
-OUTCOME = {"failure": 0.5, "normal": 1.0, "critical": 1.5}
+OUTCOME = {"failure": 0.5, "normal": 1.0, "critical": 2.0}  # owner, 2026-11-13 (S5-1); critical 1.5 before
 ATTRIBUTE_SHARE = 0.01
+SECONDARY_SHARE = 0.005  # a secondary attribute, half a primary (authoring default, 2026-11-13)
 SUCCESS = {-2: 0.50, -1: 0.65, 0: 0.80, 1: 0.90, 2: 0.95, 3: 0.98}
 
 
@@ -102,6 +103,21 @@ def gatherer(cycles, strength, mining, d=3, label=""):
     print(f"{label:<44} Mining {mining} to {m.level}, Strength {strength} to {s.level}")
 
 
+def shooter(shots, dexterity, perception, hit=0.70, crit=0.10, stage8=0.2, label=""):
+    """Shots at people and beasts (S5b.2): Light Firearms, Dexterity as its Profile Attribute and Perception as every
+    attack's secondary attribute (S5b.3) from the same shots; a fifth at Limit 8 targets, the rest at stage 9."""
+    random.seed(13)
+    k, d, p = Track(1), Track(dexterity), Track(perception)
+    for _ in range(shots):
+        task = 8 if random.random() < stage8 else 9
+        roll = random.random()
+        outcome = "failure" if roll >= hit else ("critical" if roll < hit * crit else "normal")
+        k.gain(xp_award(k.level, task, outcome))
+        d.gain(xp_award(d.level, task, outcome, ATTRIBUTE_SHARE))
+        p.gain(xp_award(p.level, task, outcome, SECONDARY_SHARE))
+    print(f"{label:<44} Light Firearms 1 to {k.level}, Dexterity {dexterity} to {d.level}, Perception {perception} to {p.level}")
+
+
 def main():
     matched_actions_per_level()
     print()
@@ -111,6 +127,10 @@ def main():
     gatherer(300, 3, 1, label="Focused gatherer: 300 cycles")
     gatherer(430, 3, 1, label="Strips the territory: 430 cycles")
     gatherer(430, 6, 1, label="Fighter archetype strips the territory")
+    print()
+    shooter(60, 3, 1, label="A shooter's two days: 60 shots")
+    shooter(200, 3, 1, label="Fights everything in reach: 200 shots")
+    shooter(200, 3, 6, label="A Сыщик, 200 shots")
 
 
 if __name__ == "__main__":

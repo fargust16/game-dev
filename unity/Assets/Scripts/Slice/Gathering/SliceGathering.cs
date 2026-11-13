@@ -180,6 +180,13 @@ namespace GameDev.Slice.Gathering
         public static CheckOutcome OutcomeOf(ReactionResult result) =>
             result == ReactionResult.Perfect ? CheckOutcome.Critical : result == ReactionResult.Good ? CheckOutcome.Normal : CheckOutcome.Failure;
 
+        /// <summary>
+        /// Every check grows its skill and attribute (07.1 §3, owner 2026-11-13, S5-1): an ordinary node is a stage 9
+        /// task, its difficulty read on §1's bands.
+        /// </summary>
+        private void Train(GatherSpot spot, CheckOutcome outcome) =>
+            _character.Train(spot.Rule.skill, Growth.StageOfDifficulty(spot.Rule.difficulty), outcome, new[] { spot.Rule.attribute });
+
         /// <summary>The Reaction Check's Δ at <paramref name="spot"/> for the character as it is (07.1 §8a).</summary>
         public double Delta(GatherSpot spot) =>
             ReactionCheck.Delta(_character.Get(spot.Rule.attribute), _character.Get(spot.Rule.skill), spot.Rule.difficulty);
@@ -214,6 +221,7 @@ namespace GameDev.Slice.Gathering
             }
 
             var outcome = OutcomeOf(result);
+            Train(spot, outcome);
             var left = Left(spot);
             var units = outcome == CheckOutcome.Critical ? left + 1 : outcome == CheckOutcome.Normal ? left : 0;
             if (units > 0 && !_bag.Add(spot.Rule.resource, units))
@@ -245,6 +253,7 @@ namespace GameDev.Slice.Gathering
             }
 
             var outcome = OutcomeOf(result);
+            Train(spot, outcome);
             var units = Math.Min(Left(spot), UnitsOf(outcome));
             if (units > 0 && !_bag.Add(spot.Rule.resource, units))
             {

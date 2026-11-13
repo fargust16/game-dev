@@ -409,6 +409,23 @@ namespace GameDev.Slice
             Creation.Configure(Character, settings.PlayerLooks);
             Identity = new GameDev.Slice.Creation.CharacterIdentity { look = Creation.FirstLook(false)?.id ?? string.Empty };
             _create = !_offer && GameDev.Slice.Creation.CharacterCreation.ShouldOffer();
+            Page = gameObject.AddComponent<GameDev.Slice.Creation.CharacterPage>();
+            Page.Configure(Character, Fights, () => Identity?.name);
+            Character.AttributeGrew += (a, level) => Grew(GameDev.Slice.Creation.CharacterPage.AttributeName(a), level);
+            Character.SkillGrew += (s, level) => Grew(PersonTalk.SkillName(s), level);
+        }
+
+        /// <summary>S5b.2: the character's page, on L out of a fight.</summary>
+        public GameDev.Slice.Creation.CharacterPage Page { get; private set; }
+
+        /// <summary>
+        /// A value grew by use (07.1 §3): a Screen Message names it and its new level (07.1 §11), every level of an
+        /// attribute and of a skill alike (authoring default, S5b.2).
+        /// </summary>
+        private void Grew(string name, int level)
+        {
+            Hud()?.ShowMessage(Loc.Format("ui.character.grew", name, level));
+            Debug.Log($"[Slice] {name} grew to {level} by use.");
         }
 
         /// <summary>The body <see cref="Identity"/> names worn on <paramref name="player"/> (a loaded run's city is new).</summary>

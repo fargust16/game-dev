@@ -287,6 +287,7 @@ namespace GameDev.Slice.Fights
 
         private void OnTreated(Combatant c, Combatant patient, Treatment treatment, bool success)
         {
+            TrainTreatment(c, treatment, success);
             _hud.Line(Loc.Format(success ? "ui.fight.log.treat.ok" : "ui.fight.log.treat.failed", Name(c), Loc.Get("ui.treatment." + treatment)));
             _hud.MarkDirty();
         }

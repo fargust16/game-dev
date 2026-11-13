@@ -52,6 +52,12 @@ namespace GameDev.Confront.Turns
         public event Action<Combatant, Combatant, FightAbility, bool, StrikeResult> AbilityUsed;
 
         /// <summary>
+        /// Once for each ability used, whatever it struck (S5b.2): <see cref="AbilityUsed"/> also tells each one an area
+        /// struck and a Сокрушение's blow apart, so growth counts the use here. The target is null for one with none.
+        /// </summary>
+        public event Action<Combatant, Combatant, FightAbility, bool, StrikeResult> AbilityCast;
+
+        /// <summary>
         /// Whether <paramref name="c"/> can use its prepared ability <paramref name="index"/> now with the AP and Will Power
         /// it holds: a targeted one at anyone, one with no target where it stands (Столп wants an enemy beside).
         /// </summary>
@@ -314,6 +320,7 @@ namespace GameDev.Confront.Turns
             }
 
             AbilityUsed?.Invoke(c, target, ability, worked, result);
+            AbilityCast?.Invoke(c, target, ability, worked, result);
             AfterHit(c, target, worked, result.Damage); // 05.1 Двойник: an ability that lands on a copy breaks it
             if (ability.Effect == AbilityEffect.Crush)
             {
@@ -499,6 +506,7 @@ namespace GameDev.Confront.Turns
             ApLeft -= brace.Ap;
             f.Braced = true;
             AbilityUsed?.Invoke(c, null, brace, true, default);
+            AbilityCast?.Invoke(c, null, brace, true, default);
         }
 
         /// <summary>

@@ -76,7 +76,7 @@ namespace GameDev.Confront.Rules
         /// <summary>A targeted ability's hit chance: §5b's formula with magical accuracy, from 5 % to 95 %.</summary>
         public double MagicHitChance(Fighter caster, Fighter target, double bonusPoints = 0d)
         {
-            var chance = baseHit + ((MagicAccuracy(caster) - Evasion(target) + bonusPoints) / 100d);
+            var chance = (baseHit + ((MagicAccuracy(caster) - Evasion(target) + bonusPoints) / 100d)) * Secondary(caster, target);
             return Math.Clamp(chance * (1d + caster.Get(CharacterAttribute.Luck) / 100d), hitFloor, hitCeiling);
         }
 

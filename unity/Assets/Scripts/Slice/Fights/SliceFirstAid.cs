@@ -113,6 +113,14 @@ namespace GameDev.Slice.Fights
             return null;
         }
 
+        /// <summary>
+        /// Every treatment grows First Aid and Dexterity, a failed one half, its difficulty read on §1's bands (07.1 §3,
+        /// S5-1); in a fight and out of one alike.
+        /// </summary>
+        public static void Train(ICharacterValues character, FightRules rules, Treatment treatment, CheckOutcome outcome) =>
+            character?.Train(CharacterSkill.FirstAid, Growth.StageOfDifficulty(rules.TreatmentDifficulty(treatment)), outcome,
+                new[] { CharacterAttribute.Dexterity });
+
         /// <summary>The treatment's ticks outside a fight, the world running through them.</summary>
         public void Work(Treatment treatment) => _clock.AdvanceTicks(_rules.TreatmentTicks(treatment));
 
@@ -130,6 +138,7 @@ namespace GameDev.Slice.Fights
         /// </summary>
         public bool Finish(Func<Fighter> load, Action<Fighter> save, Treatment treatment, ReactionResult result)
         {
+            Train(_character, _rules, treatment, Growth.Of(result));
             if (result == ReactionResult.Bad)
             {
                 return false;

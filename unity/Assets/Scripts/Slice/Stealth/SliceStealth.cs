@@ -241,10 +241,15 @@ namespace GameDev.Slice.Stealth
             var sees = Sees(o, feet, Active);
             if (Active && sees)
             {
+                _slipping.Add(o);
                 if (o.Meter.See(TimeToFill(o, feet), seconds, feet))
                 {
                     Notice(o);
                 }
+            }
+            else if (o.Meter.Fill <= 0f && !o.Meter.Noticed && _slipping.Remove(o))
+            {
+                Train(o, true); // the look ended and its meter ran empty: the character slipped past
             }
             else if (sees)
             {
@@ -258,11 +263,30 @@ namespace GameDev.Slice.Stealth
             o.Behave(feet, seconds);
         }
 
+        /// <summary>
+        /// Every use grows (07.1 §3, S5b.2): each look the character meets in Stealth Mode is one use of Stealth and
+        /// Dexterity, slipped past or noticed, the observer's Perception, raised when Alert, its difficulty on §1's bands.
+        /// A look counts once its meter has run empty again, so a cone's edge flickering over the character is one look.
+        /// </summary>
+        private void Train(StealthObserver o, bool slipped)
+        {
+            var difficulty = (int)Math.Round(o.Perception * (o.Meter != null && o.Meter.Alert ? ReactionCheck.AlertPerception : 1d));
+            _character?.Train(CharacterSkill.Stealth, Growth.StageOfDifficulty(difficulty), slipped ? CheckOutcome.Normal : CheckOutcome.Failure,
+                new[] { CharacterAttribute.Dexterity });
+        }
+
+        private readonly HashSet<StealthObserver> _slipping = new HashSet<StealthObserver>();
+
         private void Notice(StealthObserver o) => NoticedBy(o, Loc.Get($"ui.stealth.noticed.{1 + (Stable(o.name) % Lines)}"));
 
         /// <summary>An observer noticed the character in Stealth Mode: it says its line, and the character stands up.</summary>
         public void NoticedBy(StealthObserver o, string line)
         {
+            if (_slipping.Remove(o))
+            {
+                Train(o, false);
+            }
+
             LastNoticer = o;
             o.Say(line, LineSeconds);
             SetActive(false);

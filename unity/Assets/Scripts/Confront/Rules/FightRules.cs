@@ -37,6 +37,9 @@ namespace GameDev.Confront.Rules
 
         [SerializeField, Range(0f, 1f)] private float hitCeiling = 0.95f;
 
+        [Tooltip("07.1 §10, S5b.3: Perception as every attack's secondary attribute by 07.1 §5, the target's Evasion the difficulty: the hit chance × (1 + share × min(1, Perception / Evasion)) before Luck; 0 turns it off.")]
+        [SerializeField, Range(0f, 0.5f)] private float perceptionSecondary = 0.10f;
+
         [Header("10.2 §5b Damage")]
         [Tooltip("Stage Factor = 1 + stageStep × (9 − item stage).")]
         [SerializeField] private float stageStep = 0.35f;
@@ -293,13 +296,32 @@ namespace GameDev.Confront.Rules
         /// <summary>10.2 §5b Attribute Requirements: below its weapon's requirements a fighter hits that share as often.</summary>
         public static double Aim(Fighter fighter) => Fit(fighter.Values, fighter.Weapon.Requirements, fighter.Weapon.Stage);
 
+        /// <summary>Whether Perception is every attack's secondary attribute (07.1 §10, S5b.3), so that it grows with each.</summary>
+        public bool PerceptionAims => perceptionSecondary > 0f;
+
         /// <summary>
-        /// 10.2 §5b Attack: `(70 % + Accuracy − Evasion + situational) × (1 + Luck / 100)`, from 5 % to 95 %, then times
-        /// the share of the weapon its user meets.
+        /// 07.1 §5 with §10's direction (S5b.3): `1 + share × min(1, Perception / Evasion)`, the target's Evasion standing for
+        /// the task's difficulty, so at most +10 % of the hit chance, relatively; a target with no Evasion gives the full share.
+        /// </summary>
+        public double Secondary(Fighter attacker, Fighter target)
+        {
+            if (perceptionSecondary <= 0f)
+            {
+                return 1d;
+            }
+
+            var difficulty = Evasion(target);
+            var reach = difficulty <= 0d ? 1d : Math.Min(1d, attacker.Get(CharacterAttribute.Perception) / difficulty);
+            return 1d + (perceptionSecondary * reach);
+        }
+
+        /// <summary>
+        /// 10.2 §5b Attack: `(70 % + Accuracy − Evasion + situational) × Perception's secondary share × (1 + Luck / 100)`,
+        /// from 5 % to 95 %, then times the share of the weapon its user meets.
         /// </summary>
         public double HitChance(Fighter attacker, Fighter target, double bonusPoints = 0d)
         {
-            var chance = baseHit + (Accuracy(attacker) - Evasion(target) + bonusPoints) / 100d;
+            var chance = (baseHit + (Accuracy(attacker) - Evasion(target) + bonusPoints) / 100d) * Secondary(attacker, target);
             var lucky = chance * (1d + attacker.Get(CharacterAttribute.Luck) / 100d);
             return Math.Clamp(lucky, hitFloor, hitCeiling) * Aim(attacker);
         }

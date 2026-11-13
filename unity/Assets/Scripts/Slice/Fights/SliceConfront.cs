@@ -168,6 +168,7 @@ namespace GameDev.Slice.Fights
             _turns.HiddenChanged += OnHiddenChanged;
             _turns.ConeChecked += OnConeChecked;
             _turns.AbilityUsed += OnAbilityUsed;
+            _turns.AbilityCast += OnAbilityCast;
             _turns.AbilityAt += OnAbilityAt;
             _turns.DoubleEnded += OnDoubleEnded;
             _turns.VeilChanged += OnVeilChanged;
@@ -818,6 +819,7 @@ namespace GameDev.Slice.Fights
         /// <summary>The blow is shown as a beat: the attacker turns and strikes, the target is hit or falls at the impact.</summary>
         private void OnStruck(Combatant attacker, Combatant target, StrikeResult result)
         {
+            TrainStrike(attacker, target, result); // every blow grows (07.1 §3, S5b.2)
             CountKill(attacker, target);
             FightDeath(attacker, target); // a death enters the news (10.2 §5e, PB8d)
             if (!_bodies.TryGetValue(attacker, out var body) || body == null)

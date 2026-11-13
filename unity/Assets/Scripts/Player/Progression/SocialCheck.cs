@@ -71,5 +71,24 @@ namespace GameDev.Player.Progression
         /// </summary>
         // lean-ctx: no dice faces are drawn; when a panel shows them, pick a throw that gives the drawn outcome.
         public static bool Roll(double chance, Random rolls) => rolls.NextDouble() < chance;
+
+        /// <summary>
+        /// Every Social Check grows its skill and both its attributes, of equal weight, each the full hundredth; a failure
+        /// half, and no critical in V1 (07.1 §3, S5-1). Its difficulty on §1's bands is the listener's own two attributes,
+        /// <c>(A + B) / 2</c>, since the check's sum lies on the dice's scale (the agent's reading, S5b.2). A character that
+        /// is no sheet, or an NPC's, is not trained.
+        /// </summary>
+        public static void Train(ICharacterValues character, CharacterSkill skill, ICharacterValues listener, bool success)
+        {
+            if (character is not CharacterSheet sheet)
+            {
+                return;
+            }
+
+            var (first, second) = Attributes(skill);
+            var difficulty = listener == null ? 1 : (listener.Get(first) + listener.Get(second)) / 2;
+            sheet.Train(skill, Growth.StageOfDifficulty(difficulty), success ? CheckOutcome.Normal : CheckOutcome.Failure,
+                new[] { first, second });
+        }
     }
 }

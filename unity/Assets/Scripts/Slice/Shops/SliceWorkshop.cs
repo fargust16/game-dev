@@ -214,6 +214,9 @@ namespace GameDev.Slice.Shops
             var made = _state.Get(MadeKey);
             _state.Set(MadeKey, made + 1);
             _bag.Spend(Rules.WorkshopFee);
+
+            // Every piece grows Item Creation and Dexterity, a spoiled one half (07.1 §3, S5-1); its stage is the task's.
+            _character.Train(CharacterSkill.ItemCreation, stage, Growth.Of(result), new[] { CharacterAttribute.Dexterity });
             if (result == ReactionResult.Bad)
             {
                 foreach (var part in recipe)

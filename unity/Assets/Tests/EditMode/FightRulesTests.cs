@@ -70,15 +70,17 @@ namespace GameDev.Slice.Tests
             Armed(Sheet(strength, 6, 6, 6, 3, ranged: 12), "Rifle", armour, 8, "CartridgePouch");
 
         [Test]
-        public void PeersHitAboutSeventyOnePercent()
+        public void PeersHitAboutSeventyEightPercent()
         {
             var a = Armed(Sheet(10, 10, 10, 10, 10), "Axe");
             var b = Armed(Sheet(10, 10, 10, 10, 10), "Axe");
             Assert.AreEqual(_rules.Accuracy(a), _rules.Evasion(b), Tight, "peers: accuracy equals Evasion");
-            Assert.AreEqual(0.707, _rules.HitChance(a, b), Tight, "70 % × (1 + Luck 1 / 100)");
+            Assert.AreEqual(1.10, _rules.Secondary(a, b), Tight, "Perception 10 against Evasion 10: the full secondary share (07.1 §10, S5b.3)");
+            Assert.AreEqual(0.70 * 1.10 * 1.01, _rules.HitChance(a, b), Tight, "70 % × Perception's share × (1 + Luck 1 / 100)");
+            Assert.AreEqual(1.05, _rules.Secondary(Armed(Sheet(10, 10, 15, 5, 10), "Axe"), b), Tight, "Perception 5 against Evasion 10: half the share");
 
             // The slice's Limit 9 fighters, with a weapon that adds nothing to hit.
-            Assert.AreEqual(0.71, _rules.HitChance(ReferenceNine("Axe"), ReferenceNine("Axe")), 0.01);
+            Assert.AreEqual(0.78, _rules.HitChance(ReferenceNine("Axe"), ReferenceNine("Axe")), 0.01);
 
             var rolls = new Random(9105);
             var hits = 0;
@@ -89,14 +91,14 @@ namespace GameDev.Slice.Tests
                 hits += _rules.Strike(a, b, default, rolls).Hit ? 1 : 0;
             }
 
-            Assert.AreEqual(0.707, hits / (double)strikes, 0.01, "the rolls land on the chance");
+            Assert.AreEqual(0.70 * 1.10 * 1.01, hits / (double)strikes, 0.01, "the rolls land on the chance");
         }
 
         [Test]
         public void TheHitChanceTakesLuckAndStaysBetweenFiveAndNinetyFivePercent()
         {
             var target = Armed(Sheet(10, 10, 10, 10, 10), "Axe");
-            Assert.AreEqual(0.70 * 1.21, _rules.HitChance(Armed(Sheet(10, 10, 10, 10, 10, luck: 21), "Axe"), target), Tight);
+            Assert.AreEqual(0.70 * 1.10 * 1.21, _rules.HitChance(Armed(Sheet(10, 10, 10, 10, 10, luck: 21), "Axe"), target), Tight);
             Assert.AreEqual(0.95, _rules.HitChance(Armed(Sheet(10, 10, 10, 10, 10, luck: 51), "Axe"), target), Tight);
             Assert.AreEqual(0.95, _rules.HitChance(Armed(Sheet(90, 10, 90, 90, 90), "Axe"), target), Tight);
             Assert.AreEqual(0.05, _rules.HitChance(Armed(Sheet(10, 10, 10, 10, 10), "Axe"), Armed(Sheet(10, 10, 99, 99, 1), "Axe")), Tight);
@@ -354,7 +356,7 @@ namespace GameDev.Slice.Tests
             var target = Armed(Sheet(10, 10, 10, 10, 10), "Axe");
             Assert.AreEqual(0.5, FightRules.Aim(weak), Tight);
             Assert.AreEqual(0.8, FightRules.Aim(mace), Tight, "four fifths of a mace's Dexterity 5");
-            var unaided = Math.Min(0.95, (0.70 + (_rules.Accuracy(weak) - _rules.Evasion(target)) / 100) * 1.01);
+            var unaided = Math.Min(0.95, (0.70 + (_rules.Accuracy(weak) - _rules.Evasion(target)) / 100) * _rules.Secondary(weak, target) * 1.01);
             Assert.AreEqual(unaided * 0.5, _rules.HitChance(weak, target), Tight, "a weapon above its user aims worse");
 
             var plate = Armed(Sheet(4, 10, 10, 10, 10), "Sword", "Plate");

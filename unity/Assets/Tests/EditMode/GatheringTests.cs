@@ -156,6 +156,8 @@ namespace GameDev.Slice.Tests
 
             Assert.AreEqual(CheckOutcome.Critical, _gathering.Cycle(ReactionResult.Perfect));
             Assert.AreEqual(2, _bag.Count("wood"), "a perfect stop: two units");
+            Assert.AreEqual(2, _sheet.Get(CharacterSkill.Woodcutting), "and every swing grows the skill, a perfect one twice: 20 XP (S5b.2)");
+            Assert.AreEqual(0.2d, _sheet.Xp(CharacterAttribute.Strength), 1e-9, "and Strength a hundredth of what its own level takes");
             Assert.AreEqual(SliceGathering.WearGood, _gathering.Wear("woodcutting_axe"));
             Assert.AreEqual(CheckOutcome.Normal, _gathering.Cycle(_clock.Tick, ReactionResult.Good));
             Assert.AreEqual(3, _bag.Count("wood"), "a good one: one unit");

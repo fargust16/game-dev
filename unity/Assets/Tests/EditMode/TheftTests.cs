@@ -116,6 +116,7 @@ namespace GameDev.Slice.Tests
             Assert.IsFalse(_theft.TriedToday("Townsman 3"));
             Assert.AreEqual(TheftOutcome.Lifted, _theft.Resolve("Townsman 3", ReactionResult.Good, out var taken));
             Assert.AreEqual(purse, taken);
+            Assert.AreEqual(2, _sheet.Get(CharacterSkill.Theft), "every try grows Theft (S5b.2): a townsman of Perception 1 is a stage 9 task");
             Assert.AreEqual(bronze + purse, _bag.Bronze, "its bronze in the bag");
             Assert.AreEqual(0, _standing.ReputationPoints, "unseen, nothing counts against Reputation");
             Assert.IsTrue(_theft.TriedToday("Townsman 3"), "once a day");

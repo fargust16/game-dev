@@ -1,3 +1,4 @@
+using System;
 using GameDev.Items;
 using GameDev.Player.Progression;
 using GameDev.Player.Standing;
@@ -66,10 +67,16 @@ namespace GameDev.Slice.Theft
         /// <summary>The person's purse today, by the seed.</summary>
         public int Purse(string person) => _seed.Fork(SliceSeedStreams.Theft, Hash(person), (_clock.Day * 2) + 1).Next(PurseLeast, PurseMost + 1);
 
-        /// <summary>Settles a try by the Reaction Check's result; <paramref name="bronze"/> is what was taken.</summary>
-        public TheftOutcome Resolve(string person, ReactionResult result, out int bronze)
+        /// <summary>
+        /// Settles a try by the Reaction Check's result; <paramref name="bronze"/> is what was taken. Every try grows Theft
+        /// and Dexterity, a noticed one half, the target's <paramref name="perception"/> being the difficulty read on §1's
+        /// bands (07.1 §3, S5-1).
+        /// </summary>
+        public TheftOutcome Resolve(string person, ReactionResult result, out int bronze, int perception = 1, bool alert = false)
         {
             _state.Set(TriedKey(person), _clock.Day + 1);
+            var difficulty = (int)Math.Round(perception * (alert ? ReactionCheck.AlertPerception : 1d));
+            _character.Train(CharacterSkill.Theft, Growth.StageOfDifficulty(difficulty), Growth.Of(result), new[] { CharacterAttribute.Dexterity });
             if (result == ReactionResult.Bad)
             {
                 bronze = 0;

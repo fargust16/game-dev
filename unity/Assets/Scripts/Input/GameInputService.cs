@@ -38,6 +38,7 @@ namespace GameDev.Input
         private InputAction _stance;
         private InputAction _infuse;
         private InputAction _prepared;
+        private InputAction _characterPage;
         private InputAction _devArcana;
         private InputAction _changeSet;
         private InputAction _firstAid;
@@ -228,6 +229,9 @@ namespace GameDev.Input
         /// <summary>CR4, 07.2 §4.5 (authoring default, K): the page of Prepared Abilities, out of a fight.</summary>
         public bool PreparedPressed => _prepared != null && _prepared.WasPressedThisFrame();
 
+        /// <summary>S5b.2: L opens and closes the character's page, its attributes and skills and how far each has grown.</summary>
+        public bool CharacterPagePressed => _characterPage != null && _characterPage.WasPressedThisFrame();
+
         public Vector2 MousePosition => Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
         public Vector2 MouseDelta => Mouse.current != null ? Mouse.current.delta.ReadValue() : Vector2.zero;
 
@@ -303,6 +307,7 @@ namespace GameDev.Input
             _stealth = _player.AddAction("Stealth", InputActionType.Button, "<Keyboard>/c");
             _infuse = _player.AddAction("Infuse", InputActionType.Button, "<Keyboard>/u");
             _prepared = _player.AddAction("PreparedAbilities", InputActionType.Button, "<Keyboard>/k");
+            _characterPage = _player.AddAction("CharacterPage", InputActionType.Button, "<Keyboard>/l");
 
             _camera = new InputActionMap("Camera");
             _camPan = _camera.AddAction("Pan", InputActionType.Value);

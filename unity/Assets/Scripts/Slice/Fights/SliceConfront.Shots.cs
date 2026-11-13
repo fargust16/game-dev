@@ -41,7 +41,7 @@ namespace GameDev.Slice.Fights
         /// The roll of a shot out of a fight at <paramref name="target"/>, who stands at <paramref name="at"/>, from the
         /// character at <paramref name="from"/>: the fight's chance at that distance, its damage taken from the target.
         /// </summary>
-        public StrikeResult RollShot(Fighter target, Vector3 from, Vector3 at)
+        public StrikeResult RollShot(Fighter target, Vector3 from, Vector3 at, bool glowing = false)
         {
             var rules = _settings.FightRules;
             var shooter = PlayerFighter();
@@ -66,6 +66,7 @@ namespace GameDev.Slice.Fights
             var chance = rules.HitChance(shooter, target, context.HitBonus);
             var result = rules.Strike(shooter, target, context, _seed.Fork(SliceSeedStreams.Shots, ++_shots));
             LastShot = result;
+            TrainStrike(shooter, false, target.Limit, glowing, result); // a shot that touches someone grows (07.1 §3)
             Debug.Log($"[Confront] a shot out of a fight at {flat:0.#} m: {chance:P0} to hit, {(result.Hit ? "hit" : "missed")}.");
             if (!result.Hit)
             {
@@ -87,7 +88,7 @@ namespace GameDev.Slice.Fights
                 fighter.Hp = System.Math.Min(beast.Hp, fighter.MaxHp);
             }
 
-            var result = RollShot(fighter, from, beast.transform.position);
+            var result = RollShot(fighter, from, beast.transform.position, beast.Glowing);
             beast.Hp = fighter.Hp;
             Debug.Log($"[Confront] a shot touched the {beast.Kind}: {(result.Hit ? $"hit for {result.Damage:0.#}" : "grazed")}, {fighter.Hp:0.#} of {fighter.MaxHp:0.#} HP left.");
             return result;

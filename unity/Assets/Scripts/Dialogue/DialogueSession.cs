@@ -133,6 +133,7 @@ namespace GameDev.Dialogue
             var chance = Preview(option).Chance;
             var rolls = _world.Seed.Fork(_world.CheckStream, StableHash.Of(Dialogue.Id + "." + option.id), (int)_world.Clock.Tick);
             var success = SocialCheck.Roll(chance, rolls);
+            SocialCheck.Train(_world.Character, option.skill, listener.Sheet(), success);
             Pay(option, listener, success);
             if (success)
             {

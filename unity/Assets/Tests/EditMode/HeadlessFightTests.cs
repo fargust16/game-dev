@@ -114,14 +114,14 @@ namespace GameDev.Slice.Tests
             };
 
             // The table of 10.2 §5b *Beasts of the slice*, beast_sim.py at seed 7 and 40,000 fights a line, on the combat
-            // rework's rules (§5f).
+            // rework's rules (§5f) with Perception as every attack's secondary attribute (S5b.3).
             double[,] table =
             {
-                { 20, 2, 11, 2, 1 },
-                { 78, 36, 75, 65, 41 },
-                { 81, 39, 75, 69, 43 },
-                { 94, 64, 90, 85, 67 },
-                { 98, 79, 96, 93, 80 },
+                { 15, 1, 11, 1, 1 },
+                { 75, 29, 77, 59, 35 },
+                { 79, 32, 79, 64, 39 },
+                { 94, 58, 93, 83, 65 },
+                { 98, 81, 98, 92, 82 },
             };
 
             var report = new StringBuilder($"{Fights} fights a cell, C# against 10.2:\n");

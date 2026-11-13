@@ -206,7 +206,12 @@ namespace GameDev.Slice.People
         private void Persuade()
         {
             var rolls = _world.Seed.Fork(SliceSeedStreams.SocialChecks, StableHash.Of("accusation." + Path(_warden)), (int)_world.Clock.Tick);
-            if (SocialCheck.Roll(Preview().Chance, rolls))
+            var success = SocialCheck.Roll(Preview().Chance, rolls);
+            var listener = new CharacterSheet();
+            listener.Set(CharacterAttribute.Intelligence, ListenerValues);
+            listener.Set(CharacterAttribute.Will, ListenerValues);
+            SocialCheck.Train(_world.Character, CharacterSkill.Persuasion, listener, success);
+            if (success)
             {
                 _world.Standing.LetOff();
                 End("ui.accuse.letoff");

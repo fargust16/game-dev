@@ -480,3 +480,29 @@ ui.create.note.spent,Every free point is spent,Все свободные очк�
 ui.create.note.points.wrong,The points do not add up,Очки не сходятся
 ui.create.mark.on,●,●
 ui.create.mark.off,○,○
+"# The character's page and growth by use (S5b.2; 07.1 §3, owner 2026-11-13, S5-1): L out of a fight"
+ui.skill.lightfirearms,Light Firearms,Лёгкое огнестрельное
+ui.skill.heavyfirearms,Heavy Firearms,Тяжёлое огнестрельное
+ui.skill.lightmelee,Light Melee,Лёгкое ближнее оружие
+ui.skill.heavymelee,Heavy Melee,Тяжёлое ближнее оружие
+ui.skill.arcana,Arcana Skill,Навык Арканы
+ui.skill.firstaid,First Aid,Первая помощь
+ui.skill.stealth,Stealth,Скрытность
+ui.skill.theft,Theft,Кража
+ui.skill.itemcreation,Item Creation,Создание предметов
+ui.skill.herbalism,Herbalism,Травничество
+ui.skill.woodcutting,Woodcutting,Рубка леса
+ui.skill.mining,Mining,Добыча руды
+ui.skill.skinning,Skinning,Свежевание
+ui.character.title,Character,Персонаж
+ui.character.uninitiated,No Arcana entered,Без Аркана
+ui.character.limit,{0}  ·  Limit {1},{0}  ·  Предел {1}
+ui.character.attributes,Attributes,Характеристики
+ui.character.skills.fight,Fighting,Бой
+ui.character.skills.talk,Talk,Разговор
+ui.character.skills.shadow,In the shadows,Тайком
+ui.character.skills.craft,Crafts and the land,Ремёсла и промыслы
+ui.character.line,{0}  {1}  ·  {2} % to the next,{0}  {1}  ·  {2} % до следующего
+ui.character.line.top,{0}  {1},{0}  {1}
+ui.character.hint,Every use grows its skill and the attributes behind it. L or Esc closes.,Каждое применение растит свой навык и характеристики за ним. L или Esc — закрыть.
+ui.character.grew,{0} grew to {1},{0}: теперь {1}

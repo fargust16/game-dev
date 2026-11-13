@@ -65,6 +65,7 @@ namespace GameDev.Player.Progression
 
         /// <summary>10.2 §5f, 05.1: the abilities of the character's own Arcana, aimed with Intelligence.</summary>
         Arcana,
+
     }
 
     /// <summary>What a check reads of a character.</summary>
@@ -78,7 +79,8 @@ namespace GameDev.Player.Progression
     /// <summary>
     /// One character's attributes and skills (07.1 §1–2; 17 P.3): every value from 1 to 100, all starting at 1
     /// (07 Character Life). The player's sheet is kept in the save's player.character section; NPCs use the same
-    /// sheet. How the values grow (07.1 §3) comes with the systems that train them.
+    /// sheet. Each value grows by its own use (07.1 §3, S5b.2): <see cref="Train"/> gives a use's XP by
+    /// <see cref="Growth"/>, each track carries the XP toward its next level, and only the player's sheet is trained.
     /// </summary>
     public sealed class CharacterSheet : ICharacterValues
     {
@@ -87,6 +89,14 @@ namespace GameDev.Player.Progression
 
         private readonly int[] _attributes = Start(Enum.GetValues(typeof(CharacterAttribute)).Length);
         private readonly int[] _skills = Start(Enum.GetValues(typeof(CharacterSkill)).Length);
+        private readonly double[] _attributeXp = new double[Enum.GetValues(typeof(CharacterAttribute)).Length];
+        private readonly double[] _skillXp = new double[Enum.GetValues(typeof(CharacterSkill)).Length];
+
+        /// <summary>An attribute reached a new level by use.</summary>
+        public event Action<CharacterAttribute, int> AttributeGrew;
+
+        /// <summary>A skill reached a new level by use.</summary>
+        public event Action<CharacterSkill, int> SkillGrew;
 
         public int Get(CharacterAttribute attribute) => _attributes[(int)attribute];
 
@@ -96,17 +106,94 @@ namespace GameDev.Player.Progression
 
         public void Set(CharacterSkill skill, int value) => _skills[(int)skill] = Clamp(value);
 
+        /// <summary>The XP an attribute carries toward its next level.</summary>
+        public double Xp(CharacterAttribute attribute) => _attributeXp[(int)attribute];
+
+        public double Xp(CharacterSkill skill) => _skillXp[(int)skill];
+
+        /// <summary>
+        /// One use (07.1 §3; owner, 2026-11-13, S5-1): the skill takes its award by the task's stage and the outcome, each
+        /// primary attribute of the use's formula a hundredth of what it would take, each secondary one half that, each
+        /// counted on its own level. A use with no skill (null) trains its attributes alone.
+        /// </summary>
+        public void Train(CharacterSkill? skill, int taskStage, CheckOutcome outcome, IReadOnlyList<CharacterAttribute> primary,
+            IReadOnlyList<CharacterAttribute> secondary = null)
+        {
+            if (skill.HasValue)
+            {
+                Gain(skill.Value, Growth.Award(Get(skill.Value), taskStage, outcome));
+            }
+
+            foreach (var attribute in primary ?? Array.Empty<CharacterAttribute>())
+            {
+                Gain(attribute, Growth.Award(Get(attribute), taskStage, outcome, Growth.AttributeShare));
+            }
+
+            foreach (var attribute in secondary ?? Array.Empty<CharacterAttribute>())
+            {
+                Gain(attribute, Growth.Award(Get(attribute), taskStage, outcome, Growth.SecondaryShare));
+            }
+        }
+
+        /// <summary>XP onto an attribute, its levels gained while enough is carried; returns the levels gained.</summary>
+        public int Gain(CharacterAttribute attribute, double xp)
+        {
+            var gained = Grow(ref _attributes[(int)attribute], ref _attributeXp[(int)attribute], xp);
+            if (gained > 0)
+            {
+                AttributeGrew?.Invoke(attribute, Get(attribute));
+            }
+
+            return gained;
+        }
+
+        public int Gain(CharacterSkill skill, double xp)
+        {
+            var gained = Grow(ref _skills[(int)skill], ref _skillXp[(int)skill], xp);
+            if (gained > 0)
+            {
+                SkillGrew?.Invoke(skill, Get(skill));
+            }
+
+            return gained;
+        }
+
+        /// <summary>Ordinary growth stops at 99; 100 asks special criteria (07.1 §1), so XP stops gathering there.</summary>
+        private static int Grow(ref int level, ref double carried, double xp)
+        {
+            if (xp <= 0 || double.IsNaN(xp) || level >= Growth.Top)
+            {
+                return 0;
+            }
+
+            var gained = 0;
+            carried += xp;
+            while (level < Growth.Top && carried >= Growth.ToNext(level))
+            {
+                carried -= Growth.ToNext(level);
+                level++;
+                gained++;
+            }
+
+            if (level >= Growth.Top)
+            {
+                carried = 0;
+            }
+
+            return gained;
+        }
+
         public CharacterSheetState Capture()
         {
             var state = new CharacterSheetState();
             foreach (CharacterAttribute attribute in Enum.GetValues(typeof(CharacterAttribute)))
             {
-                state.attributes.Add(new CharacterValueEntry { name = attribute.ToString(), value = Get(attribute) });
+                state.attributes.Add(new CharacterValueEntry { name = attribute.ToString(), value = Get(attribute), xp = Xp(attribute) });
             }
 
             foreach (CharacterSkill skill in Enum.GetValues(typeof(CharacterSkill)))
             {
-                state.skills.Add(new CharacterValueEntry { name = skill.ToString(), value = Get(skill) });
+                state.skills.Add(new CharacterValueEntry { name = skill.ToString(), value = Get(skill), xp = Xp(skill) });
             }
 
             return state;
@@ -127,23 +214,26 @@ namespace GameDev.Player.Progression
         {
             Array.Fill(_attributes, Lowest);
             Array.Fill(_skills, Lowest);
+            Array.Fill(_attributeXp, 0d);
+            Array.Fill(_skillXp, 0d);
             foreach (var entry in state.attributes)
             {
                 if (Enum.IsDefined(typeof(CharacterAttribute), entry.name))
                 {
-                    Set((CharacterAttribute)Enum.Parse(typeof(CharacterAttribute), entry.name), entry.value);
+                    var attribute = (CharacterAttribute)Enum.Parse(typeof(CharacterAttribute), entry.name);
+                    Set(attribute, entry.value);
+                    _attributeXp[(int)attribute] = Math.Max(0d, entry.xp);
                 }
             }
 
             foreach (var entry in state.skills)
             {
-                if (Enum.IsDefined(typeof(CharacterSkill), entry.name))
+                var known = Enum.IsDefined(typeof(CharacterSkill), entry.name);
+                if (known || (entry.name != null && Renamed.ContainsKey(entry.name)))
                 {
-                    Set((CharacterSkill)Enum.Parse(typeof(CharacterSkill), entry.name), entry.value);
-                }
-                else if (entry.name != null && Renamed.TryGetValue(entry.name, out var skill))
-                {
+                    var skill = known ? (CharacterSkill)Enum.Parse(typeof(CharacterSkill), entry.name) : Renamed[entry.name];
                     Set(skill, entry.value);
+                    _skillXp[(int)skill] = Math.Max(0d, entry.xp);
                 }
             }
         }
@@ -170,5 +260,8 @@ namespace GameDev.Player.Progression
     {
         public string name;
         public int value;
+
+        /// <summary>The XP carried toward the next level (S5b.2); 0 in an older save.</summary>
+        public double xp;
     }
 }

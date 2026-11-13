@@ -120,7 +120,7 @@ namespace GameDev.Slice.Theft
                     Bar = () => _theft.Bar(Person, perception, alert),
                     CaptionKey = "ui.theft.caption",
                     PauseWorld = false,
-                    Settle = Settle,
+                    Settle = r => Settle(r, perception, alert),
                     CalledOff = () =>
                     {
                         if (walker != null && walker.Inside)
@@ -146,10 +146,10 @@ namespace GameDev.Slice.Theft
 
         private static Vector3 Flat(Vector3 at) => new Vector3(at.x, 0f, at.z);
 
-        private void Settle(ReactionResult result)
+        private void Settle(ReactionResult result, int perception, bool alert)
         {
             _settled = true;
-            if (_theft.Resolve(Person, result, out var bronze) == TheftOutcome.Lifted)
+            if (_theft.Resolve(Person, result, out var bronze, perception, alert) == TheftOutcome.Lifted)
             {
                 Say(Loc.Format("ui.theft.lifted", Coins.Show(bronze)));
                 return;

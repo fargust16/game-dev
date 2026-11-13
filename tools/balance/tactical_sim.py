@@ -255,7 +255,7 @@ class Fight:
 
     def chance(self, a, t, bonus):
         p = 0.70 + self.r.skill_weight * (a.accuracy() - t.evasion()) / 100 + bonus - (DISORIENT_HIT if a.dazed else 0.0)
-        return min(0.95, max(0.05, p * (1 + a.luck / 100)))
+        return min(0.95, max(0.05, p * c.secondary(a, t) * (1 + a.luck / 100)))
 
     def defence(self, t):
         d = c.ARMOUR[t.armour][0] * c.stage_factor(t.armour_stage) * t.armour_share() + t.gear.defence
@@ -503,7 +503,7 @@ class Fight:
         if self.r.intercept and cheb(u, t) > 1:
             t = self.interceptor(u, t)
         p = 0.70 + (u.magic_accuracy() - t.evasion()) / 100 - (self.r.cover + self.shielded(t) if cheb(u, t) > 1 else 0.0) - self.obscured(u, t)
-        hit = random.random() < min(0.95, max(0.05, p * (1 + u.luck / 100)))
+        hit = random.random() < min(0.95, max(0.05, p * c.secondary(u, t) * (1 + u.luck / 100)))
         if not hit:
             u.disoriented = 1
             return

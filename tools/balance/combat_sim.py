@@ -11,6 +11,7 @@ Run: python tools/balance/combat_sim.py
 """
 import io
 import math
+import os
 import random
 import sys
 from dataclasses import dataclass, field, replace
@@ -276,8 +277,23 @@ def mitigation(defence):
     return min(0.75, defence / (defence + 50))
 
 
+# 07.1 §10, S5b.3 (owner's direction, 2026-11-13, to be checked): Perception as every attack's secondary attribute by
+# 07.1 §5, the target's Evasion standing for the task's difficulty, at most +10 % of the hit chance, relatively.
+# Adopted in S5b.3 (perception_sim.py); PERCEPTION_SECONDARY=0 turns it off, read so that a Pool's workers see it too.
+PERCEPTION_SECONDARY = os.environ.get("PERCEPTION_SECONDARY", "1") == "1"
+SECONDARY_SHARE = 0.10
+
+
+def secondary(a, t):
+    """07.1 §5: 1 + 0.10 × min(1, Perception / difficulty); the factor a hit chance is multiplied by before Luck."""
+    if not PERCEPTION_SECONDARY:
+        return 1.0
+    difficulty = t.evasion()
+    return 1 + SECONDARY_SHARE * (1.0 if difficulty <= 0 else min(1.0, a.per / difficulty))
+
+
 def hit_chance(a, t, bonus=0.0):
-    p = 0.70 + (a.accuracy() - t.evasion()) / 100 + bonus
+    p = (0.70 + (a.accuracy() - t.evasion()) / 100 + bonus) * secondary(a, t)
     return min(0.95, max(0.05, p * (1 + a.luck / 100)))
 
 
