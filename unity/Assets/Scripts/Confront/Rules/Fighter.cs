@@ -127,6 +127,12 @@ namespace GameDev.Confront.Rules
         /// <summary>05.1 Дрёма: asleep, its Evasion zero and no guard, until its next turn is lost, damage, or an ally's waking.</summary>
         public int Asleep { get; set; }
 
+        /// <summary>
+        /// 20 §3, 05.1 *Assimilation*: the rounds it enters a fight Stunned by a Limit potion settling in it, one a round as
+        /// the world's ticks, counting down with the turns it loses; while any is left its Evasion is zero and it cannot guard.
+        /// </summary>
+        public int Defenceless { get; set; }
+
         /// <summary>05.1 Укол разума: Disorientation, which aims its next turn worse.</summary>
         public int Disoriented { get; set; }
 

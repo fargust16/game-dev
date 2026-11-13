@@ -193,12 +193,15 @@ namespace GameDev.Confront.Rules
             return fighter;
         }
 
-        /// <summary>A fighter joins a fight: its first AP fraction is rolled, and it holds no AP and loses no turn.</summary>
+        /// <summary>
+        /// A fighter joins a fight: its first AP fraction is rolled, and it holds no AP and loses no turn but those a Limit
+        /// potion's Assimilation takes (<see cref="Fighter.Defenceless"/>).
+        /// </summary>
         public void Enter(Fighter fighter, Random rolls)
         {
             fighter.ApFraction = rolls.NextDouble();
             fighter.Reserve = 0;
-            fighter.LostTurns = 0;
+            fighter.LostTurns = Math.Max(0, fighter.Defenceless);
             fighter.Asleep = fighter.Disoriented = 0;
             fighter.Dazed = fighter.Exposed = fighter.Braced = false;
         }
@@ -281,10 +284,10 @@ namespace GameDev.Confront.Rules
 
         /// <summary>
         /// 10.2 §5b Attack: `(Dexterity + Perception) / 2`, less the load, and in a Defensive Stance 1.5 for each AP held;
-        /// zero for a target that cannot evade or sleeps (05.1 Дрёма).
+        /// zero for a target that cannot evade, sleeps (05.1 Дрёма), or is Stunned by its Assimilation (20 §3).
         /// </summary>
         public double Evasion(Fighter fighter) =>
-            fighter.CanEvade && fighter.Asleep == 0
+            fighter.CanEvade && fighter.Asleep == 0 && fighter.Defenceless == 0
                 ? (fighter.Get(CharacterAttribute.Dexterity) + fighter.Get(CharacterAttribute.Perception)) / 2d + fighter.Modifiers.evasion - fighter.LoadEvasion
                   + (fighter.Stance ? stanceEvasion * fighter.Reserve : 0d)
                 : 0d;

@@ -16,9 +16,10 @@ namespace GameDev.Slice.Fights
     /// enters its Arcana at its Limit with its passives and its Prepared abilities, and starts with the Will Power left;
     /// a fight's end writes it back, and outside a fight it comes back by about 1 % of its maximum each 10 ticks. In the
     /// player's turn keys 1 to 9 or the hotbar's slots use a Prepared ability; one aimed at an enemy waits for the click
-    /// on it, and any other click puts it down. U turns Infusion on and off. Until S5b brings Faction Entry and the
-    /// pick of two abilities of each pool, the character knows every ability of its Arcana at its Limit and above, and
-    /// the development command F9 steps it through no Arcana, Жрица 9 and 8, and Император 9 and 8. Sleep's full return
+    /// on it, and any other click puts it down. U turns Infusion on and off. Each Limit gives its whole Ability
+    /// Pool (owner, COMBAT-1), so the character knows every ability of its Arcana at its Limit and the Limits above. It
+    /// enters an Arcana by a Limit potion (`SliceAdvancement`, S5b.5), and the development command F9 steps it through no
+    /// Arcana, Жрица 9 and 8, and Император 9 and 8. Sleep's full return
     /// of Will Power waits for the slice's sleep.
     /// </summary>
     public sealed partial class SliceConfront
@@ -57,7 +58,7 @@ namespace GameDev.Slice.Fights
         /// <summary>The Prepared ability being aimed, by its place in the fighter's set; -1 for none.</summary>
         public int Aiming => _aiming;
 
-        /// <summary>Enters the character's Arcana at its Limit, as the development command and, later, S5b's Faction Entry do.</summary>
+        /// <summary>Enters the character's Arcana at its Limit, as the development command does; a Limit potion does it by `SliceAdvancement` (S5b.5).</summary>
         public void Initiate(Arcana arcana, int limit)
         {
             if (_state == null)
@@ -72,7 +73,7 @@ namespace GameDev.Slice.Fights
 
         /// <summary>
         /// The abilities the character knows: every one of its Arcana at its Limit and the Limits above, Limit 7 being the
-        /// NPCs' only, until S5b's pick of two in each pool (05.1).
+        /// NPCs' only, each Limit giving its whole pool (05.1, owner COMBAT-1).
         /// </summary>
         public List<FightAbility> KnownAbilities()
         {

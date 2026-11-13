@@ -401,6 +401,22 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
+        public void AFighterWhosePotionSettlesEntersStunned()
+        {
+            var settling = ReferenceEight();
+            var evasion = _rules.Evasion(settling);
+            Assert.That(evasion, Is.GreaterThan(0d));
+            settling.Defenceless = 3;
+            _rules.Enter(settling, Scripted(0.25));
+            Assert.AreEqual(3, settling.LostTurns, "20 §3: it loses a turn for each round of Assimilation left");
+            Assert.AreEqual(0d, _rules.Evasion(settling), "and its evasion is zero while any is left");
+            settling.Reserve = 10;
+            Assert.IsFalse(_rules.CanGuard(settling), "it cannot guard");
+            settling.Defenceless = 0;
+            Assert.AreEqual(evasion, _rules.Evasion(settling), Tight);
+        }
+
+        [Test]
         public void InitiativeIsHalfDexterityAndPerceptionAndAD20()
         {
             var a = ReferenceEight();

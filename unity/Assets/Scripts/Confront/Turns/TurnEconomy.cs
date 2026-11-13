@@ -410,6 +410,7 @@ namespace GameDev.Confront.Turns
                 {
                     c.Fighter.LostTurns = Math.Max(0, c.Fighter.LostTurns - 1);
                     c.Fighter.Asleep = Math.Max(0, c.Fighter.Asleep - 1); // 05.1 Дрёма: the sleeper's turn is lost
+                    c.Fighter.Defenceless = Math.Max(0, c.Fighter.Defenceless - 1); // 20 §3: a round of Assimilation spent
                     continue;
                 }
 

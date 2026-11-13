@@ -228,6 +228,22 @@ namespace GameDev.Slice.Tests
         }
 
         [Test]
+        public void AFighterWhosePotionSettlesLosesARoundForEachTickLeft()
+        {
+            var hero = HeroEight();
+            var wolf = Wolf();
+            hero.Defenceless = 2;
+            var fight = new HeadlessFight(_rules, new[] { hero }, new[] { wolf }, new Random(3));
+            fight.Begin();
+            Assert.AreEqual((2, 2), (hero.LostTurns, hero.Defenceless), "20 §3: Stunned for the Assimilation's ticks left");
+            fight.PlayRound();
+            Assert.AreEqual((1, 1), (hero.LostTurns, hero.Defenceless), "each round spends one");
+            fight.PlayRound();
+            Assert.AreEqual((0, 0), (hero.LostTurns, hero.Defenceless));
+            Assert.AreEqual(wolf.MaxHp, wolf.Hp, "no blow while Stunned");
+        }
+
+        [Test]
         public void InitiativeOrdersTheFightAndATieGoesToTheHigherDexterity()
         {
             var quick = Make(Sheet(5, 5, 6, 5, 5), null, Weapon("Sword"), null);  // (6 + 5) / 2 = 5.5

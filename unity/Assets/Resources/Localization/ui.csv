@@ -536,3 +536,14 @@ ui.brew.fault.closed,The bench is closed now.,Стол сейчас закрыт
 ui.brew.fault.lesson,Alchemy is not learned.,Алхимия не изучена.
 ui.brew.fault.formula,You carry no formula for it.,У вас нет формулы.
 ui.brew.fault.ingredients,Not enough ingredients.,Не хватает ингредиентов.
+"# Drinking a Limit potion and its Assimilation (S5b.5; 20 §3, 05.1)"
+ui.drink.ask,Drink it? For an hour you will be defenceless. Click it again to drink.,"Выпить? Целый час вы будете беззащитны. Щёлкните ещё раз, чтобы выпить."
+ui.drink.drunk,You drink. The potion is settling: an hour defenceless.,Вы пьёте. Зелье усваивается — час беззащитности.
+ui.drink.fault.potion,This is not a Limit potion.,Это не зелье Предела.
+ui.drink.fault.fight,Not in a fight.,Не в бою.
+ui.drink.fault.settling,The last potion is still settling.,Прошлое зелье ещё усваивается.
+ui.drink.fault.arcana,Not your Arcana's potion.,Это зелье не вашего Аркана.
+ui.drink.fault.order,Not your next Limit.,Это не ваш следующий Предел.
+ui.drink.fault.ready,It is too early for you to drink it.,Вам ещё рано его пить.
+ui.save.refused.settling,Not while a potion settles.,Не во время усвоения зелья.
+ui.limit.reached,"The potion has settled. {0}, Limit {1}.","Зелье усвоилось. {0}, Предел {1}."

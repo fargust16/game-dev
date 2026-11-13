@@ -164,6 +164,11 @@ namespace GameDev.Slice
 
         public ToolGrip Hammer = new ToolGrip();
 
+        [Header("Пропуск времени")]
+        [Tooltip("Усвоение зелья Предела: сколько тиков мира (игровых минут) проходит за секунду, пока персонаж сидит на корточках, а мир идёт. 60 тиков при 10 — шесть секунд.")]
+        [Range(1f, 60f)]
+        public float AssimilationTicksPerSecond = 10f;
+
         [Header("Интерфейс")]
         public Interface Ui = new Interface();
 

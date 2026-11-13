@@ -48,6 +48,9 @@ namespace GameDev.Slice.Fights
         /// <summary>The character as a fighter in what it wears and holds (S5a.2); null leaves it the development kit.</summary>
         public Func<Fighter> WornFighter { get; set; }
 
+        /// <summary>The ticks of a Limit potion's Assimilation left (S5b.5), the rounds the character enters a fight Stunned.</summary>
+        public Func<int> Defenceless { get; set; }
+
         /// <summary>The character's life as a fight sees it: a fighter in what it wears, with the kept HP and conditions.</summary>
         public Fighter PlayerFighter() => PlayerFighter(false);
 
@@ -58,6 +61,7 @@ namespace GameDev.Slice.Fights
                 ? WornFighter()
                 : _settings.FightRules.Fighter(_character, PlayerLimit, Arms(RoleFirearm.Pistol), _settings.KitArmour, Arms(RoleFirearm.Rifle));
             Initiate(fighter); // CR4: its Arcana, Prepared abilities and Will Power
+            fighter.Defenceless = Defenceless != null ? Defenceless() : 0; // 20 §3: Stunned while a potion settles
             if (_state != null)
             {
                 fighter.Hp = fighter.MaxHp * (1d - (Mathf.Clamp(_state.Get(HpLostKey), 0, 1000) / 1000d));

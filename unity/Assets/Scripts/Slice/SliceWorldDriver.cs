@@ -145,6 +145,15 @@ namespace GameDev.Slice
         /// <summary>Whether a conversation is open on the HUD.</summary>
         public bool TalkOpen => Hud() is HudView hud && hud.IsDialogueOpen;
 
+        /// <summary>The character's Sanity (07.2 §3.4; S5b.5 spends it on the Limit potions).</summary>
+        public GameDev.Slice.Mind.SliceSanity Sanity { get; private set; }
+
+        /// <summary>Drinking a Limit potion and its Assimilation (S5b.5; 20 §3); null without the bag.</summary>
+        public GameDev.Slice.Alchemy.SliceAdvancement Advancement { get; private set; }
+
+        /// <summary>The Assimilation's ticks passing in the scene, the character crouched (S5b.5).</summary>
+        public GameDev.Slice.Alchemy.AssimilationRun Assimilation { get; private set; }
+
         /// <summary>07 *Creation choices in V1* (S5b.1): the page at a new run's start; null before the world starts.</summary>
         public GameDev.Slice.Creation.CharacterCreation Creation { get; private set; }
 
@@ -343,6 +352,20 @@ namespace GameDev.Slice
                 Fights.Standing = Standing;
             }
 
+            Sanity = new GameDev.Slice.Mind.SliceSanity(State);
+            if (Bag != null)
+            {
+                Advancement = new GameDev.Slice.Alchemy.SliceAdvancement(State, Clock, Bag, Character, Sanity, Standing, () => Fights != null && Fights.InFight);
+                Advancement.Advanced += Advanced;
+                Clock.TickBoundary += SettlePotion;
+                Assimilation = gameObject.AddComponent<GameDev.Slice.Alchemy.AssimilationRun>();
+                Assimilation.Configure(this);
+                if (Fights != null)
+                {
+                    Fights.Defenceless = () => Advancement.AssimilationLeft;
+                }
+            }
+
             DebugSight.On = Debug.isDebugBuild;
             if (settings.StealthRules != null)
             {
@@ -408,6 +431,7 @@ namespace GameDev.Slice
             Loc.Changed += Refresh;
             Save = gameObject.AddComponent<SliceSave>();
             Save.Configure(this, cityScene);
+            Save.Refusals.Add(() => Advancement != null && Advancement.Assimilating ? "ui.save.refused.settling" : null); // 05.1 *Assimilation*
             _offer = Save.ShouldOffer();
             Creation = gameObject.AddComponent<GameDev.Slice.Creation.CharacterCreation>();
             Creation.Configure(Character, settings.PlayerLooks);
@@ -421,6 +445,16 @@ namespace GameDev.Slice
 
         /// <summary>S5b.2: the character's page, on L out of a fight.</summary>
         public GameDev.Slice.Creation.CharacterPage Page { get; private set; }
+
+        private void SettlePotion(long tick) => Advancement?.Settle();
+
+        /// <summary>A Limit potion settled (S5b.5): a Screen Message names the Arcana and the Limit reached (07.1 §11).</summary>
+        private void Advanced(Arcana arcana, int limit, int cost)
+        {
+            Hud()?.ShowMessage(Loc.Format("ui.limit.reached", Loc.Get(SliceConfront.ArcanaName(arcana)), limit));
+            Debug.Log($"[Slice] Limit {limit} of {arcana} reached; Sanity -{cost}, now {Sanity.Value}.");
+            Refresh();
+        }
 
         /// <summary>
         /// A value grew by use (07.1 §3): a Screen Message names it and its new level (07.1 §11), every level of an
@@ -514,6 +548,7 @@ namespace GameDev.Slice
                 else
                 {
                     _bagNote = null;
+                    _drinkAsked = null;
                     ShowBag(hud);
                 }
             }
@@ -782,11 +817,48 @@ namespace GameDev.Slice
             foreach (var piece in Bag.Pieces)
             {
                 var p = piece;
-                actions.Add(Outfit != null ? () => TogglePiece(p) : (Action)null);
+                actions.Add(Bag.Catalogue.Find(p.item)?.kind == ItemKind.Potion
+                    ? Advancement != null ? () => AskDrink(p) : (Action)null
+                    : Outfit != null ? () => TogglePiece(p) : (Action)null);
             }
 
             hud.ShowBag(BagPage.Money(Bag), BagPage.Load(Bag), BagPage.Lines(Bag, PieceNote), actions,
                 _bagNote != null ? Loc.Get(_bagNote) : Outfit != null ? Loc.Get("ui.hud.bag.hint") : null);
+        }
+
+        private ItemPiece _drinkAsked;
+
+        /// <summary>
+        /// 20 §3 *Drinking a Limit potion*: the first click on a potion asks, warning of the hour defenceless; a second click
+        /// on it drinks it, the bag closes, and its Assimilation begins (S5b.5).
+        /// </summary>
+        private void AskDrink(ItemPiece piece)
+        {
+            var potion = Bag.Catalogue.Find(piece.item);
+            var fault = Advancement.Fault(piece, potion);
+            if (fault != null)
+            {
+                _drinkAsked = null;
+                _bagNote = fault;
+                Refresh();
+                return;
+            }
+
+            if (_drinkAsked != piece)
+            {
+                _drinkAsked = piece;
+                _bagNote = "ui.drink.ask";
+                Refresh();
+                return;
+            }
+
+            _drinkAsked = null;
+            _bagNote = null;
+            if (Advancement.Drink(piece, potion))
+            {
+                Hud()?.CloseBag();
+                Hud()?.ShowMessage(Loc.Get("ui.drink.drunk"));
+            }
         }
 
         /// <summary>A click puts a piece on or takes it off; Shift and a click holds a one-handed melee weapon in the other hand (10.2 §5b *Two weapons*).</summary>
@@ -1132,6 +1204,11 @@ namespace GameDev.Slice
             {
                 SceneManager.sceneLoaded -= OnSceneLoaded;
                 Loc.Changed -= Refresh;
+                if (Clock != null)
+                {
+                    Clock.TickBoundary -= SettlePotion;
+                }
+
                 Standing?.Dispose();
                 Director?.Dispose();
                 _running = null;

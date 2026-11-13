@@ -133,6 +133,7 @@ namespace GameDev.Confront.Rules
             if (fighter.LostTurns > 0)
             {
                 fighter.LostTurns--;
+                fighter.Defenceless = Math.Max(0, fighter.Defenceless - 1);
                 fighter.Reserve = 0;
                 return;
             }
