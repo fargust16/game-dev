@@ -142,7 +142,7 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>Opens the conversation and answers the options <paramref name="ids"/> in turn.</summary>
-        private static IEnumerator Talk(PersonTalk talk, params string[] ids)
+        internal static IEnumerator Talk(PersonTalk talk, params string[] ids)
         {
             talk.Open();
             yield return null;
@@ -155,7 +155,7 @@ namespace GameDev.Slice.Tests
             yield return null;
         }
 
-        private static void Choose(PersonTalk talk, string id)
+        internal static void Choose(PersonTalk talk, string id)
         {
             Assert.IsTrue(talk.IsOpen, $"{talk.Dialogue.Id} is open for '{id}'");
             var offered = talk.Conversation.Options.Select(o => o.id).ToList();
@@ -164,7 +164,7 @@ namespace GameDev.Slice.Tests
             talk.Choose(index);
         }
 
-        private static IEnumerator WaitFor(string scene)
+        internal static IEnumerator WaitFor(string scene)
         {
             var deadline = Time.realtimeSinceStartup + 10f;
             while ((SceneManager.GetActiveScene().name != scene || SceneTransition.IsTraveling) && Time.realtimeSinceStartup < deadline)

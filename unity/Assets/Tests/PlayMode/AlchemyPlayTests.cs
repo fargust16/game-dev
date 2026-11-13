@@ -174,7 +174,7 @@ namespace GameDev.Slice.Tests
         }
 
         /// <summary>Puts the character on free ground beside the bench, within its reach.</summary>
-        private static IEnumerator Stand(PlayerLocomotion player, AlchemyBench bench)
+        internal static IEnumerator Stand(PlayerLocomotion player, AlchemyBench bench)
         {
             var ground = LayerMask.GetMask(KitLayers.Ground, KitLayers.Structure);
             var things = ~LayerMask.GetMask(KitLayers.Ground, KitLayers.Character);

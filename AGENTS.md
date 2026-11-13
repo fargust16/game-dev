@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 2.19
+Version: 2.20
 
 Status: Draft
 
-Last Updated: 2026-11-13 (Combat rework: Perception is also every attack's secondary attribute, adopted by S5b.3's measurement)
+Last Updated: 2026-11-13 (Next Design Priority: S5 done and accepted, S5.8; S6 waits for the owner's authorisation)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -470,7 +470,7 @@ Current active design layer:
 1. Keep World Laws through Vertical Slice coherent while Draft.
 2. Design important choices as Decision Node + POI cards naming axes and Approaches.
 3. Resolve remaining high-priority Open Questions that block Canonical promotion.
-4. Architecture Pivot locked in [16](16%20Architecture%20Pivot.md). Systems map in [17](17%20Game%20Systems%20Architecture.md). Overworld V0 is shipped and stays the full game's world path. Next implementation default: the **Vertical Slice** by `unity/Assets/Plans/VERTICAL_SLICE_IMPLEMENTATION_PLAN.md`, from S0, each milestone only on the owner's authorisation — not OrganicTown C1. S5b and S5c are under way on the owner's grant of 2026-11-13; S6 waits until S5 is done. Buildings: [15](15%20Procedural%20Building%20Generation.md) Exterior Shell Grammar (sandbox lab parallel OK) + Interior Piece Assembly for Portal buildings only.
+4. Architecture Pivot locked in [16](16%20Architecture%20Pivot.md). Systems map in [17](17%20Game%20Systems%20Architecture.md). Overworld V0 is shipped and stays the full game's world path. Next implementation default: the **Vertical Slice** by `unity/Assets/Plans/VERTICAL_SLICE_IMPLEMENTATION_PLAN.md`, from S0, each milestone only on the owner's authorisation — not OrganicTown C1. S5 is done, accepted on 2026-11-13 (S5.8, `S5AcceptancePlayTests`); S6 waits for the owner's authorisation. Buildings: [15](15%20Procedural%20Building%20Generation.md) Exterior Shell Grammar (sandbox lab parallel OK) + Interior Piece Assembly for Portal buildings only.
 5. Stage 3F (prototype E): the documentation stage is under owner review. A dump-first stage 1 — E built and verified through dumps and tests, off the production path — may start only after every **[stage 1]** question in [99 Open Questions](99%20Open%20Questions.md) § Terrain — Stage 3F valley carve is answered; enabling E in the bake waits for the **[production]** questions.
 6. † Geography research (full text: *Geography-first research history* in the record). G0 and G1 are built, target D6 is approved, G3 to G3e ended without an accepted model, and G3f ran to its held-out evaluation. Next: the owner's blind review of the sealed sheets (G-5a/G-5b), then G-6; production only at G4. Any production terrain design waits for GEO-3's production placement and GEO-8's contract. Anything else needs its own plan.
 7. Cult campaign (2026-11-01): the active narrative design layer is [21 Cult Campaign and City Control](21%20Cult%20Campaign%20and%20City%20Control.md). Work through CC-1 … CC-49, where still open, in [99 Open Questions](99%20Open%20Questions.md) in their listed order. Working method with the owner: present open questions and the next path, take the owner's vision, then formalise it into project documentation.
