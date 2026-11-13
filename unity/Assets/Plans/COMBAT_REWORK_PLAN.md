@@ -1,12 +1,12 @@
 # Combat Rework Plan
 
-Version: 0.4
+Version: 0.5
 
 Status: Draft — §0 is the owner's concept as given and binds; the audit, the questions and the stages are the agent's working plan.
 
 Created: 2026-11-13
 
-Last Updated: 2026-11-13 (§5: every stage done, the slice's milestones CR1–CR6 built; §6: the report. Earlier: §2a: the audit's resolutions; §5: stages 1–4 done, the slice's milestones CR1–CR6 next. Earlier: §3a: the owner's answers to Q1–Q11 and the main goal, a firearm first and melee once an enemy has closed in; Perception leaves accuracy for the critical chance. Earlier: first version: the owner's concept recorded as given, the working method, the first audit's contradictions, the questions put to the owner, the stages)
+Last Updated: 2026-11-13 (§3b: the owner's answers to COMBAT-1 … COMBAT-12; §5 and §7: what follows them. Earlier: §5: every stage done, the slice's milestones CR1–CR6 built; §6: the report. Earlier: §2a: the audit's resolutions; §5: stages 1–4 done, the slice's milestones CR1–CR6 next. Earlier: §3a: the owner's answers to Q1–Q11 and the main goal, a firearm first and melee once an enemy has closed in; Perception leaves accuracy for the critical chance. Earlier: first version: the owner's concept recorded as given, the working method, the first audit's contradictions, the questions put to the owner, the stages)
 
 Depends On:
 [07.1](../../../07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [07.2](../../../07.2%20Derived%20Character%20Statistics.md), [10.1](../../../10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2](../../../10.2%20Combat%20System%20Draft.md), [10.3](../../../10.3%20Stealth%20and%20Detection.md), [05.1](../../../05.1%20Arcana%20and%20Limits.md), [19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md), [17](../../../17%20Game%20Systems%20Architecture.md), [99](../../../99%20Open%20Questions.md) VS-RANGED
@@ -859,6 +859,21 @@ The owner answered every question and set the rework's main goal: **in a fight a
 - **Q11 (b):** the systems, and one ability of each new way of acting: an area spell, a smoke or magic screen, an illusory double, and a step behind an enemy.
 - **Way of working:** autonomous until the documents are rewritten and the decided system is built in the game, unless the owner says stop; checks, mathematics and balance are the agent's.
 
+## 3b. The owner's answers to COMBAT-1 … COMBAT-12 (2026-11-13)
+
+Recorded in [99](../../../99%20Open%20Questions.md) and [10.2](../../../10.2%20Combat%20System%20Draft.md) §5f *The owner's answers*; they bind, and where one departs from §3a it governs.
+
+- **COMBAT-1, COMBAT-2:** no learning of abilities at all: a Limit gives its whole pool at once, three in the slice and 4–6 in the full game, and the player chooses only which active ones to prepare. This replaces Q5 (b)'s picking and later learning.
+- **COMBAT-3, COMBAT-4:** interception 60 %; Obscured −20 once.
+- **COMBAT-5 (c):** every heavy melee weapon is Heavy, with heavy firearms.
+- **COMBAT-6 (a):** Evasion and Initiative keep Perception.
+- **COMBAT-7:** everyone with Will Power infuses, and only the initiated have it, Will being only the resistance to losing Sanity for the rest; the cult is weaker one on one, its followers untrained people from the street, and an allied fighter wins about 75 % of duels at the same Limit at the middle setting, by starting attributes and gear; the cult wins by numbers; only the Generals are stronger, two of the three fighting beside their followers and the Spirit General leaving; Arcana and Limits balanced against each other, attributes and the special effects of items deciding (COMBAT-13); the odds with no player kept, about 22 % in the slice and 40/60 at the middle setting.
+- **COMBAT-8 (c):** NPCs prepare by the seed from every active ability of their Limits.
+- **COMBAT-9 (a), (b), (c):** the baton subdues people to an Arrest, kills beasts, and a subdued cultist can be questioned for an Argument.
+- **COMBAT-10 (a):** a shield is Half Cover −15 from any side.
+- **COMBAT-11:** (a) now, melee's own means later.
+- **COMBAT-12 (a) with (d):** the shooter's own bush and Пелена's haze spare its shot.
+
 # 4. Stages
 
 1. **Audit.** Every document the concept names and every other that depends on combat attributes or resources; the list goes in §2.
@@ -870,7 +885,7 @@ The owner answered every question and set the rework's main goal: **in a fight a
 
 # 5. Status (2026-11-13)
 
-Every stage is done. Stages 1–4: the audit and its resolutions (§2a), the documents, and the formulas checked by simulation. Stage 5: the slice's milestones CR1–CR6 (`VERTICAL_SLICE_IMPLEMENTATION_PLAN.md`), each recorded in [10.2](../../../10.2%20Combat%20System%20Draft.md) §5f *In the slice*. Stage 6: the report, §6. What remains is the owner's answers to COMBAT-1 … COMBAT-12, after which the documents and the system follow them.
+Every stage is done. Stages 1–4: the audit and its resolutions (§2a), the documents, and the formulas checked by simulation. Stage 5: the slice's milestones CR1–CR6 (`VERTICAL_SLICE_IMPLEMENTATION_PLAN.md`), each recorded in [10.2](../../../10.2%20Combat%20System%20Draft.md) §5f *In the slice*. Stage 6: the report, §6. The owner answered COMBAT-1 … COMBAT-12 the same day (§3b); §7 is what follows.
 
 # 6. Report (2026-11-13)
 
@@ -882,4 +897,10 @@ By the concept's §15 Stage 6. The owner's main goal holds in the models and the
 4. **Formulas and numbers** (10.2 §5f owns them; authoring defaults checked by simulation). Accuracy `(profile attribute + skill) / 2`, a targeted ability `(Intelligence + Arcana Skill) / 2`; Perception the critical chance's attribute alone, Evasion and Initiative keeping it (COMBAT-6); Luck multiplying both chances. Damage from the weapon, the ammunition or the ability only: the pistol 6.5, the rifle 9, light melee × 1.25 and heavy × 1.35 of V0, fists 1.875, Укол разума 9, Гнёт 4. Infusion `0.40 × weapon base × Stage Factor` for 5 × S Will Power on each shot or blow, halved by chain and stopped by plate. Will Power `(20 + 0.8 × Will) × S`, a thousandth of it back each tick. Prepared slots `3 + floor((Intelligence + Will − 2) / 14)`, 10 at 100, changed out of a fight in one tick, passives free. The Will Contest `(start + (MagicAccuracy − (Will + items' will)) / 100) × (1 + Luck / 100)`, 5–95 %. Requirements by the profile attribute alone. The Shot Line: three trace points, Obscured −20 once (COMBAT-4), each person on the line taking the shot 60 % of the time before the target's roll, nearest first (COMBAT-3). The Wardens' baton base 5, 4 AP, subduing. The four new abilities: Пелена 3 AP, 15 %, a 3 × 3 cloud for 3 rounds within 8 cells; Двойник 3 AP, 33 %; Рывок 3 AP, 15 %, within 6 cells; Гнёт 5 AP, 33 %, a 3 × 3 area within 10 cells. The slice with no player: about 21 % (20–23 %), with the player at Limit 8 about 52 %.
 5. **New mechanics still to build.** The pick of two in each pool and the third ability's teacher, with S5b's Faction Entry (COMBAT-1, COMBAT-2); Завеса in a fight, once stealth there reads it; the player waking a sleeping ally; shields and the other melee weapons, designed and built after the slice (COMBAT-10, Q9 (a)); heavy firearms, the only Heavy weapons (COMBAT-5); a second kind of cartridge as a second pouch (Q8 (c)); NPCs using the new abilities in the full game (COMBAT-8 (b)); the fights away from the player, which run the chain in C# (S6).
 6. **Mechanics changed in the existing implementation.** CR1: `FightRules` accuracy and damage, the five skills, the weapons' bases and requirements, the beasts' natural weapons. CR2: one Shot Line for a fight and the Aimed Shot, the kit's Partial Obstacles, interception. CR3: a firearm first in the NPCs' turns, the step aside from a friend on the line, the Wardens' baton subduing to an Arrest. CR4: the ability service, Will Power, Infusion, the Will Contest, Prepared Abilities, the hotbar's slots, the Prepared page, the NPCs' Жрица abilities. CR5: Пелена, Двойник, Рывок and Гнёт. CR6: the checks. The slice's EditMode set passes 576 of 576 and its PlayMode set 114 of 121, none failing, the 7 others render checks that are skipped.
-7. **Questions for the owner** (99, each with options, the agent's recommendation, and the working reading the slice follows meanwhile): COMBAT-1 the slice's pools; COMBAT-2 where the third ability is learned; COMBAT-3 the interception share; COMBAT-4 Obscured; COMBAT-5 which weapons are Heavy; COMBAT-6 Perception in Evasion and Initiative; COMBAT-7 the cult's edge across the Arcana, 45 % where the rule asks a little over half; COMBAT-8 NPCs and the new abilities; COMBAT-9 who the baton subdues; COMBAT-10 shields against shots; COMBAT-11 the firearm builds leading the triangle's means, against the owner's acceptance of 2026-11-03 that the builds stand about equal; COMBAT-12 Partial Obstacles and Пелена's haze.
+7. **Questions for the owner** (99, each with options, the agent's recommendation, and the working reading the slice follows meanwhile): COMBAT-1 the slice's pools; COMBAT-2 where the third ability is learned; COMBAT-3 the interception share; COMBAT-4 Obscured; COMBAT-5 which weapons are Heavy; COMBAT-6 Perception in Evasion and Initiative; COMBAT-7 the cult's edge across the Arcana, 45 % where the rule asks a little over half; COMBAT-8 NPCs and the new abilities; COMBAT-9 who the baton subdues; COMBAT-10 shields against shots; COMBAT-11 the firearm builds leading the triangle's means, against the owner's acceptance of 2026-11-03 that the builds stand about equal; COMBAT-12 Partial Obstacles and Пелена's haze. The owner answered them the same day (§3b).
+
+# 7. After the owner's answers (2026-11-13)
+
+1. **Documents.** The answers recorded in 99, 05.1, 07.2, 10.1, 10.2 §5f, 11, 21, 02, 90, this plan, `AGENTS.md` and 91.
+2. **Balance.** The models give every initiated fighter Infusion, the cult's followers worse attributes and gear until an allied fighter wins about 75 % of duels at the same Limit, Жрица and Император even at equal attributes, NPCs' abilities prepared by the seed with the four new ones, and enough cult followers that the slice stays at about 22 % and the campaign at 40/60.
+3. **The slice.** Will Power only with an Arcana; Пелена's haze sparing a shot from inside; Heavy on heavy melee; NPCs preparing by the seed and using the four new abilities; questioning a subdued cultist, with S6's invasion.
