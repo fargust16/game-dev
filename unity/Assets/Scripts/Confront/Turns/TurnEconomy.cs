@@ -111,6 +111,7 @@ namespace GameDev.Confront.Turns
             }
 
             _covering.Clear();
+            ClearUnseen(); // CR5: no copy, veil or haze outlives its fight
             FaceTheFight();
             if (opener != null)
             {
@@ -166,7 +167,7 @@ namespace GameDev.Confront.Turns
                 case IntentKind.BreakAway:
                     return BreakAway(c);
                 case IntentKind.Ability:
-                    return UseAbility(c, intent.Ability, Find(intent.Target));
+                    return UseAbility(c, intent.Ability, Find(intent.Target), intent.Cell);
                 default:
                     EndTurn(c);
                     return true;
@@ -440,6 +441,7 @@ namespace GameDev.Confront.Turns
             var round = Round;
             _turnsThisRound = 0;
             TickConditions();
+            FadeScreens(); // 05.1 Пелена: a round less for each cloud
             RoundEnded?.Invoke(round);
             if (!IsRunning)
             {
@@ -519,6 +521,7 @@ namespace GameDev.Confront.Turns
             }
 
             _joining.Clear();
+            ClearUnseen(); // CR5: copies, veils and haze end with the fight
             if (played)
             {
                 TickConditions();
@@ -531,6 +534,7 @@ namespace GameDev.Confront.Turns
         private void EndTurn(Combatant c)
         {
             c.Fighter.Reserve = Math.Max(0, ApLeft);
+            TurnEnds(c); // 05.1 Двойник: a turn's end of an unseen fighter counts down its veil
             NextTurn();
         }
 
@@ -619,6 +623,7 @@ namespace GameDev.Confront.Turns
             }
 
             c.Position = _grid.Center(c.Cell);
+            Settle(c); // 05.1 Двойник: the copy holds the cell its caster left
             FlushWalk(c);
             CheckCones();
             if (!c.Standing && IsRunning && !CheckEnd() && Acting == c)
@@ -654,7 +659,7 @@ namespace GameDev.Confront.Turns
 
                 var weapon = e.Fighter.Weapon;
                 if (e == c || !e.Standing || e.Side == c.Side || e.Reacted || e.Helpless || weapon == null || weapon.Ranged
-                    || !Beside(e.Cell, c.Cell) || c.Hidden)
+                    || !Beside(e.Cell, c.Cell) || Unseen(c))
                 {
                     continue;
                 }
@@ -751,6 +756,8 @@ namespace GameDev.Confront.Turns
             {
                 AbilityUsed?.Invoke(c, target, crush, result.Hit, result);
             }
+
+            AfterHit(c, target, result.Hit, result.Damage); // 05.1 Двойник: a copy hit breaks; damage shows the unseen
 
             Counterattack(target, c);
             CheckCones();

@@ -90,9 +90,10 @@ namespace GameDev.Confront.Turns
         /// <summary>10.3 §2 on the grid: an enemy with a cone that can act, its cone along its facing, the hider in reach and in sight.</summary>
         private bool Covers(Combatant observer, Combatant hider)
         {
-            if (Stealth == null || observer == hider || !observer.Watches || !observer.Standing || observer.Side == hider.Side || observer.Helpless)
+            if (Stealth == null || observer == hider || !observer.Watches || !observer.Standing || observer.Side == hider.Side || observer.Helpless
+                || hider.Fighter.Veiled > 0)
             {
-                return false;
+                return false; // 05.1 Двойник: no cone sees the unseen
             }
 
             var facing = new Vector3(observer.Facing.x, 0f, observer.Facing.y);
@@ -206,7 +207,7 @@ namespace GameDev.Confront.Turns
         {
             foreach (var o in _order)
             {
-                if (o.Intent != null && !o.Intent.Hidden && Covers(o, o.Intent))
+                if (o.Intent != null && !Unseen(o.Intent) && Covers(o, o.Intent))
                 {
                     o.SawAt = o.Intent.Position;
                     o.SawWho = o.Intent;
@@ -217,7 +218,7 @@ namespace GameDev.Confront.Turns
         /// <summary>A step of <paramref name="c"/>: each fighter that chose it and has it in its cone notes the cell.</summary>
         private void Spotted(Combatant c)
         {
-            if (Stealth == null || c.Hidden)
+            if (Stealth == null || Unseen(c))
             {
                 return;
             }

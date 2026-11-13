@@ -47,6 +47,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0edaa2a167212ffe6fd0925ba98b28e6, type: 2}
   gridMaterial: {fileID: 2100000, guid: 2df79b3057456e74fa4b498a77bb2ca8, type: 2}
   targetOutline: {fileID: 4800000, guid: 6b2e9d4f1a8c47e39f05c3d7a1e4b826, type: 3}
+  hazeMaterial: {fileID: 2100000, guid: 1da1a7e4ff679934f875a88a12763dcf, type: 2}
   churchPeople:
   - {fileID: 4983742377235370021, guid: 2c4f0d1dd77ef7548bc6441763742149, type: 3}
   - {fileID: 112055915828892884, guid: 275cb7096f7116045868e9964706ac6b, type: 3}

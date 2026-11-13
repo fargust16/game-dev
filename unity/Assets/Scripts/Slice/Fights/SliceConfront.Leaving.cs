@@ -213,7 +213,7 @@ namespace GameDev.Slice.Fights
         /// <summary>A blow that brings a fighter down by the player's hand is a kill in the Deeds Record (S2.2).</summary>
         private void CountKill(Combatant attacker, Combatant target)
         {
-            if (attacker == _playerCombatant && target != null && target.Fighter.Down && _killed.Add(target))
+            if (attacker == _playerCombatant && target != null && target.DoubleOf == null && target.Fighter.Down && _killed.Add(target))
             {
                 Standing?.RecordKill();
                 if (Innocent(target))

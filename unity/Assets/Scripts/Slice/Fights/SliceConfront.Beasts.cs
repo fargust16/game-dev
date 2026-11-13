@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GameDev.Confront;
+using GameDev.Confront.Rules;
 using GameDev.Confront.Turns;
 using GameDev.Locomotion;
 using GameDev.Slice.Beasts;
@@ -107,18 +108,21 @@ namespace GameDev.Slice.Fights
         }
 
         /// <summary>A beast's hit or fall as a blow lands on it.</summary>
-        private void BeastStruck(FightBeats.Beat beat)
+        private void BeastStruck(FightBeats.Beat beat) => BeastAnswer(beat.Target, beat.Result);
+
+        /// <summary>A beast's hit or fall at a blow or an ability that landed on it.</summary>
+        private void BeastAnswer(Transform body, StrikeResult result)
         {
-            if (beat.Target == null || !beat.Target.TryGetComponent<SliceBeast>(out var beast))
+            if (body == null || !body.TryGetComponent<SliceBeast>(out var beast))
             {
                 return;
             }
 
-            if (beat.Result.Downed)
+            if (result.Downed)
             {
                 beast.Die(false);
             }
-            else if (beat.Result.Damage > 0d)
+            else if (result.Damage > 0d)
             {
                 beast.Act("Hit", HitSeconds);
             }

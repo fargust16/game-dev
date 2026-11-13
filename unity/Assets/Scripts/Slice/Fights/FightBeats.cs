@@ -384,8 +384,17 @@ namespace GameDev.Slice.Fights
         /// </summary>
         private void Land(Beat beat)
         {
-            var struck = beat.Target != null ? _animated(beat.Target) : null;
-            var result = beat.Result;
+            Answer(beat.Target, beat.Result);
+            Landed?.Invoke(beat);
+        }
+
+        /// <summary>
+        /// How <paramref name="target"/> answers a blow or an ability that landed on it, its fall, knockdown or hit, without
+        /// a beat of its own: a Гнёт shows every one it struck at once (CR5).
+        /// </summary>
+        public void Answer(Transform target, StrikeResult result)
+        {
+            var struck = target != null ? _animated(target) : null;
             if (struck != null)
             {
                 if (result.Downed)
@@ -404,15 +413,13 @@ namespace GameDev.Slice.Fights
                 else if (result.Damage > 0d && struck.HasState(0, HitState))
                 {
                     var kind = result.Critical ? HitCritical : result.GuardTried ? HitThroughGuard : HitPlain + (_hits++ % 3);
-                    React(beat.Target, kind, Onset[kind - 1], HitFade);
+                    React(target, kind, Onset[kind - 1], HitFade);
                 }
                 else if (result.Damage > 0d)
                 {
                     struck.SetTrigger(HitHash);
                 }
             }
-
-            Landed?.Invoke(beat);
         }
 
         private static bool Has(Animator animator, int hash)

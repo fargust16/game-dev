@@ -88,6 +88,32 @@ namespace GameDev.Slice.Fights
             gameObject.SetActive(path.Count > 0);
         }
 
+        /// <summary>
+        /// CR5: an area an ability is aimed at, each cell framed, in gold when it can be cast there and in red when not;
+        /// nothing counts as a path.
+        /// </summary>
+        public void ShowArea(ICombatGrid grid, IReadOnlyList<CombatCell> cells, bool within)
+        {
+            transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            _vertices.Clear();
+            _within.Clear();
+            _beyond.Clear();
+            Steps = 0;
+            Affordable = 0;
+            foreach (var cell in cells)
+            {
+                Frame(grid.Center(cell) + (Vector3.up * Lift), (grid.CellSize * 0.5f) - Inset, within ? _within : _beyond);
+            }
+
+            _mesh.Clear();
+            _mesh.subMeshCount = 2;
+            _mesh.SetVertices(_vertices);
+            _mesh.SetTriangles(_within, 0);
+            _mesh.SetTriangles(_beyond, 1);
+            _mesh.RecalculateBounds();
+            gameObject.SetActive(cells.Count > 0);
+        }
+
         public void Hide()
         {
             Steps = 0;

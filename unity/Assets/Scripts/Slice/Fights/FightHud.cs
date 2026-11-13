@@ -437,6 +437,11 @@ namespace GameDev.Slice.Fights
                 words += (words.Length > 0 ? " · " : string.Empty) + Loc.Get("ui.condition.exposed");
             }
 
+            if (fighter.Veiled > 0)
+            {
+                words += (words.Length > 0 ? " · " : string.Empty) + Loc.Get("ui.condition.veiled"); // 05.1 Двойник (CR5)
+            }
+
             return words;
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GameDev.Confront.Grid;
 using GameDev.Confront.Rules;
 using GameDev.Confront.Turns;
 using GameDev.Core.Localization;
@@ -41,6 +42,7 @@ namespace GameDev.Slice.Fights
         private readonly List<FightAbility> _shownAbilities = new List<FightAbility>();
         private readonly List<int> _shownIndices = new List<int>();
         private int _aiming = -1;
+        private readonly List<CombatCell> _area = new List<CombatCell>();
         private bool _infuse;
 
         /// <summary>The Arcana the character entered; <see cref="Arcana.None"/> while it is Uninitiated.</summary>
@@ -298,7 +300,7 @@ namespace GameDev.Slice.Fights
                 return false;
             }
 
-            if (TurnEconomy.NeedsTarget(player.Fighter.Prepared[index]))
+            if (TurnEconomy.NeedsTarget(player.Fighter.Prepared[index]) || TurnEconomy.NeedsPoint(player.Fighter.Prepared[index]))
             {
                 _aiming = _aiming == index ? -1 : index;
                 _hud.MarkDirty();
@@ -328,6 +330,11 @@ namespace GameDev.Slice.Fights
             }
 
             var ability = player.Fighter.Prepared[_aiming];
+            if (TurnEconomy.NeedsPoint(ability))
+            {
+                return AimPoint(player, ability, input);
+            }
+
             var target = _cursor.Target;
             var reaches = target != null && _turns.CanAim(player, _aiming, target);
             _cursor.Aim(reaches);
@@ -347,6 +354,62 @@ namespace GameDev.Slice.Fights
             if (reaches)
             {
                 _turns.SubmitIntent(TurnIntent.UseAbility(index, target.Id));
+            }
+
+            _cursor.Clear();
+            _hud.MarkDirty();
+            return true;
+        }
+
+        /// <summary>
+        /// CR5, while Пелена or Гнёт is aimed: its area framed round the cell under the cursor, gold where it can be cast and
+        /// red where not, and its tip, for a Гнёт how many enemies and of the player's own people it would strike; a click
+        /// there casts it, any other click puts it down. True when the click was taken.
+        /// </summary>
+        private bool AimPoint(Combatant player, FightAbility ability, GameInputService input)
+        {
+            var point = _cursor.Under;
+            var fits = point.HasValue && _turns.CanAimAt(player, _aiming, point.Value);
+            if (point.HasValue)
+            {
+                _turns.AreaOf(point.Value, ability, _area);
+                _cursor.AimArea(_area, fits);
+            }
+            else
+            {
+                _cursor.Aim(false);
+            }
+
+            var name = Loc.Get($"ability.{ability.Key}.name");
+            if (!point.HasValue)
+            {
+                _hud.AimText = Loc.Format("ui.fight.ability.point", name);
+            }
+            else if (!fits)
+            {
+                _hud.AimText = Loc.Format("ui.fight.ability.far", name);
+            }
+            else if (ability.Effect == AbilityEffect.Press)
+            {
+                var (foes, friends) = _turns.PressCount(player, ability, point.Value);
+                _hud.AimText = Loc.Format("ui.fight.ability.press", name, foes, friends);
+            }
+            else
+            {
+                _hud.AimText = name;
+            }
+
+            if (!input.ClickMovePressed)
+            {
+                return false;
+            }
+
+            var index = _aiming;
+            _aiming = -1;
+            _hud.AimText = null;
+            if (fits)
+            {
+                _turns.SubmitIntent(TurnIntent.UseAbilityAt(index, point.Value));
             }
 
             _cursor.Clear();
@@ -391,7 +454,11 @@ namespace GameDev.Slice.Fights
                 FightDeath(user, target);
             }
 
-            if (ability != null && ability.Effect == AbilityEffect.Sting && _bodies.TryGetValue(user, out var body) && body != null)
+            if (ability != null && ability.Effect == AbilityEffect.Press)
+            {
+                PressHit(user, target, ability, result); // all it struck, shown and said at once
+            }
+            else if (ability != null && ability.Effect == AbilityEffect.Sting && _bodies.TryGetValue(user, out var body) && body != null)
             {
                 _bodies.TryGetValue(target, out var targetBody);
                 _beats.Strike(body, targetBody, Motion(user.Fighter, false), result, user, target, ability);

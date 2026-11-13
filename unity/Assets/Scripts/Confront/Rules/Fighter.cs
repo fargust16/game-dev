@@ -131,6 +131,35 @@ namespace GameDev.Confront.Rules
         public bool Braced { get; set; }
 
         /// <summary>
+        /// 05.1 Двойник: the ends of its own turns it stays unseen, the one it is in counted; its enemies neither target it
+        /// nor see it by their cones, and damage it deals ends it (CR5).
+        /// </summary>
+        public int Veiled { get; set; }
+
+        /// <summary>
+        /// 05.1 Двойник: a still copy of the fighter as its enemies take it, with its sheet, gear, HP and abilities; what
+        /// strikes the copy never touches the fighter.
+        /// </summary>
+        internal Fighter Copy()
+        {
+            var copy = new Fighter(Values, Limit, Set, Second, Armour, Modifiers)
+            {
+                MaxHp = MaxHp,
+                Hp = Hp,
+                LoadEvasion = LoadEvasion,
+                LoadAp = LoadAp,
+                Carried = Carried,
+                CanEvade = CanEvade,
+                Arcana = Arcana,
+                MaxWillPower = MaxWillPower,
+                WillPower = WillPower,
+            };
+            copy._prepared.AddRange(_prepared);
+            copy._passives.AddRange(_passives);
+            return copy;
+        }
+
+        /// <summary>
         /// 07.2 §4.5: what it knows of its Arcana for this fight: every passive one, and the active ones a fight can use,
         /// as many as <paramref name="slots"/> hold, in the order given.
         /// </summary>

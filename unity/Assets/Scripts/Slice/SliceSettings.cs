@@ -65,6 +65,9 @@ namespace GameDev.Slice
         [Tooltip("The outline of the enemy under the fight's cursor (owner's play test, 2026-11-12).")]
         [SerializeField] private Shader targetOutline;
 
+        [Tooltip("CR5: the particles of Пелена's haze, Гнёт's burst and the puffs of Рывок and Двойник: Veilmouth's own soft fog puff. SliceConfrontSetup sets it.")]
+        [SerializeField] private Material hazeMaterial;
+
         [Header("The church (PB8d)")]
         [Tooltip("10.2 §5e: the church's people who stand in the old chapel, each a prefab with its PersonRole. When the goddess notices two deaths within the hour, those initiated who carry a firearm come out of its door.")]
         [SerializeField] private GameObject[] churchPeople = new GameObject[0];
@@ -127,6 +130,8 @@ namespace GameDev.Slice
         public Material GridMaterial => gridMaterial;
 
         public Shader TargetOutline => targetOutline;
+
+        public Material HazeMaterial => hazeMaterial;
 
         public Texture2D[] FightCursors => fightCursors;
 

@@ -18,8 +18,9 @@ namespace GameDev.Slice.Tests
     /// CR4, abilities in a fight (05.1 *Abilities of the slice*, 07.2 §3.3, §4.5, 10.2 §5f), on a floor of 20 × 20
     /// one-metre cells: Will Power and the Prepared slots by their formulas; the slice's sixteen abilities with their words
     /// and icons; Дрёма, Стой!, Укол разума, Столп, Не сдвинуть, Опора and Сокрушение as 05.1 has them; Infusion paid for
-    /// each blow and stopped by plate; the NPCs' Дрёма on the most dangerous and waking a sleeper beside. Initiative is set
-    /// apart by Dexterity and Perception, 100 and 1.
+    /// each blow and stopped by plate; the NPCs' Дрёма on the most dangerous and waking a sleeper beside; and CR5's four,
+    /// Пелена's haze, Гнёт's area, Рывок behind an enemy and Двойник's copy. Initiative is set apart by Dexterity and
+    /// Perception, 100 and 1.
     /// </summary>
     public sealed class AbilityTests
     {
@@ -31,6 +32,7 @@ namespace GameDev.Slice.Tests
         private FightWeapon _fists;
         private FightOffHand _pouch;
         private TurnEconomy _turns;
+        private CombatGridReader _grid;
         private readonly List<(Combatant User, Combatant Target, FightAbility Ability, bool Worked)> _used = new List<(Combatant, Combatant, FightAbility, bool)>();
         private readonly List<(Combatant Attacker, Combatant Target, StrikeResult Result)> _struck = new List<(Combatant, Combatant, StrikeResult)>();
 
@@ -89,6 +91,7 @@ namespace GameDev.Slice.Tests
             Physics.SyncTransforms();
             var grid = new CombatGridReader(1f);
             Assert.IsTrue(grid.Follow(new Vector3(5.5f, 0.05f, 5.5f)), "the grid forms");
+            _grid = grid;
             _turns = new TurnEconomy(_rules, grid);
             _turns.AbilityUsed += (u, t, a, worked, r) => _used.Add((u, t, a, worked));
             _turns.Struck += (a, t, r) => _struck.Add((a, t, r));
@@ -381,6 +384,157 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(waker, _turns.Acting);
             _turns.PlayTurn();
             Assert.AreEqual(0, sleeper.Fighter.Asleep, "it wakes its neighbour for 6 AP");
+        }
+
+        private CombatCell Cell(int x, int z)
+        {
+            Assert.IsTrue(_grid.TryCellAt(new Vector3(x + 0.5f, 0.05f, z + 0.5f), out var cell), $"a cell at {x}, {z}");
+            return cell;
+        }
+
+        private void EndRounds(int rounds)
+        {
+            for (var i = 0; i < rounds * 2; i++)
+            {
+                Assert.IsTrue(_turns.SubmitIntent(TurnIntent.EndTurn));
+            }
+        }
+
+        [Test]
+        public void ScreenObscuresAShotThroughItAndFromInsideAndFadesAfterItsRounds()
+        {
+            var caster = At(0, 0, Caster(Arcana.Priestess, 8, _pistol, Ability("Screen")), 5, 5, intents: true);
+            var enemy = At(1, 1, Fighter(1, _fists), 12, 5, intents: true);
+            Begin(new ScriptedAlways(0.5d), caster, enemy);
+            Assert.IsFalse(_grid.Shot(caster.Cell, enemy.Cell).Obscured, "an open floor");
+            Assert.IsTrue(TurnEconomy.NeedsPoint(Ability("Screen")));
+            Assert.IsFalse(_turns.CanAimAt(caster, 0, Cell(14, 5)), "9 cells off, past its 8");
+            Assert.IsTrue(_turns.CanAimAt(caster, 0, Cell(9, 5)));
+            var ap = _turns.ApLeft;
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.UseAbilityAt(0, Cell(9, 5))));
+            Assert.AreEqual(ap - 3, _turns.ApLeft, "for 3 AP");
+            Assert.AreEqual(1, _turns.Clouds.Count);
+            Assert.IsTrue(_grid.Shot(caster.Cell, enemy.Cell).Obscured, "a shot through the haze aims worse");
+            Assert.IsTrue(_grid.Shot(enemy.Cell, caster.Cell).Obscured, "both ways");
+            Assert.IsFalse(_grid.Shot(Cell(5, 9), Cell(12, 9)).Obscured, "a line beside it does not meet it");
+
+            EndRounds(2);
+            Assert.AreEqual(1, _turns.Clouds.Count, "two rounds ended, one left");
+            EndRounds(1);
+            Assert.AreEqual(0, _turns.Clouds.Count, "gone after its three");
+            Assert.IsFalse(_grid.Shot(caster.Cell, enemy.Cell).Obscured, "and the line is open again");
+
+            BuildThePlace();
+            var inside = At(0, 0, Caster(Arcana.Priestess, 8, _pistol, Ability("Screen")), 5, 5, intents: true);
+            var foe = At(1, 1, Fighter(1, _fists), 12, 5, intents: true);
+            Begin(new ScriptedAlways(0.5d), inside, foe);
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.UseAbilityAt(0, inside.Cell)), "on its own cell");
+            Assert.IsTrue(_grid.Shot(inside.Cell, foe.Cell).Obscured, "a shot from inside the haze passes through it too (COMBAT-12)");
+            Assert.IsTrue(_grid.Shot(foe.Cell, inside.Cell).Obscured, "and one into it");
+        }
+
+        [Test]
+        public void PressStrikesEveryoneInItsAreaButItsCasterWithNoRoll()
+        {
+            var caster = At(0, 0, Caster(Arcana.Emperor, 8, _pistol, Ability("Press")), 5, 5, intents: true);
+            var east = At(1, 1, Fighter(1, _fists), 7, 5, intents: true);
+            var corner = At(2, 1, Fighter(1, _fists), 7, 6, intents: true);
+            var ally = At(3, 0, Fighter(1, _fists), 6, 6, intents: true);
+            var far = At(4, 1, Fighter(1, _fists), 9, 5, intents: true);
+            Begin(new ScriptedAlways(0.5d), caster, east, corner, ally, far);
+            foreach (var c in new[] { caster, east, corner, ally, far })
+            {
+                c.Fighter.Hp = 1000d;
+            }
+
+            var press = Ability("Press");
+            Assert.AreEqual((2, 1), _turns.PressCount(caster, press, Cell(6, 5)), "two enemies and one of its own in the 3 × 3");
+            var ap = _turns.ApLeft;
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.UseAbilityAt(0, Cell(6, 5))));
+            Assert.AreEqual(ap - 5, _turns.ApLeft, "for 5 AP");
+            Assert.AreEqual(996d, east.Fighter.Hp, 1e-9, "base 4, its roll in the middle, through no magical defence");
+            Assert.AreEqual(996d, corner.Fighter.Hp, 1e-9);
+            Assert.AreEqual(996d, ally.Fighter.Hp, 1e-9, "its own people too");
+            Assert.AreEqual(1000d, far.Fighter.Hp, 1e-9, "nobody outside the area");
+            Assert.AreEqual(1000d, caster.Fighter.Hp, 1e-9, "and never its caster, who stands in it");
+            Assert.AreEqual(3, _used.Count(u => u.Ability == press && u.Target != null && u.Worked), "each struck told");
+            Assert.IsTrue(_used.Exists(u => u.Ability == press && u.Target == null && u.Worked), "then the cast");
+        }
+
+        [Test]
+        public void DashLandsBehindTheEnemyWithNoReactionAttack()
+        {
+            var caster = At(0, 0, Caster(Arcana.Emperor, 8, _pistol, Ability("Dash")), 7, 5, intents: true);
+            var swordsman = At(1, 1, Fighter(1, _sword), 8, 5, intents: true);
+            Begin(new ScriptedAlways(0d), caster, swordsman);
+            Assert.IsTrue(_turns.CanAim(caster, 0, swordsman));
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.UseAbility(0, swordsman.Id)));
+            Assert.AreEqual(Cell(9, 5), caster.Cell, "behind it");
+            Assert.AreEqual(caster.Id, _grid.OccupantAt(Cell(9, 5)));
+            Assert.AreEqual(-1, _grid.OccupantAt(Cell(7, 5)), "the cell it left is free");
+            Assert.AreEqual(new Vector2Int(-1, 0), caster.Facing, "facing the enemy");
+            Assert.AreEqual(0, _struck.Count, "no walk, so no Reaction Attack");
+
+            BuildThePlace();
+            var lame = At(0, 0, Caster(Arcana.Emperor, 8, _pistol, Ability("Dash")), 5, 5, intents: true);
+            var foe = At(1, 1, Fighter(1, _fists), 8, 5, intents: true);
+            Begin(new ScriptedAlways(0d), lame, foe);
+            lame.Fighter.LegBroken = true;
+            Assert.IsFalse(_turns.CanUse(lame, 0), "a broken leg takes no step");
+        }
+
+        [Test]
+        public void DoubleDrawsTheEnemyUntilAHitBreaksItAndDamageShowsItsCaster()
+        {
+            var caster = At(0, 0, Caster(Arcana.Priestess, 8, _pistol, Ability("Double")), 5, 5, intents: true);
+            var enemy = At(1, 1, Fighter(1, _pistol), 9, 5);
+            var ended = new List<bool>();
+            Begin(new ScriptedAlways(0d), caster, enemy);
+            _turns.DoubleEnded += (c, d, broke) => ended.Add(broke);
+            enemy.Fighter.Hp = 1000d;
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.UseAbility(0)));
+            var copy = caster.Double;
+            Assert.IsNotNull(copy, "a copy where it stood");
+            Assert.AreEqual(caster, copy.DoubleOf);
+            Assert.AreEqual(1, _turns.Doubles.Count);
+            Assert.Greater(caster.Fighter.Veiled, 0, "and its caster unseen");
+            Assert.IsFalse(_turns.CanUse(caster, 0), "one copy at a time");
+
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.MoveTo(Cell(5, 8))));
+            Assert.AreEqual(copy.Id, _grid.OccupantAt(Cell(5, 5)), "the copy holds the cell its caster left");
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.EndTurn));
+            Assert.AreEqual(enemy, _turns.Acting);
+            _turns.PlayTurn();
+            Assert.IsTrue(_struck.Count > 0 && _struck.All(s => s.Target != caster), "the enemy shoots the copy, never its caster");
+            Assert.AreEqual(copy, _struck[0].Target);
+            Assert.IsNull(caster.Double, "the hit broke it");
+            Assert.AreEqual(0, _turns.Doubles.Count);
+            CollectionAssert.AreEqual(new[] { true }, ended);
+            Assert.AreEqual(-1, _grid.OccupantAt(Cell(5, 5)), "and freed its cell");
+            Assert.Greater(caster.Fighter.Veiled, 0, "its caster is still unseen to the end of its next turn");
+
+            Assert.AreEqual(caster, _turns.Acting);
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.Attack(enemy.Id)));
+            Assert.Greater(1000d - enemy.Fighter.Hp, 0d);
+            Assert.AreEqual(0, caster.Fighter.Veiled, "damage it deals shows it");
+        }
+
+        [Test]
+        public void ADoublesVeilEndsAtItsCastersNextTurnsEndAndTakesTheCopy()
+        {
+            var caster = At(0, 0, Caster(Arcana.Priestess, 8, _pistol, Ability("Double")), 5, 5, intents: true);
+            var enemy = At(1, 1, Fighter(1, _fists), 15, 5, intents: true);
+            var ended = new List<bool>();
+            Begin(new ScriptedAlways(0d), caster, enemy);
+            _turns.DoubleEnded += (c, d, broke) => ended.Add(broke);
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.UseAbility(0)));
+            EndRounds(1);
+            Assert.Greater(caster.Fighter.Veiled, 0, "the turn it cast in has ended");
+            Assert.IsNotNull(caster.Double);
+            Assert.IsTrue(_turns.SubmitIntent(TurnIntent.EndTurn));
+            Assert.AreEqual(0, caster.Fighter.Veiled, "seen again as its next turn ends");
+            Assert.IsNull(caster.Double, "its copy gone with the veil");
+            CollectionAssert.AreEqual(new[] { false }, ended);
         }
 
         /// <summary>Every draw the same value.</summary>

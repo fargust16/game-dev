@@ -155,5 +155,22 @@ namespace GameDev.Confront.Rules
 
             return result;
         }
+
+        /// <summary>
+        /// 05.1 Гнёт: magical damage of <paramref name="ability"/>'s base, ±15 %, through magical defence, to one in its
+        /// area, with no roll to hit and no critical hit; damage wakes a sleeper (CR5).
+        /// </summary>
+        public StrikeResult Press(Fighter target, FightAbility ability, Random rolls)
+        {
+            var raw = ability.BaseDamage * (1d - spread + (2d * spread * rolls.NextDouble()));
+            var damage = Warded(raw, target);
+            target.Hp -= damage;
+            if (damage > 0d)
+            {
+                target.Asleep = 0;
+            }
+
+            return new StrikeResult { Hit = true, Damage = damage, Downed = target.Down };
+        }
     }
 }

@@ -168,6 +168,9 @@ namespace GameDev.Slice.Fights
             _turns.HiddenChanged += OnHiddenChanged;
             _turns.ConeChecked += OnConeChecked;
             _turns.AbilityUsed += OnAbilityUsed;
+            _turns.AbilityAt += OnAbilityAt;
+            _turns.DoubleEnded += OnDoubleEnded;
+            _turns.VeilChanged += OnVeilChanged;
             _view = CombatGridView.Create(transform, settings.GridMaterial);
             _beats = new FightBeats(Animated, Place);
             _beats.Landed += OnLanded;
@@ -660,6 +663,7 @@ namespace GameDev.Slice.Fights
                 Guard(pair.Key, pair.Value, false);
             }
 
+            ClearEffects(); // CR5: no copy stands and no body stays a shadow
             AfterFight(_yieldedTo);
             BeginSearch();
             BeastsAfterFight();
@@ -820,7 +824,7 @@ namespace GameDev.Slice.Fights
                 SliceAlarm.Raise(new Alarm(AlarmKind.Shot, body.position, body)); // a shot is an Alarm (10.2 §5e)
             }
 
-            _bodies.TryGetValue(target, out var targetBody);
+            var targetBody = BodyOf(target); // a copy's too (05.1 Двойник)
             var motion = Motion(attacker.Fighter, result.OffHand);
             if (Mathf.RoundToInt(motion) == FightBeats.Fists)
             {
@@ -856,6 +860,11 @@ namespace GameDev.Slice.Fights
             if (c == null)
             {
                 return string.Empty;
+            }
+
+            if (c.DoubleOf != null)
+            {
+                return Loc.Format("ui.fight.double", Name(c.DoubleOf));
             }
 
             if (_names.TryGetValue(c, out var key))

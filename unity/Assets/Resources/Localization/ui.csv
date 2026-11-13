@@ -425,3 +425,14 @@ ui.dev.arcana.none,Development: no Arcana,Разработка: без Арка�
 ui.fight.log.ability.self.failed,"{0}: {1}, to no effect",{0}: {1} — не подействовало
 ui.prepared.outside,"Out of a fight: always open, no slot","Вне боя: открыты всегда, без ячейки"
 ui.prepared.mark.open,◇,◇
+ui.fight.ability.point,{0}: pick a place,{0}: выберите место
+ui.fight.ability.press,"{0}: strikes {1} enemies, {2} of yours","{0}: заденет врагов: {1}, своих: {2}"
+ui.fight.double,{0}'s double,Двойник ({0})
+ui.fight.log.double.broken,"{0}'s double crumbles: the enemies see the deceit","Двойник ({0}) рассыпается, враги видят обман"
+ui.fight.log.veiled,{0} is unseen,{0} скрывается из виду
+ui.fight.log.unveiled,{0} is seen again,{0} снова на виду
+ui.condition.veiled,Unseen,Незаметен
+ui.fight.log.press,{0}: {1} — {2},{0}: {1} — {2}
+ui.fight.log.press.none,"{0}: {1}, nobody struck","{0}: {1}, никого не задело"
+ui.fight.log.press.hit,{0} {1},{0} {1}
+ui.fight.log.press.down,"{0} {1}, falls","{0} {1}, падает"

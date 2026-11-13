@@ -70,6 +70,7 @@ namespace GameDev.Slice.EditorTools
             so.FindProperty("opponentModel").objectReferenceValue = Load<GameObject>(OpponentModel);
             so.FindProperty("gridMaterial").objectReferenceValue = GridMaterial();
             so.FindProperty("targetOutline").objectReferenceValue = Load<Shader>(TargetOutlineShader);
+            so.FindProperty("hazeMaterial").objectReferenceValue = Load<Material>(VeilmouthMystic.Folder + "/Veilmouth_Fog.mat"); // CR5, the town's own fog puff
             var cursors = so.FindProperty("fightCursors");
             cursors.arraySize = FightCursors.Length;
             for (var i = 0; i < FightCursors.Length; i++)

@@ -105,7 +105,7 @@ namespace GameDev.Confront.Turns
                 }
 
                 var cost = c.Fighter.BlowAp;
-                if (first || c.Intent == null || !c.Intent.Standing || c.Intent.Side == c.Side || c.Intent.Hidden)
+                if (first || c.Intent == null || !c.Intent.Standing || c.Intent.Side == c.Side || Unseen(c.Intent))
                 {
                     c.Intent = Best(c, _foes);
                 }
@@ -550,9 +550,18 @@ namespace GameDev.Confront.Turns
             into.Clear();
             foreach (var f in _order)
             {
-                if (f.Standing && f.Side != c.Side && !f.Hidden)
+                if (f.Standing && f.Side != c.Side && !Unseen(f))
                 {
                     into.Add(f);
+                }
+            }
+
+            // 05.1 Двойник: the enemies take a copy for the one it copies.
+            foreach (var d in _doubles)
+            {
+                if (d.Standing && d.Side != c.Side)
+                {
+                    into.Add(d);
                 }
             }
         }
@@ -563,9 +572,17 @@ namespace GameDev.Confront.Turns
             into.Clear();
             foreach (var f in _order)
             {
-                if (f.Standing && f.Side != c.Side && !f.Hidden && Beside(c.Cell, f.Cell))
+                if (f.Standing && f.Side != c.Side && !Unseen(f) && Beside(c.Cell, f.Cell))
                 {
                     into.Add(f);
+                }
+            }
+
+            foreach (var d in _doubles)
+            {
+                if (d.Standing && d.Side != c.Side && Beside(c.Cell, d.Cell))
+                {
+                    into.Add(d);
                 }
             }
         }

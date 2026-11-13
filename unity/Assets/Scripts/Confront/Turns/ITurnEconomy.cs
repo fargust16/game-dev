@@ -81,6 +81,9 @@ namespace GameDev.Confront.Turns
         /// <summary>A prepared ability, at a combatant or at none (05.1, 10.2 §5f; CR4).</summary>
         public static TurnIntent UseAbility(int index, int target = -1) => new TurnIntent(IntentKind.Ability, default, target, ability: index);
 
+        /// <summary>A prepared ability at a cell, as Пелена and Гнёт are aimed (05.1; CR5).</summary>
+        public static TurnIntent UseAbilityAt(int index, CombatCell cell) => new TurnIntent(IntentKind.Ability, cell, -1, ability: index);
+
         /// <summary>Entering Stealth Mode for 3 AP when no enemy's cone covers the fighter (10.3 §8, S3b.1).</summary>
         public static TurnIntent Hide => new TurnIntent(IntentKind.Hide, default, -1);
 
@@ -214,6 +217,9 @@ namespace GameDev.Confront.Turns
 
         /// <summary>The AP an ability costs the combatant (CR4).</summary>
         int AbilityAp(Combatant c, FightAbility ability);
+
+        /// <summary>Whether that ability can be aimed at the cell from where the combatant stands: Пелена and Гнёт (CR5).</summary>
+        bool CanAimAt(Combatant c, int index, CombatCell cell);
 
         /// <summary>Raised after an ability: who, at whom or null, which, whether it worked, and what a hit did (CR4).</summary>
         event Action<Combatant, Combatant, FightAbility, bool, StrikeResult> AbilityUsed;

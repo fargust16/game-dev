@@ -132,6 +132,12 @@ namespace GameDev.Confront.Turns
         /// <summary>The enemy a Столп holds it to in this turn.</summary>
         public Combatant Taunter { get; internal set; }
 
+        /// <summary>05.1 Двойник: its still copy, standing where it cast it, while the copy lasts (CR5).</summary>
+        public Combatant Double { get; internal set; }
+
+        /// <summary>05.1 Двойник: for a copy, the fighter it copies; null for anyone real. A copy never acts.</summary>
+        public Combatant DoubleOf { get; internal set; }
+
         /// <summary>
         /// In Stealth Mode (10.3 §8): enemies do not target it, and its next attack is a stealth attack. Set before the
         /// encounter begins for a fighter that enters it hidden; the economy sets it after.

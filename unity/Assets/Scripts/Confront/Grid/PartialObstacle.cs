@@ -10,5 +10,14 @@ namespace GameDev.Confront.Grid
     [DisallowMultipleComponent]
     public sealed class PartialObstacle : MonoBehaviour
     {
+        [Tooltip("Haze and smoke, as Пелена: a shot from inside is Obscured too. A bush round its own shooter is not (10.1 *In the slice*, COMBAT-12).")]
+        [SerializeField] private bool fromInside;
+
+        /// <summary>A shot fired from inside it is Obscured as well.</summary>
+        public bool FromInside
+        {
+            get => fromInside;
+            set => fromInside = value;
+        }
     }
 }

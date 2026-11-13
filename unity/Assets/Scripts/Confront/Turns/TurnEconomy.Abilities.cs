@@ -12,7 +12,9 @@ namespace GameDev.Confront.Turns
     /// `tools/balance/tactical_sim.py` does: at a turn's start Дрёма on the most dangerous of two or more awake enemies,
     /// Стой! on one near, Укол разума at the best target and Столп among two or more enemies beside; Сокрушение as a
     /// melee blow; Не сдвинуть from the AP left at the end, with two enemies within 3 cells; an ally beside a sleeper wakes
-    /// it. Пелена, Двойник, Рывок and Гнёт are CR5's, and Завеса, an NPC's of Limit 7 whom the slice's AI never uses, waits.
+    /// it. CR5's Пелена and Гнёт are aimed at a cell (TurnEconomy.Area), Двойник leaves a copy and veils its caster
+    /// (TurnEconomy.Unseen), and Рывок steps behind an enemy; the slice's NPCs use none of the four (COMBAT-8). Завеса, an
+    /// NPC's of Limit 7 whom the slice's AI never uses, waits.
     /// </summary>
     public sealed partial class TurnEconomy
     {
@@ -111,24 +113,29 @@ namespace GameDev.Confront.Turns
         private static FightAbility Prepared(Combatant c, int index) =>
             c != null && index >= 0 && index < c.Fighter.Prepared.Count && c.Fighter.Prepared[index].InFight ? c.Fighter.Prepared[index] : null;
 
-        /// <summary>The player's ability: its target or none, checked, paid and carried out.</summary>
-        private bool UseAbility(Combatant c, int index, Combatant target)
+        /// <summary>The player's ability: its target, its cell or neither, checked, paid and carried out.</summary>
+        private bool UseAbility(Combatant c, int index, Combatant target, CombatCell cell)
         {
             var ability = Prepared(c, index);
-            if (ability == null || !CanUse(c, index) || (NeedsTarget(ability) && !Aims(c, ability, target)))
+            if (ability == null || !CanUse(c, index) || (NeedsTarget(ability) && !Aims(c, ability, target))
+                || (NeedsPoint(ability) && !AimsAt(c, ability, cell)))
             {
                 return false;
             }
 
-            Use(c, ability, NeedsTarget(ability) ? target : null);
+            Use(c, ability, NeedsTarget(ability) ? target : null, cell);
             return true;
         }
 
         /// <summary>Whether an ability is aimed at one enemy, so the player picks it after the ability.</summary>
         public static bool NeedsTarget(FightAbility ability) =>
-            ability.Effect == AbilityEffect.Sleep || ability.Effect == AbilityEffect.Order || ability.Effect == AbilityEffect.Sting || ability.Effect == AbilityEffect.Crush;
+            ability.Effect == AbilityEffect.Sleep || ability.Effect == AbilityEffect.Order || ability.Effect == AbilityEffect.Sting
+            || ability.Effect == AbilityEffect.Crush || ability.Effect == AbilityEffect.Dash;
 
-        /// <summary>Whether an ability with no target can be used now: Столп wants an enemy beside; the CR5 abilities and Завеса wait.</summary>
+        /// <summary>
+        /// Whether an ability can be used now, before its target or cell is chosen: Столп wants an enemy beside, Двойник no
+        /// copy or veil of its caster's already, Рывок a leg that steps; Завеса waits.
+        /// </summary>
         private bool Usable(Combatant c, FightAbility ability)
         {
             switch (ability.Effect)
@@ -138,10 +145,16 @@ namespace GameDev.Confront.Turns
                 case AbilityEffect.Sting:
                 case AbilityEffect.Crush:
                 case AbilityEffect.Brace:
+                case AbilityEffect.Screen:
+                case AbilityEffect.Press:
                     return true;
                 case AbilityEffect.Pillar:
                     Around(c, _around);
                     return _around.Count > 0;
+                case AbilityEffect.Double:
+                    return c.Double == null && c.Fighter.Veiled == 0;
+                case AbilityEffect.Dash:
+                    return !c.Fighter.LegBroken; // a broken leg is Immobilisation (10.2)
                 default:
                     return false;
             }
@@ -149,11 +162,12 @@ namespace GameDev.Confront.Turns
 
         /// <summary>
         /// Whether <paramref name="ability"/> can reach <paramref name="target"/>: an enemy standing within its range and in
-        /// sight (10.1 *Shot Line*); Дрёма only a person; Сокрушение one beside, with a melee weapon in hand.
+        /// sight (10.1 *Shot Line*); Дрёма only a person; Сокрушение one beside, with a melee weapon in hand; Рывок one with
+        /// a free cell behind it.
         /// </summary>
         private bool Aims(Combatant c, FightAbility ability, Combatant target)
         {
-            if (target == null || !target.Standing || target.Side == c.Side || target.Hidden)
+            if (target == null || !target.Standing || target.Side == c.Side || Unseen(target))
             {
                 return false;
             }
@@ -162,6 +176,13 @@ namespace GameDev.Confront.Turns
             {
                 case AbilityEffect.Crush:
                     return c.Fighter.Weapon != null && !c.Fighter.Weapon.Ranged && Beside(c.Cell, target.Cell);
+                case AbilityEffect.Dash:
+                    if (!Behind(c, target, out _))
+                    {
+                        return false;
+                    }
+
+                    break;
                 case AbilityEffect.Sleep:
                     if (target.Beast)
                     {
@@ -179,8 +200,8 @@ namespace GameDev.Confront.Turns
             return Distance(c.Cell, target.Cell) <= ability.Range && _grid.Shot(c.Cell, target.Cell).Clear;
         }
 
-        /// <summary>Pays and carries out an ability whose AP, price and target are already checked.</summary>
-        private void Use(Combatant c, FightAbility ability, Combatant target)
+        /// <summary>Pays and carries out an ability whose AP, price and target or cell are already checked.</summary>
+        private void Use(Combatant c, FightAbility ability, Combatant target, CombatCell point = default)
         {
             var f = c.Fighter;
             var ap = AbilityAp(c, ability);
@@ -260,9 +281,23 @@ namespace GameDev.Confront.Turns
                 case AbilityEffect.Brace:
                     f.Braced = true;
                     break;
+                case AbilityEffect.Screen:
+                    RaiseScreen(c, ability, point);
+                    break;
+                case AbilityEffect.Press:
+                    worked = Press(c, ability, point);
+                    break;
+                case AbilityEffect.Double:
+                    RaiseDouble(c, ability);
+                    break;
+                case AbilityEffect.Dash:
+                    Dash(c, ability, target);
+                    target = null; // a step, not an act on the enemy
+                    break;
             }
 
             AbilityUsed?.Invoke(c, target, ability, worked, result);
+            AfterHit(c, target, worked, result.Damage); // 05.1 Двойник: an ability that lands on a copy breaks it
             if (ability.Effect == AbilityEffect.Crush)
             {
                 return; // the blow checked the end and the turn itself

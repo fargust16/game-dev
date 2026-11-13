@@ -59,6 +59,9 @@ namespace GameDev.Slice.Fights
         /// <summary>The cell under the cursor, when it points at no enemy.</summary>
         public CombatCell? Cell { get; private set; }
 
+        /// <summary>CR5: the cell under the cursor whatever stands in it, the player's own and an enemy's too, as an area is aimed.</summary>
+        public CombatCell? Under { get; private set; }
+
         /// <summary>The walk and the blow's AP together, or the walk's.</summary>
         public int Cost { get; private set; }
 
@@ -91,6 +94,7 @@ namespace GameDev.Slice.Fights
         {
             Target = null;
             Cell = null;
+            Under = null;
             Cost = 0;
             Steps = 0;
             Affordable = false;
@@ -108,6 +112,7 @@ namespace GameDev.Slice.Fights
             Target = EnemyAt(player, camera, mouse);
             if (Target != null)
             {
+                Under = Target.Cell;
                 Steps = _turns.PathToStrike(player, Target, _path);
                 var from = Steps > 0 ? _path[_path.Count - 1] : player.Cell;
                 // 10.2 §5b *Two weapons*: the blow of the hand the turns will choose with the AP the walk leaves.
@@ -128,7 +133,13 @@ namespace GameDev.Slice.Fights
                 return;
             }
 
-            if (!CellAt(camera, mouse, player.Cell, out var cell) || cell == player.Cell)
+            var found = CellAt(camera, mouse, player.Cell, out var cell);
+            if (found)
+            {
+                Under = cell;
+            }
+
+            if (!found || cell == player.Cell)
             {
                 Show(Shape.Basic, 0);
                 return;
@@ -222,6 +233,14 @@ namespace GameDev.Slice.Fights
             _path.Clear();
             _view.Hide();
             Set(reaches ? Shape.Attack : Shape.AttackBlocked);
+        }
+
+        /// <summary>CR5: an area aimed at a cell: its cells framed, and the strike's cursor where it can be cast, the blocked one elsewhere.</summary>
+        public void AimArea(IReadOnlyList<CombatCell> cells, bool fits)
+        {
+            _path.Clear();
+            _view.ShowArea(_grid, cells, fits);
+            Set(fits ? Shape.Attack : Shape.AttackBlocked);
         }
 
         /// <summary>No path, no target, and the plain cursor.</summary>
