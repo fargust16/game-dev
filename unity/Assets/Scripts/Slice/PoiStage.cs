@@ -166,8 +166,19 @@ namespace GameDev.Slice
                 return;
             }
 
+            var fights = SliceWorldDriver.Running?.Fights;
+            if (fights != null)
+            {
+                fights.NextFightSettles = conversation.Fought.won != null && conversation.Fought.won.settles != null; // 05.1: worth 2
+            }
+
             if (!Fight(conversation.FightWith.id, (won, _) => conversation.AfterFight(won)))
             {
+                if (fights != null)
+                {
+                    fights.NextFightSettles = false;
+                }
+
                 // No fight can be fought here: the scene goes on as a fight lost, so the POI is still settled.
                 Debug.LogWarning($"[PoiStage] {name}: no fight with '{conversation.FightWith.id}' could start; it counts as lost.");
                 conversation.AfterFight(false);

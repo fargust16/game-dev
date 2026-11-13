@@ -252,7 +252,7 @@ namespace GameDev.Slice.Fights
                 request.Target = Nearest(player, combatants);
             }
 
-            return _lock.TryBegin(request);
+            return Begin(request);
         }
 
         private void Update()
@@ -309,6 +309,7 @@ namespace GameDev.Slice.Fights
             }
 
             WatchWillPower();
+            WatchConduct();
             _beats.Tick(Time.deltaTime);
             var settled = !_beats.Busy;
             var acting = _turns.Acting;
@@ -631,6 +632,7 @@ namespace GameDev.Slice.Fights
                     _playerCombatant.Fighter.Bleeding = false;
                 }
 
+                ConductEnded(side); // 05.1: the deeds of a fight won
                 WatchWillPower(); // the fight's last spending
                 _wpFighter = null;
                 Unequip(_playerCombatant);

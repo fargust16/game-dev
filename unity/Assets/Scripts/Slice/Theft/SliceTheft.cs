@@ -72,8 +72,12 @@ namespace GameDev.Slice.Theft
         /// and Dexterity, a noticed one half, the target's <paramref name="perception"/> being the difficulty read on §1's
         /// bands (07.1 §3, S5-1).
         /// </summary>
+        /// <summary>The character's Conduct Progress (S5b.7): a theft is against Император, one unseen a deed of Жрица.</summary>
+        public GameDev.Slice.Alchemy.SliceConduct Conduct { get; set; }
+
         public TheftOutcome Resolve(string person, ReactionResult result, out int bronze, int perception = 1, bool alert = false)
         {
+            Conduct?.Against(Arcana.Emperor);
             _state.Set(TriedKey(person), _clock.Day + 1);
             var difficulty = (int)Math.Round(perception * (alert ? ReactionCheck.AlertPerception : 1d));
             _character.Train(CharacterSkill.Theft, Growth.StageOfDifficulty(difficulty), Growth.Of(result), new[] { CharacterAttribute.Dexterity });
@@ -87,6 +91,7 @@ namespace GameDev.Slice.Theft
             bronze = Purse(person);
             _bag.Earn(bronze);
             _state.Set(LiftedKey, _state.Get(LiftedKey) + 1);
+            Conduct?.Deed(GameDev.Slice.Alchemy.ConductDeed.TakeUnseen, "theft." + person);
             return TheftOutcome.Lifted;
         }
 

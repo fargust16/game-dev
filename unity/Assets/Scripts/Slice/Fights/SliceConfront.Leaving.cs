@@ -166,6 +166,7 @@ namespace GameDev.Slice.Fights
             };
             _hud.Line(Loc.Format(key, Name(c)));
             _hud.MarkDirty();
+            ConductDeparted(c);
             if (c.Departure == Departure.Spared && Group(c) is string group && _state != null)
             {
                 _state.Set(SparedKey(group), _state.Get(SparedKey(group)) + 1);

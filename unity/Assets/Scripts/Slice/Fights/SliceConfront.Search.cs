@@ -264,7 +264,7 @@ namespace GameDev.Slice.Fights
 
             _searching.Clear();
             var request = new EncounterRequest(at, combatants, _seed.Fork(SliceSeedStreams.Combat, _fights), "search");
-            if (!_lock.TryBegin(request))
+            if (!Begin(request))
             {
                 _starts.Clear();
                 Unarm();

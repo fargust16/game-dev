@@ -38,6 +38,9 @@ namespace GameDev.Dialogue
         /// <summary>What the sources say and the player has heard (09); null hides every option that asks for a tip.</summary>
         public TipBook Tips { get; set; }
 
+        /// <summary>A Social Check was rolled: the option, its listener's id, and whether it succeeded (05.1 Conduct Progress, S5b.7).</summary>
+        public Action<DialogueOption, string, bool> Checked { get; set; }
+
         /// <summary>Points a troubled mind and Fatigue put on every Social Check (07.2 §3.3–3.4, S5b.6); null for none.</summary>
         public Func<int> MindPenalty { get; set; }
     }
@@ -139,6 +142,7 @@ namespace GameDev.Dialogue
             var success = SocialCheck.Roll(chance, rolls);
             SocialCheck.Train(_world.Character, option.skill, listener.Sheet(), success);
             Pay(option, listener, success);
+            _world.Checked?.Invoke(option, listener.id, success);
             if (success)
             {
                 Follow(option.success);

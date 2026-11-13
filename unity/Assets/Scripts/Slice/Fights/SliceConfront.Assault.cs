@@ -154,7 +154,7 @@ namespace GameDev.Slice.Fights
                 Opener = opened ? null : player,
                 Target = opened ? null : struck,
             };
-            if (_lock.TryBegin(request))
+            if (Begin(request, assault: true))
             {
                 Standing?.Record(Deed.Assault);
                 _peopleEnded = AssaultOver;

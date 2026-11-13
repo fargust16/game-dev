@@ -560,3 +560,9 @@ ui.mind.fatigue.tired,tired,утомление
 ui.mind.fatigue.verytired,very tired,сильное утомление
 ui.death.sanity,You are no longer yourself,Вы больше не принадлежите себе
 ui.fight.log.exhausted,{0}: Will Power is spent,{0}: Сила воли иссякла
+"# Conduct Progress (SliceConduct, S5b.7; 05.1): no counter, one short line after a deed or an act against the Arcana"
+ui.conduct.deed.priestess,"The quiet way suits you, and the potion in you answers.","Тихий путь вам по душе, и зелье внутри отзывается."
+ui.conduct.deed.emperor,"Your will bent the world a little, and the potion in you answers.","Ваша воля чуть прогнула мир, и зелье внутри отзывается."
+ui.conduct.ready,"The potion has taken root in you: you are ready for the next.","Зелье укоренилось в вас: вы готовы к следующему."
+ui.conduct.against.priestess,"The quiet in you frays.","Тишина внутри вас истончается."
+ui.conduct.against.emperor,"You gave ground, and the potion in you recoils.","Вы уступили, и зелье внутри вас противится."

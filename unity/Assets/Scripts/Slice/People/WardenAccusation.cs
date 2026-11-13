@@ -214,6 +214,7 @@ namespace GameDev.Slice.People
             SocialCheck.Train(_world.Character, CharacterSkill.Persuasion, listener, success);
             if (success)
             {
+                _world.Conduct?.Deed(GameDev.Slice.Alchemy.ConductDeed.Convince, "accusation." + Path(_warden)); // 05.1
                 _world.Standing.LetOff();
                 End("ui.accuse.letoff");
                 return;

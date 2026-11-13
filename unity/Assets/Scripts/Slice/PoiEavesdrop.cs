@@ -111,6 +111,7 @@ namespace GameDev.Slice
                 }
 
                 speaker.Say(Loc.Get(overheardLine), seconds);
+                world.Conduct?.Deed(GameDev.Slice.Alchemy.ConductDeed.Overhear, "overheard." + name); // 05.1: unseen
             }
         }
 

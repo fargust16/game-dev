@@ -84,7 +84,7 @@ namespace GameDev.Slice.Fights
                 request.Target = Nearest(player, combatants);
             }
 
-            if (_lock.TryBegin(request))
+            if (Begin(request))
             {
                 _peopleEnded = ended;
                 return true;

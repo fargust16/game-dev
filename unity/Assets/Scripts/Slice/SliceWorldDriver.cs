@@ -367,6 +367,12 @@ namespace GameDev.Slice
             {
                 Advancement = new GameDev.Slice.Alchemy.SliceAdvancement(State, Clock, Bag, Character, Sanity, Standing, () => Fights != null && Fights.InFight);
                 Advancement.Advanced += Advanced;
+                Conduct = new GameDev.Slice.Alchemy.SliceConduct(State, Advancement);
+                Conduct.Felt += key => Hud()?.ShowMessage(Loc.Get(key)); // 05.1: one short line, no counter
+                if (Fights != null)
+                {
+                    Fights.Conduct = Conduct;
+                }
                 Clock.TickBoundary += SettlePotion;
                 Assimilation = gameObject.AddComponent<GameDev.Slice.Alchemy.AssimilationRun>();
                 Assimilation.Configure(this);
@@ -419,7 +425,7 @@ namespace GameDev.Slice
 
             if (Bag != null && Standing != null)
             {
-                Theft = new GameDev.Slice.Theft.SliceTheft(Bag, State, Clock, Character, Standing, seed);
+                Theft = new GameDev.Slice.Theft.SliceTheft(Bag, State, Clock, Character, Standing, seed) { Conduct = Conduct };
                 FindPurses();
             }
 
@@ -436,6 +442,7 @@ namespace GameDev.Slice
                 Tips = Tips,
                 Withheld = new HashSet<Approach> { Approach.Veil },
                 MindPenalty = () => Mind.SocialPenalty,
+                Checked = TalkChecked,
             };
             Notes = new CharacterNotes(Tips);
             Notes.Added += _ => Refresh();
@@ -459,6 +466,18 @@ namespace GameDev.Slice
         public GameDev.Slice.Creation.CharacterPage Page { get; private set; }
 
         private void SettlePotion(long tick) => Advancement?.Settle();
+
+        /// <summary>The character's Conduct Progress toward the next Limit (S5b.7; 05.1).</summary>
+        public GameDev.Slice.Alchemy.SliceConduct Conduct { get; private set; }
+
+        /// <summary>05.1: a Convince or Threaten check won is a deed, worth 2 when its success settles a POI.</summary>
+        private void TalkChecked(DialogueOption option, string listener, bool success)
+        {
+            if (success && Conduct != null)
+            {
+                Conduct.Checked(option.approach, listener, option.success != null && option.success.settles != null);
+            }
+        }
 
         /// <summary>The character's Sanity, its band and Fatigue, and what they take away (S5b.6; 07.2 §3.3–3.4).</summary>
         public GameDev.Slice.Mind.SliceMind Mind { get; private set; }
