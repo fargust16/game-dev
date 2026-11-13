@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GameDev.Player.Progression;
 
 namespace GameDev.Confront.Rules
@@ -89,6 +90,99 @@ namespace GameDev.Confront.Rules
         public bool CanEvade { get; set; } = true;
 
         public bool Down => Hp <= 0d;
+
+        /// <summary>05.1: the Arcana it entered; <see cref="Arcana.None"/> for the Uninitiated and beasts.</summary>
+        public Arcana Arcana { get; internal set; }
+
+        /// <summary>07.2 §3.3: `(20 + 0.8 × Will) × S`, and the items' share.</summary>
+        public double MaxWillPower { get; internal set; }
+
+        /// <summary>07.2 §3.3: what is left to spend on abilities and Infusion; it comes back slowly, so a fight is fought on it.</summary>
+        public double WillPower { get; set; }
+
+        private readonly List<FightAbility> _prepared = new List<FightAbility>();
+        private readonly List<FightAbility> _passives = new List<FightAbility>();
+
+        /// <summary>07.2 §4.5: the active abilities prepared for this fight, the only ones it can use in it.</summary>
+        public IReadOnlyList<FightAbility> Prepared => _prepared;
+
+        /// <summary>05.1: the passive abilities it knows, which always work.</summary>
+        public IReadOnlyList<FightAbility> Passives => _passives;
+
+        /// <summary>
+        /// 10.2 §5f Infusion: an NPC that pours Will Power into each blow or shot while it can spare it, as the slice's
+        /// allied fighters do; the player's choice is the turns' own.
+        /// </summary>
+        public bool Infuses { get; set; }
+
+        /// <summary>05.1 Дрёма: asleep, its Evasion zero and no guard, until its next turn is lost, damage, or an ally's waking.</summary>
+        public int Asleep { get; set; }
+
+        /// <summary>05.1 Укол разума: Disorientation, which aims its next turn worse.</summary>
+        public int Disoriented { get; set; }
+
+        /// <summary>This turn it aims worse, being disoriented as it began.</summary>
+        public bool Dazed { get; set; }
+
+        /// <summary>05.1: a failed ability leaves it open; the next attack on it aims better, once.</summary>
+        public bool Exposed { get; set; }
+
+        /// <summary>05.1 Не сдвинуть: until its next turn, the physical damage it takes is lower.</summary>
+        public bool Braced { get; set; }
+
+        /// <summary>
+        /// 07.2 §4.5: what it knows of its Arcana for this fight: every passive one, and the active ones a fight can use,
+        /// as many as <paramref name="slots"/> hold, in the order given.
+        /// </summary>
+        public void Prepare(Arcana arcana, IEnumerable<FightAbility> known, int slots)
+        {
+            Arcana = arcana;
+            _prepared.Clear();
+            _passives.Clear();
+            if (known == null)
+            {
+                return;
+            }
+
+            foreach (var ability in known)
+            {
+                if (ability == null)
+                {
+                    continue;
+                }
+
+                if (ability.Passive)
+                {
+                    _passives.Add(ability);
+                }
+                else if (_prepared.Count < slots && !_prepared.Contains(ability))
+                {
+                    _prepared.Add(ability);
+                }
+            }
+        }
+
+        /// <summary>The prepared or passive ability with this effect, or null.</summary>
+        public FightAbility Knows(AbilityEffect effect)
+        {
+            foreach (var a in _prepared)
+            {
+                if (a.Effect == effect)
+                {
+                    return a;
+                }
+            }
+
+            foreach (var a in _passives)
+            {
+                if (a.Effect == effect)
+                {
+                    return a;
+                }
+            }
+
+            return null;
+        }
 
         /// <summary>10.2 §5b: the second Weapon Set comes to hand and the first goes to the back; false if it carries none.</summary>
         public bool SwapSets()

@@ -123,6 +123,9 @@ namespace GameDev.Slice
         /// <summary>The fights in the scene (S3a.4): the Encounter Lock, the turns and the Combat Grid; null without FightRules.</summary>
         public SliceConfront Fights { get; private set; }
 
+        /// <summary>CR4: the page of Prepared Abilities, on K out of a fight.</summary>
+        public PreparedPage Prepared { get; private set; }
+
         /// <summary>Stealth in free movement (S3b.1); a fight takes it over while it lasts.</summary>
         public SliceStealth Hiding { get; private set; }
 
@@ -275,11 +278,13 @@ namespace GameDev.Slice
                 Fights = gameObject.AddComponent<SliceConfront>();
                 Fights.Configure(settings, seed, Clock, Character, State);
                 Fights.News = News;
+                Prepared = gameObject.AddComponent<PreparedPage>();
+                Prepared.Configure(Fights);
             }
             if (Fights != null && Outfit != null && settings.Fists != null)
             {
                 Outfit.Locked = () => Fights.InFight;
-                Fights.WornFighter = () => Outfit.Fighter(settings.FightRules, Character, settings.Fists);
+                Fights.WornFighter = () => Outfit.Fighter(settings.FightRules, Character, settings.Fists, Fights.PlayerLimit);
             }
 
             if (Fights != null && Bag != null)

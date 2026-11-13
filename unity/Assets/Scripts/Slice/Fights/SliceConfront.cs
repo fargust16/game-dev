@@ -167,6 +167,7 @@ namespace GameDev.Slice.Fights
             _turns.MercyAsked += OnMercyAsked;
             _turns.HiddenChanged += OnHiddenChanged;
             _turns.ConeChecked += OnConeChecked;
+            _turns.AbilityUsed += OnAbilityUsed;
             _view = CombatGridView.Create(transform, settings.GridMaterial);
             _beats = new FightBeats(Animated, Place);
             _beats.Landed += OnLanded;
@@ -290,6 +291,10 @@ namespace GameDev.Slice.Fights
                 {
                     StartDevelopmentFight(input.SprintHeld ? Wardens : Cult);
                 }
+                else if (input != null && input.DevArcanaPressed && Debug.isDebugBuild)
+                {
+                    StepArcana(); // CR4's development command
+                }
                 else if (input != null && input.FirstAidPressed)
                 {
                     TreatOutside();
@@ -329,7 +334,8 @@ namespace GameDev.Slice.Fights
             }
 
             Watch();
-            _hud.Refresh(_turns, _playerCombatant, _cursor, _turnAp, input != null ? input.MousePosition : Vector2.zero, !_beats.Busy, ActionState);
+            _hud.Refresh(_turns, _playerCombatant, _cursor, _turnAp, input != null ? input.MousePosition : Vector2.zero, !_beats.Busy, ActionState,
+                _shownAbilities, AbilityState, _infuse);
             ShowLife(_playerCombatant?.Fighter);
         }
 
@@ -351,15 +357,29 @@ namespace GameDev.Slice.Fights
             if (_hud.OverBar)
             {
                 _cursor.Clear();
+                _hud.AimText = null;
             }
             else
             {
                 _cursor.Point(player, _camera.View != null ? _camera.View : Camera.main, input.MousePosition);
-                if (input.ClickMovePressed && _cursor.Click(player))
+                if (AimAbility(player, input))
+                {
+                    return; // CR4: a click while an ability is aimed uses it or puts it down
+                }
+
+                if (_aiming < 0 && input.ClickMovePressed && _cursor.Click(player))
                 {
                     _hud.MarkDirty();
                     return;
                 }
+            }
+
+            // CR4: U turns Infusion on and off; keys 1 to 9 and the ability slots use the Prepared abilities.
+            if (PlayerAbilities(player, input, picked))
+            {
+                _cursor.Clear();
+                _hud.MarkDirty();
+                return;
             }
 
             // S3a.6: R waits to the end of the round, G ends the turn in a Defensive Stance, X changes the Weapon Set.
@@ -421,6 +441,8 @@ namespace GameDev.Slice.Fights
                     }
 
                     return (false, 0);
+                case FightAction.Infuse:
+                    return (ours && CanInfuse(player), 0);
                 default:
                     return (ours, 0);
             }
@@ -524,6 +546,9 @@ namespace GameDev.Slice.Fights
             _beats.Clear();
             _hud.Show(true);
             _cursor.Clear();
+            _aiming = -1;
+            _hud.AimText = null;
+            ShowAbilities(_playerCombatant);
             ResetLeaving();
             Whistled = false;
             foreach (var c in request.Combatants)
@@ -551,6 +576,7 @@ namespace GameDev.Slice.Fights
 
         private void OnTurnAdvanced(Combatant acting)
         {
+            _aiming = -1;
             if (acting == _playerCombatant)
             {
                 _turnAp = _turns.ApLeft;
@@ -811,7 +837,15 @@ namespace GameDev.Slice.Fights
         {
             var attacker = beat.AttackerKey as Combatant;
             var target = beat.TargetKey as Combatant;
-            _hud.Log(attacker, target, beat.Result);
+            if (beat.Ability is FightAbility ability)
+            {
+                _hud.LogAbility(attacker, target, ability, beat.Result.Hit, beat.Result);
+            }
+            else
+            {
+                _hud.Log(attacker, target, beat.Result);
+            }
+
             BeastStruck(beat);
             BlowShown?.Invoke(attacker, target, beat.Result);
         }

@@ -356,3 +356,72 @@ news.ago.10,about ten hours ago,около десяти часов назад
 news.place.town,Veilmouth,Вейлмут
 news.place.outside,outside the walls,за городскими стенами
 ui.fight.god.came,The goddess has shown us this place!,Богиня указала нам это место!
+ability.keen_ear.name,Keen Ear,Чуткое ухо
+ability.keen_ear.text,"Passive. In a conversation you see that the speaker lies, though not about what.","Пассивная. В разговоре видно, что собеседник лжёт, но не видно, в чём."
+ability.suggestion.name,Suggestion,Внушение
+ability.suggestion.text,A bonus to the next Convince check. Outside a fight.,Бонус к следующей проверке убеждения. Вне боя.
+ability.screen.name,Screen,Пелена
+ability.screen.text,"A 3×3 cloud of haze at a point in sight within 8 cells, for 3 rounds: shots through it or at whoever stands in it aim worse, your own too.","Облако дымки 3×3 в видимой точке до 8 клеток, на 3 раунда: выстрелы сквозь него или в того, кто в нём, хуже, и ваши тоже."
+ability.drowse.name,Drowse,Дрёма
+ability.drowse.text,A person within 6 cells who fails a Will Contest sleeps through its next turn; damage or an ally beside wakes it. On failure you are open.,"Человек в 6 клетках, не устоявший по Воле, спит и теряет ход; урон или союзник рядом будит. При неудаче вы открыты."
+ability.dream_touch.name,Dream Touch,Чужой сон
+ability.dream_touch.text,Touching a sleeper gives a scrap of its memory. Outside a fight.,Касание спящего даёт обрывок его памяти. Вне боя.
+ability.double.name,Double,Двойник
+ability.double.text,"A still copy stays in your place, and you are unseen until the end of your next turn or until you deal damage.","На вашем месте остаётся неподвижная копия, а вы невидимы до конца следующего хода или до нанесённого урона."
+ability.veil.name,Veil,Завеса
+ability.veil.text,For three rounds nobody sees you. An attack ends it.,Три раунда вас не видно. Атака снимает эффект.
+ability.mind_sting.name,Mind Sting,Укол разума
+ability.mind_sting.text,A magical attack within 12 cells: damage and Disorientation for a round. Cover hinders it. A miss disorients you.,Магическая атака до 12 клеток: урон и дезориентация на раунд. Укрытие мешает. Промах дезориентирует вас.
+ability.kinship.name,Kinship,Родство
+ability.kinship.text,"Passive. You sense the Emperor's followers nearby, and they sense you.","Пассивная. Вы чувствуете последователей Императора рядом, а они вас."
+ability.unmoved.name,Unmoved,Не сдвинуть
+ability.unmoved.text,"With the AP left at the end of the turn, which it ends: until your next turn physical damage is 25 % lower.","На оставшиеся в конце хода ОД, завершая ход: до следующего хода физический урон на 25 % ниже."
+ability.dash.name,Dash,Рывок
+ability.dash.text,"An instant move to a free cell behind an enemy in sight within 6 cells, drawing no Reaction Attack.","Мгновенный переход в свободную клетку за видимым врагом до 6 клеток, без ответной атаки."
+ability.support.name,Support,Опора
+ability.support.text,Passive. Allies within 2 cells gain +5 physical defence.,Пассивная. Союзники в 2 клетках получают +5 к физической защите.
+ability.halt.name,Halt!,Стой!
+ability.halt.text,An order to an enemy within 4 cells: one who fails a Will Contest loses its next turn. On failure its next attack on you aims better.,Приказ врагу в 4 клетках: не устоявший по Воле теряет следующий ход. При неудаче его следующая атака по вам точнее.
+ability.press.name,Press,Гнёт
+ability.press.text,"Magical damage to everyone in a 3×3 area at a point in sight within 10 cells, with no roll. It strikes your own too.","Магический урон каждому в области 3×3 в видимой точке до 10 клеток, без броска. Задевает и своих."
+ability.pillar.name,Pillar,Столп
+ability.pillar.text,Enemies beside you who fail a Will Contest strike only you in their next turn.,"Враги рядом, не устоявшие по Воле, в свой следующий ход бьют только вас."
+ability.crush.name,Crush,Сокрушение
+ability.crush.text,A heavy blow of the melee weapon in hand: ×1.5 damage that cannot be parried or blocked. A miss leaves you open.,"Тяжёлый удар оружием ближнего боя в руке: урон ×1,5, его не парировать и не заблокировать. Промах открывает вас."
+arcana.priestess,The High Priestess,Жрица
+arcana.emperor,The Emperor,Император
+ui.fight.action.infuse,Infusion,Насыщение
+ui.fight.action.infuse.tip,Pour Will Power into each blow and shot: magical damage of 0.4 of the weapon's base. Chain halves it and plate stops it.,"Вливать Силу воли в каждый удар и выстрел: магический урон в 0,4 базы оружия. Кольчуга вдвое его ослабляет, латы гасят."
+ui.fight.action.infuse.key,U,U
+ui.fight.action.infuse.cost,Will Power: {0} for each blow or shot,Сила воли: {0} за удар или выстрел
+ui.fight.ability.cost,Will Power: {0},Сила воли: {0}
+ui.fight.ability.target,{0}: pick a target,{0}: выберите цель
+ui.fight.ability.far,{0}: out of reach,{0}: цель недосягаема
+ui.fight.ability.chance,{0}: {1} % chance,{0}: шанс {1} %
+ui.fight.wp,Will Power {0} / {1},Сила воли {0} / {1}
+ui.fight.log.ability.self,{0}: {1},{0}: {1}
+ui.fight.log.ability.on,{0} → {1}: {2},{0} → {1}: {2}
+ui.fight.log.ability.resisted,"{0} → {1}: {2}, resisted",{0} → {1}: {2} — не подействовало
+ui.fight.log.ability.damage,"{0} → {1}: {2}, {3} damage","{0} → {1}: {2}, урон {3}"
+ui.fight.log.ability.miss,"{0} → {1}: {2}, miss",{0} → {1}: {2} — промах
+ui.condition.asleep,Asleep,Спит
+ui.condition.disoriented,Disoriented,Дезориентация
+ui.condition.braced,Unmoved,Не сдвинуть
+ui.condition.exposed,Open,Открыт
+ui.prepared.title,Prepared Abilities,Подготовленные способности
+ui.prepared.slots,Slots: {0} of {1},Ячейки: {0} из {1}
+ui.prepared.active,"Active: a click prepares or puts away, 1 tick","Активные: щелчок готовит или убирает, 1 тик"
+ui.prepared.passive,Passive: always at work,Пассивные: работают всегда
+ui.prepared.mark.on,●,●
+ui.prepared.mark.off,○,○
+ui.prepared.line,{0}  {1}  ·  {2} % of Will Power,{0}  {1}  ·  {2} % Силы воли
+ui.prepared.line.ap,{0}  {1}  ·  {2} % of Will Power  ·  {3} AP,{0}  {1}  ·  {2} % Силы воли  ·  {3} ОД
+ui.prepared.full,Every slot is taken: put one away first.,Все ячейки заняты: сначала уберите одну.
+ui.prepared.none,"You have entered no Arcana, so you know no ability.","Вы не вошли в Аркан, способностей нет."
+ui.prepared.hint,K or Esc closes.,K или Esc — закрыть.
+ui.prepared.changed,The set is changed; a tick has passed.,"Набор изменён, прошёл тик."
+ui.dev.arcana,"Development: {0}, Limit {1}","Разработка: {0}, Предел {1}"
+ui.dev.arcana.none,Development: no Arcana,Разработка: без Аркана
+ui.fight.log.ability.self.failed,"{0}: {1}, to no effect",{0}: {1} — не подействовало
+ui.prepared.outside,"Out of a fight: always open, no slot","Вне боя: открыты всегда, без ячейки"
+ui.prepared.mark.open,◇,◇

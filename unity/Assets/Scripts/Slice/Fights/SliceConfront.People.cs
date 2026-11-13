@@ -4,6 +4,7 @@ using GameDev.Confront;
 using GameDev.Confront.Rules;
 using GameDev.Confront.Turns;
 using GameDev.Locomotion;
+using GameDev.Player.Progression;
 using GameDev.Slice.People;
 using UnityEngine;
 
@@ -105,7 +106,33 @@ namespace GameDev.Slice.Fights
             var role = group == Wardens ? ResidentRole.Warden : group == Residents ? PersonRole.Of(body) : ResidentRole.Cult;
             var made = ResidentRoles.Make(role, Who(body), _seed);
             var second = role == ResidentRole.Warden && _settings.WardensBaton != null ? new WeaponSet(_settings.WardensBaton) : default;
-            return Wounded(body, _settings.FightRules.Fighter(made.Sheet, made.Limit, Arms(made.Firearm), null, second));
+            var fighter = _settings.FightRules.Fighter(made.Sheet, made.Limit, Arms(made.Firearm), null, second);
+            if (made.Limit is int limit)
+            {
+                Ordain(fighter, Arcana.Priestess, limit); // a role's Limit is of Жрица (§5a *Roles*)
+            }
+
+            return Wounded(body, fighter);
+        }
+
+        /// <summary>
+        /// CR4, 05.1: an NPC of <paramref name="arcana"/> at <paramref name="limit"/> knows its Limit's abilities and the
+        /// Limits' above, the abilities of 2026-11-02 only (COMBAT-8), prepares those a fight can use, and pours Will
+        /// Power into its blows while it can spare it, as `tactical_sim.py`'s allies do.
+        /// </summary>
+        public void Ordain(Fighter fighter, Arcana arcana, int limit)
+        {
+            var known = new List<FightAbility>();
+            foreach (var a in _settings.Abilities ?? new FightAbility[0])
+            {
+                if (a != null && a.Arcana == arcana && a.Limit >= limit && !a.PlayerOnly && (a.InFight || a.Passive))
+                {
+                    known.Add(a);
+                }
+            }
+
+            fighter.Prepare(arcana, known, _settings.FightRules.PreparedSlots(fighter.Values));
+            fighter.Infuses = true;
         }
 
         private WeaponSet Arms(RoleFirearm firearm) => firearm switch

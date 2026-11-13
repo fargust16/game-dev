@@ -49,6 +49,18 @@ namespace GameDev.Confront.Rules
         public float evasion;
         public float ap;
         public float initiative;
+
+        /// <summary>19 §2.4 Magical Damage: a share of the weapon's base each blow or shot adds as magical damage (10.2 §5f).</summary>
+        public float magic;
+
+        /// <summary>19 §2.4 Magical Defence, flat, beside the armour's.</summary>
+        public float ward;
+
+        /// <summary>19 §2.4 Maximum Will Power, a share (07.2 §3.3).</summary>
+        public float willPower;
+
+        /// <summary>19 §2.4 Will against control, added to the target's Will in a Will Contest (10.2 §5f).</summary>
+        public float will;
     }
 
     /// <summary>

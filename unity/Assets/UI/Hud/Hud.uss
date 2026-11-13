@@ -429,6 +429,21 @@
     opacity: 0.35;
 }
 
+/* CR4: Infusion on, or an ability being aimed. */
+.hud__fight-slot--on {
+    border-color: rgb(236, 200, 128);
+    background-color: rgba(92, 66, 30, 0.95);
+}
+
+/* CR4: the Prepared Abilities stand apart, their icons in a cold tint. */
+.hud__fight-slot--ability-first {
+    margin-left: 18px;
+}
+
+.hud__fight-slot--ability .hud__fight-slot-icon {
+    -unity-background-image-tint-color: rgb(200, 186, 236);
+}
+
 .hud__fight-slot-icon {
     width: 38px;
     height: 38px;

@@ -77,6 +77,13 @@ namespace GameDev.Confront.Turns
                 return;
             }
 
+            // CR4: the abilities a turn opens with (tactical_sim.py control).
+            Control(c);
+            if (!IsRunning || Acting != c)
+            {
+                return;
+            }
+
             var first = true;
             var stepped = false;
             for (var decision = 0; decision < MaxDecisions && IsRunning && Acting == c && ApLeft > 0; decision++)
@@ -101,6 +108,18 @@ namespace GameDev.Confront.Turns
                 if (first || c.Intent == null || !c.Intent.Standing || c.Intent.Side == c.Side || c.Intent.Hidden)
                 {
                     c.Intent = Best(c, _foes);
+                }
+
+                // 05.1 Столп: one held to the caster strikes only it.
+                if (c.Taunter != null && c.Taunter.Standing && c.Taunter.Side != c.Side)
+                {
+                    c.Intent = c.Taunter;
+                }
+
+                // 05.1 Дрёма: an ally beside a sleeper wakes it (tactical_sim.py).
+                if (Wake(c))
+                {
+                    continue;
                 }
 
                 var target = c.Intent;
@@ -200,6 +219,11 @@ namespace GameDev.Confront.Turns
 
             if (IsRunning && Acting == c)
             {
+                Brace(c); // 05.1 Не сдвинуть, from the AP left
+            }
+
+            if (IsRunning && Acting == c)
+            {
                 EndTurn(c);
             }
         }
@@ -290,7 +314,7 @@ namespace GameDev.Confront.Turns
                 }
             }
 
-            return n == 0 ? 0d : Blows(e) * sum / n;
+            return (n == 0 ? 0d : Blows(e) * sum / n) + Control(e.Fighter);
         }
 
         private int Blows(Combatant c) => Math.Max(1, _rules.FullAp(c.Fighter) / Math.Max(1, c.Fighter.BlowAp));
@@ -303,7 +327,9 @@ namespace GameDev.Confront.Turns
                 return 0d;
             }
 
-            var forecast = _rules.Forecast(a.Fighter, t.Fighter, ContextFor(a, from, t));
+            var context = ContextFor(a, from, t);
+            context.MagicShare = WouldInfuse(a) ? _rules.InfusionShare(a.Fighter) : 0d;
+            var forecast = _rules.Forecast(a.Fighter, t.Fighter, context);
             return forecast.Chance * (forecast.Low + forecast.High) * 0.5d;
         }
 

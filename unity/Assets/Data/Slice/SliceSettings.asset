@@ -28,6 +28,23 @@ MonoBehaviour:
   opponentModel: {fileID: 6665424575185744845, guid: 9fea873044392c744863f2c285c6839c, type: 3}
   peoplePistol: {fileID: 11400000, guid: b4a04340c6a647988cf1fc295ab908a3, type: 2}
   wardensBaton: {fileID: 11400000, guid: e98eeb6f8e3b4968b6caf0abb000f334, type: 2}
+  abilities:
+  - {fileID: 11400000, guid: 762264bd1e1f9c003727a9612a473179, type: 2}
+  - {fileID: 11400000, guid: a5217bda3cbf4aa83fab6b402dfcbc5c, type: 2}
+  - {fileID: 11400000, guid: ed2fce2020c64b015cdb136c1f08c98c, type: 2}
+  - {fileID: 11400000, guid: 158aa985aac01324668a16d1f5cee730, type: 2}
+  - {fileID: 11400000, guid: a5ae10cd93c8c90c2a7cdacc0245d4be, type: 2}
+  - {fileID: 11400000, guid: d2e0d73b5f5f138f288609e7fd0511e0, type: 2}
+  - {fileID: 11400000, guid: 5694d40b5a1dfb36691dfaa68cc26639, type: 2}
+  - {fileID: 11400000, guid: f051f8293d3a8b53b8b86d5eef5add36, type: 2}
+  - {fileID: 11400000, guid: 725ffd40a056c821b1c927bb384f3c17, type: 2}
+  - {fileID: 11400000, guid: c1fce49678fc4f8a62bf5fff291bab3f, type: 2}
+  - {fileID: 11400000, guid: 4a20e928d4046a6e409ac5a06593a477, type: 2}
+  - {fileID: 11400000, guid: 6edbb160651723baeba83ae63612ada1, type: 2}
+  - {fileID: 11400000, guid: 010d931a05c527995963cae674e6f760, type: 2}
+  - {fileID: 11400000, guid: e2a1fb77cecf64c3159180ab782d1fc5, type: 2}
+  - {fileID: 11400000, guid: 7b718dead25e8047a927e27c0b6aa1c4, type: 2}
+  - {fileID: 11400000, guid: 0edaa2a167212ffe6fd0925ba98b28e6, type: 2}
   gridMaterial: {fileID: 2100000, guid: 2df79b3057456e74fa4b498a77bb2ca8, type: 2}
   targetOutline: {fileID: 4800000, guid: 6b2e9d4f1a8c47e39f05c3d7a1e4b826, type: 3}
   churchPeople:
@@ -52,3 +69,4 @@ MonoBehaviour:
   - {fileID: 285396403, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
   - {fileID: -607346249, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
   - {fileID: 381300419, guid: 132358e9bf26b60458b731bf001e31db, type: 3}
+  - {fileID: 798309987, guid: 132358e9bf26b60458b731bf001e31db, type: 3}

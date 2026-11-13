@@ -165,6 +165,8 @@ namespace GameDev.Confront.Turns
                     return Hide(c);
                 case IntentKind.BreakAway:
                     return BreakAway(c);
+                case IntentKind.Ability:
+                    return UseAbility(c, intent.Ability, Find(intent.Target));
                 default:
                     EndTurn(c);
                     return true;
@@ -242,7 +244,8 @@ namespace GameDev.Confront.Turns
                 context.CriticalBonus += _rules.HigherGroundCritical;
             }
 
-            context.HitBonus = bonus;
+            context.HitBonus = bonus + Opening(attacker, target);
+            context.Support = Support(target);
             return context;
         }
 
@@ -401,9 +404,11 @@ namespace GameDev.Confront.Turns
 
                 var held = resumed ? Math.Min(c.HeldAp, c.Fighter.Reserve) : 0;
                 c.Fighter.Reserve = 0; // the AP kept for reactions expire as the new turn begins (10.2 §5)
-                if (c.Fighter.LostTurns > 0)
+                BeginAbilities(c);
+                if (c.Fighter.LostTurns > 0 || c.Fighter.Asleep > 0)
                 {
-                    c.Fighter.LostTurns--;
+                    c.Fighter.LostTurns = Math.Max(0, c.Fighter.LostTurns - 1);
+                    c.Fighter.Asleep = Math.Max(0, c.Fighter.Asleep - 1); // 05.1 Дрёма: the sleeper's turn is lost
                     continue;
                 }
 
@@ -659,6 +664,7 @@ namespace GameDev.Confront.Turns
                 Face(e, c.Cell);
                 c.Fighter.Reserve = ApLeft;
                 var result = _rules.Strike(e.Fighter, c.Fighter, ContextFor(e, e.Cell, c), _rolls);
+                Spent(c);
                 Afflict(c, result);
                 Subdue(e, c);
                 ApLeft = c.Fighter.Reserve;
@@ -674,7 +680,7 @@ namespace GameDev.Confront.Turns
             return c.Standing;
         }
 
-        private bool Strike(Combatant c, Combatant target, bool? offHand = null)
+        private bool Strike(Combatant c, Combatant target, bool? offHand = null, FightAbility crush = null)
         {
             if (c.Fighter.Set.Weapon == null || !target.Standing || target.Side == c.Side)
             {
@@ -683,13 +689,28 @@ namespace GameDev.Confront.Turns
 
             c.Fighter.OffHand = c.Fighter.Set.Paired && (offHand ?? Hand(c, target, c.Cell, ApLeft));
             var weapon = c.Fighter.Weapon;
-            if (ApLeft < weapon.AttackAp || !Reaches(c, target))
+            // 05.1 Сокрушение: an NPC's melee blow, when its Will Power spares it (tactical_sim.py attack).
+            var auto = false;
+            if (crush == null && !c.TakesIntents && !weapon.Ranged && c.Fighter.Knows(AbilityEffect.Crush) is FightAbility known
+                && ApLeft >= weapon.AttackAp + known.Ap && Spare(c.Fighter, known))
+            {
+                crush = known;
+                auto = true;
+            }
+
+            var ap = weapon.AttackAp + (crush != null ? crush.Ap : 0);
+            if (ApLeft < ap || !Reaches(c, target))
             {
                 c.Fighter.OffHand = false;
                 return false;
             }
 
-            ApLeft -= weapon.AttackAp;
+            if (auto)
+            {
+                c.Fighter.WillPower -= _rules.AbilityCost(c.Fighter, crush);
+            }
+
+            ApLeft -= ap;
             c.Attacked = true;
             c.Fired |= weapon.Ranged;
             Face(c, target.Cell);
@@ -700,7 +721,20 @@ namespace GameDev.Confront.Turns
 
             var context = ContextFor(c, c.Cell, target);
             context.Stealth = c.Hidden; // 10.3 §7: an attack from Stealth Mode, which it ends
+            context.MagicShare = Infuse(c);
+            if (crush != null)
+            {
+                context.Unguarded = true;
+                context.Multiplier = crush.Multiplier;
+            }
+
             var result = _rules.Strike(c.Fighter, target.Fighter, context, _rolls);
+            Spent(target);
+            if (crush != null && !result.Hit)
+            {
+                c.Fighter.Exposed = true; // 05.1 Сокрушение: a miss leaves its striker open
+            }
+
             Subdue(c, target);
             result.OffHand = c.Fighter.OffHand;
             c.LastOffHand = result.OffHand;
@@ -713,6 +747,11 @@ namespace GameDev.Confront.Turns
 
             SetHidden(c, false);
             Struck?.Invoke(c, target, result);
+            if (auto)
+            {
+                AbilityUsed?.Invoke(c, target, crush, result.Hit, result);
+            }
+
             Counterattack(target, c);
             CheckCones();
             if (!CheckEnd() && !c.Standing && Acting == c)
@@ -735,7 +774,9 @@ namespace GameDev.Confront.Turns
         public StrikeForecast ForecastFor(Combatant c, Combatant target, CombatCell from, bool offHand)
         {
             c.Fighter.OffHand = offHand && c.Fighter.Set.Paired;
-            var forecast = _rules.Forecast(c.Fighter, target.Fighter, ContextFor(c, from, target));
+            var context = ContextFor(c, from, target);
+            context.MagicShare = WouldInfuse(c) ? _rules.InfusionShare(c.Fighter) : 0d;
+            var forecast = _rules.Forecast(c.Fighter, target.Fighter, context);
             c.Fighter.OffHand = false;
             return forecast;
         }
@@ -799,7 +840,10 @@ namespace GameDev.Confront.Turns
 
             defender.Fighter.Reserve -= price;
             Face(defender, attacker.Cell);
-            var result = _rules.Strike(defender.Fighter, attacker.Fighter, ContextFor(defender, defender.Cell, attacker), _rolls);
+            var context = ContextFor(defender, defender.Cell, attacker);
+            context.MagicShare = Infuse(defender);
+            var result = _rules.Strike(defender.Fighter, attacker.Fighter, context, _rolls);
+            Spent(attacker);
             Afflict(attacker, result);
             Subdue(defender, attacker);
             if (attacker.Fighter.Down)
@@ -810,7 +854,6 @@ namespace GameDev.Confront.Turns
             Struck?.Invoke(defender, attacker, result);
         }
 
-        /// <summary>10.2 *Beasts of the slice*: a beast's critical hit makes its target bleed, and a glowing bite may poison it.</summary>
         /// <summary>
         /// 10.2 §5f The Wardens' baton: a person the striking weapon subdues, brought to 0 HP by it, lies unconscious and
         /// not dead; a beast dies. Read before the other hand's flag is cleared, so the weapon is the one that struck.
@@ -823,6 +866,7 @@ namespace GameDev.Confront.Turns
             }
         }
 
+        /// <summary>10.2 *Beasts of the slice*: a beast's critical hit makes its target bleed, and a glowing bite may poison it.</summary>
         private static void Afflict(Combatant target, StrikeResult result)
         {
             target.Fighter.Bleeding |= result.Bleeds;

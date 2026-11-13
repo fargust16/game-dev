@@ -56,7 +56,8 @@ namespace GameDev.Slice.Fights
         {
             var fighter = !kit && WornFighter != null
                 ? WornFighter()
-                : _settings.FightRules.Fighter(_character, null, Arms(RoleFirearm.Pistol), _settings.KitArmour, Arms(RoleFirearm.Rifle));
+                : _settings.FightRules.Fighter(_character, PlayerLimit, Arms(RoleFirearm.Pistol), _settings.KitArmour, Arms(RoleFirearm.Rifle));
+            Initiate(fighter); // CR4: its Arcana, Prepared abilities and Will Power
             if (_state != null)
             {
                 fighter.Hp = fighter.MaxHp * (1d - (Mathf.Clamp(_state.Get(HpLostKey), 0, 1000) / 1000d));
@@ -81,6 +82,7 @@ namespace GameDev.Slice.Fights
             _state.Set(BleedingKey, fighter.Bleeding ? 1 : 0);
             _state.Set(PoisonedKey, fighter.Poisoned ? 1 : 0);
             _state.Set(LegKey, fighter.LegBroken ? 1 : 0);
+            SaveWillPower(fighter);
         }
 
         private bool Healthy => _state == null
@@ -110,10 +112,19 @@ namespace GameDev.Slice.Fights
             FirstAid?.Spend(player);
         }
 
-        /// <summary>One world tick outside a fight (10.2): the conditions, then HP's ordinary return while nothing stops it.</summary>
+        /// <summary>
+        /// One world tick outside a fight (10.2): Will Power's return (CR4, 07.2 §3.3), the conditions, then HP's ordinary
+        /// return while nothing stops it.
+        /// </summary>
         private void OnTick(long tick)
         {
-            if (_settings == null || _state == null || InFight || _died || Healthy)
+            if (_settings == null || _state == null || InFight || _died)
+            {
+                return;
+            }
+
+            RestoreWillPower();
+            if (Healthy)
             {
                 return;
             }

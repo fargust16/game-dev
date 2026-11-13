@@ -45,7 +45,7 @@ namespace GameDev.Slice.Gear
         private readonly Bag _bag;
         private readonly Dictionary<WearSlot, ItemPiece> _worn = new Dictionary<WearSlot, ItemPiece>();
         private FightArmour _armour;
-        private (float, float, float) _armourKey;
+        private (float, float, float, float) _armourKey;
 
         public Outfit(Bag bag)
         {
@@ -178,20 +178,23 @@ namespace GameDev.Slice.Gear
             return null;
         }
 
-        /// <summary>The character as a fighter in what it wears and holds; <paramref name="fists"/> in a set with no weapon.</summary>
-        public Fighter Fighter(FightRules rules, ICharacterValues values, FightWeapon fists)
+        /// <summary>
+        /// The character as a fighter in what it wears and holds; <paramref name="fists"/> in a set with no weapon, and at
+        /// <paramref name="limit"/>, null for the Uninitiated (05.1).
+        /// </summary>
+        public Fighter Fighter(FightRules rules, ICharacterValues values, FightWeapon fists, int? limit = null)
         {
             var first = SetOf(WearSlot.WeaponOne, WearSlot.OffHandOne) ?? new WeaponSet(fists);
             var second = SetOf(WearSlot.WeaponTwo, WearSlot.OffHandTwo) ?? default(WeaponSet);
             var armour = Armour(rules, values);
             var held = first.Weight + second.Weight + (armour != null ? armour.Weight : 0f);
-            return rules.Fighter(values, null, first, armour, second, Modifiers(values), Math.Max(0d, _bag.Weight - held));
+            return rules.Fighter(values, limit, first, armour, second, Modifiers(values), Math.Max(0d, _bag.Weight - held));
         }
 
         /// <summary>
         /// What the modifiers of every worn and held piece add up to in a fight (19 §2.4, 10.2 §5b), each piece's by the share
-        /// of it its wearer meets. Magical defence, Magical Damage, Will Power and Will against control are carried but give
-        /// nothing in the slice's fights until 10.2's magic is in them.
+        /// of it its wearer meets: Magical Damage a share of the weapon's base on every blow, Magical defence flat, Maximum
+        /// Will Power a share, and Will against control points in a Will Contest (CR4, 10.2 §5f).
         /// </summary>
         public FightModifiers Modifiers(ICharacterValues values)
         {
@@ -218,6 +221,10 @@ namespace GameDev.Slice.Gear
                         case ModifierType.Evasion: sum.evasion += v; break;
                         case ModifierType.Ap: sum.ap += v; break;
                         case ModifierType.Initiative: sum.initiative += v; break;
+                        case ModifierType.MagicalDamage: sum.magic += v; break;
+                        case ModifierType.MagicalDefence: sum.ward += v; break;
+                        case ModifierType.MaxWillPower: sum.willPower += v; break;
+                        case ModifierType.WillAgainstControl: sum.will += v; break;
                     }
                 }
             }
@@ -225,10 +232,14 @@ namespace GameDev.Slice.Gear
             return sum;
         }
 
-        /// <summary>The worn armour pieces as one armour, or null when none is worn.</summary>
+        /// <summary>
+        /// The worn armour pieces as one armour, or null when none is worn. Its channel (10.2 §5f) is what is left of 1 when
+        /// each piece holds back its share of a whole set by what its family stops: a whole set of plate stops Infusion,
+        /// plate on the body alone half of it.
+        /// </summary>
         public FightArmour Armour(FightRules rules, ICharacterValues values)
         {
-            float physical = 0f, magical = 0f, kg = 0f;
+            float physical = 0f, magical = 0f, kg = 0f, held = 0f;
             var any = false;
             foreach (var slot in ArmourSlots)
             {
@@ -244,6 +255,7 @@ namespace GameDev.Slice.Gear
                 var fit = (float)(rules.StageFactor(piece.stage) * FightRules.Fit(values, family.Requirements, piece.stage) * share);
                 physical += family.Physical * fit;
                 magical += family.Magical * fit;
+                held += share * (1f - family.Channel);
                 kg += item.weight;
             }
 
@@ -252,7 +264,7 @@ namespace GameDev.Slice.Gear
                 return null;
             }
 
-            var key = (physical, magical, kg);
+            var key = (physical, magical, kg, held);
             if (_armour == null || !_armourKey.Equals(key))
             {
                 if (_armour != null)
@@ -268,7 +280,7 @@ namespace GameDev.Slice.Gear
                     }
                 }
 
-                _armour = FightArmour.Worn(physical, magical, kg);
+                _armour = FightArmour.Worn(physical, magical, kg, 1f - held);
                 _armourKey = key;
             }
 

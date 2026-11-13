@@ -121,7 +121,16 @@ namespace GameDev.Confront.Turns
         public Departure Departure { get; internal set; }
 
         /// <summary>It loses its turns or has asked for mercy, so Target Rules weigh it as no threat (10.2 §5a).</summary>
-        internal bool Helpless => Fighter.LostTurns > 0 || AsksMercy;
+        internal bool Helpless => Fighter.LostTurns > 0 || Fighter.Asleep > 0 || AsksMercy;
+
+        /// <summary>10.2 §5f Infusion: the player pours Will Power into each blow or shot while it can pay (CR4).</summary>
+        public bool Infusing { get; set; }
+
+        /// <summary>05.1 Столп: the enemy it must strike in its next turn, set by a contest it lost.</summary>
+        public Combatant TauntedBy { get; internal set; }
+
+        /// <summary>The enemy a Столп holds it to in this turn.</summary>
+        public Combatant Taunter { get; internal set; }
 
         /// <summary>
         /// In Stealth Mode (10.3 §8): enemies do not target it, and its next attack is a stealth attack. Set before the

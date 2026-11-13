@@ -20,6 +20,7 @@ namespace GameDev.Confront.Turns
         Spare,
         Hide,
         BreakAway,
+        Ability,
     }
 
     /// <summary>An Environment Action open across the edge to a cell beside (10.1, S3a.7): what it is, where it lands, and its AP and chance.</summary>
@@ -45,8 +46,9 @@ namespace GameDev.Confront.Turns
     /// </summary>
     public readonly struct TurnIntent
     {
-        private TurnIntent(IntentKind kind, CombatCell cell, int target, Treatment treatment = default, bool? success = null, bool? offHand = null)
+        private TurnIntent(IntentKind kind, CombatCell cell, int target, Treatment treatment = default, bool? success = null, bool? offHand = null, int ability = -1)
         {
+            Ability = ability;
             Kind = kind;
             Cell = cell;
             Target = target;
@@ -72,6 +74,12 @@ namespace GameDev.Confront.Turns
         /// choose the hand whose blow opens the most harmful mix of blows the AP left can buy.
         /// </summary>
         public bool? OffHand { get; }
+
+        /// <summary>The index of the prepared ability used, in <see cref="Fighter.Prepared"/> (CR4).</summary>
+        public int Ability { get; }
+
+        /// <summary>A prepared ability, at a combatant or at none (05.1, 10.2 §5f; CR4).</summary>
+        public static TurnIntent UseAbility(int index, int target = -1) => new TurnIntent(IntentKind.Ability, default, target, ability: index);
 
         /// <summary>Entering Stealth Mode for 3 AP when no enemy's cone covers the fighter (10.3 §8, S3b.1).</summary>
         public static TurnIntent Hide => new TurnIntent(IntentKind.Hide, default, -1);
@@ -197,6 +205,18 @@ namespace GameDev.Confront.Turns
         /// away, spared, or yielded (S3a.9). A yield ends the fight next.
         /// </summary>
         event Action<Combatant> Departed;
+
+        /// <summary>Whether the acting combatant can use its prepared ability now, with its AP and Will Power (CR4).</summary>
+        bool CanUse(Combatant c, int index);
+
+        /// <summary>Whether that ability can be aimed at the target from where the combatant stands (CR4).</summary>
+        bool CanAim(Combatant c, int index, Combatant target);
+
+        /// <summary>The AP an ability costs the combatant (CR4).</summary>
+        int AbilityAp(Combatant c, FightAbility ability);
+
+        /// <summary>Raised after an ability: who, at whom or null, which, whether it worked, and what a hit did (CR4).</summary>
+        event Action<Combatant, Combatant, FightAbility, bool, StrikeResult> AbilityUsed;
 
         /// <summary>Raised when a combatant of people asks for mercy (08 §7, S3a.9).</summary>
         event Action<Combatant> MercyAsked;

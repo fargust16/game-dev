@@ -73,6 +73,12 @@ namespace GameDev.Slice.Fights
         /// <summary>The action clicked on the hotbar since the last call, once.</summary>
         public FightAction Take() => _bar.Take();
 
+        /// <summary>The ability slot clicked on the hotbar since the last call, once, by its place; -1 when none was (CR4).</summary>
+        public int TakeAbility() => _bar.TakeAbility();
+
+        /// <summary>CR4: while an ability is being aimed, what the tip by the cursor says in place of the blow's; null otherwise.</summary>
+        public string AimText { get; set; }
+
         public bool Shown => Bind() && _fight.ClassListContains(Visible);
 
         /// <summary>The fighters the order shows, in order.</summary>
@@ -151,13 +157,51 @@ namespace GameDev.Slice.Fights
             _dirty = true;
         }
 
+        /// <summary>CR4: an ability, said as the log's line: on whom, whether it worked, and what a Укол разума did.</summary>
+        public void LogAbility(Combatant user, Combatant target, FightAbility ability, bool worked, StrikeResult result)
+        {
+            if (!Bind() || user == null || ability == null)
+            {
+                return;
+            }
+
+            var who = _name(user);
+            var what = Loc.Get($"ability.{ability.Key}.name");
+            string line;
+            if (target == null)
+            {
+                line = Loc.Format(worked ? "ui.fight.log.ability.self" : "ui.fight.log.ability.self.failed", who, what);
+            }
+            else if (ability.Effect == AbilityEffect.Sting)
+            {
+                line = result.Hit
+                    ? Loc.Format("ui.fight.log.ability.damage", who, _name(target), what, Math.Max(0, (int)Math.Round(result.Damage)))
+                    : Loc.Format("ui.fight.log.ability.miss", who, _name(target), what);
+            }
+            else
+            {
+                line = Loc.Format(worked ? "ui.fight.log.ability.on" : "ui.fight.log.ability.resisted", who, _name(target), what);
+            }
+
+            if (target != null && result.Downed)
+            {
+                line += "  " + Loc.Format("ui.fight.log.down", _name(target));
+            }
+
+            _log.text = line;
+            _dirty = true;
+        }
+
         /// <summary>
         /// Writes the order, the bar and the tip. <paramref name="settled"/> is false while the scene still shows earlier
         /// blows, and the order and the bar wait for it, so they never tell a blow before it is seen.
         /// </summary>
         /// <param name="actions">Whether each hotbar action is usable now and its AP; null dims them all.</param>
+        /// <param name="abilities">CR4: the Prepared Abilities the bar shows, and for each by its place whether it is usable, its AP, its Will Power and whether it is being aimed.</param>
+        /// <param name="infusing">CR4: Infusion is on.</param>
         public void Refresh(ITurnEconomy turns, Combatant player, FightCursor cursor, int turnAp, Vector2 mouse, bool settled,
-            Func<FightAction, (bool Usable, int Ap)> actions = null)
+            Func<FightAction, (bool Usable, int Ap)> actions = null, IReadOnlyList<FightAbility> abilities = null,
+            Func<int, (bool Usable, int Ap, int WillPower, bool On)> abilityState = null, bool infusing = false)
         {
             if (!Bind() || turns == null)
             {
@@ -175,13 +219,18 @@ namespace GameDev.Slice.Fights
                 if (player != null)
                 {
                     _hp.text = Loc.Format("ui.fight.hp", Hp(player.Fighter.Hp), Hp(player.Fighter.MaxHp));
+                    if (player.Fighter.Arcana != GameDev.Player.Progression.Arcana.None)
+                    {
+                        _hp.text += "  ·  " + Loc.Format("ui.fight.wp", (int)Math.Floor(player.Fighter.WillPower + 1e-9), (int)Math.Round(player.Fighter.MaxWillPower));
+                    }
                 }
             }
 
             Pips(playersTurn ? turns.ApLeft : player?.Fighter.Reserve ?? 0, Math.Max(turnAp, playersTurn ? turns.ApLeft : 0),
                 playersTurn && cursor.Affordable ? cursor.Cost : 0);
             Tip(playersTurn ? cursor : null, player, mouse);
-            _bar.Refresh(actions);
+            _bar.SetAbilities(abilities);
+            _bar.Refresh(actions, abilityState, infusing);
         }
 
         private void Order(ITurnEconomy turns)
@@ -247,7 +296,11 @@ namespace GameDev.Slice.Fights
             }
 
             _text.Clear();
-            if (cursor.Target != null)
+            if (AimText != null)
+            {
+                _text.Append(AimText);
+            }
+            else if (cursor.Target != null)
             {
                 _text.Append(_name(cursor.Target)).Append(" — ").Append(Condition(cursor.Target.Fighter)).Append('\n');
                 _text.Append(cursor.Steps < 0 ? Loc.Get("ui.fight.noway")
@@ -300,18 +353,18 @@ namespace GameDev.Slice.Fights
                 _text.Append(cursor.Steps < 0 ? Loc.Get("ui.fight.noway") : Loc.Format(cursor.Affordable ? "ui.fight.move" : "ui.fight.far", cursor.Cost));
             }
 
-            if (cursor.Provokes)
+            if (cursor.Provokes && AimText == null)
             {
                 _text.Append('\n').Append(Loc.Get("ui.fight.provokes"));
             }
 
             // 10.1 *Shot Line* (CR2): what the eye sees on the line is told whatever the Intelligence.
-            if (cursor.Target != null && cursor.Obscured)
+            if (cursor.Target != null && cursor.Obscured && AimText == null)
             {
                 _text.Append('\n').Append(Loc.Get("ui.fight.obscured"));
             }
 
-            if (cursor.Target != null && cursor.OnLine > 0)
+            if (cursor.Target != null && cursor.OnLine > 0 && AimText == null)
             {
                 _text.Append('\n').Append(Loc.Format("ui.fight.online", cursor.OnLine));
             }
@@ -361,6 +414,27 @@ namespace GameDev.Slice.Fights
             if (fighter.LegBroken)
             {
                 words += (words.Length > 0 ? " · " : string.Empty) + Loc.Get("ui.condition.leg");
+            }
+
+            // CR4, 05.1: what abilities left on it.
+            if (fighter.Asleep > 0)
+            {
+                words += (words.Length > 0 ? " · " : string.Empty) + Loc.Get("ui.condition.asleep");
+            }
+
+            if (fighter.Disoriented > 0 || fighter.Dazed)
+            {
+                words += (words.Length > 0 ? " · " : string.Empty) + Loc.Get("ui.condition.disoriented");
+            }
+
+            if (fighter.Braced)
+            {
+                words += (words.Length > 0 ? " · " : string.Empty) + Loc.Get("ui.condition.braced");
+            }
+
+            if (fighter.Exposed)
+            {
+                words += (words.Length > 0 ? " · " : string.Empty) + Loc.Get("ui.condition.exposed");
             }
 
             return words;

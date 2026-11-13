@@ -36,13 +36,23 @@ namespace GameDev.Slice.EditorTools
         // the asset map names for every icon of the game, tinted by the HUD, one for each FightAction after None: the
         // skip for ending the turn, the clock for waiting, the shield for the Defensive Stance, the turning arrow for the
         // other Weapon Set, the full heart for First Aid, the figure in shadow for Stealth, the arrows running back for
-        // Сбежать (owner, 2026-11-12), the way out for a Yield, the open heart for mercy.
+        // Сбежать (owner, 2026-11-12), the way out for a Yield, the open heart for mercy, the struck lightning for Infusion
+        // (CR4).
         private const string IconAtlas = "Assets/Modern GDR - Free icons pack/00_Atlas/BrightIcons.png";
         private static readonly string[] FightIcons =
         {
             "Skip_Bright", "Watch_Bright", "Shield_Bright", "Reload_Bright", "Heart02_Bright", "Network_Bright", "Rewind_Bright", "Exit_Bright",
-            "Heart01_Bright",
+            "Heart01_Bright", "ThunderStrike_Bright",
+        };
 
+        // CR4, 05.1 *Abilities of the slice*: every ability in the order the player's Prepared set is kept by, never to be
+        // reordered, each with its icon from the same atlas (authoring defaults).
+        private static readonly (string File, string Icon)[] Abilities =
+        {
+            ("KeenEar", "MusicNote01_Bright"), ("Suggestion", "Text_Bright"), ("Screen", "Circle_Bright"), ("Drowse", "Pause_Bright"),
+            ("DreamTouch", "Quest01_Bright"), ("Double", "Diamond_Bright"), ("Veil", "ToggleOff_Bright"), ("MindSting", "Thunder_Bright"),
+            ("Kinship", "Compass_Bright"), ("Unmoved", "Padlock01_Bright"), ("Dash", "Right_Bright"), ("Support", "Gear02_Bright"),
+            ("Halt", "Cross_Bright"), ("Press", "Down02_Bright"), ("Pillar", "Up_Bright"), ("Crush", "Sword_Bright"),
         };
 
         public static void Configure()
@@ -77,9 +87,22 @@ namespace GameDev.Slice.EditorTools
                     : throw new System.InvalidOperationException($"[SliceConfrontSetup] missing icon {FightIcons[i]} in {IconAtlas}");
             }
 
+            var abilities = so.FindProperty("abilities");
+            abilities.arraySize = Abilities.Length;
+            for (var i = 0; i < Abilities.Length; i++)
+            {
+                var ability = Load<FightAbility>($"{Data}/Abilities/{Abilities[i].File}.asset");
+                var own = new SerializedObject(ability);
+                own.FindProperty("icon").objectReferenceValue = sprites.TryGetValue(Abilities[i].Icon, out var mark)
+                    ? mark
+                    : throw new System.InvalidOperationException($"[SliceConfrontSetup] missing icon {Abilities[i].Icon} in {IconAtlas}");
+                own.ApplyModifiedPropertiesWithoutUndo();
+                abilities.GetArrayElementAtIndex(i).objectReferenceValue = ability;
+            }
+
             so.ApplyModifiedPropertiesWithoutUndo();
             AssetDatabase.SaveAssets();
-            Debug.Log("[SliceConfrontSetup] the slice's settings carry the fight's numbers, the development kit, the opponents and the grid's material.");
+            Debug.Log("[SliceConfrontSetup] the slice's settings carry the fight's numbers, the development kit, the opponents, the grid's material and the abilities.");
         }
 
         private static Material GridMaterial()

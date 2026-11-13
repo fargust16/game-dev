@@ -151,8 +151,11 @@ namespace GameDev.Slice.Fights
             }
         }
 
-        /// <summary>The attacker turns to its target and strikes; at the impact the target is hit, or falls.</summary>
-        public void Strike(Transform attacker, Transform target, float weaponMotion, StrikeResult result, object attackerKey, object targetKey)
+        /// <summary>
+        /// The attacker turns to its target and strikes; at the impact the target is hit, or falls. <paramref name="ability"/>
+        /// is the ability the blow is, for the log, such as a Укол разума (CR4).
+        /// </summary>
+        public void Strike(Transform attacker, Transform target, float weaponMotion, StrikeResult result, object attackerKey, object targetKey, object ability = null)
         {
             if (attacker == null)
             {
@@ -167,6 +170,7 @@ namespace GameDev.Slice.Fights
                 Result = result,
                 AttackerKey = attackerKey,
                 TargetKey = targetKey,
+                Ability = ability,
             });
         }
 
@@ -440,6 +444,9 @@ namespace GameDev.Slice.Fights
 
             /// <summary>The target, as the fight's host named it.</summary>
             public object TargetKey { get; internal set; }
+
+            /// <summary>CR4: the ability the blow is, or null for a weapon's blow.</summary>
+            public object Ability { get; internal set; }
         }
     }
 }

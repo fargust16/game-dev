@@ -36,6 +36,9 @@ namespace GameDev.Input
         private InputAction _endTurn;
         private InputAction _waitTurn;
         private InputAction _stance;
+        private InputAction _infuse;
+        private InputAction _prepared;
+        private InputAction _devArcana;
         private InputAction _changeSet;
         private InputAction _firstAid;
         private InputAction _yield;
@@ -188,6 +191,12 @@ namespace GameDev.Input
         /// <summary>S3b.1 authoring default, C: Stealth Mode, in free movement and in a fight (10.3 §1, §8).</summary>
         public bool StealthPressed => _stealth != null && _stealth.WasPressedThisFrame();
 
+        /// <summary>CR4, 10.2 §5f (authoring default, U): Infusion on or off in a fight.</summary>
+        public bool InfusePressed => _infuse != null && _infuse.WasPressedThisFrame();
+
+        /// <summary>CR4, 07.2 §4.5 (authoring default, K): the page of Prepared Abilities, out of a fight.</summary>
+        public bool PreparedPressed => _prepared != null && _prepared.WasPressedThisFrame();
+
         public Vector2 MousePosition => Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
         public Vector2 MouseDelta => Mouse.current != null ? Mouse.current.delta.ReadValue() : Vector2.zero;
 
@@ -201,6 +210,9 @@ namespace GameDev.Input
 
         /// <summary>Development command (S3a.4 authoring default, F7): a fight with two opponents beside the player.</summary>
         public bool DevFightPressed => _devFight != null && _devFight.WasPressedThisFrame();
+
+        /// <summary>Development command (CR4 authoring default, F9): the character's Arcana and Limit to the next test step.</summary>
+        public bool DevArcanaPressed => _devArcana != null && _devArcana.WasPressedThisFrame();
 
         public bool CancelPressed => _cancel != null && _cancel.WasPressedThisFrame();
 
@@ -258,6 +270,8 @@ namespace GameDev.Input
             _breakAway = _player.AddAction("BreakAway", InputActionType.Button, "<Keyboard>/z");
 
             _stealth = _player.AddAction("Stealth", InputActionType.Button, "<Keyboard>/c");
+            _infuse = _player.AddAction("Infuse", InputActionType.Button, "<Keyboard>/u");
+            _prepared = _player.AddAction("PreparedAbilities", InputActionType.Button, "<Keyboard>/k");
 
             _camera = new InputActionMap("Camera");
             _camPan = _camera.AddAction("Pan", InputActionType.Value);
@@ -290,6 +304,7 @@ namespace GameDev.Input
             _skipDayNight = _world.AddAction("SkipDayNight", InputActionType.Button, "<Keyboard>/n");
             _devCharacterValues = _world.AddAction("DevCharacterValues", InputActionType.Button, "<Keyboard>/f8");
             _devFight = _world.AddAction("DevFight", InputActionType.Button, "<Keyboard>/f7");
+            _devArcana = _world.AddAction("DevArcana", InputActionType.Button, "<Keyboard>/f9");
 
             _ui = new InputActionMap("UI");
             _cancel = _ui.AddAction("Cancel", InputActionType.Button, "<Keyboard>/escape");

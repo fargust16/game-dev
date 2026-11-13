@@ -182,6 +182,8 @@ namespace GameDev.Confront.Rules
             var fighter = new Fighter(values, limit, set, second, armour, modifiers) { Carried = carried };
             fighter.MaxHp = (hpBase + hpPerEndurance * values.Get(CharacterAttribute.Endurance)) * LimitMultiplier(limit) * (1d + modifiers.hp);
             fighter.Hp = fighter.MaxHp;
+            fighter.MaxWillPower = WillPowerMax(values, limit, modifiers);
+            fighter.WillPower = fighter.MaxWillPower;
             var band = LoadBand(LoadShare(fighter));
             fighter.LoadEvasion = loadEvasion[band];
             fighter.LoadAp = loadAp[band];
@@ -194,6 +196,8 @@ namespace GameDev.Confront.Rules
             fighter.ApFraction = rolls.NextDouble();
             fighter.Reserve = 0;
             fighter.LostTurns = 0;
+            fighter.Asleep = fighter.Disoriented = 0;
+            fighter.Dazed = fighter.Exposed = fighter.Braced = false;
         }
 
         public double LimitMultiplier(int? limit)
@@ -274,10 +278,10 @@ namespace GameDev.Confront.Rules
 
         /// <summary>
         /// 10.2 §5b Attack: `(Dexterity + Perception) / 2`, less the load, and in a Defensive Stance 1.5 for each AP held;
-        /// zero for a target that cannot evade.
+        /// zero for a target that cannot evade or sleeps (05.1 Дрёма).
         /// </summary>
         public double Evasion(Fighter fighter) =>
-            fighter.CanEvade
+            fighter.CanEvade && fighter.Asleep == 0
                 ? (fighter.Get(CharacterAttribute.Dexterity) + fighter.Get(CharacterAttribute.Perception)) / 2d + fighter.Modifiers.evasion - fighter.LoadEvasion
                   + (fighter.Stance ? stanceEvasion * fighter.Reserve : 0d)
                 : 0d;
@@ -333,9 +337,9 @@ namespace GameDev.Confront.Rules
         /// The physical defence one strike meets: doubled against a firearm beyond the next cell, and halved by a
         /// critical melee blow, which finds the gap in the armour.
         /// </summary>
-        public double DefenceAgainst(Fighter attacker, Fighter target, bool beyond, bool critical)
+        public double DefenceAgainst(Fighter attacker, Fighter target, bool beyond, bool critical, double support = 0d)
         {
-            var defence = PhysicalDefence(target);
+            var defence = PhysicalDefence(target) + support;
             if (attacker.Weapon.Ranged)
             {
                 return beyond ? defence * rangedArmour : defence;
@@ -357,11 +361,12 @@ namespace GameDev.Confront.Rules
         /// </summary>
         public StrikeForecast Forecast(Fighter attacker, Fighter target, StrikeContext context)
         {
-            var through = BaseDamage(attacker) * (1d - Reduction(DefenceAgainst(attacker, target, context.Beyond, false)));
+            var through = BaseDamage(attacker) * (1d - Reduction(DefenceAgainst(attacker, target, context.Beyond, false, context.Support))) * Braced(target);
+            var magic = Warded(MagicShare(attacker, context) * WeaponBase(attacker), target);
             return new StrikeForecast(
                 HitChance(attacker, target, context.HitBonus),
-                through * (1d - spread),
-                through * (1d + spread),
+                (through * (1d - spread)) + magic,
+                (through * (1d + spread)) + magic,
                 baseHit,
                 Accuracy(attacker),
                 Evasion(target),
@@ -372,7 +377,7 @@ namespace GameDev.Confront.Rules
 
         /// <summary>A melee hit can be parried or blocked by a target holding the reaction's AP and able to act.</summary>
         public bool CanGuard(Fighter target) =>
-            target.Set.Guard != Guard.None && target.Reserve >= reactionAp && target.LostTurns == 0 && target.CanEvade && !target.Down;
+            target.Set.Guard != Guard.None && target.Reserve >= reactionAp && target.LostTurns == 0 && target.Asleep == 0 && target.CanEvade && !target.Down;
 
         /// <summary>
         /// One blow or shot: the hit, the critical hit, damage through armour, the target's parry or block from the AP
@@ -393,9 +398,11 @@ namespace GameDev.Confront.Rules
             var raw = RawCritical(attacker, CriticalPoints(context));
             result.Critical = rolls.NextDouble() < CriticalChance(raw);
             var multiplier = result.Critical ? CriticalMultiplier(attacker, raw, CriticalExtraOf(weapon, context)) : 1d;
-            var share = context.Cleaving ? weapon.Cleave : 1d;
+            var share = (context.Cleaving ? weapon.Cleave : 1d) * (context.Multiplier > 0d ? context.Multiplier : 1d);
             var rolled = BaseDamage(attacker) * (1d - spread + 2d * spread * rolls.NextDouble());
-            var damage = rolled * multiplier * share * (1d - Reduction(DefenceAgainst(attacker, target, context.Beyond, result.Critical)));
+            var damage = rolled * multiplier * share * (1d - Reduction(DefenceAgainst(attacker, target, context.Beyond, result.Critical, context.Support))) * Braced(target);
+            // 10.2 §5f: Infusion and the items' Magical Damage, a share of the weapon's base, through magical defence.
+            damage += Warded(MagicShare(attacker, context) * WeaponBase(attacker) * multiplier * share, target);
 
             if (!context.Unguarded && !weapon.Ranged && CanGuard(target))
             {
@@ -412,6 +419,11 @@ namespace GameDev.Confront.Rules
             target.Hp -= damage;
             result.Damage = damage;
             result.Downed = target.Down;
+            if (damage > 0d)
+            {
+                target.Asleep = 0; // 05.1 Дрёма: damage wakes
+            }
+
             if (!context.Stealth && !target.Down && weapon.Stun > 0f && rolls.NextDouble() < weapon.Stun)
             {
                 result.Stunned = true;

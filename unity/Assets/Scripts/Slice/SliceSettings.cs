@@ -56,6 +56,9 @@ namespace GameDev.Slice
         [Tooltip("10.2 §5f: the Wardens' baton, every Warden's second set beside its firearm; it subdues.")]
         [SerializeField] private FightWeapon wardensBaton;
 
+        [Tooltip("05.1 *Abilities of the slice*: every ability of the slice's two Arcana, in a fixed order the player's Prepared set is kept by (CR4). SliceConfrontSetup sets them.")]
+        [SerializeField] private FightAbility[] abilities = new FightAbility[0];
+
         [Tooltip("The Combat Grid's cell outlines.")]
         [SerializeField] private Material gridMaterial;
 
@@ -78,7 +81,7 @@ namespace GameDev.Slice
         [Tooltip("Basic RPG Cursors (asset map §5), one for each FightCursor shape in its order: plain, walk, strike, a walk the AP do not reach, a blow they do not reach. SliceConfrontSetup imports them as cursors.")]
         [SerializeField] private Texture2D[] fightCursors;
 
-        [Tooltip("The fight hotbar's icons (Modern GDR pack, asset map), one for each FightAction after None in its order: end turn, wait, Defensive Stance, change weapons, First Aid, Stealth, Yield, Spare. SliceConfrontSetup sets them.")]
+        [Tooltip("The fight hotbar's icons (Modern GDR pack, asset map), one for each FightAction after None in its order: end turn, wait, Defensive Stance, change weapons, First Aid, Stealth, Сбежать, Yield, Spare, Infusion. SliceConfrontSetup sets them.")]
         [SerializeField] private Sprite[] fightIcons;
 
         public int Seed => seed;
@@ -116,6 +119,8 @@ namespace GameDev.Slice
         public FightWeapon PeoplePistol => peoplePistol;
 
         public FightWeapon WardensBaton => wardensBaton;
+
+        public FightAbility[] Abilities => abilities;
 
         public GameObject[] ChurchPeople => churchPeople;
 

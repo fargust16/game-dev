@@ -216,6 +216,14 @@ namespace GameDev.Slice.Fights
             return Cell.HasValue && _turns.SubmitIntent(TurnIntent.MoveTo(Cell.Value));
         }
 
+        /// <summary>CR4: an ability aimed: no path, the strike's cursor over an enemy it reaches, the blocked one elsewhere.</summary>
+        public void Aim(bool reaches)
+        {
+            _path.Clear();
+            _view.Hide();
+            Set(reaches ? Shape.Attack : Shape.AttackBlocked);
+        }
+
         /// <summary>No path, no target, and the plain cursor.</summary>
         public void Clear()
         {

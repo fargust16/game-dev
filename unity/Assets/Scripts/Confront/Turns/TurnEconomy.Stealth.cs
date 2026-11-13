@@ -184,7 +184,9 @@ namespace GameDev.Confront.Turns
             var context = ContextFor(attacker, attacker.Cell, target);
             context.Stealth = attacker.Hidden;
             attacker.Fired |= attacker.Fighter.Weapon.Ranged;
+            context.MagicShare = Infuse(attacker);
             var result = _rules.Strike(attacker.Fighter, target.Fighter, context, _rolls);
+            Spent(target);
             Afflict(target, result);
             Subdue(attacker, target);
             if (target.Fighter.Down)

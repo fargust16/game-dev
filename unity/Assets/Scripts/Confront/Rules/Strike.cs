@@ -72,6 +72,15 @@ namespace GameDev.Confront.Rules
 
         /// <summary>A stealth attack (10.3 §7): +50 points of critical chance after Luck, the weapon's stealth critical, never a stun.</summary>
         public bool Stealth;
+
+        /// <summary>10.2 §5f Infusion: the share of the weapon's base this blow adds as magical damage, its Will Power already paid.</summary>
+        public double MagicShare;
+
+        /// <summary>05.1 Опора: physical defence the target's allies lend it.</summary>
+        public double Support;
+
+        /// <summary>05.1 Сокрушение: what the blow's damage is multiplied by; 0 stands for 1.</summary>
+        public double Multiplier;
     }
 
     /// <summary>What one blow or shot did. The conditions it starts are applied by their own system (S3a.7).</summary>

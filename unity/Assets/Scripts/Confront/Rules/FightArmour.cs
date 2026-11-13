@@ -19,6 +19,9 @@ namespace GameDev.Confront.Rules
         [Tooltip("10.2 §5b Damage: magical defence at stage 9; it answers Infusion and abilities, which come later.")]
         [SerializeField] private float magical;
 
+        [Tooltip("10.2 §5f Infusion: the share of its wearer's Infusion that passes through it: 1, chain 0.5, plate 0.")]
+        [SerializeField, Range(0f, 1f)] private float channel = 1f;
+
         [Tooltip("10.2 §5b Load in a Fight: kg, worn armour still counting.")]
         [SerializeField] private float weight;
 
@@ -31,15 +34,17 @@ namespace GameDev.Confront.Rules
         public string Section => section;
         public float Physical => physical;
         public float Magical => magical;
+        public float Channel => channel;
         public float Weight => weight;
         public int Stage => stage;
         public IReadOnlyList<AttributeRequirement> Requirements => requirements;
 
         /// <summary>
         /// Pieces of several families worn together as one armour (S5a.2): its defence already counts each piece's
-        /// Stage Factor and the share of it its wearer meets, so it is of stage 9 and asks nothing more.
+        /// Stage Factor and the share of it its wearer meets, so it is of stage 9 and asks nothing more. Its channel is the
+        /// pieces' own, weighed by how much of a whole set each is.
         /// </summary>
-        public static FightArmour Worn(float physicalDefence, float magicalDefence, float kg)
+        public static FightArmour Worn(float physicalDefence, float magicalDefence, float kg, float channelShare = 1f)
         {
             var armour = CreateInstance<FightArmour>();
             armour.name = "Worn";
@@ -47,6 +52,7 @@ namespace GameDev.Confront.Rules
             armour.section = "S5a.2 worn pieces";
             armour.physical = physicalDefence;
             armour.magical = magicalDefence;
+            armour.channel = Mathf.Clamp01(channelShare);
             armour.weight = kg;
             armour.stage = 9;
             armour.requirements = new AttributeRequirement[0];
