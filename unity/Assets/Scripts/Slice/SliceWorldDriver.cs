@@ -58,6 +58,9 @@ namespace GameDev.Slice
 
         public TipBook Tips { get; private set; }
 
+        /// <summary>Veilmouth's News Pool (09; PB8d): what the city is talking about, told by the Notice Board.</summary>
+        public GameDev.Slice.News.SliceNews News { get; private set; }
+
         public IWorldClock Clock { get; private set; }
 
         public CharacterNotes Notes { get; private set; }
@@ -256,6 +259,7 @@ namespace GameDev.Slice
             Director = new PoiDirector(pois, State, seed, SliceSeedStreams.PoiUnattended, Clock);
             Director.Evaluate(Clock.Tick);
             Tips = new TipBook(tips, State, Director);
+            News = new GameDev.Slice.News.SliceNews(State, seed);
             Character = new CharacterSheet();
             if (settings.Items != null)
             {
@@ -270,6 +274,7 @@ namespace GameDev.Slice
             {
                 Fights = gameObject.AddComponent<SliceConfront>();
                 Fights.Configure(settings, seed, Clock, Character, State);
+                Fights.News = News;
             }
             if (Fights != null && Outfit != null && settings.Fists != null)
             {

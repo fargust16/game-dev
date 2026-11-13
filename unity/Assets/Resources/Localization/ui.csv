@@ -327,3 +327,29 @@ ui.accuse.bribe.taken,"Never saw you. Move along.","Я тебя не видел.
 ui.accuse.bribe.refused,"A bribe, to a Warden? The fine's {0} now.","Взятка стражнику? Теперь штраф {0}."
 ui.accuse.letoff,"Once. Next time it's the lock-up.","Один раз. В следующий раз — камера."
 ui.accuse.persuade.failed,"Save it for the magistrate.","Прибереги это для судьи."
+news.death.line,"A body found: {0}. Where: {1}, {2}. {3}","Найдено тело: {0}. Место: {1}, {2}. {3}"
+news.death.seen,Witnesses saw who did it: {0}.,Очевидцы видели убийцу: {0}.
+news.death.unseen,Nobody saw who did it.,Убийцу никто не видел.
+news.victim.townsman,a townsman,горожанин
+news.victim.townswoman,a townswoman,горожанка
+news.victim.warden,a Warden,стражник
+news.victim.church,a servant of the church,служитель церкви
+news.victim.stranger,a stranger,неизвестный
+news.killer.character,a stranger,какой-то незнакомец
+news.killer.warden,a Warden,стражник
+news.killer.resident,one of the townsfolk,кто-то из горожан
+news.killer.beast,a beast,зверь
+news.killer.outsider,outsiders,чужаки
+news.ago.1,about an hour ago,около часа назад
+news.ago.2,about two hours ago,около двух часов назад
+news.ago.3,about three hours ago,около трёх часов назад
+news.ago.4,about four hours ago,около четырёх часов назад
+news.ago.5,about five hours ago,около пяти часов назад
+news.ago.6,about six hours ago,около шести часов назад
+news.ago.7,about seven hours ago,около семи часов назад
+news.ago.8,about eight hours ago,около восьми часов назад
+news.ago.9,about nine hours ago,около девяти часов назад
+news.ago.10,about ten hours ago,около десяти часов назад
+news.place.town,Veilmouth,Вейлмут
+news.place.outside,outside the walls,за городскими стенами
+ui.fight.god.came,The goddess has shown us this place!,Богиня указала нам это место!

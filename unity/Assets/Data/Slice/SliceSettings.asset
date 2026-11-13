@@ -29,6 +29,10 @@ MonoBehaviour:
   peoplePistol: {fileID: 11400000, guid: b4a04340c6a647988cf1fc295ab908a3, type: 2}
   gridMaterial: {fileID: 2100000, guid: 2df79b3057456e74fa4b498a77bb2ca8, type: 2}
   targetOutline: {fileID: 4800000, guid: 6b2e9d4f1a8c47e39f05c3d7a1e4b826, type: 3}
+  churchPeople:
+  - {fileID: 4983742377235370021, guid: 2c4f0d1dd77ef7548bc6441763742149, type: 3}
+  - {fileID: 112055915828892884, guid: 275cb7096f7116045868e9964706ac6b, type: 3}
+  - {fileID: 6885193778138171790, guid: 809ba5e009f2c8a4490bd8fe6f2ada15, type: 3}
   stealthRules: {fileID: 11400000, guid: 7b2d9e4f1a3c4e5b8d6f0a1c2e3b4d5f, type: 2}
   beastRules: {fileID: 11400000, guid: 8a4c2e6f1b3d4f5a9c7e1b3d5f7a9c2e, type: 2}
   fightCursors:

@@ -193,6 +193,7 @@ namespace GameDev.Slice.Fights
             _wounds.Remove(body);
             Standing?.RecordKill();
             Standing?.Record(Deed.InnocentKilled);
+            ShotDeath(body); // a death enters the news (10.2 §5e, PB8d)
             if (body.TryGetComponent<TownsfolkWalker>(out var walker))
             {
                 walker.enabled = false;

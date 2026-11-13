@@ -770,6 +770,7 @@ namespace GameDev.Slice.Fights
         private void OnStruck(Combatant attacker, Combatant target, StrikeResult result)
         {
             CountKill(attacker, target);
+            FightDeath(attacker, target); // a death enters the news (10.2 §5e, PB8d)
             if (!_bodies.TryGetValue(attacker, out var body) || body == null)
             {
                 return;

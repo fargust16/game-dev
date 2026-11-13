@@ -136,8 +136,11 @@ namespace GameDev.Slice.Fights
             return came;
         }
 
-        /// <summary>A Warden runs to <paramref name="at"/> and joins the fight on <paramref name="side"/> at the end of the round by which it is there.</summary>
-        private void Come(Transform body, Vector3 at, int side)
+        /// <summary>
+        /// A Warden runs to <paramref name="at"/> and joins the fight on <paramref name="side"/> at the end of the round by which
+        /// it is there; one of the church's people sent by the goddess comes the same way (PB8d), of its own group and line.
+        /// </summary>
+        private void Come(Transform body, Vector3 at, int side, string group = Wardens, string line = "ui.fight.help.warden")
         {
             // One on its way to look at a shot, or standing where a fight drew it, keeps the post it goes back to.
             var back = _returning.Find(r => r.Body == body) ?? _late.Find(k => k.Body == body);
@@ -146,14 +149,14 @@ namespace GameDev.Slice.Fights
             _coming.Add(new Coming
             {
                 Body = body,
-                Combatant = Person(body, Wardens, _nextId++, side: side),
+                Combatant = Person(body, group, _nextId++, side: side),
                 Round = _lastRound + TicksToRun(body.position, at),
                 To = at,
                 OnlyLooks = side == PlayerSide,
                 Post = back != null ? back.Post : body.position,
                 PostFacing = back != null ? back.PostFacing : body.rotation,
             });
-            Say(body, "ui.fight.help.warden");
+            Say(body, line);
         }
 
         /// <summary>
@@ -192,6 +195,7 @@ namespace GameDev.Slice.Fights
             foreach (var coming in _coming)
             {
                 coming.Arrives = Time.time + (Mathf.Max(0, coming.Round - _lastRound) * SecondsPerTick);
+                coming.OnlyLooks |= _church.Contains(coming.Body); // the church's people come late only to look (PB8d)
                 _late.Add(coming);
             }
 

@@ -1,0 +1,340 @@
+{
+    "places": [
+        {
+            "key": "map.the_penny",
+            "kind": "square",
+            "x0": 14.0,
+            "z0": 34.0,
+            "x1": 66.0,
+            "z1": 86.0
+        },
+        {
+            "key": "map.black_puddle",
+            "kind": "square",
+            "x0": 96.0,
+            "z0": -34.0,
+            "x1": 148.0,
+            "z1": -1.0
+        },
+        {
+            "key": "map.fishlip_quay",
+            "kind": "square",
+            "x0": 163.0,
+            "z0": -50.0,
+            "x1": 180.0,
+            "z1": 240.0
+        },
+        {
+            "key": "map.tipsy_pier",
+            "kind": "square",
+            "x0": 180.0,
+            "z0": 53.0,
+            "x1": 242.0,
+            "z1": 67.0
+        },
+        {
+            "key": "map.last_turning_cemetery",
+            "kind": "square",
+            "x0": -68.0,
+            "z0": 149.0,
+            "x1": -28.0,
+            "z1": 174.0
+        },
+        {
+            "key": "map.bishop_s_garden",
+            "kind": "square",
+            "x0": -16.0,
+            "z0": 133.0,
+            "x1": 14.0,
+            "z1": 230.0
+        },
+        {
+            "key": "map.quiet_whistle_garden",
+            "kind": "square",
+            "x0": 66.0,
+            "z0": 148.0,
+            "x1": 96.0,
+            "z1": 230.0
+        },
+        {
+            "key": "map.drowsy_steps",
+            "kind": "square",
+            "x0": 5.0,
+            "z0": 133.0,
+            "x1": 75.0,
+            "z1": 170.0
+        },
+        {
+            "key": "map.deaf_boiler_yard",
+            "kind": "square",
+            "x0": 121.0,
+            "z0": -186.0,
+            "x1": 162.0,
+            "z1": -160.0
+        },
+        {
+            "key": "map.last_farthing_bridge",
+            "kind": "bridge",
+            "x0": -122.0,
+            "z0": 53.0,
+            "x1": -82.0,
+            "z1": 67.0
+        },
+        {
+            "key": "map.grubby_bridge",
+            "kind": "bridge",
+            "x0": 32.0,
+            "z0": -88.0,
+            "x1": 48.0,
+            "z1": -50.0
+        },
+        {
+            "key": "map.crows_walk",
+            "kind": "street",
+            "x0": -77.0,
+            "z0": 230.0,
+            "x1": 160.0,
+            "z1": 240.0
+        },
+        {
+            "key": "map.cold_shoulder",
+            "kind": "street",
+            "x0": -80.0,
+            "z0": -44.0,
+            "x1": -68.0,
+            "z1": 237.5
+        },
+        {
+            "key": "map.spade_lane",
+            "kind": "street",
+            "x0": -77.0,
+            "z0": 174.0,
+            "x1": -19.0,
+            "z1": 184.0
+        },
+        {
+            "key": "map.last_turning",
+            "kind": "street",
+            "x0": -28.0,
+            "z0": 123.5,
+            "x1": -16.0,
+            "z1": 237.5
+        },
+        {
+            "key": "map.thimble_street",
+            "kind": "street",
+            "x0": -28.0,
+            "z0": -44.0,
+            "x1": -16.0,
+            "z1": 123.5
+        },
+        {
+            "key": "map.widows_row",
+            "kind": "street",
+            "x0": -77.0,
+            "z0": 116.0,
+            "x1": 160.0,
+            "z1": 133.0
+        },
+        {
+            "key": "map.long_tongue",
+            "kind": "street",
+            "x0": -82.0,
+            "z0": 49.0,
+            "x1": 21.0,
+            "z1": 71.0
+        },
+        {
+            "key": "map.salt_gullet",
+            "kind": "street",
+            "x0": 59.0,
+            "z0": 49.0,
+            "x1": 160.0,
+            "z1": 71.0
+        },
+        {
+            "key": "map.lenten_street",
+            "kind": "street",
+            "x0": 29.0,
+            "z0": 79.0,
+            "x1": 51.0,
+            "z1": 127.0
+        },
+        {
+            "key": "map.smoked_street",
+            "kind": "street",
+            "x0": 29.0,
+            "z0": -44.0,
+            "x1": 51.0,
+            "z1": 41.0
+        },
+        {
+            "key": "map.nettle_street",
+            "kind": "street",
+            "x0": 96.0,
+            "z0": 1.5,
+            "x1": 108.0,
+            "z1": 237.5
+        },
+        {
+            "key": "map.button_lane",
+            "kind": "street",
+            "x0": -77.0,
+            "z0": -1.0,
+            "x1": 40.0,
+            "z1": 9.0
+        },
+        {
+            "key": "map.draught_lane",
+            "kind": "street",
+            "x0": 40.0,
+            "z0": -1.0,
+            "x1": 160.0,
+            "z1": 9.0
+        },
+        {
+            "key": "map.tar_row",
+            "kind": "street",
+            "x0": 148.0,
+            "z0": -44.0,
+            "x1": 163.0,
+            "z1": 237.5
+        },
+        {
+            "key": "map.powder_embankment",
+            "kind": "street",
+            "x0": -77.0,
+            "z0": -50.0,
+            "x1": 160.0,
+            "z1": -34.0
+        },
+        {
+            "key": "map.ash_bank",
+            "kind": "street",
+            "x0": -77.5,
+            "z0": -98.0,
+            "x1": 177.5,
+            "z1": -88.0
+        },
+        {
+            "key": "map.cinder_lane",
+            "kind": "street",
+            "x0": -80.0,
+            "z0": -199.5,
+            "x1": -70.0,
+            "z1": -90.5
+        },
+        {
+            "key": "map.furnace_road",
+            "kind": "street",
+            "x0": 33.0,
+            "z0": -199.5,
+            "x1": 47.0,
+            "z1": -88.0
+        },
+        {
+            "key": "map.clinker_road",
+            "kind": "street",
+            "x0": -77.5,
+            "z0": -152.0,
+            "x1": 177.5,
+            "z1": -138.0
+        },
+        {
+            "key": "map.coughing_lane",
+            "kind": "street",
+            "x0": -77.5,
+            "z0": -202.0,
+            "x1": 177.5,
+            "z1": -192.0
+        },
+        {
+            "key": "map.brine_lane",
+            "kind": "street",
+            "x0": 170.0,
+            "z0": -199.5,
+            "x1": 180.0,
+            "z1": -90.5
+        },
+        {
+            "key": "map.bellows_lane",
+            "kind": "street",
+            "x0": -24.0,
+            "z0": -145.0,
+            "x1": -14.0,
+            "z1": -90.5
+        },
+        {
+            "key": "map.rats_choir",
+            "kind": "street",
+            "x0": -24.0,
+            "z0": -199.5,
+            "x1": -14.0,
+            "z1": -145.0
+        },
+        {
+            "key": "map.kettle_lane",
+            "kind": "street",
+            "x0": 103.0,
+            "z0": -199.5,
+            "x1": 113.0,
+            "z1": -90.5
+        },
+        {
+            "key": "map.parsons_end",
+            "kind": "district",
+            "x0": -80.0,
+            "z0": 133.0,
+            "x1": 163.0,
+            "z1": 240.0
+        },
+        {
+            "key": "map.sleepy_quarter",
+            "kind": "district",
+            "x0": -80.0,
+            "z0": -34.0,
+            "x1": -16.0,
+            "z1": 116.0
+        },
+        {
+            "key": "map.salt_end",
+            "kind": "district",
+            "x0": 96.0,
+            "z0": 49.0,
+            "x1": 163.0,
+            "z1": 116.0
+        },
+        {
+            "key": "map.lower_veil",
+            "kind": "district",
+            "x0": 51.0,
+            "z0": -50.0,
+            "x1": 163.0,
+            "z1": 49.0
+        },
+        {
+            "key": "map.the_reek",
+            "kind": "district",
+            "x0": -80.0,
+            "z0": -202.0,
+            "x1": 180.0,
+            "z1": -86.0
+        },
+        {
+            "key": "map.west_road",
+            "kind": "road",
+            "x0": -500.0,
+            "z0": 54.0,
+            "x1": -122.0,
+            "z1": 66.0
+        },
+        {
+            "key": "news.place.town",
+            "kind": "town",
+            "x0": -80.0,
+            "z0": -50.0,
+            "x1": 180.0,
+            "z1": 240.0
+        }
+    ]
+}

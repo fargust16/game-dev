@@ -339,7 +339,12 @@ namespace GameDev.Slice.Fights
                 if ((r.Body.position - at).sqrMagnitude > PostReturnDistance * PostReturnDistance &&
                     (r.Post - at).sqrMagnitude > PostReturnDistance * PostReturnDistance)
                 {
-                    r.Body.SetPositionAndRotation(r.Post, r.PostFacing);
+                    // One of the church's people goes back in at the old chapel's door (PB8d); a Warden stands at its post.
+                    if (!GoesBackIn(r.Body))
+                    {
+                        r.Body.SetPositionAndRotation(r.Post, r.PostFacing);
+                    }
+
                     _returning.RemoveAt(i);
                 }
             }
