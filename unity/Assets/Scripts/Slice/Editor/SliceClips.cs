@@ -627,6 +627,38 @@ namespace GameDev.Slice.EditorTools
             return controller;
         }
 
+        /// <summary>
+        /// S5b.4: the work states <see cref="PlayerWork.Clips"/> names that the player's controller at <paramref name="path"/>
+        /// lacks, added to it in place, as <see cref="Player"/> would build them, so the controller and its measured paces
+        /// need not be built again for one new work clip. Returns the states added.
+        /// </summary>
+        public static List<string> AddWorkStates(string path)
+        {
+            var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(path);
+            var added = new List<string>();
+            if (controller == null)
+            {
+                Debug.LogError($"[SliceClips] no player controller at {path}.");
+                return added;
+            }
+
+            var machine = controller.layers[0].stateMachine;
+            for (var i = 0; i < PlayerWork.Clips.Length; i++)
+            {
+                var name = PlayerWork.Clips[i];
+                if (machine.states.Any(s => s.state.name == name))
+                {
+                    continue;
+                }
+
+                State(machine, name, Get(name), new Vector3(1080f, i * 60f)).iKOnFeet = true;
+                added.Add(name);
+            }
+
+            EditorUtility.SetDirty(controller);
+            return added;
+        }
+
         /// <summary>The upper body's mask: the spine, the head and both arms with their fingers, never the legs or the root.</summary>
         public const string UpperBodyMask = ControllerFolder + "/UpperBody.mask";
 

@@ -29,7 +29,7 @@ namespace GameDev.Slice.Creation
             ("ui.character.skills.shadow", new[] { CharacterSkill.Stealth, CharacterSkill.Theft }),
             ("ui.character.skills.craft", new[]
             {
-                CharacterSkill.FirstAid, CharacterSkill.ItemCreation, CharacterSkill.Herbalism, CharacterSkill.Woodcutting,
+                CharacterSkill.FirstAid, CharacterSkill.ItemCreation, CharacterSkill.Alchemy, CharacterSkill.Herbalism, CharacterSkill.Woodcutting,
                 CharacterSkill.Mining, CharacterSkill.Skinning,
             }),
         };

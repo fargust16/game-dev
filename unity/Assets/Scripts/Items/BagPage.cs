@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using GameDev.Core.Localization;
@@ -29,6 +30,12 @@ namespace GameDev.Items
             foreach (var piece in bag.Pieces)
             {
                 var item = bag.Catalogue.Find(piece.item);
+                if (item.kind == ItemKind.Potion)
+                {
+                    lines.Add(Potion(item, piece));
+                    continue;
+                }
+
                 var line = Loc.Format("ui.hud.bag.piece", Loc.Get(item.NameKey), Loc.Get(QualityKey(piece.Quality)), Kg(item.weight));
                 var mods = ItemMaker.Describe(piece.modifiers);
                 if (mods.Length > 0)
@@ -42,6 +49,10 @@ namespace GameDev.Items
 
             return lines;
         }
+
+        /// <summary>A Limit potion's line: its name and what its six brewing checks gave (20 §3; S5b.4).</summary>
+        public static string Potion(ItemDefinition item, ItemPiece piece) =>
+            Loc.Format("ui.hud.bag.potion", Loc.Get(item.NameKey), piece.perfect, Math.Max(0, 6 - piece.perfect - piece.bad), piece.bad, Kg(item.weight));
 
         public static string BandKey(LoadBand band) => band switch
         {

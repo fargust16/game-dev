@@ -128,7 +128,7 @@ namespace GameDev.Slice.Tests
             _book.Read(TipSource.NoticeBoard, _clock.Tick);
             _book.Read(TipSource.StreetRumour, _clock.Tick);
 
-            var order = new[] { "kit.drawers", "kit.coachcoats", "board.girls", "board.wren" };
+            var order = new[] { "kit.drawers", "kit.coachcoats", "kit.den", "board.girls", "board.wren" };
             CollectionAssert.AreEqual(order, heard);
             CollectionAssert.AreEqual(order, _book.HeardInOrder().Select(t => t.id));
 

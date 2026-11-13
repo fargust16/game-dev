@@ -265,3 +265,12 @@ MonoBehaviour:
     requiresKey: tip.sweep.coach.heard
     requiresAtLeast: 1
     needsApproach: 0
+  - id: kit.den
+    source: 2
+    day: 0
+    fromMinute: 480
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: 
+    requiresAtLeast: 1
+    needsApproach: 0

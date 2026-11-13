@@ -29,7 +29,7 @@ namespace GameDev.Slice.Tests
             book.Read(TipSource.NoticeBoard, clock.Tick);
 
             var tips = Catalogue().Tips.ToDictionary(t => t.id);
-            var expected = new[] { "kit.drawers", "kit.coachcoats", "board.girls", "board.wren", "board.seizure" }.Select(id => tips[id].Note).ToList();
+            var expected = new[] { "kit.drawers", "kit.coachcoats", "kit.den", "board.girls", "board.wren", "board.seizure" }.Select(id => tips[id].Note).ToList();
             CollectionAssert.AreEqual(expected, notes.Lines);
             CollectionAssert.AreEqual(expected, added, "each fact is noted once, when found");
             director.Dispose();

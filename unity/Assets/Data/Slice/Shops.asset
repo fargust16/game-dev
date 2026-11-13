@@ -48,6 +48,12 @@ MonoBehaviour:
     - lockpicks
     equipment: 1
     lessons: []
+  - keeper: harrow
+    sells: []
+    equipment: 0
+    lessons:
+    - alchemy
+    workshop: 0
   shopSkill: 26
   skillPerDay: 1
   opens: 8

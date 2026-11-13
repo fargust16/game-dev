@@ -154,6 +154,9 @@ namespace GameDev.Slice
         [Tooltip("Кража из кармана (клип Gather2).")]
         public WorkTiming Pickpocketing = new WorkTiming(0.60f);
 
+        [Tooltip("Варка зелья за алхимическим столом (клип Interact): каждая из шести проверок. Левая рука дальше всего, по замеру, на 0.77 с.")]
+        public WorkTiming Brewing = new WorkTiming(0.77f);
+
         [Header("Инструменты в руке: поправка к хвату, видна сразу во время работы")]
         public ToolGrip Axe = new ToolGrip();
 
@@ -202,6 +205,8 @@ namespace GameDev.Slice
                     return Kneeling;
                 case "Gather2":
                     return Pickpocketing;
+                case "Interact":
+                    return Brewing;
                 default:
                     return null;
             }

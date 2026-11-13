@@ -45,6 +45,24 @@ namespace GameDev.Slice.EditorTools
         private const string OutputFolder = "Logs/SliceSurvey";
 
         /// <summary>
+        /// S5b.4: the work states the player's controller lacks (brewing's Interact) added in place, and the woman's override
+        /// renewed over them; batch runs use it through -executeMethod.
+        /// </summary>
+        [MenuItem("GameDev/Slice/People/Add the Player's Missing Work States")]
+        public static void AddPlayerWorkStates()
+        {
+            var added = SliceClips.AddWorkStates(PlayerController);
+            var player = AssetDatabase.LoadAssetAtPath<AnimatorController>(PlayerController);
+            if (player != null)
+            {
+                SliceClips.WomanOverride(player, WomanPlayerController);
+            }
+
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[SlicePeopleModels] work states added to the player's controller: {(added.Count > 0 ? string.Join(", ", added) : "none")}.");
+        }
+
+        /// <summary>
         /// Authoring default: the player's locomotion plays a clip at most this much faster, so a step keeps a human
         /// cadence; where a clip's in-place stride is shorter than the player's speed, the feet slide the rest.
         /// </summary>

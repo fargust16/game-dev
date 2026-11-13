@@ -81,6 +81,9 @@ namespace GameDev.Slice
             ["Harvest"] = 1.27f,
             ["Kneel"] = 4.30f,
             ["Gather2"] = 0.60f,
+
+            // Brewing (S5b.4): Q1 Interact, the left hand furthest out, 0.77 of 2.00 s (measured in AN3).
+            ["Interact"] = 0.77f,
         };
 
         /// <summary>
@@ -114,7 +117,7 @@ namespace GameDev.Slice
         private readonly Dictionary<GameObject, (Vector3 Position, Quaternion Rotation)> _baked = new Dictionary<GameObject, (Vector3, Quaternion)>();
 
         /// <summary>Every work state the player's controller carries: those with a key frame, and the hammer's rebound.</summary>
-        public static readonly string[] Clips = { "Chop", "Mine", "HammerDown", "HammerUp", "Harvest", "Kneel", "Gather2" };
+        public static readonly string[] Clips = { "Chop", "Mine", "HammerDown", "HammerUp", "Harvest", "Kneel", "Gather2", "Interact" };
 
         /// <summary>The tools in the player's right hand, switched off but while the work they are for lasts (<c>SliceTools.Arm</c>).</summary>
         public const string AxeTool = "Tool_Axe";

@@ -506,3 +506,33 @@ ui.character.line,{0}  {1}  ·  {2} % to the next,{0}  {1}  ·  {2} % до сл�
 ui.character.line.top,{0}  {1},{0}  {1}
 ui.character.hint,Every use grows its skill and the attributes behind it. L or Esc closes.,Каждое применение растит свой навык и характеристики за ним. L или Esc — закрыть.
 ui.character.grew,{0} grew to {1},{0}: теперь {1}
+"# Alchemy at the three benches (S5b.4; 20 §3, SLICE_TRIAL §4)"
+ui.skill.alchemy,Alchemy,Алхимия
+ui.lesson.alchemy,Alchemy,Алхимия
+ui.hud.bag.potion,"{0}: {1} perfect, {2} good, {3} bad, {4} kg","{0}: идеальных {1}, хороших {2}, плохих {3}, {4} кг"
+ui.prompt.brew,E  Brew at the bench,E  Варить зелье
+ui.prompt.brew_closed,The bench is closed until {0}:00,Стол закрыт до {0}:00
+ui.prompt.brew_members,The faction's bench: members only,Стол фракции — только для своих
+ui.prompt.brew_barred,"The keeper: ""Not for you. Not ever.""",Сторож: «Не для тебя. Никогда.»
+ui.brew.title.harrow,Harrow's bench,Стол Харроу
+ui.brew.title.faction,The faction's bench,Стол фракции
+ui.brew.title.den,The night kitchen,Ночная кухня
+ui.brew.heading,Alchemy: {0} a brewing,Алхимия: {0} за варку
+ui.brew.heading.free,Alchemy: free for members,Алхимия: бесплатно для своих
+ui.brew.unlearned,Learn Alchemy from Harrow to brew here.,"Чтобы варить здесь, возьмите урок алхимии у Харроу."
+ui.brew.no_formula,You carry no formula.,У вас нет ни одной формулы.
+ui.brew.recipe,"Brew {0}: {1} · six checks, then {2} min","Сварить: {0} — {1} · шесть проверок, затем {2} мин"
+ui.brew.hint,"Click a formula: six checks at the bench, the world still at each, then the brewing's minutes.","Щелчок по формуле: шесть проверок у стола, мир замирает на каждой, затем минуты варки."
+ui.brew.caption,Brewing: Space when the marker is in the zone,"Варка: пробел, когда метка в зоне"
+ui.brew.interrupted,Broken off: nothing spent,Прервано — ничего не потрачено
+ui.brew.made,"Brewed: {0}, in {1} minutes.","Сварено: {0}, за {1} мин."
+ui.brew.made_cut,Brewed: {0}; a fight cut the brewing's time short at {1} min.,Сварено: {0}; бой оборвал время варки на {1} мин.
+ui.brew.message,"{0}: {1} perfect, {2} bad","{0}: идеальных {1}, плохих {2}"
+ui.brew.at_bench,"Potions are brewed at the bench in the laboratory, {0} a brewing.","Зелья варят за столом в лаборатории, {0} за варку."
+ui.brew.fault.member,Only the faction's members brew here.,Здесь варят только члены фракции.
+ui.brew.fault.barred,The keeper won't let you in.,Сторож не пускает вас.
+ui.brew.fault.unknown,You don't know this place.,Вы не знаете этого места.
+ui.brew.fault.closed,The bench is closed now.,Стол сейчас закрыт.
+ui.brew.fault.lesson,Alchemy is not learned.,Алхимия не изучена.
+ui.brew.fault.formula,You carry no formula for it.,У вас нет формулы.
+ui.brew.fault.ingredients,Not enough ingredients.,Не хватает ингредиентов.

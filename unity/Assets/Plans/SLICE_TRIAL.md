@@ -2,7 +2,7 @@
 
 Status: Draft — written by the agent on 2026-11-13 as authoring defaults on the owner's grant of autonomous work for S5, with no review stop; shown to the owner in S5's final report. Every name, line and number here may be changed by the owner.
 Created: 2026-11-13
-Last Updated: 2026-11-13 (first version, D1)
+Last Updated: 2026-11-13 (§1.5, §4: the benches as built in S5b.4: the faction's in its archive, the house having one storey; the den in the warehouse by Tipsy Pier; Kit tells of it every day; no keeper stands at the den's bench (99 VS-BREW). Earlier: first version, D1)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md) *Limited forms* and *The first-day trial*, [05.1 Arcana and Limits](../../../05.1%20Arcana%20and%20Limits.md), [19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.2–6.3, [20 Alchemy and Potioncraft](../../../20%20Alchemy%20and%20Potioncraft.md) §3, [09 Information Sources](../../../09%20Information%20Sources.md) § News Pool, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) S5b, S5c and §5
 Related: [SLICE_PEOPLE.md](SLICE_PEOPLE.md) (the people, their schedules and Чужой сон's lines), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §21, §29 (places)
 
@@ -68,7 +68,7 @@ Thomas lodged alone on the second floor of a tenement on Draught Lane, in Lower 
 | Ashgrave, asked who they are | "We keep the church's quiet business. The rest you hear once you're one of us." |
 | Ashgrave, the cache handed in | "So he went to them. Father Hale at the old chapel will vouch for you. Go now; I'll send word." |
 | Father Hale | "Ashgrave's sent me another one. Tell me, child: why do you want to serve?" — any answer — "Then go with God, and with Ashgrave. I'll put my name to you." |
-| Ashgrave, the entry | "Welcome to the quiet business. This is what we drink to see more than other men. Harrow teaches the brewing; the bench upstairs is yours." |
+| Ashgrave, the entry | "Welcome to the quiet business. This is what we drink to see more than other men. Harrow teaches the brewing; the table in the archive is yours." |
 | Ashgrave, at Limit 9 | "You've drunk and you're still yourself. Good. Here is the next step. Don't rush it." |
 
 ---
@@ -134,16 +134,16 @@ The three benches of 20 §3 *Where brewing is done*. Every bench needs the Alche
 
 | Bench | Where | Open | Fee | Who may use it |
 |---|---|---|---|---|
-| Harrow's bench | The back room of Harrow & Tincture, the Black Puddle | 08:00–20:00, while the shop is open | 100 bronze | Anyone. While Harrow is gone after POI A, Pip opens the shop and the bench (11) |
-| The faction's bench | The upper room of the faction's house, Quiet Whistle Garden | 07:00–23:00 | Free | Members |
-| Veinmarket's den | A warehouse on the quay in Lower Veil, its door marked with Veinmarket's chalk hook | 22:00–05:00 | 300 bronze | Anyone who has heard of it, unless it went against Veinmarket in POI B (`against.veinmarket`) |
+| Harrow's bench | The lab bench in the laboratory of Harrow & Tincture, the Black Puddle | 08:00–20:00, while the shop is open | 100 bronze | Anyone. While Harrow is gone after POI A, Pip opens the shop and the bench (11) |
+| The faction's bench | The reading table of the archive in the faction's house, Quiet Whistle Garden; the house has one storey | 07:00–23:00 | Free | Members |
+| Veinmarket's den | The office desk of the warehouse by Tipsy Pier in Lower Veil (`dwelling.1480.315`), its door marked with Veinmarket's chalk hook | 22:00–05:00 | 300 bronze | Anyone who has heard of it, unless it went against Veinmarket in POI B (`against.veinmarket`) |
 
 **Hearing of the den.** Its door is an ordinary locked warehouse door until the character knows it. Two sources tell it, each a Tip that enters the Character Notes:
 
-- Kit Mallow, on day 1 or 2 by the seed: "Night-cooks by the quay. Hook in chalk on the door. Don't knock before ten."
+- Kit Mallow, every day from 08:00 (S5b.4; first written as day 1 or 2 by the seed, which a tip's fixed day cannot draw): "Night-cooks by the quay. Hook in chalk on the door. Don't knock before ten."
 - Dace, asked about brewing at the Soot & Bell or on Draught Lane at night, when Harrow's shop is closed: "Harrow's not the only kettle in town. Warehouse by Tipsy Pier, the hooked one. Ten o'clock, bring silver."
 
-A nameless Veinmarket keeper takes the fee. To one who went against Veinmarket in POI B the keeper says "Not for you. Not ever." and the door stays shut.
+Until the character has heard of it the warehouse has no bench. The fee is paid at the bench: in S5b.4 no keeper stands there, and the keeper is the bench's prompt to one who went against Veinmarket in POI B, "Not for you. Not ever." The door's lock, shut to one who has not heard of the den or is barred from it, comes with the break-ins (S5c.5).
 
 ---
 

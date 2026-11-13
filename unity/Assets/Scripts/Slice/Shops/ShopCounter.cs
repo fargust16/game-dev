@@ -109,8 +109,15 @@ namespace GameDev.Slice.Shops
                 return;
             }
 
-            var lines = new List<PageLine> { new PageLine(Loc.Get("ui.shop.for_sale"), heading: true) };
-            foreach (var thing in shops.Shelf(Keeper))
+            // Harrow sells nothing and teaches Alchemy (S5b.4): a shop with an empty shelf shows no heading for it.
+            var shelf = shops.Shelf(Keeper);
+            var lines = new List<PageLine>();
+            if (shelf.Count > 0)
+            {
+                lines.Add(new PageLine(Loc.Get("ui.shop.for_sale"), heading: true));
+            }
+
+            foreach (var thing in shelf)
             {
                 var t = thing;
                 lines.Add(new PageLine(ThingLine(t), () => Act(shops.Buy(Keeper, t), "ui.shop.bought", t.Item)));
@@ -134,6 +141,12 @@ namespace GameDev.Slice.Shops
             {
                 // Item Creation is worked at the anvil in the yard, not at the counter (the owner's play test of S5a).
                 lines.Add(new PageLine(Loc.Format("ui.craft.at_anvil", Coins.Show(world.Workshop.Rules.WorkshopFee))));
+            }
+
+            if (shop.lessons.Contains(GameDev.Slice.Alchemy.SliceAlchemy.Lesson) && world.Alchemy != null)
+            {
+                // Potions are brewed at the bench in the laboratory, not at the counter (20 §3, S5b.4).
+                lines.Add(new PageLine(Loc.Format("ui.brew.at_bench", Coins.Show(GameDev.Slice.Alchemy.SliceAlchemy.HarrowFee))));
             }
 
             var sellable = shops.Sellable(Keeper, p => world.Outfit != null && world.Outfit.IsWorn(p));

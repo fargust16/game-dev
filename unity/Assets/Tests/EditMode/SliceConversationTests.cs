@@ -156,7 +156,7 @@ namespace GameDev.Slice.Tests
             Begin(8 * 60);
             var kit = Talk("KitDialogue");
 
-            CollectionAssert.AreEqual(new[] { "kit.drawers", "kit.coachcoats" }, kit.Said.Select(t => t.id));
+            CollectionAssert.AreEqual(new[] { "kit.drawers", "kit.coachcoats", "kit.den" }, kit.Said.Select(t => t.id), "and Veinmarket's den every day (S5b.4)");
             Assert.AreEqual(PoiDiscovery.Hinted, _director.Discovery(_poiB), "one Hinted source only hints B");
             kit.Choose(kit.Options.Single(o => o.id == "leave"));
             Assert.IsFalse(kit.IsOpen);

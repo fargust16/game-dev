@@ -114,6 +114,9 @@ namespace GameDev.Slice.Dwellings
 
             // The door's arrival looks for the floor under it, which the physics scene knows only once synced.
             Physics.SyncTransforms();
+
+            // Veinmarket's den keeps its bench on its office desk, for one who heard of it (S5b.4; SLICE_TRIAL §4).
+            GameDev.Slice.Alchemy.AlchemyBench.AtDwelling(key.DwellingId, _built);
             return door;
         }
 

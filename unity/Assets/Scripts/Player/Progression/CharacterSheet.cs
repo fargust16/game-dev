@@ -66,6 +66,8 @@ namespace GameDev.Player.Progression
         /// <summary>10.2 §5f, 05.1: the abilities of the character's own Arcana, aimed with Intelligence.</summary>
         Arcana,
 
+        /// <summary>20 §3: a brewing check takes `(Intelligence + Alchemy) / 2` against the potion's difficulty (S5b.4).</summary>
+        Alchemy,
     }
 
     /// <summary>What a check reads of a character.</summary>

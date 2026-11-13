@@ -681,3 +681,119 @@ MonoBehaviour:
     recipe:
     - item: iron_ore
       count: 3
+  - id: formula_priestess_9
+    kind: 5
+    weight: 0
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 9
+    family:
+    fight: {fileID: 0}
+    recipe: []
+    arcana: 1
+  - id: formula_priestess_8
+    kind: 5
+    weight: 0
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 8
+    family:
+    fight: {fileID: 0}
+    recipe: []
+    arcana: 1
+  - id: formula_emperor_9
+    kind: 5
+    weight: 0
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 9
+    family:
+    fight: {fileID: 0}
+    recipe: []
+    arcana: 2
+  - id: formula_emperor_8
+    kind: 5
+    weight: 0
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 8
+    family:
+    fight: {fileID: 0}
+    recipe: []
+    arcana: 2
+  - id: potion_priestess_9
+    kind: 6
+    weight: 0.2
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 9
+    family:
+    fight: {fileID: 0}
+    recipe:
+    - item: herb
+      count: 3
+    - item: wolf_fang
+      count: 1
+    - item: glow_essence_9
+      count: 1
+    arcana: 1
+  - id: potion_priestess_8
+    kind: 6
+    weight: 0.2
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 8
+    family:
+    fight: {fileID: 0}
+    recipe:
+    - item: herb
+      count: 4
+    - item: wolf_fang
+      count: 2
+    - item: flax
+      count: 1
+    - item: glow_essence_8
+      count: 1
+    arcana: 1
+  - id: potion_emperor_9
+    kind: 6
+    weight: 0.2
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 9
+    family:
+    fight: {fileID: 0}
+    recipe:
+    - item: herb
+      count: 2
+    - item: boar_tusk
+      count: 1
+    - item: glow_essence_9
+      count: 1
+    arcana: 2
+  - id: potion_emperor_8
+    kind: 6
+    weight: 0.2
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 8
+    family:
+    fight: {fileID: 0}
+    recipe:
+    - item: herb
+      count: 3
+    - item: boar_tusk
+      count: 2
+    - item: iron_ore
+      count: 1
+    - item: glow_essence_8
+      count: 1
+    arcana: 2

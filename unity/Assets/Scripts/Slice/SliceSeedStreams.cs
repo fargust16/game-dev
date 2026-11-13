@@ -47,6 +47,9 @@ namespace GameDev.Slice
         /// <summary>A piece made at a workshop (S5a.4; 19 §3); fork it with the count of pieces made before it.</summary>
         public const string Workshop = "slice.workshop";
 
+        /// <summary>A brewing check's bar (S5b.4; 20 §3); fork it with the count of potions brewed before and the check's number.</summary>
+        public const string Alchemy = "slice.alchemy";
+
         /// <summary>A gathering cycle (S5a.5; 19 §6.4); fork it with the tick and the node's id hashed.</summary>
         public const string Gathering = "slice.gathering";
 
@@ -87,7 +90,7 @@ namespace GameDev.Slice
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
             ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens, Roles, Search, Shots, Boldness, News, GodNotices,
-            Prepared,
+            Prepared, Alchemy,
 
         };
     }

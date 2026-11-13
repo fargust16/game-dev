@@ -125,6 +125,9 @@ namespace GameDev.World.Poi
             }
         }
 
-        private static string HeardKey(Tip tip) => "tip." + tip.id + ".heard";
+        private static string HeardKey(Tip tip) => HeardKeyOf(tip.id);
+
+        /// <summary>The world state key set once the tip <paramref name="id"/> is heard, its value the order it was heard in.</summary>
+        public static string HeardKeyOf(string id) => "tip." + id + ".heard";
     }
 }

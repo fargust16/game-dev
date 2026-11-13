@@ -98,7 +98,7 @@ namespace GameDev.Slice.Tests
             yield return Tap(Key.E);
 
             Assert.IsTrue(hud.IsDialogueOpen, "Interact opens the dialogue column");
-            CollectionAssert.AreEqual(new[] { Loc.Get("tip.kit.drawers.line"), Loc.Get("tip.kit.coachcoats.line") }, hud.DialogueLines,
+            CollectionAssert.AreEqual(new[] { Loc.Get("tip.kit.drawers.line"), Loc.Get("tip.kit.coachcoats.line"), Loc.Get("tip.kit.den.line") }, hud.DialogueLines,
                 "the morning's rumours, said on arriving");
             CollectionAssert.AreEqual(new[] { "1. " + Loc.Get("dialogue.kit.news.leave") }, hud.DialogueOptions);
             Assert.IsFalse(hud.IsPromptVisible, "no prompt while talking");

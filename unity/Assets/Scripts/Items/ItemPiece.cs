@@ -23,13 +23,22 @@ namespace GameDev.Items
         public float value;
     }
 
-    /// <summary>One piece of equipment: its base, stage and modifiers. Pieces are carried one by one, never stacked.</summary>
+    /// <summary>
+    /// One piece of equipment, its base, stage and modifiers, or one Limit potion with what its brewing gave (S5b.4). Pieces
+    /// are carried one by one, never stacked.
+    /// </summary>
     [Serializable]
     public sealed class ItemPiece
     {
         public string item;
         public int stage = 9;
         public List<ItemModifier> modifiers = new List<ItemModifier>();
+
+        /// <summary>A potion's perfect results of its six brewing checks (20 §3); 0 for equipment.</summary>
+        public int perfect;
+
+        /// <summary>A potion's bad results of its six brewing checks (20 §3); 0 for equipment.</summary>
+        public int bad;
 
         public ItemPiece(string itemId, int itemStage = 9)
         {

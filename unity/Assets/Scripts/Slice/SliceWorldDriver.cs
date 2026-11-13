@@ -81,6 +81,9 @@ namespace GameDev.Slice
         /// <summary>Edda Brann's workshop (S5a.4); null without the shops.</summary>
         public SliceWorkshop Workshop { get; private set; }
 
+        /// <summary>Alchemy at the three benches (S5b.4; 20 §3); null without the shops.</summary>
+        public GameDev.Slice.Alchemy.SliceAlchemy Alchemy { get; private set; }
+
         /// <summary>The character's Stamina (S5a.5; 07.2 §3.2); null without the gathering rules.</summary>
         public SliceStamina Stamina { get; private set; }
 
@@ -330,6 +333,7 @@ namespace GameDev.Slice
             {
                 Shops = new SliceShops(settings.Shops, settings.Items, seed, Clock, Bag, State);
                 Workshop = new SliceWorkshop(Shops, settings.Items, seed, Clock, Bag, State, Character);
+                Alchemy = new GameDev.Slice.Alchemy.SliceAlchemy(Shops, settings.Items, seed, Clock, Bag, State, Character);
                 OpenCounters();
             }
 
@@ -951,6 +955,8 @@ namespace GameDev.Slice
                 added |= Workshop != null && Shops.Find(person.Id)?.workshop == true && OpenAnvil(person);
             }
 
+            added |= Alchemy != null && OpenBenches();
+
             var hud = Hud();
             if (added && hud != null)
             {
@@ -979,6 +985,40 @@ namespace GameDev.Slice
 
             anvil.gameObject.AddComponent<CraftStation>().Configure(master.Id);
             return true;
+        }
+
+        /// <summary>The apothecary's scene, whose lab bench is Harrow's (S5b.4).</summary>
+        public const string HarrowScene = "HarrowApothecary";
+
+        /// <summary>The faction house's scene, whose archive table is the members' bench (S5b.4; SLICE_TRIAL §4).</summary>
+        public const string FactionHouseScene = "FactionHouse";
+
+        /// <summary>
+        /// 20 §3 *Where brewing is done* (S5b.4): Harrow's lab bench in the apothecary's laboratory, and the reading table of
+        /// the faction house's archive, the house having one storey, become alchemy benches; the den's comes with its
+        /// dwelling (<see cref="GameDev.Slice.Alchemy.AlchemyBench.AtDwelling"/>). True when one was opened now.
+        /// </summary>
+        private static bool OpenBenches()
+        {
+            var added = false;
+            foreach (var block in FindObjectsByType<KitBlock>(FindObjectsInactive.Exclude))
+            {
+                var scene = block.gameObject.scene.name;
+                GameDev.Slice.Alchemy.BenchKind? kind = scene == HarrowScene && block.name.StartsWith("Kit_BkFurniture_LabBench")
+                    ? GameDev.Slice.Alchemy.BenchKind.Harrow
+                    : scene == FactionHouseScene && block.name.StartsWith("Kit_ViFurniture_Table_")
+                        ? GameDev.Slice.Alchemy.BenchKind.Faction
+                        : null;
+                if (kind == null || block.GetComponent<GameDev.Slice.Alchemy.AlchemyBench>() != null)
+                {
+                    continue;
+                }
+
+                block.gameObject.AddComponent<GameDev.Slice.Alchemy.AlchemyBench>().Configure(kind.Value);
+                added = true;
+            }
+
+            return added;
         }
 
         private void Refresh()

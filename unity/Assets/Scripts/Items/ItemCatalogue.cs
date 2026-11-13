@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameDev.Player.Progression;
 using UnityEngine;
 
 namespace GameDev.Items
 {
-    /// <summary>What an item is for (19 §4.1): stacked goods, or a piece of equipment carried one by one.</summary>
+    /// <summary>What an item is for (19 §4.1): stacked goods, or a piece of equipment or a potion carried one by one.</summary>
     public enum ItemKind
     {
         Resource,
@@ -13,6 +14,12 @@ namespace GameDev.Items
         Tool,
         Supply,
         Equipment,
+
+        /// <summary>A written note of weight 0, a Limit potion's formula (11; S5b.4): it stacks, and no shop buys it.</summary>
+        Note,
+
+        /// <summary>A Limit potion (20 §3; S5b.4): carried one by one, each with what its brewing's six checks gave.</summary>
+        Potion,
     }
 
     /// <summary>Where a piece of equipment goes (19 §4.2). A hand item goes in either hand, a two-handed one in both.</summary>
@@ -76,12 +83,15 @@ namespace GameDev.Items
         [Tooltip("Equipment: its numbers in a fight, 10.2 §5b: a weapon, a shield or the pouch, or the whole set of its armour family (S5a.2).")]
         public ScriptableObject fight;
 
-        [Tooltip("Equipment: what a stage 9 piece is made of at a workshop (19 §3); empty for a base nobody makes.")]
+        [Tooltip("Equipment: what a stage 9 piece is made of at a workshop (19 §3); a potion: its formula's ingredients (SLICE_TRIAL §2); empty for anything nobody makes.")]
         public RecipePart[] recipe = new RecipePart[0];
+
+        [Tooltip("A Limit potion's Arcana (05.1); None for anything else. Its Limit is the stage.")]
+        public Arcana arcana;
 
         public string NameKey => $"item.{id}";
 
-        public bool Stacks => kind != ItemKind.Equipment;
+        public bool Stacks => kind != ItemKind.Equipment && kind != ItemKind.Potion;
     }
 
     /// <summary>Every item of the slice as data (S5a.1), found by id.</summary>
