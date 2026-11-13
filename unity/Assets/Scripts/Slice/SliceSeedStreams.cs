@@ -89,11 +89,14 @@ namespace GameDev.Slice
         /// <summary>Which active abilities an NPC prepares when its slots hold fewer than it knows (07.2 §4.5; COMBAT-8 (c), CR7); fork it with the person's name hashed.</summary>
         public const string Prepared = "slice.prepared";
 
+        /// <summary>A Will Contest of an ability out of a fight (05.1 *Вне боя*, S5b.8); fork it with the ability and the person hashed and the tick.</summary>
+        public const string Abilities = "slice.abilities";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
             ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens, Roles, Search, Shots, Boldness, News, GodNotices,
-            Prepared, Alchemy,
+            Prepared, Alchemy, Abilities,
 
         };
     }

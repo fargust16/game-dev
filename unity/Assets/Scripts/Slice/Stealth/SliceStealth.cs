@@ -58,6 +58,15 @@ namespace GameDev.Slice.Stealth
 
         public event Action<StealthObserver> Noticed;
 
+        /// <summary>05.1 Двойник out of a fight (S5b.8): no cone sees the character meanwhile.</summary>
+        public bool Unseen { get; set; }
+
+        /// <summary>05.1 Пелена out of a fight (S5b.8): a cloud between an eye and the character puts the look out.</summary>
+        public Func<Vector3, Vector3, bool> Screened { get; set; }
+
+        /// <summary>05.1 Родство (S5b.8): an observer that senses the character, walls or no walls, a follower of its Arcana near.</summary>
+        public Func<StealthObserver, bool> Kin { get; set; }
+
         /// <summary>S4.4: the world state key the black drop raises when drunk (11.1 *Slice build (S4)*; 99 VS-DROP).</summary>
         public const string FogKey = "bargain.black_drop";
 
@@ -176,9 +185,20 @@ namespace GameDev.Slice.Stealth
         /// <summary>Whether the observer has the character in its cone and in sight.</summary>
         public bool Sees(StealthObserver o, Vector3 feet, bool crouching)
         {
+            if (Kin != null && Kin(o))
+            {
+                return true; // 05.1 Родство: it senses the character, the price of the Arcana
+            }
+
+            if (Unseen)
+            {
+                return false;
+            }
+
             var eye = o.transform.position + (Vector3.up * (o.EyeHeight > 0f ? o.EyeHeight : _rules.EyeHeight));
             var head = feet + (Vector3.up * (crouching ? _rules.CrouchHeight : StandingHeight));
-            return _rules.InCone(o.transform.position, o.transform.forward, feet, 1f) && !Blocked(eye, head, o.transform, _player.transform);
+            return _rules.InCone(o.transform.position, o.transform.forward, feet, 1f) && !Blocked(eye, head, o.transform, _player.transform)
+                   && (Screened == null || !Screened(eye, head));
         }
 
         private void Update()

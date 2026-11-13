@@ -175,6 +175,11 @@ namespace GameDev.Slice.Stealth
         {
             var at = o.MarkPosition;
             var line = Time.time < o.LineUntil ? o.Line : null;
+            if (line == null && _stealth.Kin != null && _stealth.Kin(o))
+            {
+                line = Loc.Get("ui.ability.kinship.mark"); // 05.1 Родство (S5b.8): the character senses a follower
+            }
+
             var meter = showMeter && o.Meter != null && o.Meter.Fill > 0f;
             var near = (at - eye).sqrMagnitude < MarkReach * MarkReach && Vector3.Dot(camera.transform.forward, at - eye) > 0f;
             if (!near || (!meter && line == null))

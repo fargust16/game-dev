@@ -77,16 +77,16 @@ namespace GameDev.Slice.Fights
                     lines.Add(new PageLine(text, () => Toggle(ability)));
                 }
 
-                if (known.Exists(a => !a.Passive && !a.InFight))
+                // 05.1 *Вне боя* (S5b.8): every active ability with a use out of a fight, open there without a slot, by its key.
+                var outside = _fights.OutsideAbilities();
+                if (outside.Count > 0)
                 {
                     lines.Add(new PageLine(Loc.Get("ui.prepared.outside"), heading: true));
-                    foreach (var a in known)
+                    for (var i = 0; i < outside.Count && i < 9; i++)
                     {
-                        if (!a.Passive && !a.InFight)
-                        {
-                            lines.Add(new PageLine(Loc.Format("ui.prepared.line", Loc.Get("ui.prepared.mark.open"), Loc.Get($"ability.{a.Key}.name"),
-                                Mathf.RoundToInt(a.Cost * 100f))));
-                        }
+                        var a = outside[i];
+                        lines.Add(new PageLine(Loc.Format("ui.prepared.line", (i + 1).ToString(System.Globalization.CultureInfo.InvariantCulture),
+                            Loc.Get($"ability.{a.Key}.name"), Mathf.RoundToInt(a.Cost * 100f)) + "  ·  " + Loc.Get($"ability.{a.Key}.outside")));
                     }
                 }
 

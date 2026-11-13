@@ -432,7 +432,7 @@ ui.prepared.changed,The set is changed; a tick has passed.,"Набор изме�
 ui.dev.arcana,"Development: {0}, Limit {1}","Разработка: {0}, Предел {1}"
 ui.dev.arcana.none,Development: no Arcana,Разработка: без Аркана
 ui.fight.log.ability.self.failed,"{0}: {1}, to no effect",{0}: {1} — не подействовало
-ui.prepared.outside,"Out of a fight: always open, no slot","Вне боя: открыты всегда, без ячейки"
+ui.prepared.outside,"Out of a fight, by the keys 1–9: no slot","Вне боя, клавиши 1–9: без ячейки"
 ui.prepared.mark.open,◇,◇
 ui.fight.ability.point,{0}: pick a place,{0}: выберите место
 ui.fight.ability.press,"{0}: strikes {1} enemies, {2} of yours","{0}: заденет врагов: {1}, своих: {2}"
@@ -566,3 +566,32 @@ ui.conduct.deed.emperor,"Your will bent the world a little, and the potion in yo
 ui.conduct.ready,"The potion has taken root in you: you are ready for the next.","Зелье укоренилось в вас: вы готовы к следующему."
 ui.conduct.against.priestess,"The quiet in you frays.","Тишина внутри вас истончается."
 ui.conduct.against.emperor,"You gave ground, and the potion in you recoils.","Вы уступили, и зелье внутри вас противится."
+"# 05.1 *Вне боя*: the abilities out of a fight (SliceConfront.Outside, S5b.8)"
+ui.ability.fault.unknown,This cannot be used now.,Сейчас это не применить.
+ui.ability.fault.on,It is already in effect.,Это уже действует.
+ui.ability.fault.target,Nobody in front within reach.,Впереди никого в пределах досягаемости.
+ui.ability.fault.sleeper,Nobody asleep within reach of a touch.,"Рядом нет спящего, до кого дотянуться."
+ui.ability.fault.wp,Not enough Will Power.,Не хватает Силы воли.
+ui.ability.suggestion.on,Your next words will carry further.,Ваши следующие слова прозвучат убедительнее.
+ui.ability.suggestion.noticed,"The attempt was noticed, and not liked.","Попытку заметили, и она не понравилась."
+ui.ability.screen.raised,A haze gathers where you looked.,"Там, куда вы смотрели, сгущается дымка."
+ui.ability.drowse.slept,Their eyes close: they sink into sleep.,Глаза закрываются: человек погружается в сон.
+ui.ability.drowse.failed,They shake the sleep off and stare at you.,Человек стряхивает сон и смотрит на вас.
+ui.ability.halt.frozen,They freeze where they stand.,Человек замирает на месте.
+ui.ability.halt.failed,The order breaks against their will.,Приказ разбивается о чужую волю.
+ui.ability.dream.noted,A shred of their memory: you note it down.,Обрывок чужой памяти: вы заносите его в заметки.
+ui.ability.dream.line,A dream: {0},Чужой сон: {0}
+ui.ability.dream.empty,"Their dream is murk: smoke, whistles, footsteps.","Чужой сон мутен: дым, гудки, чьи-то шаги."
+ui.ability.dream.failed,"The sleeper wakes with a start, and your head rings.","Спящий вздрагивает и просыпается, а у вас звенит в голове."
+ui.ability.double.on,"Your double stays where you stood, and you are seen no more.","Ваш двойник остаётся на месте, а вас больше не видно."
+ui.ability.double.off,The double scatters: you are seen again.,Двойник рассыпается: вас снова видно.
+ui.ability.startled,What are you doing?,Что это вы делаете?
+ui.ability.exhausted,Your Will Power is spent to the last drop.,Сила воли выжата до последней капли.
+ui.ability.keen_ear.lie,[a lie],[ложь]
+ui.ability.kinship.mark,◆ kin,◆ родство
+ability.suggestion.outside,+2 to the next Persuasion check,+2 к следующей проверке Убеждения
+ability.screen.outside,a haze of 3×3 m within 8 m for 2 ticks; no cone sees through it,дымка 3×3 м в пределах 8 м на 2 тика; конусы зрения сквозь неё не видят
+ability.drowse.outside,one person within 6 m sleeps about 10 ticks if Will gives way,"человек в пределах 6 м спит около 10 тиков, если не устоит по Воле"
+ability.dream_touch.outside,"a sleeper's memory, a line in the notes","память спящего, строка в заметках"
+ability.double.outside,unseen for 1 tick or until you strike,невидимость на 1 тик или до удара
+ability.halt.outside,one person within 8 m freezes for 2 ticks and calls no help,человек в пределах 8 м замирает на 2 тика и не зовёт на помощь

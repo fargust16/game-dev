@@ -46,6 +46,7 @@ namespace GameDev.Slice.Fights
                 return false;
             }
 
+            OutsideFightBegins(); // S5b.8: Двойник's veil falls, and those held whom it takes wake
             _conductSettles = settles;
             _conductWayOut = false;
             var ours = new List<Fighter>();

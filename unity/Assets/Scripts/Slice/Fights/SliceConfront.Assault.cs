@@ -118,7 +118,18 @@ namespace GameDev.Slice.Fights
             _playerCombatant = player;
 
             var warden = PeopleAround.IsWarden(victim);
+            var frozen = HeldStill.Frozen(victim); // 05.1 Стой! out of a fight (S5b.8): it calls no help
+            var asleep = HeldStill.Sleeping(victim);
             var struck = Person(victim, warden ? Wardens : Residents, 1, fighter);
+            if (frozen)
+            {
+                struck.Fighter.LostTurns = Math.Max(struck.Fighter.LostTurns, 1); // it stands frozen, its turn lost
+            }
+
+            if (asleep)
+            {
+                struck.Fighter.Asleep = Math.Max(struck.Fighter.Asleep, 1); // Дрёма: struck asleep, the blow wakes it
+            }
             _bodies[struck] = victim;
             combatants.Add(struck);
             _nextId = 2;
@@ -133,17 +144,21 @@ namespace GameDev.Slice.Fights
             // 10.2 §5e: the cry is an Alarm, and every free Warden who hears it runs to the place, joining at the end of
             // the round by which it is there.
             Assaulting = true;
-            SliceAlarm.Raise(new Alarm(AlarmKind.Call, _assaultAt, victim));
+            if (!frozen)
+            {
+                SliceAlarm.Raise(new Alarm(AlarmKind.Call, _assaultAt, victim));
+            }
+
             if (!warden)
             {
                 // 10.2 §5a: a resident fights back only with a chance, and otherwise runs for help to a post that did not answer.
                 struck.FightsAt = FightsBackAt;
-                struck.HelpAt = HelpFor(victim);
+                struck.HelpAt = frozen ? null : HelpFor(victim);
             }
 
             var lawful = new List<Fighter> { struck.Fighter };
             lawful.AddRange(_coming.ConvertAll(k => k.Combatant.Fighter));
-            var joined = JoinTheCall(player.Fighter, lawful, victim, ref _nextId);
+            var joined = frozen ? 0 : JoinTheCall(player.Fighter, lawful, victim, ref _nextId); // no call, nobody joins it
             Debug.Log($"[Confront] the call: {_coming.Count} Wardens coming, {joined} residents join.");
 
             // The blow is the fight's opening strike, a stealth attack only from Stealth Mode (10.3 §7); a shot rolled on

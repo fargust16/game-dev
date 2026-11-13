@@ -391,6 +391,8 @@ namespace GameDev.Slice
                 if (Fights != null)
                 {
                     Fights.Hiding = Hiding;
+                    Hiding.Screened = Fights.Screened; // 05.1 Пелена out of a fight (S5b.8)
+                    Hiding.Kin = Fights.SensesKin;     // 05.1 Родство
                 }
 
                 if (settings.BeastRules != null)
@@ -442,8 +444,14 @@ namespace GameDev.Slice
                 Tips = Tips,
                 Withheld = new HashSet<Approach> { Approach.Veil },
                 MindPenalty = () => Mind.SocialPenalty,
+                SkillBonus = skill => Fights != null ? Fights.SuggestionFor(skill) : 0,
                 Checked = TalkChecked,
             };
+            if (Fights != null)
+            {
+                // 05.1 *Вне боя* (S5b.8): the keys use the abilities only in free exploration.
+                Fights.OutsideBusy = () => (Work != null && Work.Busy) || PageOpen() || (Advancement != null && Advancement.Assimilating);
+            }
             Notes = new CharacterNotes(Tips);
             Notes.Added += _ => Refresh();
             State.Changed += (_, _, _) => Refresh();
@@ -477,6 +485,8 @@ namespace GameDev.Slice
             {
                 Conduct.Checked(option.approach, listener, option.success != null && option.success.settles != null);
             }
+
+            Fights?.Persuaded(option.skill, listener, success); // 05.1 Внушение is spent on the check
         }
 
         /// <summary>The character's Sanity, its band and Fatigue, and what they take away (S5b.6; 07.2 §3.3–3.4).</summary>
@@ -1198,6 +1208,7 @@ namespace GameDev.Slice
             }
 
             hud.ShowStamina((float)Stamina.Share, tired);
+            hud.ShowWillPower(Fights != null && !Fights.InFight ? Fights.WillPowerShare : 1f); // S5b.8: out of a fight
         }
 
         /// <summary>

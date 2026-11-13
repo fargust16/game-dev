@@ -198,7 +198,8 @@ namespace GameDev.Slice.People
             var attitude = _world.Standing.Attitude(Listener);
             var standing = _world.Standing.Reading(skill, false);
             var mind = _world.Mind != null ? _world.Mind.SocialPenalty : 0; // 07.2 §3.3–3.4
-            var modifiers = SocialCheck.Modifiers(rules, attitude + standing.Modifier + mind);
+            var bonus = _world.Fights != null ? _world.Fights.SuggestionFor(skill) : 0; // 05.1 Внушение (S5b.8)
+            var modifiers = SocialCheck.Modifiers(rules, attitude + standing.Modifier + mind + bonus);
             var chance = SocialCheck.Chance(rules, characterValue, modifiers, difficulty, _world.Character.Get(CharacterAttribute.Luck));
             return new CheckPreview(chance, characterValue, listenerValue, difficulty, attitude, standing, 0, modifiers);
         }
@@ -212,6 +213,7 @@ namespace GameDev.Slice.People
             listener.Set(CharacterAttribute.Intelligence, ListenerValues);
             listener.Set(CharacterAttribute.Will, ListenerValues);
             SocialCheck.Train(_world.Character, CharacterSkill.Persuasion, listener, success);
+            _world.Fights?.Persuaded(CharacterSkill.Persuasion, Listener, success);
             if (success)
             {
                 _world.Conduct?.Deed(GameDev.Slice.Alchemy.ConductDeed.Convince, "accusation." + Path(_warden)); // 05.1

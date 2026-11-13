@@ -150,6 +150,9 @@ namespace GameDev.Dialogue
         [Tooltip("The source whose tips it says, with Says Tips.")]
         public TipSource source;
 
+        [Tooltip("The speaker lies in its line: Чуткое ухо marks it (05.1, S5b.8).")]
+        public bool lies;
+
         public DialogueOption[] options = new DialogueOption[0];
     }
 

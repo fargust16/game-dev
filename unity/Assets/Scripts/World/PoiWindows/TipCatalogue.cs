@@ -20,6 +20,9 @@ namespace GameDev.World.Poi
 
         /// <summary>09 §6: someone tied to a scene, who tells by Convince, Threaten, or Exchange (S4.2).</summary>
         Witness,
+
+        /// <summary>05.1 Чужой сон: a sleeper's fragment, told only by a touch (S5b.8; SLICE_PEOPLE §5).</summary>
+        Dream,
     }
 
     /// <summary>What hearing a tip does to its POI (09 *Hinted to Marked*): a tip that names a place a person can walk to Marks it, one that names only a district, a kind of event, or a time Hints it.</summary>

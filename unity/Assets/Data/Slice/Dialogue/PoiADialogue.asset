@@ -305,6 +305,7 @@ MonoBehaviour:
     speaker: wardens
     saysTips: 0
     source: 0
+    lies: 1
     options:
     - id: retreat
       approach: 0

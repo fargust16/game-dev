@@ -90,6 +90,11 @@ namespace GameDev.Slice.Fights
 
             var result = RollShot(fighter, from, beast.transform.position, beast.Glowing);
             beast.Hp = fighter.Hp;
+            if (result.Hit)
+            {
+                EndDouble(true); // 05.1 Двойник: the damage it deals ends it (S5b.8)
+            }
+
             Debug.Log($"[Confront] a shot touched the {beast.Kind}: {(result.Hit ? $"hit for {result.Damage:0.#}" : "grazed")}, {fighter.Hp:0.#} of {fighter.MaxHp:0.#} HP left.");
             return result;
         }
@@ -108,6 +113,7 @@ namespace GameDev.Slice.Fights
             if (result.Hit)
             {
                 _wounds[body] = fighter.MaxHp - fighter.Hp;
+                EndDouble(true); // 05.1 Двойник: the damage it deals ends it (S5b.8)
             }
 
             Debug.Log($"[Confront] a shot touched {body.name}: {(result.Hit ? $"hit for {result.Damage:0.#}{(result.Critical ? ", critical" : string.Empty)}" : "grazed")}, {fighter.Hp:0.#} of {fighter.MaxHp:0.#} HP left.");

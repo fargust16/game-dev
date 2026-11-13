@@ -303,6 +303,10 @@ namespace GameDev.Slice.Fights
                 {
                     TreatOutside();
                 }
+                else
+                {
+                    Outside(input); // 05.1 *Вне боя* (S5b.8)
+                }
 
                 ShowLife(null);
                 return;
@@ -310,6 +314,7 @@ namespace GameDev.Slice.Fights
 
             WatchWillPower();
             WatchConduct();
+            ExpireClouds(); // a cloud of Пелена raised out of a fight runs out by the round's ticks
             _beats.Tick(Time.deltaTime);
             var settled = !_beats.Busy;
             var acting = _turns.Acting;

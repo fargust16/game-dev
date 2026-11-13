@@ -266,20 +266,7 @@ namespace GameDev.Slice.Fights
             }
 
             _copies.Remove(copy);
-            if (shown == null)
-            {
-                return;
-            }
-
-            foreach (var filter in shown.GetComponentsInChildren<MeshFilter>())
-            {
-                if (filter.sharedMesh != null && filter.sharedMesh.name.StartsWith("Double "))
-                {
-                    Destroy(filter.sharedMesh); // the baked meshes are the copy's own
-                }
-            }
-
-            Destroy(shown.gameObject);
+            DropBaked(shown);
         }
 
         /// <summary>The body shows only its shadow while it is unseen, and takes its own look back after.</summary>

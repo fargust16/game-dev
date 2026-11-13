@@ -84,7 +84,21 @@ namespace GameDev.Slice
 
         public bool InReach(Vector3 position) => InteractReach.Within(transform, position, interactRadius);
 
-        public string PromptFor(Vector3 player) => opensItself && Available && dialogue != null && !IsOpen && InReach(player) ? Loc.Get(promptKey) : null;
+        public string PromptFor(Vector3 player) => opensItself && Available && dialogue != null && !IsOpen && InReach(player) && !Asleep ? Loc.Get(promptKey) : null;
+
+        /// <summary>05.1 Дрёма (S5b.8): one asleep is not talked to.</summary>
+        private bool Asleep => GameDev.Slice.Fights.HeldStill.Sleeping(transform);
+
+        /// <summary>
+        /// 05.1 Чуткое ухо (S5b.8): a line in which the speaker lies is marked for a character who knows it, which tells
+        /// that it lies, never in what.
+        /// </summary>
+        public static string Heard(DialogueDefinition dialogue, DialogueNode node)
+        {
+            var line = dialogue.Line(node);
+            var fights = SliceWorldDriver.Running != null ? SliceWorldDriver.Running.Fights : null;
+            return node.lies && fights != null && fights.Knows("keen_ear") ? line + "  " + Loc.Get("ui.ability.keen_ear.lie") : line;
+        }
 
         /// <summary>What Interact does: opens the conversation on its first node.</summary>
         public void Open() => Open(null);
@@ -93,7 +107,7 @@ namespace GameDev.Slice
         public void Open(string node)
         {
             var world = SliceWorldDriver.Running;
-            if (IsOpen || !Available || world == null || dialogue == null || Hud() == null)
+            if (IsOpen || !Available || world == null || dialogue == null || Hud() == null || Asleep)
             {
                 return;
             }
@@ -189,7 +203,7 @@ namespace GameDev.Slice
             Func<string> name = () => string.IsNullOrEmpty(speaker) ? null : Loc.Get(speaker);
             if (_talk.Said.Count == 0)
             {
-                _history.Add(() => (name(), dialogue.Line(node)));
+                _history.Add(() => (name(), Heard(dialogue, node)));
                 return;
             }
 

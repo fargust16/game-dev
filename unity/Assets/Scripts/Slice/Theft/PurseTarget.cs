@@ -156,6 +156,13 @@ namespace GameDev.Slice.Theft
             }
 
             Say(Loc.Get("ui.theft.noticed"));
+            var held = GameDev.Slice.Fights.HeldStill.Of(transform);
+            if (held != null && !held.Asleep)
+            {
+                return; // 05.1 Стой! out of a fight (S5b.8): frozen, it calls no help
+            }
+
+            held?.Release(); // a sleeper the theft wakes
             if (_eyes != null)
             {
                 var at = _player != null ? _player.transform.position : transform.position;

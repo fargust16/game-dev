@@ -311,29 +311,67 @@ namespace GameDev.UI
         }
 
         // Authoring defaults: a thin dark bar edged in brass at the bottom left, under the life line.
-        private void BuildStamina(VisualElement root)
+        private void BuildStamina(VisualElement root) => _stamina = ThinBar(root, "stamina", 10f, StaminaColour, out _staminaFill);
+
+        private static VisualElement ThinBar(VisualElement root, string name, float bottom, Color colour, out VisualElement fill)
         {
-            _stamina = new VisualElement { name = "stamina", pickingMode = PickingMode.Ignore };
-            _stamina.style.position = Position.Absolute;
-            _stamina.style.left = 24f;
-            _stamina.style.bottom = 10f;
-            _stamina.style.width = 220f;
-            _stamina.style.height = 8f;
-            _stamina.style.backgroundColor = new Color(0.07f, 0.06f, 0.05f, 0.82f);
+            var bar = new VisualElement { name = name, pickingMode = PickingMode.Ignore };
+            bar.style.position = Position.Absolute;
+            bar.style.left = 24f;
+            bar.style.bottom = bottom;
+            bar.style.width = 220f;
+            bar.style.height = 8f;
+            bar.style.backgroundColor = new Color(0.07f, 0.06f, 0.05f, 0.82f);
             var brass = new Color(0.62f, 0.50f, 0.30f);
-            _stamina.style.borderTopColor = brass;
-            _stamina.style.borderBottomColor = brass;
-            _stamina.style.borderLeftColor = brass;
-            _stamina.style.borderRightColor = brass;
-            _stamina.style.borderTopWidth = 1f;
-            _stamina.style.borderBottomWidth = 1f;
-            _stamina.style.borderLeftWidth = 1f;
-            _stamina.style.borderRightWidth = 1f;
-            _staminaFill = Zone(StaminaColour);
-            _staminaFill.style.left = 0f;
-            _stamina.Add(_staminaFill);
-            _stamina.style.display = DisplayStyle.None;
-            root.Add(_stamina);
+            bar.style.borderTopColor = brass;
+            bar.style.borderBottomColor = brass;
+            bar.style.borderLeftColor = brass;
+            bar.style.borderRightColor = brass;
+            bar.style.borderTopWidth = 1f;
+            bar.style.borderBottomWidth = 1f;
+            bar.style.borderLeftWidth = 1f;
+            bar.style.borderRightWidth = 1f;
+            fill = Zone(colour);
+            fill.style.left = 0f;
+            bar.Add(fill);
+            bar.style.display = DisplayStyle.None;
+            root.Add(bar);
+            return bar;
+        }
+
+        // Will Power's bar out of a fight (07.2 §3.3; 05.1 *Вне боя*, S5b.8): a lilac fill above Stamina's (authoring default).
+        private static readonly Color WillPowerColour = new Color(0.55f, 0.46f, 0.72f, 0.95f);
+        private VisualElement _willPower;
+        private VisualElement _willPowerFill;
+
+        /// <summary>Whether Will Power's bar is on the screen.</summary>
+        public bool IsWillPowerShown => _willPower != null && _willPower.panel != null && _willPower.style.display.value == DisplayStyle.Flex;
+
+        /// <summary>Will Power's bar at <paramref name="share"/> of its width, shown while any is spent and hidden when it is full.</summary>
+        public void ShowWillPower(float share)
+        {
+            if (share >= 0.999f)
+            {
+                if (_willPower != null)
+                {
+                    _willPower.style.display = DisplayStyle.None;
+                }
+
+                return;
+            }
+
+            if (!Bind())
+            {
+                return;
+            }
+
+            if (_willPower == null || _willPower.panel == null)
+            {
+                _willPower = ThinBar(GetComponent<UIDocument>().rootVisualElement, "willpower", 22f, WillPowerColour, out _willPowerFill);
+            }
+
+            _willPowerFill.style.width = Length.Percent(Mathf.Clamp01(share) * 100f);
+            _willPower.style.display = DisplayStyle.Flex;
         }
 
         /// <summary>The bag page's lines, money and load first, then each stack and piece (S5a.1).</summary>

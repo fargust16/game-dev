@@ -43,6 +43,9 @@ namespace GameDev.Dialogue
 
         /// <summary>Points a troubled mind and Fatigue put on every Social Check (07.2 §3.3–3.4, S5b.6); null for none.</summary>
         public Func<int> MindPenalty { get; set; }
+
+        /// <summary>Points an ability gives the next check of a skill, inside the cap, as Внушение (05.1, S5b.8); null for none.</summary>
+        public Func<CharacterSkill, int> SkillBonus { get; set; }
     }
 
     /// <summary>
@@ -109,7 +112,8 @@ namespace GameDev.Dialogue
             var standing = _world.Standing.Reading(option.skill, listener.enemy);
             var arguments = Math.Min(2, Math.Max(0, option.arguments.Count(_world.State.IsSet) - 1));
             var mind = _world.MindPenalty != null ? _world.MindPenalty() : 0;
-            var modifiers = SocialCheck.Modifiers(rules, attitude + standing.Modifier + arguments + mind);
+            var bonus = _world.SkillBonus != null ? _world.SkillBonus(option.skill) : 0;
+            var modifiers = SocialCheck.Modifiers(rules, attitude + standing.Modifier + arguments + mind + bonus);
             var luck = _world.Character.Get(CharacterAttribute.Luck);
             var chance = SocialCheck.Chance(rules, characterValue, modifiers, difficulty, luck);
             return new CheckPreview(chance, characterValue, listenerValue, difficulty, attitude, standing, arguments, modifiers);
