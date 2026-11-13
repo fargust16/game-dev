@@ -94,7 +94,8 @@ MonoBehaviour:
     - 3
     dialogueOptions:
     - promise
-    cost: "A promise to the door-watcher; coin waits for S5a"
+    - pay
+    cost: "A promise to the door-watcher, or 50 bronze (S5c.7)"
     consequence: "Which stair they always use: an Argument against the collectors, and a lead for POI C"
     opens: "A threat the collectors believe"
     closes: "The door-watcher may sell the player out later"

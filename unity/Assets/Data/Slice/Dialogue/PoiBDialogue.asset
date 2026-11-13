@@ -316,6 +316,31 @@ MonoBehaviour:
         settles: {fileID: 0}
         tells: []
         minutes: 0
+    - id: pay
+      approach: 3
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      bronze: 50
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: stair
+        raises:
+        - poi.b.heard.stair
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
     - id: never
       approach: 0
       kind: 0

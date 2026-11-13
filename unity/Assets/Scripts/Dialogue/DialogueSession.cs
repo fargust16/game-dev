@@ -46,6 +46,12 @@ namespace GameDev.Dialogue
 
         /// <summary>Points an ability gives the next check of a skill, inside the cap, as Внушение (05.1, S5b.8); null for none.</summary>
         public Func<CharacterSkill, int> SkillBonus { get; set; }
+
+        /// <summary>The bronze the character carries (an Exchange in coin, S5c.7); null hides every option that costs coin.</summary>
+        public Func<int> Purse { get; set; }
+
+        /// <summary>Spends that much bronze; true when paid.</summary>
+        public Func<int, bool> Spend { get; set; }
     }
 
     /// <summary>
@@ -124,6 +130,11 @@ namespace GameDev.Dialogue
             if (!IsOpen || !Node.options.Contains(option) || !Offered(option))
             {
                 throw new InvalidOperationException($"Option {option?.id} is not offered now.");
+            }
+
+            if (option.bronze > 0 && (_world.Spend == null || !_world.Spend(option.bronze)))
+            {
+                throw new InvalidOperationException($"Option {option.id} costs {option.bronze} bronze the character cannot pay.");
             }
 
             if (option.kind != OptionKind.Check)
@@ -217,6 +228,11 @@ namespace GameDev.Dialogue
             }
 
             if (!string.IsNullOrEmpty(option.asks) && (_world.Tips == null || !_world.Tips.CanTell(option.asks, _world.Clock.Tick)))
+            {
+                return false;
+            }
+
+            if (option.bronze > 0 && (_world.Purse == null || _world.Purse() < option.bronze))
             {
                 return false;
             }

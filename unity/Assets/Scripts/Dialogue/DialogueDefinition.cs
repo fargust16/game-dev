@@ -106,6 +106,9 @@ namespace GameDev.Dialogue
         [Tooltip("The item shown, for ShowItem.")]
         public string item = "";
 
+        [Tooltip("Bronze it costs, paid when chosen: an Exchange in coin (S5c.7). Offered only while the character carries it.")]
+        [Min(0)] public int bronze;
+
         public CharacterSkill skill;
 
         public RequestSize request = RequestSize.Ordinary;

@@ -34,6 +34,7 @@ namespace GameDev.Slice.Save
         private const string IdentityPart = "identity";
         private const string BagPart = "bag";
         private const string OutfitPart = "outfit";
+        private const string HeldPart = "wardens_store";
         private const string ObjectsPart = "objects";
         private const string BodiesPart = "bodies";
         private const string ConfrontPart = "confront";
@@ -337,6 +338,11 @@ namespace GameDev.Slice.Save
                 if (w.Outfit != null)
                 {
                     inventory.Add(new SavePart(OutfitPart, CaptureOutfit, RestoreOutfit));
+                }
+
+                if (w.Debts != null)
+                {
+                    inventory.Add(new SavePart(HeldPart, w.Debts.Capture, w.Debts.Restore)); // S5c.7: the Wardens' store
                 }
 
                 list.Add(new SavePartsSection(SaveSchema.PlayerInventory, Version, inventory));

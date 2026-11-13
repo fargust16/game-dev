@@ -9,6 +9,7 @@ using GameDev.Core.Scenes;
 using GameDev.Locomotion;
 using GameDev.Player.Progression;
 using GameDev.Slice.Fights;
+using GameDev.Slice.People;
 using GameDev.UI;
 using GameDev.World.Portals;
 using NUnit.Framework;
@@ -236,6 +237,8 @@ namespace GameDev.Slice.Tests
             fights.BeatPace = 4f;
             var player = Object.FindAnyObjectByType<PlayerLocomotion>();
             world.State.Set(SliceConfront.DebtKey(SliceConfront.Wardens), 1);
+            var pistol = new GameDev.Items.ItemPiece("pistol");
+            Assert.IsTrue(world.Bag.AddPiece(pistol), "a pistol carried");
 
             Assert.IsTrue(fights.StartDevelopmentFight(SliceConfront.Wardens), "a fight with two Wardens");
             yield return PlayersTurn(fights);
@@ -273,6 +276,25 @@ namespace GameDev.Slice.Tests
             player = Object.FindAnyObjectByType<PlayerLocomotion>();
             Assert.Less(Vector3.Distance(player.transform.position, door.ArrivalPose.position), 1.5f, "by the lock-up's door");
             Assert.IsTrue(player.enabled, "free to walk out");
+
+            // S5c.7: the lock-up's own HUD says the release, and the pistol is in the Wardens' store until the fine is paid at its desk.
+            hud = Object.FindAnyObjectByType<HudView>();
+            Assert.AreEqual(SliceConfront.LockupScene, hud.gameObject.scene.name, "the lock-up's HUD, the city's being switched off");
+            Assert.AreEqual(Loc.Get("ui.lockup.released"), hud.MessageText, "the release said where it is seen");
+            CollectionAssert.DoesNotContain(world.Bag.Pieces, pistol, "the weapon is not carried");
+            CollectionAssert.Contains(world.Debts.Held, pistol, "it is in the Wardens' store");
+            var desk = Object.FindAnyObjectByType<WardensDesk>();
+            Assert.IsNotNull(desk, "the lock-up has its front desk");
+            world.Bag.Spend(world.Bag.Bronze);
+            Assert.IsFalse(desk.Settle(world.Debts), "no coin, no weapons");
+            Assert.AreEqual(Loc.Format("ui.fine.short", GameDev.Items.Coins.Show(SliceConfront.WardensFine)), hud.MessageText);
+            world.Bag.Earn(SliceConfront.WardensFine + 50);
+            Assert.IsTrue(desk.Settle(world.Debts), "the fine paid");
+            Assert.AreEqual(50, world.Bag.Bronze);
+            CollectionAssert.Contains(world.Bag.Pieces, pistol, "the weapon is back");
+            Assert.AreEqual(0, world.State.Get(SliceConfront.OwedKey(SliceConfront.Wardens)));
+            Assert.AreEqual(0, world.State.Get(SliceConfront.WeaponsHeldKey));
+            Assert.IsFalse(world.Debts.Owing);
         }
 
         /// <summary>Two cells reachable from the player, <paramref name="cells"/> cells off as moves count them and a few apart.</summary>

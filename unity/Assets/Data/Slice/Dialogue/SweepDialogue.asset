@@ -164,6 +164,47 @@ MonoBehaviour:
         tells: []
         minutes: 0
         fights: 0
+    - id: pay
+      approach: 3
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      bronze: 100
+      skill: 0
+      request: 1
+      listener: 
+      asks: sweep.coach
+      success:
+        next: told
+        raises: []
+        settles: {fileID: 0}
+        tells:
+        - sweep.coach
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
     - id: leave
       approach: 0
       kind: 0

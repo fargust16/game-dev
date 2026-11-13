@@ -114,6 +114,9 @@ namespace GameDev.Slice
         /// <summary>Break-ins (S5c.5; 10.3 §6.1–6.2): locks, Lockpicks, the Wanted and the night's loot.</summary>
         public GameDev.Slice.BreakIns.SliceBreakIns BreakIns { get; private set; }
 
+        /// <summary>A Yield's terms paid from the bag and the Wardens' store of weapons (S5c.7); null without the bag.</summary>
+        public YieldDebts Debts { get; private set; }
+
         /// <summary>11's start: plain clothes with no defence and 500 bronze, with no weapon or tool.</summary>
         public const int StartingBronze = 500;
 
@@ -483,6 +486,15 @@ namespace GameDev.Slice
                 FindPurses();
             }
 
+            if (Bag != null)
+            {
+                Debts = new YieldDebts(State, Bag, Outfit, BreakIns); // S5c.7: a Yield's terms paid from the bag
+                if (Fights != null)
+                {
+                    Fights.Debts = Debts;
+                }
+            }
+
             _talk = new DialogueContext
             {
                 State = State,
@@ -498,6 +510,8 @@ namespace GameDev.Slice
                 MindPenalty = () => Mind.SocialPenalty,
                 SkillBonus = skill => Fights != null ? Fights.SuggestionFor(skill) : 0,
                 Checked = TalkChecked,
+                Purse = () => Bag != null ? Bag.Bronze : 0, // S5c.7: an Exchange in coin
+                Spend = bronze => Bag != null && Bag.Spend(bronze),
             };
             if (Fights != null)
             {
@@ -1045,6 +1059,10 @@ namespace GameDev.Slice
             }
 
             PlaceCaches(scene);
+            if (Debts != null)
+            {
+                WardensDesk.Place(scene); // S5c.7: the fine paid at the lock-up's desk
+            }
         }
 
         /// <summary>S5c.6: the run's Hidden Caches in the city's scene, once it stands.</summary>

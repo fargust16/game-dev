@@ -15,7 +15,8 @@ namespace GameDev.Slice.Fights
     /// breaks away by Сбежать, Z, for 2 AP, seen by no enemy and 15 cells or more from the nearest, and the fight ends.
     /// Y yields to people, for 2 AP: the fight ends at once, and their terms are said in the
     /// dialogue column. The Wardens take the character to their lock-up until 08:00 and keep its weapons till it pays a
-    /// fine of 1 000 bronze; Veinmarket and robbers take what it carries. The cult and beasts take no surrender. A
+    /// fine of 1 000 bronze at the lock-up's desk; Veinmarket and robbers take what it carries, from the bag at once (S5c.7,
+    /// <see cref="GameDev.Slice.People.YieldDebts"/>). The cult and beasts take no surrender. A
     /// person of the other side who is losing asks for mercy, and V spares every one asking. At 0 HP the character
     /// dies, in a fight or bleeding out after one, and the run ends (<see cref="SliceDeathScreen"/>). What the fight
     /// leaves: the Deeds Record's kills, the bodies, which stay until the player is away, a world-state count of fights
@@ -33,10 +34,10 @@ namespace GameDev.Slice.Fights
         /// <summary>The fine the Wardens hold the character's weapons for, in bronze (10.2 §9, owner-approved).</summary>
         public const int WardensFine = 1000;
 
-        /// <summary>The bronze the character owes a group, until S5a's purse settles it (plan, S3 authoring default).</summary>
+        /// <summary>The bronze the character owes a group: the Wardens' fine, paid at the lock-up's desk (S5c.7).</summary>
         public static string OwedKey(string group) => "owed." + group;
 
-        /// <summary>A take owed to Veinmarket or robbers: all money, and the most valuable worn item under 1 000 bronze (10.2 §9).</summary>
+        /// <summary>A take owed to Veinmarket or robbers in a bare fight with no bag; the world pays it at once (S5c.7).</summary>
         public static string TakeKey(string group) => "owed." + group + ".take";
 
         /// <summary>How many fights the character has had with a group.</summary>
@@ -78,6 +79,9 @@ namespace GameDev.Slice.Fights
 
         /// <summary>The Deeds Record, which counts the character's kills (S2.2); set by the world.</summary>
         public SocialStanding Standing { get; set; }
+
+        /// <summary>A Yield's terms paid from the bag (S5c.7); set by the world, null in a bare fight.</summary>
+        public GameDev.Slice.People.YieldDebts Debts { get; set; }
 
         /// <summary>True when the last fight ended with the player broken away.</summary>
         public bool BrokeAway => _brokeAway;
@@ -330,7 +334,7 @@ namespace GameDev.Slice.Fights
         /// <summary>
         /// The character goes with them. The dialogue's end costs its tick. The Wardens hold it until 08:00, the night
         /// passing on the clock, keep its weapons, and let it out by the lock-up's door, owing the fine; Veinmarket and
-        /// robbers leave it where it stands, owing their take until S5a's purse settles it.
+        /// robbers leave it where it stands, having taken their take from the bag (S5c.7).
         /// </summary>
         public void AcceptTerms()
         {
@@ -352,15 +356,32 @@ namespace GameDev.Slice.Fights
 
             if (group != Wardens)
             {
+                if (Debts != null)
+                {
+                    // S5c.7: the take is paid from the bag at once.
+                    var (bronze, piece) = Debts.Rob();
+                    var line = bronze > 0 ? Loc.Format("ui.yield.robbed", GameDev.Items.Coins.Show(bronze)) : Loc.Get("ui.yield.robbed.none");
+                    Note(piece != null ? line + " " + Loc.Format("ui.yield.robbed.piece", Loc.Get(new GameDev.Items.ItemDefinition { id = piece.item }.NameKey)) : line);
+                    return;
+                }
+
                 _state?.Set(TakeKey(group), 1);
                 Note(Loc.Get("ui.yield.taken"));
                 return;
             }
 
-            if (_state != null)
+            if (Debts != null)
+            {
+                Debts.LockUp(WardensFine); // S5c.7: the fine owed, the stolen goods back, the weapons in the store
+            }
+            else if (_state != null)
             {
                 _state.Set(OwedKey(Wardens), _state.Get(OwedKey(Wardens)) + WardensFine);
                 _state.Set(WeaponsHeldKey, 1);
+            }
+
+            if (_state != null)
+            {
                 _state.Set(LockupsKey, _state.Get(LockupsKey) + 1);
             }
 
@@ -371,8 +392,19 @@ namespace GameDev.Slice.Fights
                 _clock.AdvanceTicks(wait == 0 ? 1440 : wait);
             }
 
-            Note(Loc.Get("ui.lockup.released"));
-            SceneTransition.Travel(new TravelRequest(LockupScene, LockupArrival));
+            // S5c.7: said in the lock-up, on the HUD of its own scene, since the city's is switched off while it is kept.
+            void Released(TravelRequest request)
+            {
+                SceneTransition.TravelCompleted -= Released;
+                FindAnyObjectByType<HudView>()?.ShowMessage(Loc.Get("ui.lockup.released"));
+            }
+
+            SceneTransition.TravelCompleted += Released;
+            if (!SceneTransition.Travel(new TravelRequest(LockupScene, LockupArrival)))
+            {
+                SceneTransition.TravelCompleted -= Released;
+                Note(Loc.Get("ui.lockup.released"));
+            }
         }
 
         /// <summary>

@@ -163,8 +163,16 @@ ui.yield.wardens.line,"Drop it. You're coming with us: a night in the lock-up, a
 ui.yield.wardens.go,Go with them,Пойти с ними
 ui.yield.take.line,"Sensible. Turn out your pockets, every coin of it.","Разумно. Выворачивай карманы, всё до монеты."
 ui.yield.take.go,Hand it over,Отдать
-ui.lockup.released,"Let out of the lock-up at 08:00. Your weapons are held till the fine is paid.","В 08:00 вас выпустили из камеры. Оружие удержано до уплаты штрафа."
+ui.lockup.released,"Let out of the lock-up at 08:00. Your weapons wait at the front desk till the fine is paid.","В 08:00 вас выпустили из камеры. Оружие ждёт у дежурного до уплаты штрафа."
 ui.yield.taken,"They took what you carried, and you owe them the rest.","У вас забрали всё, что было при себе, и вы остались им должны."
+ui.yield.robbed,"They took every coin you had: {0}.","У вас забрали все деньги: {0}."
+ui.yield.robbed.none,"You had no coin on you, and they let it go at that.","Денег при себе не оказалось, на том и разошлись."
+ui.yield.robbed.piece,"And they took: {0}.","И ещё забрали: {0}."
+ui.prompt.fine.pay,E  Pay the fine: {0},E  Заплатить штраф: {0}
+ui.prompt.fine.weapons,E  Take back your weapons,E  Забрать оружие
+ui.fine.short,"The fine is {0}, and you have not got it on you.","Штраф — {0}, а при себе столько нет."
+ui.fine.paid,Fine paid. Your weapons are back.,Штраф уплачен. Оружие вернули.
+ui.fine.paid.full,"Fine paid. What you cannot carry waits here.","Штраф уплачен. Что не унести, подождёт здесь."
 ui.death.title,You died,Вы умерли
 ui.death.restart,Start again,Начать заново
 ui.death.quit,Quit the game,Выйти из игры
