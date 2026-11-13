@@ -211,6 +211,7 @@ namespace GameDev.Slice.Fights
             {
                 animator.SetFloat(DeathHash, 1 + (_shotDeaths++ % FightBeats.Deaths.Length));
                 animator.SetBool(DownHash, true);
+                FallenBody.Mark(body, true, animator.GetFloat(DeathHash));
             }
 
             foreach (var part in body.GetComponents<Collider>())

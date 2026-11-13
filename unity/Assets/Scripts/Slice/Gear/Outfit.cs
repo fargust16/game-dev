@@ -78,6 +78,51 @@ namespace GameDev.Slice.Gear
 
         public bool IsWorn(ItemPiece piece) => SlotOf(piece).HasValue;
 
+        /// <summary>What is worn, each slot with its piece's place among the bag's pieces (17 X.3).</summary>
+        public List<(WearSlot slot, int piece)> Capture()
+        {
+            var worn = new List<(WearSlot, int)>();
+            foreach (var pair in _worn)
+            {
+                var index = IndexOf(pair.Value);
+                if (index >= 0)
+                {
+                    worn.Add((pair.Key, index));
+                }
+            }
+
+            return worn;
+        }
+
+        /// <summary>Puts on again what a save says was worn, by the pieces' places in the restored bag.</summary>
+        public void Restore(IEnumerable<(WearSlot slot, int piece)> worn)
+        {
+            _worn.Clear();
+            foreach (var (slot, index) in worn)
+            {
+                if (index >= 0 && index < _bag.Pieces.Count)
+                {
+                    Put(slot, _bag.Pieces[index]);
+                }
+            }
+
+            Forget();
+            Changed?.Invoke();
+        }
+
+        private int IndexOf(ItemPiece piece)
+        {
+            for (var i = 0; i < _bag.Pieces.Count; i++)
+            {
+                if (ReferenceEquals(_bag.Pieces[i], piece))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
         public static bool IsSecondSet(WearSlot slot) => slot == WearSlot.WeaponTwo || slot == WearSlot.OffHandTwo;
 
         /// <summary>Puts a worn piece off, or an unworn one on; the key of the reason it cannot, or null.</summary>

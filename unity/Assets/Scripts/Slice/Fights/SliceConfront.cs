@@ -709,6 +709,12 @@ namespace GameDev.Slice.Fights
             animator.SetFloat(WeaponHash, Motion(c.Fighter));
             animator.SetBool(DownHash, c.Fighter.Down);
             animator.SetBool(FightingHash, fighting);
+            if (!fighting && animator.isHuman && body.GetComponent<PlayerLocomotion>() == null)
+            {
+                // A person lies fallen once the fight is over, and stays so when its scene comes back on (17 X.3).
+                GameDev.Slice.People.FallenBody.Mark(body, c.Fighter.Down, System.Array.Exists(animator.parameters, p => p.nameHash == DeathHash) ? animator.GetFloat(DeathHash) : 0f);
+            }
+
             Stance(c, animator, fighting);
             Arms(c, body, fighting);
         }

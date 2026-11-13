@@ -75,6 +75,16 @@ namespace GameDev.Slice.People
         /// <summary>Whether a Warden's Accusation is open now.</summary>
         public bool IsOpen => _open;
 
+        /// <summary>Whether a Warden is on its way to stop the character or stands talking to it.</summary>
+        public bool Busy => _open || _warden != null;
+
+        /// <summary>The tick before which no Warden stops the character again; kept by a Suspend Save (17 X.3).</summary>
+        public long QuietUntil
+        {
+            get => _quietUntil;
+            set => _quietUntil = value;
+        }
+
         /// <summary>The Warden who accuses, while it is open.</summary>
         public Transform Warden => _open ? _warden : null;
 

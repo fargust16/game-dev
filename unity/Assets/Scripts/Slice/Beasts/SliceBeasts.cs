@@ -103,6 +103,83 @@ namespace GameDev.Slice.Beasts
             SliceAlarm.Raised += OnAlarm;
         }
 
+        /// <summary>Whether a pack has noticed the character, runs at it or attacks it: a Suspend Save waits (17 X.3).</summary>
+        public bool Alarmed
+        {
+            get
+            {
+                foreach (var p in _packs.Values)
+                {
+                    if (p.Noticed || p.Chasing || p.Attacking)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        [Serializable]
+        private sealed class SavedPack
+        {
+            public int number;
+            public int warnings;
+            public float wanderIn;
+            public int wanders;
+            public int heard;
+            public bool converged;
+        }
+
+        [Serializable]
+        private sealed class SavedPacks
+        {
+            public List<SavedPack> packs = new List<SavedPack>();
+        }
+
+        private readonly Dictionary<int, SavedPack> _saved = new Dictionary<int, SavedPack>();
+
+        /// <summary>Each pack's wander and what it heard, for a Suspend Save (17 X.3); the beasts keep their own places.</summary>
+        public string CapturePacks()
+        {
+            var saved = new SavedPacks();
+            foreach (var p in _packs.Values)
+            {
+                saved.packs.Add(new SavedPack { number = p.Number, warnings = p.Warnings, wanderIn = p.WanderIn, wanders = p.Wanders, heard = p.Heard, converged = p.Converged });
+            }
+
+            return JsonUtility.ToJson(saved);
+        }
+
+        /// <summary>Puts the packs back; a pack not found yet takes its saved state when its beasts are found.</summary>
+        public void RestorePacks(string payload)
+        {
+            _saved.Clear();
+            foreach (var p in JsonUtility.FromJson<SavedPacks>(payload).packs)
+            {
+                if (_packs.TryGetValue(p.number, out var pack))
+                {
+                    Apply(pack, p);
+                }
+                else
+                {
+                    _saved[p.number] = p;
+                }
+            }
+        }
+
+        private static void Apply(Pack pack, SavedPack p)
+        {
+            pack.Noticed = false;
+            pack.Chasing = false;
+            pack.Attacking = false;
+            pack.Warnings = p.warnings;
+            pack.WanderIn = p.wanderIn;
+            pack.Wanders = p.wanders;
+            pack.Heard = p.heard;
+            pack.Converged = p.converged;
+        }
+
         /// <summary>The warnings a pack has given since it noticed the character.</summary>
         public int WarningsOf(int pack) => _packs.TryGetValue(pack, out var p) ? p.Warnings : 0;
 
@@ -558,6 +635,11 @@ namespace GameDev.Slice.Beasts
 
                     // Its first wander after the least wait, spread by the pack's number so the woods do not move at once.
                     pack.WanderIn = WanderLeast + ((b.Pack * 2.3f) % (WanderMost - WanderLeast));
+                    if (_saved.TryGetValue(b.Pack, out var saved))
+                    {
+                        Apply(pack, saved);
+                        _saved.Remove(b.Pack);
+                    }
                 }
 
                 pack.Members.Add(b);

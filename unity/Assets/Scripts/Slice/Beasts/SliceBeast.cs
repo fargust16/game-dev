@@ -23,7 +23,7 @@ namespace GameDev.Slice.Beasts
     /// setup builds (Idle, Walk, Run, Attack, Hit, Dead, Warn): its walk and run from how fast it moves, the rest when told.
     /// It glows when the seed makes it a glowing beast. <see cref="SliceBeasts"/> decides what it does.
     /// </summary>
-    public sealed class SliceBeast : MonoBehaviour
+    public sealed class SliceBeast : MonoBehaviour, GameDev.Core.Save.ISavedObject
     {
         private const float WalkAbove = 0.25f;  // m/s
         private const float RunAbove = 2.6f;    // m/s
@@ -177,6 +177,54 @@ namespace GameDev.Slice.Beasts
             {
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(toward, Vector3.up), degrees);
             }
+        }
+
+        [System.Serializable]
+        private sealed class Saved
+        {
+            public Vector3 at;
+            public float yaw;
+            public bool wounded;
+            public double hp;
+            public bool going;
+            public Vector3 goal;
+            public float goalSpeed;
+            public bool vanish;
+        }
+
+        /// <summary>A Suspend Save's id (17 X.3): its scene and its run-long name.</summary>
+        public string SaveId => gameObject.scene.name + "/beast:" + id;
+
+        /// <summary>
+        /// Where it stands or lies and faces, the HP a fight left it and the walk it is on; whether it is dead or gone the
+        /// world state keeps (17 X.3).
+        /// </summary>
+        public string CaptureState() => JsonUtility.ToJson(new Saved
+        {
+            at = transform.position,
+            yaw = transform.eulerAngles.y,
+            wounded = !double.IsNaN(Hp),
+            hp = double.IsNaN(Hp) ? 0d : Hp,
+            going = _going,
+            goal = _goal,
+            goalSpeed = _goalSpeed,
+            vanish = _vanish,
+        });
+
+        public void ClearState()
+        {
+        }
+
+        public void RestoreState(string payload)
+        {
+            var s = JsonUtility.FromJson<Saved>(payload);
+            transform.SetPositionAndRotation(s.at, Quaternion.Euler(0f, s.yaw, 0f));
+            _last = s.at;
+            Hp = s.wounded ? s.hp : double.NaN;
+            _going = s.going && !_dead;
+            _goal = s.goal;
+            _goalSpeed = s.goalSpeed;
+            _vanish = s.vanish;
         }
 
         private void Awake()

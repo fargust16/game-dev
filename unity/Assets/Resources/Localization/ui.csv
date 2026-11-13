@@ -22,7 +22,16 @@ ui.hud.dialogue.close,1–9  Answer    Esc  Leave,1–9  Ответить    Esc
 ui.hud.menu.title,Menu,Меню
 ui.hud.menu.resume,Resume,Продолжить
 ui.hud.menu.language,Change the language,Сменить язык
+ui.hud.menu.save,Save and quit,Сохранить и выйти
 ui.hud.menu.quit,Quit the game,Выйти из игры
+ui.hud.start.title,A saved game,Сохранённая игра
+ui.hud.start.continue,Continue,Продолжить
+ui.hud.start.new,New game (the save is lost),Новая игра (сохранение пропадёт)
+ui.save.refused.fight,Not during a fight,Не во время боя
+ui.save.refused.talk,Not during a conversation,Не во время разговора
+ui.save.refused.work,Finish what you are doing first,Сначала закончите начатое
+ui.save.refused.busy,Not now,Не сейчас
+ui.save.refused.alarm,Not now: there is an alarm around,Не сейчас: вокруг тревога
 ui.hud.menu.close,Esc  Close,Esc  Закрыть
 ui.dialogue.you,You,Вы
 ui.dialogue.check,[{0}],[{0}]

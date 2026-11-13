@@ -62,6 +62,13 @@ namespace GameDev.Slice.Gathering
         private readonly Dictionary<string, GatherSpot> _spots = new Dictionary<string, GatherSpot>();
         private int _strokes;
 
+        /// <summary>The strokes drawn so far, whose count keys each Reaction Bar's draw; kept by a Suspend Save (17 X.3).</summary>
+        public int Strokes
+        {
+            get => _strokes;
+            set => _strokes = value;
+        }
+
         public SliceGathering(GatherRules rules, Bag bag, IWorldState state, IWorldClock clock, ICharacterValues character,
             SliceStamina stamina, IWorldSeed seed)
         {

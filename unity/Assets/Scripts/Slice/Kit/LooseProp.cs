@@ -19,7 +19,7 @@ namespace GameDev.Slice.Kit
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody))]
-    public sealed class LooseProp : MonoBehaviour
+    public sealed class LooseProp : MonoBehaviour, GameDev.Core.Save.ISavedObject
     {
         /// <summary>The owner's (2026-11-12): one game hour, 60 ticks, from the prop's last move to its return.</summary>
         public const int RestoreTicks = 60;
@@ -151,6 +151,50 @@ namespace GameDev.Slice.Kit
             }
 
             return best;
+        }
+
+        [System.Serializable]
+        private sealed class Saved
+        {
+            public Vector3 at;
+            public Quaternion facing;
+            public long movedSince;
+        }
+
+        /// <summary>
+        /// A Suspend Save's id (17 X.3): its scene, its name and its home to the millimetre, since a set's thing leaves its
+        /// block for the block's parent in an order Unity does not promise.
+        /// </summary>
+        public string SaveId => System.FormattableString.Invariant(
+            $"{gameObject.scene.name}/prop:{name}@{Mathf.RoundToInt(HomePosition.x * 1000f)},{Mathf.RoundToInt(HomePosition.y * 1000f)},{Mathf.RoundToInt(HomePosition.z * 1000f)}");
+
+        /// <summary>Only a prop lying moved, or counting its hour, is kept; one at home comes back home with its scene.</summary>
+        public string CaptureState() => !Displaced && _movedSince < 0
+            ? null
+            : JsonUtility.ToJson(new Saved { at = transform.position, facing = transform.rotation, movedSince = _movedSince });
+
+        public void ClearState()
+        {
+        }
+
+        public void RestoreState(string payload)
+        {
+            var s = JsonUtility.FromJson<Saved>(payload);
+            var body = Body();
+            if (!body.isKinematic)
+            {
+                body.linearVelocity = Vector3.zero;
+                body.angularVelocity = Vector3.zero;
+            }
+
+            transform.SetPositionAndRotation(s.at, s.facing);
+            body.position = s.at;
+            body.rotation = s.facing;
+            _movedSince = s.movedSince;
+            if (!body.isKinematic)
+            {
+                body.Sleep();
+            }
         }
 
         private Rigidbody Body() => _body != null ? _body : _body = GetComponent<Rigidbody>();

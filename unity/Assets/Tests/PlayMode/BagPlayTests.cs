@@ -100,7 +100,7 @@ namespace GameDev.Slice.Tests
 
             yield return Tap(Key.Escape);
             Assert.IsTrue(hud.IsMenuOpen, "with no window, Esc opens the menu");
-            CollectionAssert.AreEqual(new[] { "Resume", "Change the language", "Quit the game" }, hud.MenuLines);
+            CollectionAssert.AreEqual(new[] { "Resume", "Change the language", "Save and quit", "Quit the game" }, hud.MenuLines);
             Assert.AreEqual(0f, Time.timeScale, "the world stops under the menu");
             Assert.IsTrue(world.Clock.IsPaused, "its clock too");
 

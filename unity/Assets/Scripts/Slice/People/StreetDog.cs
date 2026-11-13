@@ -1,7 +1,6 @@
 using GameDev.Locomotion;
 using GameDev.World.Timekeeping;
 using UnityEngine;
-using Random = System.Random;
 
 namespace GameDev.Slice.People
 {
@@ -12,7 +11,7 @@ namespace GameDev.Slice.People
     /// The Animator's states are named after the clips (<c>SliceDogs</c> builds it): Walking01, Breathing, SittingStart
     /// (which goes on to SittingCycle by itself), and WigglingTail. It stands still while the world clock is held.
     /// </summary>
-    public sealed class StreetDog : MonoBehaviour
+    public sealed class StreetDog : MonoBehaviour, GameDev.Core.Save.ISavedObject
     {
         private const string Walk = "Walking01";
         private const string Sit = "SittingStart";
@@ -52,7 +51,7 @@ namespace GameDev.Slice.People
         private Mode _resume;
         private float _until;
         private int _next;
-        private Random _random;
+        private int _draws;
         private Transform _player;
         private float _lookForPlayer;
 
@@ -72,7 +71,6 @@ namespace GameDev.Slice.People
 
         private void Start()
         {
-            _random = new Random(seed);
             var best = float.MaxValue;
             for (var i = 0; i < route.Length; i++)
             {
@@ -147,7 +145,67 @@ namespace GameDev.Slice.People
         /// <summary>Walk or sit, even odds; a dog with no route only sits.</summary>
         private void Choose()
         {
-            Enter(route.Length >= 2 && _random.NextDouble() < 0.5 ? Mode.Walking : Mode.Sitting);
+            Enter(route.Length >= 2 && Draw() < 0.5 ? Mode.Walking : Mode.Sitting);
+        }
+
+        /// <summary>
+        /// The dog's next draw in [0, 1): its seed and how many it has drawn, hashed, with no state but the count, so a
+        /// Suspend Save keeps its stream (17 X.3).
+        /// </summary>
+        private double Draw()
+        {
+            unchecked
+            {
+                var h = 2166136261u;
+                h = (h ^ (uint)seed) * 16777619u;
+                h = (h ^ (uint)_draws++) * 16777619u;
+                h ^= h >> 15;
+                h *= 2246822519u;
+                h ^= h >> 13;
+                return (h & 0xFFFFFF) / (double)0x1000000;
+            }
+        }
+
+        [System.Serializable]
+        private sealed class Saved
+        {
+            public Vector3 at;
+            public float yaw;
+            public int mode;
+            public int resume;
+            public float left;
+            public int next;
+            public int draws;
+        }
+
+        public string SaveId => GameDev.Slice.Save.SavedObjects.PathOf(transform);
+
+        public string CaptureState() => JsonUtility.ToJson(new Saved
+        {
+            at = transform.position,
+            yaw = transform.eulerAngles.y,
+            mode = (int)_mode,
+            resume = (int)_resume,
+            left = _until - Time.time,
+            next = _next,
+            draws = _draws,
+        });
+
+        public void ClearState()
+        {
+        }
+
+        public void RestoreState(string payload)
+        {
+            var s = JsonUtility.FromJson<Saved>(payload);
+            transform.SetPositionAndRotation(s.at, Quaternion.Euler(0f, s.yaw, 0f));
+            _next = route.Length > 0 ? Mathf.Clamp(s.next, 0, route.Length - 1) : 0;
+            _resume = (Mode)s.resume;
+            var mode = (Mode)s.mode;
+            _mode = mode == Mode.Greeting ? Mode.Walking : Mode.Greeting; // so Enter starts the clip
+            Enter(mode);
+            _until = Time.time + s.left;
+            _draws = s.draws; // after Enter, whose draw the saved one already made
         }
 
         private void Enter(Mode mode)
@@ -155,7 +213,7 @@ namespace GameDev.Slice.People
             var keep = mode == _mode && mode != Mode.Greeting && animator != null;
             _mode = mode;
             var span = mode == Mode.Walking ? walkSeconds : sitSeconds;
-            _until = Time.time + Mathf.Lerp(span.x, span.y, (float)_random.NextDouble());
+            _until = Time.time + Mathf.Lerp(span.x, span.y, (float)Draw());
             if (animator == null || keep)
             {
                 return;

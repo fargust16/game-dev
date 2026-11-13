@@ -14,6 +14,7 @@ using GameDev.Slice.Gathering;
 using GameDev.Slice.Gear;
 using GameDev.Slice.Kit;
 using GameDev.Slice.People;
+using GameDev.Slice.Save;
 using GameDev.Slice.Shops;
 using GameDev.Slice.Stealth;
 using GameDev.UI;
@@ -134,6 +135,14 @@ namespace GameDev.Slice
 
         /// <summary>The Deeds Record, Attitude and lies (10.4 §4–5).</summary>
         public SocialStanding Standing { get; private set; }
+
+        /// <summary>The Suspend Save (17 X.3, S5c.1): "Save and quit" on the Esc menu, and the start's offer to continue.</summary>
+        public SliceSave Save { get; private set; }
+
+        /// <summary>Whether a conversation is open on the HUD.</summary>
+        public bool TalkOpen => Hud() is HudView hud && hud.IsDialogueOpen;
+
+        private bool _offer;
 
         /// <summary>The slice's one world seed; every random choice forks it by name (SliceSeedStreams).</summary>
         public GameDev.World.Seed.IWorldSeed Seed { get; private set; }
@@ -384,6 +393,9 @@ namespace GameDev.Slice
             Notes.Added += _ => Refresh();
             State.Changed += (_, _, _) => Refresh();
             Loc.Changed += Refresh;
+            Save = gameObject.AddComponent<SliceSave>();
+            Save.Configure(this, cityScene);
+            _offer = Save.ShouldOffer();
         }
 
         // The pages belong to whichever scene's HUD is up; the keys work in every scene the world lives through.
@@ -416,6 +428,12 @@ namespace GameDev.Slice
 
             KeepStamina(hud);
             Tune(hud);
+            if (_offer)
+            {
+                _offer = false;
+                OpenStart(hud);
+            }
+
             if (_menuPaused && !hud.IsMenuOpen)
             {
                 Unpause(); // the menu closed by its own line or with its scene
@@ -485,6 +503,11 @@ namespace GameDev.Slice
         /// </summary>
         private void Escape(HudView hud)
         {
+            if (hud.IsStartOpen)
+            {
+                return; // the start's offer is answered by its lines
+            }
+
             if (hud.IsMenuOpen)
             {
                 CloseMenu(hud);
@@ -506,7 +529,42 @@ namespace GameDev.Slice
         /// <summary>The menu, the world stopped under it: its clock paused and the frame's time at a stand.</summary>
         private void OpenMenu(HudView hud)
         {
-            hud.ShowMenu(() => CloseMenu(hud), Loc.Next, Quit);
+            hud.ShowMenu(() => CloseMenu(hud), Loc.Next, () => SaveAndQuit(hud), Quit);
+            PauseUnderMenu(hud);
+        }
+
+        /// <summary>17 X.3: the Suspend Save written and the game left; a Screen Message says why it must wait.</summary>
+        private void SaveAndQuit(HudView hud)
+        {
+            var refused = Save != null ? Save.Write() : "ui.save.refused.busy";
+            if (refused != null)
+            {
+                hud.ShowMessage(Loc.Get(refused));
+                return;
+            }
+
+            Quit();
+        }
+
+        /// <summary>The start's offer of a saved run (17 X.3), the world stopped under it as under the menu.</summary>
+        private void OpenStart(HudView hud)
+        {
+            hud.ShowStart(
+                () =>
+                {
+                    CloseMenu(hud);
+                    Save.Continue();
+                },
+                () =>
+                {
+                    Save.Decline();
+                    CloseMenu(hud);
+                });
+            PauseUnderMenu(hud);
+        }
+
+        private void PauseUnderMenu(HudView hud)
+        {
             if (!hud.IsMenuOpen || _menuPaused)
             {
                 return;

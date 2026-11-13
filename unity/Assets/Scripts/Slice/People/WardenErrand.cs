@@ -33,6 +33,27 @@ namespace GameDev.Slice.People
         private float _stoop;
         private int _playing;
 
+        /// <summary>The bodies still to take up, the one it stoops over first; kept by a Suspend Save (17 X.3).</summary>
+        public List<GameObject> Bodies
+        {
+            get
+            {
+                var bodies = new List<GameObject>();
+                if (_stooping != null)
+                {
+                    bodies.Add(_stooping);
+                }
+
+                bodies.AddRange(_bodies);
+                return bodies;
+            }
+        }
+
+        /// <summary>The post it goes back to, and its facing there.</summary>
+        public Vector3 Post => _post;
+
+        public Quaternion Facing => _facing;
+
         /// <summary>The bodies still to take up, the one it stoops over among them.</summary>
         public int Left => _bodies.Count + (_stooping != null ? 1 : 0);
 

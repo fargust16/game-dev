@@ -101,6 +101,34 @@ namespace GameDev.Items
         }
 
         /// <summary>Takes a piece of equipment, or refuses it beyond the hard limit.</summary>
+        /// <summary>
+        /// Puts back a saved bag (17 X.3) whole: its stacks, pieces and bronze as they were, past the weight check, since
+        /// what was carried was carried. Unknown items are dropped.
+        /// </summary>
+        public void Restore(IEnumerable<(string id, int count)> stacks, IEnumerable<ItemPiece> pieces, int bronze)
+        {
+            _stacks.Clear();
+            _pieces.Clear();
+            foreach (var (id, count) in stacks)
+            {
+                if (count > 0 && _catalogue.Find(id) != null)
+                {
+                    _stacks[id] = count;
+                }
+            }
+
+            foreach (var piece in pieces)
+            {
+                if (piece != null && _catalogue.Find(piece.item) != null)
+                {
+                    _pieces.Add(piece);
+                }
+            }
+
+            Bronze = Math.Max(0, bronze);
+            Changed?.Invoke();
+        }
+
         public bool AddPiece(ItemPiece piece)
         {
             var item = piece != null ? _catalogue.Find(piece.item) : null;

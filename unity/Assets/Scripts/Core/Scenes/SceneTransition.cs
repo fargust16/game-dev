@@ -44,6 +44,12 @@ namespace GameDev.Core.Scenes
         /// <summary>The last finished journey's times, set on its first drawn frame.</summary>
         public static JourneyTimes LastJourney { get; private set; }
 
+        /// <summary>The journey that brought the traveller to the scene it is in; default before the first.</summary>
+        public static TravelRequest Arrived { get; private set; }
+
+        /// <summary>The arrival portal of <see cref="Restart"/>, which no portal answers.</summary>
+        public const string RestartPortal = "restart";
+
         /// <summary>The scene kept loaded, switched off, while the traveller is in an interior; invalid when none.</summary>
         public static Scene KeptScene => _kept.IsValid() && _kept.isLoaded ? _kept : default;
 
@@ -60,6 +66,7 @@ namespace GameDev.Core.Scenes
             LoadInTheDark(false);
             IsTraveling = false;
             _current = default;
+            Arrived = default;
             _kept = default;
             KeptRoots.Clear();
             Interiors.Clear();
@@ -110,6 +117,37 @@ namespace GameDev.Core.Scenes
                 _dark = Watch.Elapsed.TotalSeconds;
                 LoadInTheDark(true);
                 Go(request.SceneName);
+            });
+            return true;
+        }
+
+        /// <summary>
+        /// Starts the run's scene again in the dark (17 X.3: a Suspend Save's Continue): every scene, a kept one too, gives
+        /// way to <paramref name="sceneName"/> loaded alone, and the journey arrives at <see cref="RestartPortal"/>, so
+        /// the player stands where the scene placed it until the save puts it back. Objects that live through scene changes
+        /// stay. False when a journey is under way.
+        /// </summary>
+        public static bool Restart(string sceneName)
+        {
+            var request = new TravelRequest(sceneName, RestartPortal);
+            if (IsTraveling || !Application.CanStreamedLevelBeLoaded(sceneName))
+            {
+                return false;
+            }
+
+            IsTraveling = true;
+            _current = request;
+            _from = SceneManager.GetActiveScene().name;
+            Watch.Restart();
+            ScreenFade.Out(() =>
+            {
+                _dark = Watch.Elapsed.TotalSeconds;
+                LoadInTheDark(true);
+                _way = "restarted alone";
+                Forget();
+                Interiors.Clear();
+                SceneManager.sceneLoaded += OnSceneLoaded;
+                SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
             });
             return true;
         }
@@ -277,6 +315,7 @@ namespace GameDev.Core.Scenes
             _loaded = Watch.Elapsed.TotalSeconds;
             var request = _current;
             _current = default;
+            Arrived = request;
             IsTraveling = false;
             Arriving?.Invoke(request);
             TravelCompleted?.Invoke(request);

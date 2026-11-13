@@ -56,6 +56,24 @@ namespace GameDev.Slice.Gathering
             clock.TickBoundary += _ => CatchUp();
         }
 
+        /// <summary>The run's own reckoning beside the kept share, for a Suspend Save (17 X.3): the last tick counted, the rest's end, and whether it ran out.</summary>
+        public string Capture() => FormattableString.Invariant($"{_last:R};{_restUntil:R};{(_spentOut ? 1 : 0)}");
+
+        public void Restore(string payload)
+        {
+            var parts = (payload ?? string.Empty).Split(';');
+            if (parts.Length == 3
+                && double.TryParse(parts[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var last)
+                && double.TryParse(parts[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var rest))
+            {
+                _last = last;
+                _restUntil = rest;
+                _spentOut = parts[2] == "1";
+                _exerting = false;
+                _sprinting = false;
+            }
+        }
+
         /// <summary>While true, Stamina does not come back (07.2 §3.2: recovery pauses during exertion).</summary>
         public bool Exerting
         {

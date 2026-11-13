@@ -392,15 +392,31 @@ namespace GameDev.UI
             _bag?.RemoveFromClassList(NotesVisible);
         }
 
-        // The menu on Esc (owner, 2026-11-12): its lines in order, each a click.
-        private static readonly string[] MenuNames = { "menu-resume", "menu-language", "menu-quit" };
-        private readonly System.Action[] _menuActions = new System.Action[3];
+        // The menu on Esc (owner, 2026-11-12): its lines in order, each a click; the same panel offers a saved run at the
+        // start (17 X.3), with its own title and lines.
+        private static readonly string[] MenuNames = { "menu-resume", "menu-language", "menu-save", "menu-quit" };
+        private static readonly string[] StartNames = { "start-continue", "start-new" };
+        private static readonly string[] MenuParts = { "menu-title", "menu-resume", "menu-language", "menu-save", "menu-quit", "menu-close" };
+        private static readonly string[] StartParts = { "start-title", "start-continue", "start-new" };
+        private readonly System.Action[] _menuActions = new System.Action[4];
+        private string[] _menuLines = MenuNames;
         private VisualElement _menu;
 
         public bool IsMenuOpen => _menu != null && _menu.ClassListContains(NotesVisible);
 
+        /// <summary>Whether the panel open is the start's offer of a saved run.</summary>
+        public bool IsStartOpen => IsMenuOpen && _menuLines == StartNames;
+
         /// <summary>The menu's lines as shown, in order.</summary>
-        public IReadOnlyList<string> MenuLines => _menu == null ? new string[0] : MenuNames.Select(n => _menu.Q<Label>(n)?.text).ToArray();
+        public IReadOnlyList<string> MenuLines => _menu == null ? new string[0] : _menuLines.Select(n => _menu.Q<Label>(n)?.text).ToArray();
+
+        /// <summary>
+        /// The start's offer (17 X.3): continue the saved run, or begin a new one, each line a click; Esc does not close it.
+        /// </summary>
+        public void ShowStart(System.Action continueRun, System.Action newRun)
+        {
+            OpenPanel(StartNames, StartParts, MenuParts, continueRun, newRun);
+        }
 
         /// <summary>Whether any window is open: a page, a shop, a conversation, the reading panel or the menu.</summary>
         public bool AnyWindowOpen => IsReadingOpen || IsNotesOpen || IsBagOpen || IsShopOpen || IsMapOpen || IsDialogueOpen || IsMenuOpen;
@@ -409,17 +425,43 @@ namespace GameDev.UI
         /// The menu on Esc (owner, 2026-11-12: Esc closes any window open, and with none it opens the menu and closes it
         /// again): resume, change the language, quit the game, each line a click. The pages close under it.
         /// </summary>
-        public void ShowMenu(System.Action resume, System.Action language, System.Action quit)
+        public void ShowMenu(System.Action resume, System.Action language, System.Action save, System.Action quit)
+        {
+            OpenPanel(MenuNames, MenuParts, StartParts, resume, language, save, quit);
+        }
+
+        private void OpenPanel(string[] lines, string[] shown, string[] hidden, params System.Action[] actions)
         {
             if (!Bind() || _menu == null)
             {
                 return;
             }
 
-            _menuActions[0] = resume;
-            _menuActions[1] = language;
-            _menuActions[2] = quit;
-            foreach (var name in MenuNames)
+            _menuLines = lines;
+            for (var i = 0; i < _menuActions.Length; i++)
+            {
+                _menuActions[i] = i < actions.Length ? actions[i] : null;
+            }
+
+            foreach (var name in hidden)
+            {
+                var part = _menu.Q(name);
+                if (part != null)
+                {
+                    part.style.display = DisplayStyle.None;
+                }
+            }
+
+            foreach (var name in shown)
+            {
+                var part = _menu.Q(name);
+                if (part != null)
+                {
+                    part.style.display = DisplayStyle.Flex;
+                }
+            }
+
+            foreach (var name in lines)
             {
                 var line = _menu.Q<Label>(name);
                 if (line != null)
@@ -444,7 +486,7 @@ namespace GameDev.UI
         /// <summary>Clicks the n-th line of the menu, as the mouse does; false if it has no action.</summary>
         public bool ClickMenuLine(int index)
         {
-            if (!IsMenuOpen || index < 0 || index >= _menuActions.Length || _menuActions[index] == null)
+            if (!IsMenuOpen || index < 0 || index >= _menuLines.Length || _menuActions[index] == null)
             {
                 return false;
             }
@@ -457,7 +499,7 @@ namespace GameDev.UI
         {
             if (click.currentTarget is VisualElement line)
             {
-                ClickMenuLine(System.Array.IndexOf(MenuNames, line.name));
+                ClickMenuLine(System.Array.IndexOf(_menuLines, line.name));
             }
         }
 
