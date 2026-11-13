@@ -393,6 +393,18 @@ namespace GameDev.Slice.Fights
             _innocents.Clear();
         }
 
+        /// <summary>
+        /// <paramref name="body"/>, a Warden who fought away from its post (a pursuit's end, VS-ASSAULT (h)), goes back to
+        /// <paramref name="post"/> once the character is away, as the Wardens who came to a fight do.
+        /// </summary>
+        public void SendBack(Transform body, Vector3 post, Quaternion facing)
+        {
+            if (body != null && !_returning.Exists(r => r.Body == body))
+            {
+                _returning.Add(new Coming { Body = body, Post = post, PostFacing = facing });
+            }
+        }
+
         /// <summary>A body gone after its day; the nearest free Warden sent for the rest once no Warden is still on its way.</summary>
         private void TakeUpTheFallen()
         {
@@ -422,7 +434,7 @@ namespace GameDev.Slice.Fights
             }
 
             var taker = PeopleAround.Wardens(waiting[0].Body.transform.position)
-                .Find(w => !Lying(w) && w.GetComponent<WardenErrand>() == null && w.GetComponent<SliceFighter>() == null);
+                .Find(w => !Lying(w) && w.GetComponent<WardenErrand>() == null && w.GetComponent<SliceFighter>() == null && w.GetComponent<WardenPursuit>() == null);
             if (taker == null)
             {
                 return;

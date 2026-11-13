@@ -239,12 +239,34 @@ namespace GameDev.Slice
             }
             else if (IsShown && !talking && (gone || (!open && !near)))
             {
-                cast.SetActive(false);
+                Hide();
             }
 
             if (Talk != null)
             {
                 Talk.Available = IsShown && open && !Busy;
+            }
+        }
+
+        // VS-ASSAULT (g): the fallen of a fight here lie their day or until a Warden takes them up; the rest go unseen.
+        private void Hide()
+        {
+            var fallen = false;
+            foreach (Transform person in cast.transform)
+            {
+                if (person.gameObject.activeSelf && person.GetComponent<GameDev.Slice.People.FallenBody>() != null)
+                {
+                    fallen = true;
+                }
+                else
+                {
+                    person.gameObject.SetActive(false);
+                }
+            }
+
+            if (!fallen)
+            {
+                cast.SetActive(false);
             }
         }
 

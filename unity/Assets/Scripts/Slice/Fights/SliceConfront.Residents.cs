@@ -28,7 +28,7 @@ namespace GameDev.Slice.Fights
         /// <summary>Whether a place is within the call's 30 cells of the one struck (10.2 §5e).</summary>
         private bool Heard(Vector3 at) => SliceAlarm.Hears(_assaultAt, at);
 
-        private static void Say(Transform body, string key)
+        internal static void Say(Transform body, string key)
         {
             var eyes = body.GetComponent<StealthObserver>();
             if (eyes == null)

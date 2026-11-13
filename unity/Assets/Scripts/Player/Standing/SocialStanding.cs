@@ -62,6 +62,13 @@ namespace GameDev.Player.Standing
         public const string LetOffKey = "accusation.letoff";
         public const string LetOffBelowKey = "accusation.letoff.below";
 
+        /// <summary>
+        /// 10.4 §6 *Accusation*, VS-ASSAULT (a): the Promise given, once a life, and the Promise believed, after which an
+        /// Assault's every cost to Reputation, its harm and its kills, counts double.
+        /// </summary>
+        public const string PromiseKey = "accusation.promise";
+        public const string PromisedKey = "accusation.promised";
+
         private const string AttitudePrefix = "attitude.";
         private const string LiePrefix = "lie.";
         private const string ExposedPrefix = "exposed.";
@@ -107,14 +114,30 @@ namespace GameDev.Player.Standing
 
         public int DangerModifier => _rules.DangerModifier(Danger);
 
-        public void Record(Deed deed) => Add(ReputationKey, _rules.Points(deed));
+        public void Record(Deed deed) => Add(ReputationKey, _rules.Points(deed) * (deed == Deed.Assault || deed == Deed.InnocentKilled ? AssaultFactor : 1));
 
         public void RecordKill() => Add(KillsKey, 1);
 
         public void RecordLimitReached() => Add(LimitsKey, 1);
 
         /// <summary>10.4 §4, 10.2 §5c: an Assault's harm, the HP the people who were not the character's enemies lost over its fight.</summary>
-        public void RecordHarm(double hp) => Add(ReputationKey, -_rules.HarmPoints(hp));
+        public void RecordHarm(double hp) => Add(ReputationKey, -_rules.HarmPoints(hp) * AssaultFactor);
+
+        /// <summary>Whether the character may still give the Promise: once a life.</summary>
+        public bool PromiseOpen => _state.Get(PromiseKey) == 0;
+
+        /// <summary>2 once a Promise was believed, else 1: what an Assault's costs are multiplied by.</summary>
+        public int AssaultFactor => _state.Get(PromisedKey) != 0 ? 2 : 1;
+
+        /// <summary>Gives the Promise, spent whether or not it is <paramref name="believed"/>.</summary>
+        public void Promise(bool believed)
+        {
+            _state.Set(PromiseKey, 1);
+            if (believed)
+            {
+                _state.Set(PromisedKey, 1);
+            }
+        }
 
         /// <summary>10.4 §6: a Warden accuses the character: its Reputation is low, and no talk let it off at this level.</summary>
         public bool Accused => ReputationPoints <= _rules.AccusationAt && (_state.Get(LetOffKey) == 0 || ReputationPoints <= _state.Get(LetOffBelowKey));

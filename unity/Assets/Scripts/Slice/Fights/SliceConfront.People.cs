@@ -17,7 +17,8 @@ namespace GameDev.Slice.Fights
     /// as the development opponents of their group do (S3a.9), take a Yield when their group does, and may ask for mercy.
     /// Each carries what 10.2 §5d gives it (owner, 2026-11-12: firearms first; <see cref="Armed"/>).
     /// When the last beat has played, the host learns whether the player's side stood and how many were spared; those
-    /// who left the fight alive leave the scene, and the fallen lie where they fell until the scene is cleared.
+    /// who left the fight alive leave the scene, and the fallen of a fight in the city lie a game day or until a Warden
+    /// takes them up (10.2 §5c *The fallen*, VS-ASSAULT (g)).
     /// </summary>
     public sealed partial class SliceConfront
     {
@@ -200,6 +201,17 @@ namespace GameDev.Slice.Fights
                     spared++;
                 }
 
+                // VS-ASSAULT (g): the fallen of every fight in the city lie a game day or until a Warden takes them up.
+                if (pair.Key.Fighter.Down && InTheCity(body) && !_fallen.Exists(f => f.Body == body.gameObject))
+                {
+                    foreach (var part in body.GetComponents<Collider>())
+                    {
+                        part.enabled = false;
+                    }
+
+                    _fallen.Add(new Fallen { Body = body.gameObject, Tick = _clock != null ? _clock.Tick : 0 });
+                }
+
                 // Who left the fight alive leaves the scene, but for a resident gone to find help (10.2 §5a).
                 if (!pair.Key.Fighter.Down && pair.Key.Departure != Departure.None && body.GetComponent<HelpRun>() == null)
                 {
@@ -221,6 +233,9 @@ namespace GameDev.Slice.Fights
 
             ended(won, spared);
         }
+
+        private static bool InTheCity(Transform body) =>
+            SliceWorldDriver.Running != null && body.gameObject.scene.name == SliceWorldDriver.Running.CityScene;
 
         // The scene's people fight no more once their fight is over: nothing joins a later fight from them.
         private void Unarm()

@@ -74,6 +74,11 @@ namespace GameDev.Slice.People
         private HudView _hud;
         private Transform _warden;
         private Quaternion _wardenFacing;
+        private Vector3 _wardenPost;
+        private WardenPursuit _pursuit;
+        private Transform _warnedBy;
+        private int _warned;
+        private bool _promise;
         private IDisposable _pause;
         private bool _open;
         private bool _refused;
@@ -92,7 +97,10 @@ namespace GameDev.Slice.People
         public bool IsArrest => _open && _arrest;
 
         /// <summary>Whether a Warden is on its way to stop the character or stands talking to it.</summary>
-        public bool Busy => _open || _warden != null;
+        public bool Busy => _open || _warden != null || _pursuit != null;
+
+        /// <summary>The Warden following the character after it ran (VS-ASSAULT (h)), or null.</summary>
+        public WardenPursuit Pursuit => _pursuit;
 
         /// <summary>The tick before which no Warden stops the character again; kept by a Suspend Save (17 X.3).</summary>
         public long QuietUntil
@@ -120,7 +128,10 @@ namespace GameDev.Slice.People
             warden != null && _world.Seed.Fork(SliceSeedStreams.Wardens, StableHash.Of(Path(warden))).Next(CorruptOneIn) == 0;
 
         /// <summary>Opens the Accusation of <paramref name="warden"/>; false when none can open now.</summary>
-        public bool Open(Transform warden)
+        public bool Open(Transform warden) => warden != null && Open(warden, warden.position, warden.rotation);
+
+        // A Warden who caught up with the character speaks where it stands, and walks back to its post afterwards.
+        private bool Open(Transform warden, Vector3 post, Quaternion facing)
         {
             if (_open || warden == null || _world == null || Player() == null || Hud() == null)
             {
@@ -129,7 +140,8 @@ namespace GameDev.Slice.People
 
             _open = true;
             _warden = warden;
-            _wardenFacing = warden.rotation;
+            _wardenFacing = facing;
+            _wardenPost = post;
             _arrest = Wanted;
             _seen = _arrest && _world.BreakIns.Seen;
             _world.Fights?.CallOff(warden); // stopped on its way to the place, it is there
@@ -223,12 +235,25 @@ namespace GameDev.Slice.People
                     break;
                 case Choice.Fight:
                     var warden = _warden;
-                    End(null);
-                    _world.Fights.StartAssault(warden);
+                    var post = _wardenPost;
+                    var facing = _wardenFacing;
+                    End(null, false);
+                    if (_world.Fights.StartAssault(warden))
+                    {
+                        _world.Fights.SendBack(warden, post, facing);
+                    }
+
                     break;
                 default:
-                    _quietUntil = _world.Clock.Tick + 1 + QuietTicks;
-                    End(null);
+                    // VS-ASSAULT (h): the Warden follows, warns twice, then fights; one who gives up leaves 10 quiet ticks.
+                    var from = _warden;
+                    var home = _wardenPost;
+                    var faced = _wardenFacing;
+                    var warned = from == _warnedBy ? _warned : 0;
+                    End(null, false);
+                    _pursuit = WardenPursuit.Begin(from, this, warned, home, faced);
+                    _warnedBy = from;
+                    _warned = _pursuit.Warned;
                     break;
             }
         }
@@ -266,6 +291,11 @@ namespace GameDev.Slice.People
             listener.Set(CharacterAttribute.Will, ListenerValues);
             SocialCheck.Train(_world.Character, CharacterSkill.Persuasion, listener, success);
             _world.Fights?.Persuaded(CharacterSkill.Persuasion, Listener, success);
+            if (_promise)
+            {
+                _world.Standing.Promise(success); // once a life, believed or not
+            }
+
             if (success)
             {
                 _world.Conduct?.Deed(GameDev.Slice.Alchemy.ConductDeed.Convince, "accusation." + Path(_warden)); // 05.1
@@ -282,7 +312,7 @@ namespace GameDev.Slice.People
                 }
 
                 _world.Standing.LetOff();
-                End("ui.accuse.letoff");
+                End(_promise ? "ui.accuse.promised" : "ui.accuse.letoff");
                 return;
             }
 
@@ -345,7 +375,8 @@ namespace GameDev.Slice.People
             // Persuasion's Arguments: the Wardens' debt; in an Arrest also a good name, or giving back what was stolen.
             var goodName = _arrest && _world.Standing.ReputationPoints >= GoodNameReputation;
             _giveBack = _arrest && !debt && !goodName && _world.BreakIns.CanGiveBack;
-            if (!_failed && (debt || goodName || _giveBack))
+            _promise = !_arrest && !debt && _world.Standing.PromiseOpen; // 10.4 §6: the Promise, an Argument of its own
+            if (!_failed && (debt || goodName || _giveBack || _promise))
             {
                 _choices.Add(Choice.Persuade);
             }
@@ -372,7 +403,7 @@ namespace GameDev.Slice.People
                 case Choice.Bribe:
                     return Loc.Format("ui.accuse.bribe", Coins.Show(Bribe));
                 case Choice.Persuade:
-                    var words = Loc.Get(_giveBack ? "ui.arrest.giveback" : "ui.accuse.persuade");
+                    var words = Loc.Get(_giveBack ? "ui.arrest.giveback" : _promise ? "ui.accuse.promise" : "ui.accuse.persuade");
                     if (!tagged)
                     {
                         return words;
@@ -388,9 +419,15 @@ namespace GameDev.Slice.People
         }
 
         // The column closes, the world runs on by the dialogue's tick, and the Warden's last words show on the screen.
-        private void End(string lineKey)
+        private void End(string lineKey, bool home = true)
         {
-            Close();
+            if (home)
+            {
+                _warnedBy = null; // a talk ended otherwise than by running: its warnings are spent
+                _warned = 0;
+            }
+
+            Close(home);
             _world.Clock.AdvanceTicks(1);
             if (lineKey != null)
             {
@@ -398,12 +435,19 @@ namespace GameDev.Slice.People
             }
         }
 
-        private void Close()
+        private void Close(bool home = true)
         {
             Talking(false);
-            if (_warden != null)
+            if (_warden != null && home)
             {
-                _warden.rotation = _wardenFacing;
+                if (Vector3.ProjectOnPlane(_warden.position - _wardenPost, Vector3.up).sqrMagnitude > 0.25f)
+                {
+                    WardenErrand.Send(_warden, new GameObject[0], _wardenPost, _wardenFacing); // caught up away from its post
+                }
+                else
+                {
+                    _warden.rotation = _wardenFacing;
+                }
             }
 
             _open = false;
@@ -470,7 +514,7 @@ namespace GameDev.Slice.People
             var clock = _world.Clock;
             var hud = Hud();
             var wanted = Wanted; // S5c.5: a Warden on its way to the place still stops the character it sees
-            return standing != null && (standing.Accused || wanted) && fights != null && clock != null && hud != null && !clock.IsPaused
+            return standing != null && (standing.Accused || wanted) && _pursuit == null && fights != null && clock != null && hud != null && !clock.IsPaused
                    && clock.Tick >= _quietUntil && !fights.InFight && fights.Terms == null && !fights.Assaulting && (fights.WardensComing == 0 || wanted)
                    && _player.enabled && !_player.InWater && (_world.Work == null || !_world.Work.Busy)
                    && !hud.IsDialogueOpen && !hud.IsReadingOpen && !hud.IsBagOpen && !hud.IsShopOpen && !hud.IsMapOpen && !hud.IsNotesOpen;
@@ -517,6 +561,35 @@ namespace GameDev.Slice.People
         {
             var animator = body.GetComponentInChildren<Animator>();
             return animator != null && animator.runtimeAnimatorController != null && animator.parameters.Any(p => p.nameHash == DownHash) && animator.GetBool(DownHash);
+        }
+
+        /// <summary>The pursuit is over: given up, it leaves the quiet ticks of a run; ended otherwise, its warnings stand.</summary>
+        internal void PursuitOver(WardenPursuit pursuit, bool gaveUp)
+        {
+            if (_pursuit != pursuit)
+            {
+                return;
+            }
+
+            _pursuit = null;
+            _warned = pursuit.Warned;
+            if (gaveUp && _world != null)
+            {
+                _quietUntil = _world.Clock.Tick + 1 + QuietTicks;
+                _warnedBy = null;
+                _warned = 0;
+            }
+        }
+
+        /// <summary>The character stopped where the following Warden saw it: the Accusation opens again, its warnings kept.</summary>
+        internal void CaughtUp(Transform warden, int warned, Vector3 post, Quaternion facing)
+        {
+            _warnedBy = warden;
+            _warned = warned;
+            if (!CanAccuse() || !Open(warden, post, facing))
+            {
+                WardenErrand.Send(warden, new GameObject[0], post, facing);
+            }
         }
 
         private void Talking(bool on)

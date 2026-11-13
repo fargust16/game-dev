@@ -263,5 +263,30 @@ namespace GameDev.Slice.Tests
             Assert.AreEqual(source, reading.Source, $"{skill} with {who}");
             Assert.AreEqual(modifier, reading.Modifier, $"{skill} with {who}");
         }
+
+        [Test]
+        public void ThePromiseIsGivenOnceALifeAndABelievedOneDoublesAnAssault()
+        {
+            Assert.IsTrue(_standing.PromiseOpen);
+            Assert.AreEqual(1, _standing.AssaultFactor);
+            _standing.Promise(false);
+            Assert.IsFalse(_standing.PromiseOpen, "given, it is spent even when not believed");
+            Assert.AreEqual(1, _standing.AssaultFactor, "a Promise not believed doubles nothing");
+
+            var believed = new SocialStanding(new WorldState(), _rules, _clock, new WorldSeed(Seed), SliceSeedStreams.Lies);
+            believed.Promise(true);
+            Assert.AreEqual(2, believed.AssaultFactor);
+            believed.Record(Deed.Assault);
+            Assert.AreEqual(2 * _rules.Points(Deed.Assault), believed.ReputationPoints, "an Assault after it costs double");
+            believed.RecordHarm(10d);
+            Assert.AreEqual(2 * (_rules.Points(Deed.Assault) - _rules.HarmPoints(10d)), believed.ReputationPoints, "its harm too");
+            var before = believed.ReputationPoints;
+            believed.Record(Deed.InnocentKilled);
+            Assert.AreEqual(before + (2 * _rules.Points(Deed.InnocentKilled)), believed.ReputationPoints, "and a kill");
+            before = believed.ReputationPoints;
+            believed.Record(Deed.TheftNoticed);
+            Assert.AreEqual(before + _rules.Points(Deed.TheftNoticed), believed.ReputationPoints, "other deeds count once");
+            believed.Dispose();
+        }
     }
 }

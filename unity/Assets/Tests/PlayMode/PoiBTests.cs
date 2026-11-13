@@ -155,6 +155,18 @@ namespace GameDev.Slice.Tests
             }
 
             Assert.AreEqual(collectors.Any(c => !c.gameObject.activeInHierarchy), world.State.IsSet("poi.b.heard.landing"), "a spared collector tells the landing");
+
+            // VS-ASSAULT (g): the fallen of every fight in the city lie their day or until a Warden takes them up, even
+            // with the scene gone unseen behind the character.
+            var fallen = collectors.Where(c => c.gameObject.activeInHierarchy && c.GetComponent<GameDev.Slice.People.FallenBody>() != null).ToList();
+            Assert.AreEqual(fallen.Count, fights.FallenLying, "the lane's fallen are the city's fallen");
+            var away = stage.transform.position + new Vector3(0f, 0f, 150f);
+            player.Teleport(Physics.Raycast(away + (Vector3.up * 60f), Vector3.down, out var ground, 120f, ~0, QueryTriggerInteraction.Ignore) ? ground.point : away, player.transform.rotation);
+            yield return new WaitForSeconds(0.3f);
+            foreach (var body in fallen)
+            {
+                Assert.IsTrue(body.gameObject.activeInHierarchy, $"{body.name} still lies in the lane");
+            }
         }
 
         /// <summary>
