@@ -98,6 +98,8 @@ ui.fight.log.critical,"{0} → {1}: {2} damage, a critical hit","{0} → {1}: у
 ui.fight.log.miss,{0} → {1}: miss,{0} → {1}: промах
 ui.fight.log.down,{0} is out of the fight,{0}: вне боя
 ui.fight.provokes,Draws a Reaction Attack,Вызовет удар вдогонку
+ui.fight.obscured,Obscured — harder to hit,Заслонено — попасть труднее
+ui.fight.online,On the line of fire: {0} — may take the shot,На линии огня: {0} — может принять выстрел
 ui.fight.stance,In a stance,В стойке
 ui.fight.waiting,Waiting,Ждёт
 ui.fight.log.guarded,"{0} → {1}: {2} damage, guarded","{0} → {1}: урон {2}, отражено"

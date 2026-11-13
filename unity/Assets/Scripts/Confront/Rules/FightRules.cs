@@ -109,6 +109,13 @@ namespace GameDev.Confront.Rules
         [Tooltip("10.2 §5b Firearms: points to hit a firearm loses while an enemy stands beside the shooter.")]
         [SerializeField] private float pointBlank = 10f;
 
+        [Header("10.1 Shot Line (10.2 §5f)")]
+        [Tooltip("Points to hit a shot loses when its line crosses a Partial Obstacle or its target stands in one, once however many (COMBAT-4).")]
+        [SerializeField] private float obscured = 20f;
+
+        [Tooltip("The chance that each person on a shot's line, nearest first, takes the shot before the target is rolled (COMBAT-3).")]
+        [SerializeField, Range(0f, 1f)] private float intercept = 0.60f;
+
         [Header("10.2 §5b Wait and Defensive Stance")]
         [Tooltip("Evasion each AP held in a Defensive Stance adds.")]
         [SerializeField] private float stanceEvasion = 1.5f;
@@ -145,6 +152,8 @@ namespace GameDev.Confront.Rules
         public double HigherGroundCritical => higherGroundCritical;
         public float HigherGroundRise => higherGroundRise;
         public double PointBlank => pointBlank;
+        public double Obscured => obscured;
+        public double Intercept => intercept;
         public int CounterattackAp => counterattackAp;
         public int WeaponSetAp => weaponSetAp;
 

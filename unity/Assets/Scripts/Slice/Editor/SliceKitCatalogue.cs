@@ -33,6 +33,7 @@ namespace GameDev.Slice.EditorTools
             Doorway,  // a linear wall with an opening in its middle: two side boxes and a lintel
             Leaf,     // a door leaf: one box filling its doorway's opening, 0.1 m thick on the line
             Mesh,     // the model's own meshes as static colliders: walked under an awning, stopped by its posts and tables (market stalls, S5a play test)
+            Partial,  // NoGrid: a trigger over what is seen, marked a Partial Obstacle (10.1 Shot Line, CR2): walked through, never solid, a line across it Obscured
         }
 
         public enum Anchor
@@ -190,6 +191,12 @@ namespace GameDev.Slice.EditorTools
         /// -executeMethod GameDev.Slice.EditorTools.SliceKitCatalogue.RebuildSeats
         /// </summary>
         public static void RebuildSeats() => LoadRebuilding(Specs().Where(s => s.SeatTop > 0f).Select(s => s.Key).ToArray());
+
+        /// <summary>
+        /// The bushes' and hedges' wrappers written again in place, keeping their GUIDs, once they became Partial Obstacles
+        /// (10.1 *Shot Line*, CR2). Batch: -executeMethod GameDev.Slice.EditorTools.SliceKitCatalogue.RebuildPartials
+        /// </summary>
+        public static void RebuildPartials() => LoadRebuilding(Specs().Where(s => s.Body == Body.Partial).Select(s => s.Key).ToArray());
 
         private static Spec S(string key, string family, string part, string folder, string file, string layer,
             Body body = Body.Box, Anchor anchor = Anchor.Centre) =>
@@ -375,7 +382,7 @@ namespace GameDev.Slice.EditorTools
             yield return flax;
             foreach (var n in new[] { "Bush 006", "Bush 011", "Bush 021" })
             {
-                var bush = S("Bush_" + n.Substring(5), "Bush", n.Substring(5), Trees + "/Bushes", n, KitLayers.NoGrid, Body.None, Anchor.Pivot);
+                var bush = S("Bush_" + n.Substring(5), "Bush", n.Substring(5), Trees + "/Bushes", n, KitLayers.NoGrid, Body.Partial, Anchor.Pivot);
                 bush.SizeY = 1.6f;
                 yield return bush;
             }
@@ -403,7 +410,7 @@ namespace GameDev.Slice.EditorTools
                 yield return S(key, "Tree", key.Substring(5), Polytope + "/Trees", file, ve, Body.Trunk, Anchor.Pivot);
             }
 
-            var shrub = S("Shrub", "Bush", "Shrub", Polytope + "/Shrubs", "PT_Generic_Shrub_01_green", KitLayers.NoGrid, Body.None, Anchor.Pivot);
+            var shrub = S("Shrub", "Bush", "Shrub", Polytope + "/Shrubs", "PT_Generic_Shrub_01_green", KitLayers.NoGrid, Body.Partial, Anchor.Pivot);
             shrub.SizeY = 1.2f;
             yield return shrub;
             var grass = S("Grass", "Bush", "Grass", Polytope + "/Plants", "PT_Grass_02", KitLayers.NoGrid, Body.None, Anchor.Pivot);
@@ -1179,6 +1186,18 @@ namespace GameDev.Slice.EditorTools
                 case Body.Keep:
                 case Body.None:
                     return;
+                case Body.Partial:
+                {
+                    // 10.1 Shot Line (CR2): walked through and never solid, as a hedge always was (owner, 2026-11-09), but a
+                    // targeted attack whose line crosses what is seen, or whose target stands in it, is Obscured. Grass
+                    // and flowers stay None: they stand below the hips' point.
+                    var haze = root.AddComponent<BoxCollider>();
+                    haze.center = seen.center;
+                    haze.size = Vector3.Max(seen.size, Vector3.one * 0.05f);
+                    haze.isTrigger = true;
+                    root.AddComponent<GameDev.Confront.Grid.PartialObstacle>();
+                    return;
+                }
                 case Body.Mesh:
                     // Owner's play test of S5a (2026-11-11): one box over a stall took in its awning and the tables before
                     // it, an invisible wall. Each seen mesh is its own collider, so the space under the awning is open.

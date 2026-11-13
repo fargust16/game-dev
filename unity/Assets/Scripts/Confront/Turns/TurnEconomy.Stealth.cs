@@ -176,6 +176,11 @@ namespace GameDev.Confront.Turns
             }
 
             Face(attacker, target.Cell);
+            if (attacker.Fighter.Weapon.Ranged)
+            {
+                target = ShotTaker(attacker, attacker.Cell, target); // 10.1 *Shot Line*
+            }
+
             var context = ContextFor(attacker, attacker.Cell, target);
             context.Stealth = attacker.Hidden;
             attacker.Fired |= attacker.Fighter.Weapon.Ranged;

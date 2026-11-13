@@ -165,6 +165,9 @@ namespace GameDev.Confront.Turns
         /// <summary>The forecast of a blow from a cell, with the other hand's weapon when asked.</summary>
         StrikeForecast ForecastFor(Combatant c, Combatant target, CombatCell from, bool offHand);
 
+        /// <summary>10.1 *Shot Line*: how many people stand on the line of a shot from <paramref name="from"/> at <paramref name="target"/>.</summary>
+        int PeopleOnLine(Combatant attacker, CombatCell from, Combatant target);
+
         /// <summary>Whether the attacker's weapon reaches the target from a cell: across a side for a blow, in range and in sight for a shot.</summary>
         bool ReachesFrom(Combatant attacker, CombatCell from, Combatant target);
 

@@ -83,6 +83,12 @@ namespace GameDev.Confront.Grid
         /// </summary>
         bool CanSee(CombatCell from, CombatCell to);
 
+        /// <summary>
+        /// 10.1 *Shot Line*: the line of an attack from a person standing in one cell to a person standing in the other,
+        /// to the chest, the head or the hips, solid obstacles stopping it and Partial Obstacles making it Obscured.
+        /// </summary>
+        ShotLine Shot(CombatCell from, CombatCell to);
+
         /// <summary>The 10.1 tag of the block that closes the way from one cell toward another.</summary>
         bool TryGetEnvironmentAction(CombatCell from, CombatCell to, out IEnvironmentAction action);
 

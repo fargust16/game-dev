@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GameDev.Confront.Grid;
 using GameDev.Confront.Rules;
 using GameDev.Core.Localization;
 using GameDev.Locomotion;
@@ -12,7 +13,8 @@ namespace GameDev.Slice.Fights
     /// <summary>
     /// 10.2 §5e, the Aimed Shot out of a fight (owner, 2026-11-12; PB8b). Only a projectile that touches someone is rolled,
     /// by the fight's chance to hit at that distance: a Point-Blank Shot within the next cell, armour counting double
-    /// beyond it, higher ground, and a stealth attack from Stealth Mode. A roll that misses is a graze, the Screen Message
+    /// beyond it, higher ground, a line Obscured by a Partial Obstacle (10.1 *Shot Line*, CR2), and a stealth attack from
+    /// Stealth Mode. A roll that misses is a graze, the Screen Message
     /// «Вскользь», with no harm. The one touched turns toward the shot's source: if it sees the shooter the shot is an
     /// Assault, the fight starting in place with the shot already dealt; if not, it is Alert and searches toward the
     /// source as §9's search does, and finding the shooter later it starts the Assault then. The wound stays on the body
@@ -54,6 +56,11 @@ namespace GameDev.Slice.Fights
             {
                 context.HitBonus += rules.HigherGround;
                 context.CriticalBonus += rules.HigherGroundCritical;
+            }
+
+            if (ShotTrace.Trace(from, at).Obscured)
+            {
+                context.HitBonus -= rules.Obscured; // a bush, a hedge or haze on the line, or round the target
             }
 
             var chance = rules.HitChance(shooter, target, context.HitBonus);

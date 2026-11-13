@@ -447,6 +447,9 @@ namespace GameDev.Confront.Grid
             return !Physics.Linecast(a, b, Mask, QueryTriggerInteraction.Ignore);
         }
 
+        public ShotLine Shot(CombatCell from, CombatCell to) =>
+            IsWalkable(from) && IsWalkable(to) ? ShotTrace.Trace(Center(from), Center(to)) : default;
+
         /// <summary>
         /// The 10.1 tag of what stands between two cells when no step joins them: a person's capsule, as an edge reads
         /// it, is moved level from the first cell toward the second, and the first collider it meets, or one of its

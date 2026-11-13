@@ -305,6 +305,17 @@ namespace GameDev.Slice.Fights
                 _text.Append('\n').Append(Loc.Get("ui.fight.provokes"));
             }
 
+            // 10.1 *Shot Line* (CR2): what the eye sees on the line is told whatever the Intelligence.
+            if (cursor.Target != null && cursor.Obscured)
+            {
+                _text.Append('\n').Append(Loc.Get("ui.fight.obscured"));
+            }
+
+            if (cursor.Target != null && cursor.OnLine > 0)
+            {
+                _text.Append('\n').Append(Loc.Format("ui.fight.online", cursor.OnLine));
+            }
+
             _tip.text = _text.ToString();
             // The mouse is read in the camera's pixels, which are the screen's unless the camera draws into a texture.
             var height = Camera.main != null ? Camera.main.pixelHeight : Screen.height;

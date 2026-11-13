@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3074908779209282176}
   - component: {fileID: 7116819420479124749}
+  - component: {fileID: 6890560599164293709}
+  - component: {fileID: 6178165750606397574}
   m_Layer: 14
   m_Name: Kit_Bush_006_1x2
   m_TagString: Untagged
@@ -45,6 +47,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d9534333a80045479e9bddcb8f9446e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.Kit.KitBlock
+--- !u!65 &6890560599164293709
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9188500016683114659}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.4677628, y: 1.6, z: 1.5567715}
+  m_Center: {x: 0.47353786, y: 0.8, z: 0.5075885}
+--- !u!114 &6178165750606397574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9188500016683114659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24aa64c999ef06d47a0a2d82ed080e39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Confront::GameDev.Confront.Grid.PartialObstacle
 --- !u!1001 &3785079567957613588
 PrefabInstance:
   m_ObjectHideFlags: 0

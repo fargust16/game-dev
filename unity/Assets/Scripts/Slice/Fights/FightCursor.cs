@@ -75,6 +75,12 @@ namespace GameDev.Slice.Fights
         /// <summary>The walk shown leaves an enemy's side and draws its Reaction Attack (S3a.6).</summary>
         public bool Provokes { get; private set; }
 
+        /// <summary>10.1 *Shot Line* (CR2): how many people stand on the shot's line, each of whom may take it; 0 for a melee blow.</summary>
+        public int OnLine { get; private set; }
+
+        /// <summary>10.1 *Shot Line* (CR2): the shot's line crosses a Partial Obstacle, or the target stands in one.</summary>
+        public bool Obscured { get; private set; }
+
         /// <summary>The cell pointed at lies across a tagged edge, and an Environment Action is the way there (S3a.7).</summary>
         public bool HasOption { get; private set; }
 
@@ -89,6 +95,8 @@ namespace GameDev.Slice.Fights
             Steps = 0;
             Affordable = false;
             Provokes = false;
+            OnLine = 0;
+            Obscured = false;
             HasOption = false;
             _path.Clear();
             if (player == null || camera == null || !_turns.IsRunning || _turns.Acting != player)
@@ -109,6 +117,12 @@ namespace GameDev.Slice.Fights
                 Cost = Steps < 0 ? 0 : walk + (offHand ? set.OffWeapon : set.Weapon).AttackAp;
                 Affordable = Steps >= 0 && Cost <= _turns.ApLeft;
                 Forecast = _turns.ForecastFor(player, Target, from, offHand);
+                if (Steps >= 0 && (offHand ? set.OffWeapon : set.Weapon).Ranged)
+                {
+                    OnLine = _turns.PeopleOnLine(player, from, Target);
+                    Obscured = _grid.Shot(from, Target.Cell).Obscured;
+                }
+
                 Provokes = Steps > 0 && Leaves(player);
                 Show(Affordable ? Shape.Attack : Shape.AttackBlocked, Affordable ? Steps : Math.Min(Math.Max(Steps, 0), _turns.ApLeft));
                 return;

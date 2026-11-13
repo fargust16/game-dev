@@ -229,6 +229,11 @@ namespace GameDev.Confront.Turns
                 {
                     bonus -= _rules.CoverPenalty(CoverFacing(target.Cell, from));
                 }
+
+                if (_grid.Shot(from, target.Cell).Obscured)
+                {
+                    bonus -= _rules.Obscured; // 10.1 *Shot Line*: once, however many Partial Obstacles
+                }
             }
 
             if (_grid.Center(from).y - _grid.Center(target.Cell).y >= _rules.HigherGroundRise)
@@ -250,7 +255,7 @@ namespace GameDev.Confront.Turns
             }
 
             return weapon.Ranged
-                ? Distance(from, target.Cell) <= weapon.RangeCells && _grid.CanSee(from, target.Cell)
+                ? Distance(from, target.Cell) <= weapon.RangeCells && _grid.Shot(from, target.Cell).Clear
                 : Beside(from, target.Cell);
         }
 
@@ -687,6 +692,11 @@ namespace GameDev.Confront.Turns
             c.Attacked = true;
             c.Fired |= weapon.Ranged;
             Face(c, target.Cell);
+            if (weapon.Ranged)
+            {
+                target = ShotTaker(c, c.Cell, target); // 10.1 *Shot Line*: someone on the line may take the shot
+            }
+
             var context = ContextFor(c, c.Cell, target);
             context.Stealth = c.Hidden; // 10.3 §7: an attack from Stealth Mode, which it ends
             var result = _rules.Strike(c.Fighter, target.Fighter, context, _rolls);

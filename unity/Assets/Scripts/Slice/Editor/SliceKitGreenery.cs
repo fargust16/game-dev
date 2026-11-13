@@ -57,7 +57,7 @@ namespace GameDev.Slice.EditorTools
             // Garden bushes, in the Polytope shrub's place inside the walls.
             foreach (var n in new[] { "Bush 006", "Bush 011", "Bush 015" })
             {
-                var bush = S("CityBush_" + n.Substring(5), "Bush", "City" + n.Substring(5), Trees + "/Bushes", n, KitLayers.NoGrid, Body.None, Anchor.Pivot);
+                var bush = S("CityBush_" + n.Substring(5), "Bush", "City" + n.Substring(5), Trees + "/Bushes", n, KitLayers.NoGrid, Body.Partial, Anchor.Pivot);
                 bush.SizeY = 1.4f;
                 yield return bush;
             }
@@ -66,7 +66,7 @@ namespace GameDev.Slice.EditorTools
             // clipped to a metre of line.
             foreach (var n in new[] { "Bush 019", "Bush 020" })
             {
-                var hedge = S("CityHedge_" + n.Substring(5), "Hedge", "City" + n.Substring(5), Trees + "/Bushes", n, KitLayers.NoGrid, Body.None, Anchor.Linear);
+                var hedge = S("CityHedge_" + n.Substring(5), "Hedge", "City" + n.Substring(5), Trees + "/Bushes", n, KitLayers.NoGrid, Body.Partial, Anchor.Linear);
                 hedge.Width = 1;
                 hedge.SizeX = HedgeLength;
                 hedge.SizeY = HedgeHeight;
