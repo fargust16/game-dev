@@ -134,6 +134,13 @@ namespace GameDev.Slice.EditorTools
         public static readonly Look Innkeeper = new Look("Innkeeper", "innkeeper", false, 1.72f, ResidentRole.Innkeeper);
         public static readonly Look Tailor = new Look("Tailor", "tailor", false, 1.75f, ResidentRole.Tailor);
 
+        /// <summary>
+        /// Nell Garrow's own model since the owner's answer to S5-9 (2026-11-13; asset map §1): the owner's tavern keeper,
+        /// Tripo's <c>realistic_fantasy_character_3d_model</c> renamed <c>tavern_keeper</c>; she keeps the tavern, so her
+        /// role is the innkeeper's. Height an authoring default.
+        /// </summary>
+        public static readonly Look TavernKeeper = new Look("TavernKeeper", "tavern_keeper", true, 1.66f, ResidentRole.Innkeeper);
+
         /// <summary>The third list's looks.</summary>
         public static readonly Look[] Roles = { OldBeliever, ChurchMaid, OldPriest, Acolyte, FactoryWorker, Vagrant, Dockworker, OldDockworker, Moneylender, Innkeeper, Tailor };
 
@@ -141,6 +148,7 @@ namespace GameDev.Slice.EditorTools
         {
             Gentleman, Lady, WorkingWoman, Officer, Detective, Blacksmith, WardenWoman,
             OldBeliever, ChurchMaid, OldPriest, Acolyte, FactoryWorker, Vagrant, Dockworker, OldDockworker, Moneylender, Innkeeper, Tailor,
+            TavernKeeper,
         };
 
         /// <summary>The player's two bodies (owner, 2026-11-10): worn by the player's prefabs, with no standing prefab of their own.</summary>
@@ -177,18 +185,20 @@ namespace GameDev.Slice.EditorTools
                 case "Old priest": return OldPriest;
                 case "Acolyte": return Acolyte;
                 case "Church maid": return ChurchMaid;
-                case "Innkeeper": return Innkeeper;
-                case "Moneylender": return Moneylender;
+                case "Innkeeper": case "Market trader": return Innkeeper;
+                case "Moneylender": case "Mortimer Kettle": case "The pawnbroker": return Moneylender;
+                case "Nell Garrow": return TavernKeeper;
+                case "Father Ambrose Hale": return OldPriest;
                 case "Josiah Harrow": case "Harrow": case "POI A - Harrow": case "Silas Quill": case "Tobias Penn": case "Mr Ashgrave":
                 case "The trader": case "Master of Enchanting":
                     return Gentleman;
                 case "Ada Merrow": case "Madame Ilse": case "Master of First Aid": case "The seer":
                     return Lady;
-                case "Nell Garrow": case "Lottie Wren": case "Edda Brann": case "Tavern keeper": case "Master of Item Creation":
+                case "Lottie Wren": case "Edda Brann": case "Tavern keeper": case "Master of Item Creation":
                     return WorkingWoman;
                 case "Pip Vance": case "Kit Mallow": case "Dace": case "Veinmarket": case "Veinmarket at a table": case "Drunkard": case "Farmer":
                     return Gentleman;
-                case "Ruth Kettle": case "The pawnbroker": case "POI B - Old woman in a doorway": case "POI A - Neighbour (middle)":
+                case "POI B - Old woman in a doorway": case "POI A - Neighbour (middle)":
                     return WorkingWoman;
                 case "Faction member":
                     return female ? Lady : Gentleman;
@@ -375,7 +385,7 @@ namespace GameDev.Slice.EditorTools
             AssetDatabase.SaveAssets();
             var speeds = NewWalkers.ToDictionary(l => l.Walking, l => AssetDatabase.LoadAssetAtPath<GameObject>(l.Walking).GetComponent<TownsfolkWalker>().Speed);
             Scenes(speeds, report);
-            OneMoneylender(speeds, report);
+            NoMoneylender(report);
             SliceActivities.Interiors(report);
             Directory.CreateDirectory(OutputFolder);
             File.WriteAllText($"{OutputFolder}/people_third_list.txt", report.ToString());
@@ -400,46 +410,80 @@ namespace GameDev.Slice.EditorTools
         }
 
         /// <summary>
-        /// The one moneylender (VS-ROLES (a)): of Veilmouth's men walking by a rich block, the first by name, unless one
-        /// already walks in the moneylender's prefab.
+        /// No nameless moneylender (VS-ROLES (a), settled by the owner's answer to S5-9, 2026-11-13): the moneylender's
+        /// model is the pawnbroker Mortimer Kettle's, so every walker in it walks as a gentleman again.
         /// </summary>
-        private static void OneMoneylender(Dictionary<string, float> speeds, StringBuilder report)
+        private static void NoMoneylender(StringBuilder report)
         {
             var scene = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
-            var layout = VeilmouthLayout.Load();
-            // Only a nameless townsperson: the Farmer and the other named walkers keep their own looks (LookFor).
-            var walkers = Roots().Where(g => g.name == "Townsperson" && g.GetComponent<TownsfolkWalker>() is TownsfolkWalker w && w.Route.Length > 0).ToList();
-            foreach (var named in Roots().Where(g => g.name != "Townsperson" && PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g) == Moneylender.Walking).ToList())
+            var changed = false;
+            foreach (var walker in Roots().Where(g => PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g) == Moneylender.Walking).ToList())
             {
-                Replace(named, AssetDatabase.LoadAssetAtPath<GameObject>(Gentleman.Walking));
-                report.AppendLine($"{named.name}: back to the gentleman");
+                Replace(walker, AssetDatabase.LoadAssetAtPath<GameObject>(Gentleman.Walking));
+                report.AppendLine($"{walker.name}: no moneylender, a gentleman again");
+                changed = true;
             }
 
-            if (walkers.Any(g => PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g) == Moneylender.Walking))
+            if (changed)
             {
-                report.AppendLine("The moneylender: already walking");
-                return;
+                EditorSceneManager.MarkSceneDirty(scene);
+                EditorSceneManager.SaveScene(scene);
+            }
+        }
+
+        /// <summary>
+        /// The owner's answer to S5-9 (2026-11-13; asset map §1), built in S5c.3: the tavern keeper's model made Humanoid and
+        /// built, and worn by Nell Garrow; the pawnbroker the gentleman Mortimer Kettle in the moneylender's model, and no
+        /// nameless moneylender walks; the old innkeeper no longer behind the Soot &amp; Bell's bar (the hours' pass sets
+        /// him at Bawling Row's food stall). The Tripo folder was renamed on disk first, its <c>.meta</c> files keeping
+        /// their GUIDs.
+        /// </summary>
+        public static void S5Nine(StringBuilder report)
+        {
+            SliceCharacterRigs.Convert();
+            Build(TavernKeeper, false, null, report);
+            AssetDatabase.SaveAssets();
+
+            var tavern = EditorSceneManager.OpenScene(VeilmouthScene.SootAndBellScenePath, OpenSceneMode.Single);
+            var nell = Object.FindObjectsByType<NamedPerson>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(p => p.Id == "nell");
+            if (nell != null && PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(nell.gameObject) != TavernKeeper.Standing)
+            {
+                Replace(nell.gameObject, AssetDatabase.LoadAssetAtPath<GameObject>(TavernKeeper.Standing));
+                report.AppendLine($"Nell Garrow: the tavern keeper's model at {nell.transform.position}");
             }
 
-            var one = walkers.Where(g => PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g) == Gentleman.Walking)
-                .Where(g =>
+            foreach (var innkeeper in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+                         .Where(t => t.name == "Innkeeper" && PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject)).ToList())
+            {
+                Object.DestroyImmediate(innkeeper.gameObject);
+                report.AppendLine("The innkeeper: no longer behind the bar");
+            }
+
+            EditorSceneManager.MarkSceneDirty(tavern);
+            EditorSceneManager.SaveScene(tavern);
+
+            var city = EditorSceneManager.OpenScene(VeilmouthScene.ScenePath, OpenSceneMode.Single);
+            var pawnbroker = Object.FindObjectsByType<NamedPerson>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(p => p.Id == "ruth" || p.Id == "kettle");
+            if (pawnbroker != null)
+            {
+                if (PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(pawnbroker.gameObject) != Moneylender.Standing)
                 {
-                    var (px, py) = (g.transform.position.x + 500f, 500f - g.transform.position.z);
-                    return layout.blocks?.OrderBy(b => Outside(b, px, py)).FirstOrDefault()?.wealth == "rich";
-                })
-                .OrderBy(g => g.name, System.StringComparer.Ordinal).FirstOrDefault();
-            if (one == null)
+                    Replace(pawnbroker.gameObject, AssetDatabase.LoadAssetAtPath<GameObject>(Moneylender.Standing));
+                }
+
+                pawnbroker.gameObject.name = "Mortimer Kettle";
+                pawnbroker.Configure("kettle");
+                EditorUtility.SetDirty(pawnbroker);
+                report.AppendLine($"Mortimer Kettle: the pawnbroker in the moneylender's model at {pawnbroker.transform.position}");
+                EditorSceneManager.MarkSceneDirty(city);
+                EditorSceneManager.SaveScene(city);
+            }
+            else
             {
-                report.AppendLine("The moneylender: NO rich man walking");
-                return;
+                report.AppendLine("The pawnbroker: NOT FOUND in Veilmouth");
             }
 
-            Replace(one, AssetDatabase.LoadAssetAtPath<GameObject>(Moneylender.Walking));
-            var lines = new List<string> { $"{one.name}: the moneylender" };
-            Paces(speeds, lines);
-            EditorSceneManager.MarkSceneDirty(scene);
-            EditorSceneManager.SaveScene(scene);
-            report.AppendLine(string.Join("\n", lines));
+            NoMoneylender(report);
         }
 
         /// <summary>One of each of the third list's walkers in Veilmouth, as the player would meet it (`people_role_*.png`).</summary>

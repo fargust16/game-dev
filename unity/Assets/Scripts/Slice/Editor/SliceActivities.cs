@@ -345,17 +345,8 @@ namespace GameDev.Slice.EditorTools
 
                 report.AppendLine($"  the bar: {length * 2f:0.0} m long, {places.Length} places before it 1.6 m or more along it from Nell, {(places.Length > 0 ? "a drinker at the first" : "NO ROOM")}");
 
-                // The innkeeper (the owner's third list, VS-ROLES (a)): behind the bar beside Nell, 1.2 m or more along it.
-                var behind = new[] { 1.4f, -1.4f, 2.2f, -2.2f, 1.2f, -1.2f }.Select(d => Grounded(nell.transform.position + (along * d)))
-                    .FirstOrDefault(p => Mathf.Abs(Vector3.Dot(Flat(p - bounds.center), along)) <= length + 0.6f &&
-                                         !Physics.CheckCapsule(p + (Vector3.up * 0.45f), p + (Vector3.up * 1.45f), 0.25f, Blocking, QueryTriggerInteraction.Ignore));
-                report.AppendLine(behind != Vector3.zero
-                    ? $"  the innkeeper behind the bar, {Flat(behind - nell.transform.position).magnitude:0.0} m from Nell"
-                    : "  the innkeeper: NO ROOM behind the bar");
-                if (behind != Vector3.zero)
-                {
-                    Standing(scene, SlicePeopleModels.Innkeeper.Standing, "Innkeeper", behind, Yaw(out_));
-                }
+                // No innkeeper behind the bar since the owner's answer to S5-9 (2026-11-13): Nell Garrow keeps the tavern in
+                // the tavern keeper's model, and the innkeeper's model is Bawling Row's market trader (SliceHoursPosts).
             }
             else
             {
@@ -411,7 +402,7 @@ namespace GameDev.Slice.EditorTools
             // The church's people (the owner's third list): the rostrum stands against the north wall (VeilmouthInteriors.Chapel),
             // so the old priest stands before it facing the pews, the acolyte and the maid at its sides; each on the first
             // clear place of a few on the floor. Those of an earlier run go first, found a place or not.
-            var clergyNames = new[] { "Old priest", "Acolyte", "Church maid" };
+            var clergyNames = new[] { "Old priest", SliceHoursPosts.HaleName, "Acolyte", "Church maid" };
             foreach (var old in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None)
                          .Where(t => t.gameObject.scene == scene && clergyNames.Contains(t.name) && PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject)).ToList())
             {
@@ -433,7 +424,7 @@ namespace GameDev.Slice.EditorTools
                     !Physics.CheckCapsule(p + (Vector3.up * 0.45f), p + (Vector3.up * 1.45f), 0.25f, Blocking, QueryTriggerInteraction.Ignore));
                 var clergy = new[]
                 {
-                    (SlicePeopleModels.OldPriest.Standing, "Old priest", Clear(new[] { 0.5f, 0.7f, 0.9f }.Select(d => box.center - (toward * (depth + d))))),
+                    (SlicePeopleModels.OldPriest.Standing, SliceHoursPosts.HaleName, Clear(new[] { 0.5f, 0.7f, 0.9f }.Select(d => box.center - (toward * (depth + d))))),
                     (SlicePeopleModels.Acolyte.Standing, "Acolyte", Clear(new[] { 0.5f, 0.8f, 1.1f }.Select(d => box.center - (toward * 0.3f) + (along * (width + d))))),
                     (SlicePeopleModels.ChurchMaid.Standing, "Church maid", Clear(new[] { 0.5f, 0.8f, 1.1f }.Select(d => box.center - (toward * 0.3f) - (along * (width + d))))),
                 };
@@ -445,6 +436,9 @@ namespace GameDev.Slice.EditorTools
                         Standing(scene, prefab, name, at, Yaw(-toward));
                     }
                 }
+
+                // The old priest is Father Ambrose Hale, the fifteenth named person (S5c.3).
+                SliceHoursPosts.NameHale(scene, report);
             }
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -727,11 +721,11 @@ namespace GameDev.Slice.EditorTools
             return tris;
         }
 
-        private static IEnumerable<GameObject> Instances(string prefabPath) =>
+        internal static IEnumerable<GameObject> Instances(string prefabPath) =>
             Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).Select(t => t.gameObject)
                 .Where(g => PrefabUtility.IsOutermostPrefabInstanceRoot(g) && PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(g) == prefabPath);
 
-        private static Bounds Bounds(GameObject g)
+        internal static Bounds Bounds(GameObject g)
         {
             // Meshes only: a candle flame's particle renderer, never simulated in the editor, has its bounds at the origin.
             var renderers = g.GetComponentsInChildren<Renderer>().Where(r => r.enabled && (r is MeshRenderer || r is SkinnedMeshRenderer)).ToArray();
@@ -746,15 +740,15 @@ namespace GameDev.Slice.EditorTools
 
         private static Vector3 Centre(GameObject g) => Bounds(g).center;
 
-        private static Vector3 Grounded(Vector3 p) =>
+        internal static Vector3 Grounded(Vector3 p) =>
             Physics.Raycast(p + (Vector3.up * 1.5f), Vector3.down, out var hit, 4f, SliceTownsfolk.GroundMask, QueryTriggerInteraction.Ignore)
                 ? new Vector3(p.x, hit.point.y, p.z)
                 : p;
 
-        private static Vector3 Snap(Vector3 v) => Mathf.Abs(v.x) > Mathf.Abs(v.z) ? new Vector3(Mathf.Sign(v.x), 0f, 0f) : new Vector3(0f, 0f, Mathf.Sign(v.z));
+        internal static Vector3 Snap(Vector3 v) => Mathf.Abs(v.x) > Mathf.Abs(v.z) ? new Vector3(Mathf.Sign(v.x), 0f, 0f) : new Vector3(0f, 0f, Mathf.Sign(v.z));
 
-        private static float Yaw(Vector3 forward) => Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg;
+        internal static float Yaw(Vector3 forward) => Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg;
 
-        private static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
+        internal static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
     }
 }

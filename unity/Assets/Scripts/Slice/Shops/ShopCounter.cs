@@ -46,7 +46,7 @@ namespace GameDev.Slice.Shops
                 return null;
             }
 
-            return shops.IsOpen ? Loc.Get("ui.prompt.trade") : Loc.Format("ui.prompt.shop_closed", shops.Rules.Opens);
+            return shops.IsOpenFor(Keeper) ? Loc.Get("ui.prompt.trade") : Loc.Format("ui.prompt.shop_closed", shops.Opens(Keeper));
         }
 
         /// <summary>Opens the shop page, as E does.</summary>
@@ -54,7 +54,7 @@ namespace GameDev.Slice.Shops
         {
             var shops = Shops();
             _hud ??= FindAnyObjectByType<HudView>();
-            if (shops == null || _hud == null || !shops.IsOpen || Busy())
+            if (shops == null || _hud == null || !shops.IsOpenFor(Keeper) || Busy())
             {
                 return false;
             }
@@ -201,7 +201,7 @@ namespace GameDev.Slice.Shops
             var input = GameInputService.Instance;
             _player ??= FindAnyObjectByType<PlayerLocomotion>();
             if (_hud == null || !_hud.IsShopOpen || _player == null || !InReach(_player.transform.position) || Busy()
-                || (Shops() != null && !Shops().IsOpen) || (input != null && (input.CancelPressed || input.InteractPressed)))
+                || (Shops() != null && !Shops().IsOpenFor(Keeper)) || (input != null && (input.CancelPressed || input.InteractPressed)))
             {
                 Close();
             }

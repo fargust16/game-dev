@@ -1981,6 +1981,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 370587203}
     m_Modifications:
+    - target: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
+      propertyPath: m_Name
+      value: Pip Vance
+      objectReference: {fileID: 0}
+    - target: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 7896047013878157855, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.5
@@ -2020,14 +2028,6 @@ PrefabInstance:
     - target: {fileID: 7896047013878157855, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
-      propertyPath: m_Name
-      value: Pip Vance
-      objectReference: {fileID: 0}
-    - target: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
-      propertyPath: m_Layer
-      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 71517773341481403, guid: cf00dd020e6c2da47b5072176f1d9758, type: 3}
       propertyPath: m_Layer
@@ -2280,6 +2280,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
       insertIndex: -1
       addedObject: {fileID: 319897263}
+    - targetCorrespondingSourceObject: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 319897264}
   m_SourcePrefab: {fileID: 100100000, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
 --- !u!4 &319897261 stripped
 Transform:
@@ -2304,6 +2307,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: pip
+--- !u!114 &319897264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 319897262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48fc034b907c81f43bf0d14fb1df05d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.PersonPost
+  person: pip
+  post: work
+  primary: 1
 --- !u!1001 &327023498
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6709,6 +6727,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1369994671}
+    - targetCorrespondingSourceObject: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1369994672}
   m_SourcePrefab: {fileID: 100100000, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
 --- !u!4 &1369994669 stripped
 Transform:
@@ -6733,6 +6754,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: harrow
+--- !u!114 &1369994672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1369994670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48fc034b907c81f43bf0d14fb1df05d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.PersonPost
+  person: harrow
+  post: work
+  primary: 1
 --- !u!1001 &1408754282
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -7135,6 +7135,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8755413562499794411, guid: 9e1bf74a2f7b3b1438113504dab29124, type: 3}
       insertIndex: -1
       addedObject: {fileID: 646234481}
+    - targetCorrespondingSourceObject: {fileID: 8755413562499794411, guid: 9e1bf74a2f7b3b1438113504dab29124, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 646234482}
   m_SourcePrefab: {fileID: 100100000, guid: 9e1bf74a2f7b3b1438113504dab29124, type: 3}
 --- !u!4 &646234479 stripped
 Transform:
@@ -7159,6 +7162,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: coyle
+--- !u!114 &646234482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646234480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48fc034b907c81f43bf0d14fb1df05d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.PersonPost
+  person: coyle
+  post: work
+  primary: 1
 --- !u!1001 &666003338
 PrefabInstance:
   m_ObjectHideFlags: 0

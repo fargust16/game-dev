@@ -102,7 +102,7 @@ namespace GameDev.Slice.Shops
         /// <summary>The key of the reason a piece cannot be begun, or null.</summary>
         public string Fault(string keeper, ItemDefinition item, int stage)
         {
-            if (!_shops.IsOpen)
+            if (!_shops.IsOpenFor(keeper))
             {
                 return "ui.shop.fault.closed";
             }

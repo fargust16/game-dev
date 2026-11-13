@@ -4407,18 +4407,57 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4983742377235370021, guid: 2c4f0d1dd77ef7548bc6441763742149, type: 3}
       propertyPath: m_Name
-      value: Old priest
+      value: Father Ambrose Hale
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4983742377235370021, guid: 2c4f0d1dd77ef7548bc6441763742149, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 841731574}
+    - targetCorrespondingSourceObject: {fileID: 4983742377235370021, guid: 2c4f0d1dd77ef7548bc6441763742149, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 841731573}
   m_SourcePrefab: {fileID: 100100000, guid: 2c4f0d1dd77ef7548bc6441763742149, type: 3}
 --- !u!4 &841731571 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2034518638766993258, guid: 2c4f0d1dd77ef7548bc6441763742149, type: 3}
   m_PrefabInstance: {fileID: 841731570}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &841731572 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4983742377235370021, guid: 2c4f0d1dd77ef7548bc6441763742149, type: 3}
+  m_PrefabInstance: {fileID: 841731570}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &841731573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841731572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48fc034b907c81f43bf0d14fb1df05d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.PersonPost
+  person: hale
+  post: work
+  primary: 1
+--- !u!114 &841731574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 841731572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bbce0b262152e24eb1ca1b164c51fc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
+  id: hale
 --- !u!1001 &850420813
 PrefabInstance:
   m_ObjectHideFlags: 0

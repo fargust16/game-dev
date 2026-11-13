@@ -103,8 +103,7 @@ namespace GameDev.Slice.Tests
                 Assert.IsTrue(string.IsNullOrWhiteSpace(dream.requiresKey));
             }
 
-            // The pawnbroker's roster id follows S5-9's Mortimer Kettle with S5c.3.
-            foreach (var entry in SliceRoster.All.Where(e => e.Id != "ruth"))
+            foreach (var entry in SliceRoster.All)
             {
                 Assert.IsTrue(dreams.Any(d => d.id == SliceConfront.DreamTip(entry.Id)), entry.Id);
             }

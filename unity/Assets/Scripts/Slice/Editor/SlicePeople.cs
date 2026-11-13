@@ -9,7 +9,8 @@ using UnityEngine;
 namespace GameDev.Slice.EditorTools
 {
     /// <summary>
-    /// S1.5, once (SLICE_PEOPLE §1): the fourteen named people in the owner's scenes. Eleven take the place and pose of
+    /// S1.5, once (SLICE_PEOPLE §1): the fourteen named people in the owner's scenes; the fifteenth, Father Ambrose Hale, is the
+    /// old chapel's priest, named where he stands by the hours' pass (S5c.3, <see cref="SliceHoursPosts"/>). Eleven take the place and pose of
     /// the Dummy that stood for their role; Pip, Lottie, and Kit are new, at the first free place of their list. Each
     /// is a Dummy of the role's colour and the person's sex, named, with <see cref="NamedPerson"/>; Nell and Kit, the
     /// bartender and Street Rumour sources of S1.3, are talked to through their conversations since S2.4
@@ -28,7 +29,7 @@ namespace GameDev.Slice.EditorTools
             { "silas", "Master of Enchanting" },
             { "ada", "Master of First Aid" },
             { "tobias", "The trader" },
-            { "ruth", "The pawnbroker" },
+            { "kettle", "The pawnbroker" },
             { "ilse", "The seer" },
             { "coyle", "Warden" },
             { "ashgrave", "Faction member" },
@@ -58,6 +59,9 @@ namespace GameDev.Slice.EditorTools
         public static DialogueDefinition DialogueOf(string id) => Talks.TryGetValue(id, out var talk)
             ? AssetDatabase.LoadAssetAtPath<DialogueDefinition>($"Assets/Data/Slice/Dialogue/{talk.dialogue}.asset")
             : null;
+
+        /// <summary>How near the person <paramref name="id"/> is talked to, m, or null for one nobody talks to yet.</summary>
+        public static float? TalkReach(string id) => Talks.TryGetValue(id, out var talk) ? talk.reach : (float?)null;
 
         public static string ScenePath(string scene) =>
             scene == SliceRoster.Veilmouth ? "Assets/Scenes/Slice/Veilmouth.unity" : $"Assets/Scenes/Slice/Interiors/{scene}.unity";

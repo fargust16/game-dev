@@ -92,10 +92,16 @@ namespace GameDev.Slice
                 shown.SetActive(on);
             }
 
+            // A person's post is the hours' to switch (S5c.3): the residue holds it, and the hours put it away at once.
             foreach (var hidden in hides.Where(o => o != null))
             {
-                hidden.SetActive(!on);
+                if (hidden.GetComponent<GameDev.Slice.People.PersonPost>() == null)
+                {
+                    hidden.SetActive(!on);
+                }
             }
+
+            world.Hours?.Refresh();
 
             foreach (var door in seals.Where(d => d != null))
             {

@@ -8,7 +8,7 @@ namespace GameDev.Slice.People
     /// <summary>
     /// One of the slice's named people (SLICE_PEOPLE §1): who they are, so the HUD names them nearby. The name and the
     /// role are in the string tables (17 X.7) as <c>person.&lt;id&gt;.name</c> and <c>.role</c>, placeholders the owner may
-    /// change. Their schedules come with S5c.
+    /// change. Their hours are <see cref="SliceHours"/>, kept by <see cref="PersonHours"/> (S5c.3).
     /// </summary>
     public sealed class NamedPerson : MonoBehaviour, INameTag
     {
@@ -33,7 +33,11 @@ namespace GameDev.Slice.People
         }
     }
 
-    /// <summary>The slice's named people and where each stands until S5c's schedules (SLICE_PEOPLE §1, accepted by the owner 2026-11-07).</summary>
+    /// <summary>
+    /// The slice's named people and the scene each works in (SLICE_PEOPLE §1, accepted by the owner 2026-11-07): since the
+    /// owner's answer to S5-9 the pawnbroker is Mortimer Kettle, and since S5c.3 Father Ambrose Hale, the old priest, is the
+    /// fifteenth; their other posts are <see cref="SliceHours"/>.
+    /// </summary>
     public static class SliceRoster
     {
         public sealed class Entry
@@ -70,6 +74,7 @@ namespace GameDev.Slice.People
         public const string Apothecary = "HarrowApothecary";
         public const string Station = "WardensLockup";
         public const string FactionHouse = "FactionHouse";
+        public const string Chapel = "OldChapel";
 
         public static string NameKey(string id) => $"person.{id}.name";
 
@@ -84,13 +89,14 @@ namespace GameDev.Slice.People
             new Entry("silas", Veilmouth, false, "Green"),
             new Entry("ada", Veilmouth, true, "Green"),
             new Entry("tobias", Veilmouth, false, "Orange"),
-            new Entry("ruth", Veilmouth, true, "Orange"),
+            new Entry("kettle", Veilmouth, false, "Orange"),
             new Entry("ilse", Veilmouth, true, "Orange"),
             new Entry("coyle", Station, false, "Blue"),
             new Entry("ashgrave", FactionHouse, false, "Teal"),
             new Entry("lottie", Tavern, true, "Yellow"),
             new Entry("dace", Tavern, false, "Brown"),
             new Entry("kit", Veilmouth, false, "Yellow"),
+            new Entry("hale", Chapel, false, "Teal"),
         };
     }
 }

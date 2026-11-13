@@ -31,6 +31,8 @@ namespace GameDev.Slice.EditorTools
             // The owner's third list of 2026-11-12, each file renamed by its role (asset map §1).
             "old_believer_woman", "church_maid", "old_priest", "young_acolyte", "old_factory_worker", "street_vagrant",
             "young_dockworker", "old_dockworker", "moneylender", "innkeeper", "tailor",
+            // Nell Garrow's, by the owner's answer to S5-9 (2026-11-13), renamed from realistic_fantasy_character_3d_model.
+            "tavern_keeper",
         };
 
         public static string ModelPath(string file) => $"{Tripo}/{file}/{file}.fbx";

@@ -57,7 +57,7 @@ namespace GameDev.Slice.Shops
                 return null;
             }
 
-            return world.Shops.IsOpen ? Loc.Get("ui.prompt.anvil") : Loc.Format("ui.prompt.anvil_closed", world.Shops.Rules.Opens);
+            return world.Shops.IsOpenFor(Keeper) ? Loc.Get("ui.prompt.anvil") : Loc.Format("ui.prompt.anvil_closed", world.Shops.Opens(Keeper));
         }
 
         /// <summary>Opens the page, as E does.</summary>
@@ -65,7 +65,7 @@ namespace GameDev.Slice.Shops
         {
             var world = SliceWorldDriver.Running;
             _hud ??= FindAnyObjectByType<HudView>();
-            if (world == null || world.Workshop == null || _hud == null || !world.Shops.IsOpen || Busy() || Working(world))
+            if (world == null || world.Workshop == null || _hud == null || !world.Shops.IsOpenFor(Keeper) || Busy() || Working(world))
             {
                 return false;
             }
@@ -188,7 +188,7 @@ namespace GameDev.Slice.Shops
             _player ??= FindAnyObjectByType<PlayerLocomotion>();
             var shops = SliceWorldDriver.Running != null ? SliceWorldDriver.Running.Shops : null;
             if (_hud == null || !_hud.IsShopOpen || _player == null || !InReach(_player.transform.position) || Busy()
-                || (shops != null && !shops.IsOpen) || (input != null && (input.CancelPressed || input.InteractPressed)))
+                || (shops != null && !shops.IsOpenFor(Keeper)) || (input != null && (input.CancelPressed || input.InteractPressed)))
             {
                 Close();
             }

@@ -151,6 +151,28 @@ namespace GameDev.Slice
         /// <summary>Sleep (S5c.2; 18 §3): the page, the passing night, its visitors and its recovery.</summary>
         public GameDev.Slice.Mind.SleepRun Sleep { get; private set; }
 
+        /// <summary>The people's hours (S5c.3; 18 *Townsfolk in the slice*): who stands where at each hour, and the walkers at night.</summary>
+        public PersonHours Hours { get; private set; }
+
+        /// <summary>
+        /// The hours switched people on or off (S5c.3): a keeper come to work gets its counter, a walker back from home its
+        /// purse, and the HUD looks again for names and prompts.
+        /// </summary>
+        public void PeopleChanged()
+        {
+            if (Shops != null)
+            {
+                OpenCounters();
+            }
+
+            if (Theft != null)
+            {
+                FindPurses();
+            }
+
+            Hud()?.FindPromptSources();
+        }
+
         /// <summary>The character's Sanity (07.2 §3.4; S5b.5 spends it on the Limit potions).</summary>
         public GameDev.Slice.Mind.SliceSanity Sanity { get; private set; }
 
@@ -344,9 +366,13 @@ namespace GameDev.Slice
                 Accusation = gameObject.AddComponent<WardenAccusation>();
                 Accusation.Configure(this);
             }
+            // S5c.3: the people's hours before the counters, so a keeper away gets none.
+            Hours = gameObject.AddComponent<PersonHours>();
+            Hours.Configure(this);
             if (Bag != null && settings.Shops != null)
             {
                 Shops = new SliceShops(settings.Shops, settings.Items, seed, Clock, Bag, State);
+                Shops.KeeperAtWork = Hours.AtWork;
                 Workshop = new SliceWorkshop(Shops, settings.Items, seed, Clock, Bag, State, Character);
                 Alchemy = new GameDev.Slice.Alchemy.SliceAlchemy(Shops, settings.Items, seed, Clock, Bag, State, Character);
                 OpenCounters();
@@ -1087,6 +1113,12 @@ namespace GameDev.Slice
             var added = false;
             foreach (var person in FindObjectsByType<NamedPerson>(FindObjectsInactive.Exclude))
             {
+                // A keeper trades only at its work post: Silas Quill at a table of the Soot & Bell has no counter (S5c.3).
+                if (person.TryGetComponent<PersonPost>(out var post) && post.Post != SliceHours.Work)
+                {
+                    continue;
+                }
+
                 if (Shops.Find(person.Id) != null && person.GetComponent<ShopCounter>() == null)
                 {
                     person.gameObject.AddComponent<ShopCounter>().Configure(person.Id);

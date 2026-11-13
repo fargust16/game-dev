@@ -75,6 +75,18 @@ namespace GameDev.Slice.Shops
 
         public bool IsOpen => _clock.MinuteOfDay >= _rules.Opens * 60 && _clock.MinuteOfDay < _rules.Closes * 60;
 
+        /// <summary>
+        /// 18 *Townsfolk in the slice* (S5c.3): whether a keeper is at its work now, by its hours; the driver sets it, and with
+        /// none every keeper is.
+        /// </summary>
+        public Func<string, bool> KeeperAtWork { get; set; }
+
+        /// <summary>A shop and its workshop are open in the shops' hours while their keeper is at work: never while it is away, asleep or hiding.</summary>
+        public bool IsOpenFor(string keeper) => IsOpen && (KeeperAtWork == null || KeeperAtWork(keeper));
+
+        /// <summary>The hour a keeper's shop opens, as its closed sign shows it: its work's by its hours, else the shops'.</summary>
+        public int Opens(string keeper) => GameDev.Slice.People.SliceHours.WorkOpens(keeper) ?? _rules.Opens;
+
         /// <summary>19 §6.1 World Age: the Shop Skill of today's shelves.</summary>
         public int ShopSkill => _rules.ShopSkill + (_rules.SkillPerDay * (ShelfDay - 1));
 
@@ -132,7 +144,7 @@ namespace GameDev.Slice.Shops
         /// <summary>Buys one of a shelf's things; the key of the reason it cannot, or null.</summary>
         public string Buy(string keeper, ShelfItem thing)
         {
-            if (!IsOpen)
+            if (!IsOpenFor(keeper))
             {
                 return "ui.shop.fault.closed";
             }
@@ -171,7 +183,7 @@ namespace GameDev.Slice.Shops
         public string Sell(string keeper, ItemDefinition item, ItemPiece piece)
         {
             var shop = Find(keeper);
-            if (!IsOpen)
+            if (!IsOpenFor(keeper))
             {
                 return "ui.shop.fault.closed";
             }
@@ -206,7 +218,7 @@ namespace GameDev.Slice.Shops
         public string Learn(string keeper, string lesson)
         {
             var shop = Find(keeper);
-            if (!IsOpen)
+            if (!IsOpenFor(keeper))
             {
                 return "ui.shop.fault.closed";
             }

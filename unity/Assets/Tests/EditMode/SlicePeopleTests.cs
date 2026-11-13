@@ -12,7 +12,11 @@ using UnityEngine;
 
 namespace GameDev.Slice.Tests
 {
-    /// <summary>S1.5: every named person of SLICE_PEOPLE §1 stands at its place, once; Nell and Kit are talked to (S2.4).</summary>
+    /// <summary>
+    /// S1.5: every named person of SLICE_PEOPLE §1 stands at its place, once; Nell and Kit are talked to (S2.4). Since
+    /// S5c.3 a person may also stand, switched off, at another post of its hours (SLICE_PEOPLE §4): such a body is the
+    /// same person in the same model, never at its primary post.
+    /// </summary>
     public sealed class SlicePeopleTests
     {
         [Test]
@@ -25,7 +29,18 @@ namespace GameDev.Slice.Tests
                 Physics.SyncTransforms();
                 foreach (var person in Object.FindObjectsByType<NamedPerson>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 {
-                    found.Add((person.Id, scene));
+                    var post = person.GetComponent<PersonPost>();
+                    if (post == null || post.Primary)
+                    {
+                        found.Add((person.Id, scene));
+                    }
+                    else
+                    {
+                        Assert.AreEqual(person.Id, post.Person, $"{person.name}'s post is its own");
+                        Assert.AreNotEqual(SliceHoursPosts.PrimaryPost(person.Id), post.Post, $"{person.name}: another post than the roster's");
+                        Assert.IsFalse(person.gameObject.activeSelf, $"{person.name} at {post.Post} is switched off until its hour");
+                    }
+
                     var entry = SliceRoster.All.SingleOrDefault(e => e.Id == person.Id);
                     Assert.IsNotNull(entry, $"{person.name} in {scene} is on the roster");
                     Assert.AreEqual(entry.Name, person.DisplayName);
@@ -58,7 +73,7 @@ namespace GameDev.Slice.Tests
                 CollectionAssert.AreEqual(new[] { (entry.Id, entry.Scene) }, found.Where(f => f.id == entry.Id).ToArray(), $"{entry.Name} stands once, in {entry.Scene}");
             }
 
-            Assert.AreEqual(14, SliceRoster.All.Count);
+            Assert.AreEqual(15, SliceRoster.All.Count, "Father Ambrose Hale is the fifteenth (S5-9)");
         }
 
         /// <summary>

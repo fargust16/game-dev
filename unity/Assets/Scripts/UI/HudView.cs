@@ -922,7 +922,8 @@ namespace GameDev.UI
                 var position = _player.transform.position;
                 foreach (var person in _tags)
                 {
-                    if (person as Object == null)
+                    // A person switched off since the HUD looked, as one gone home for the night (S5c.3), is no one.
+                    if (person as Object == null || (person is Behaviour b && !b.isActiveAndEnabled))
                     {
                         continue;
                     }
@@ -986,7 +987,7 @@ namespace GameDev.UI
 
             foreach (var source in _sources)
             {
-                var prompt = source as Object != null ? source.PromptFor(position) : null;
+                var prompt = source as Object != null && !(source is Behaviour b && !b.isActiveAndEnabled) ? source.PromptFor(position) : null;
                 if (prompt != null)
                 {
                     return prompt;

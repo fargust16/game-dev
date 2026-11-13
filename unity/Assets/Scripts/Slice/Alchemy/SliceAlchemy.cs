@@ -178,14 +178,17 @@ namespace GameDev.Slice.Alchemy
             var hour = _clock.MinuteOfDay / 60;
             return bench switch
             {
-                BenchKind.Harrow => _shops.IsOpen,
+                BenchKind.Harrow => _shops.IsOpenFor(HarrowKeeper),
                 BenchKind.Faction => hour >= FactionOpens && hour < FactionCloses,
                 _ => hour >= DenOpens || hour < DenCloses,
             };
         }
 
         /// <summary>The hour a closed bench opens.</summary>
-        public int Opens(BenchKind bench) => bench == BenchKind.Harrow ? _shops.Rules.Opens : bench == BenchKind.Faction ? FactionOpens : DenOpens;
+        public int Opens(BenchKind bench) => bench == BenchKind.Harrow ? _shops.Opens(HarrowKeeper) : bench == BenchKind.Faction ? FactionOpens : DenOpens;
+
+        /// <summary>Harrow's bench is his shop's: open while he is at work (S5c.3).</summary>
+        public const string HarrowKeeper = "harrow";
 
         public bool IsMember => _state.IsSet(MemberKey);
 
