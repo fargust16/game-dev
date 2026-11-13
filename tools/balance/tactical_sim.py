@@ -265,9 +265,10 @@ class Fight:
         w = a.weapon
         magic = share * w.base * c.stage_factor(w.stage) * crit * mult * self.r.damage_scale
         pierce = self.r.crit_pierce if crit > 1 and not w.ranged else 0.0
-        damage = self.reduce(a.damage_roll() * crit * mult * self.r.damage_scale, t, w.ranged and cheb(a, t) > 1, pierce) + self.warded(magic, t)
+        physical = self.reduce(a.damage_roll() * crit * mult * self.r.damage_scale, t, w.ranged and cheb(a, t) > 1, pierce)
         if t.brace:
-            damage *= 1 - c.BRACE_REDUCTION
+            physical *= 1 - c.BRACE_REDUCTION  # 05.1 Не сдвинуть lowers the physical damage only, as the game does (CR6)
+        damage = physical + self.warded(magic, t)
         if not unguarded and not a.weapon.ranged and t.weapon.guard and t.reserve >= c.REACTION_AP and not t.asleep and not t.skip and not t.conducting:
             guard = t.weapon.guard_chance * (1 + self.r.stance_guard * t.reserve if t.stance else 1)
             t.reserve -= c.REACTION_AP
