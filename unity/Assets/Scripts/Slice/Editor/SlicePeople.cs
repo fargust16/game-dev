@@ -53,6 +53,10 @@ namespace GameDev.Slice.EditorTools
         {
             { "nell", ("NellDialogue", 3f) },
             { "kit", ("KitDialogue", 2f) },
+            // The first-day trial (S5c.4; SLICE_TRIAL §1).
+            { "lottie", ("LottieDialogue", 2f) },
+            { "ashgrave", ("AshgraveDialogue", 2.5f) },
+            { "hale", ("HaleDialogue", 2.5f) },
         };
 
         /// <summary>The conversation of the person <paramref name="id"/>, or null for one nobody talks to yet.</summary>

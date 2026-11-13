@@ -45,6 +45,9 @@ namespace GameDev.World.Portals
         /// </summary>
         public bool Sealed { get; set; }
 
+        /// <summary>The prompt's key while sealed; null for the sealed door's own (S5c.4: a locked door says what opens it).</summary>
+        public string SealedPrompt { get; set; }
+
         public TravelRequest Target => new TravelRequest(targetScene, targetPortalId, travelContext);
 
         /// <summary>

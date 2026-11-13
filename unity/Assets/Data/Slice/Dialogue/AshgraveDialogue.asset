@@ -1,0 +1,593 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a7c9e1b3d5f4a7c9e1b3d5f7a9c1e3b, type: 3}
+  m_Name: AshgraveDialogue
+  m_EditorClassIdentifier: 
+  id: ashgrave
+  listeners:
+  - id: ashgrave
+    nameKey: person.ashgrave.name
+    enemy: 0
+    strength: 6
+    intelligence: 8
+    will: 7
+  nodes:
+  - id: desk
+    speaker: ashgrave
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: work
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy:
+      - trial.offered
+      - player.faction.member
+      - player.arcana
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: offer
+        raises: 
+        - trial.offered
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: who
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy:
+      - player.faction.member
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: who
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: cache
+      approach: 0
+      kind: 0
+      arguments: []
+      needs:
+      - trial.offered
+      - trial.cache.found
+      hiddenBy:
+      - trial.handed
+      - player.arcana
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: handed
+        raises: 
+        - trial.handed
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: thomas
+      approach: 0
+      kind: 0
+      arguments: []
+      needs:
+      - trial.offered
+      hiddenBy:
+      - trial.handed
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: again
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: vouched
+      approach: 0
+      kind: 0
+      arguments: []
+      needs:
+      - trial.vouched
+      hiddenBy:
+      - player.faction.member
+      - player.arcana
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: entry
+        raises: 
+        - player.faction.member
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: step
+      approach: 0
+      kind: 0
+      arguments: []
+      needs:
+      - player.faction.member
+      - trial.priestess.nine
+      hiddenBy:
+      - trial.formula.eight
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: next_step
+        raises: 
+        - trial.formula.eight
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: leave
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: offer
+    speaker: ashgrave
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: accept
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: who
+    speaker: ashgrave
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: who_back
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: desk
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: handed
+    speaker: ashgrave
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: handed_go
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: again
+    speaker: ashgrave
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: again_ok
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: entry
+    speaker: ashgrave
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: entry_thanks
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: next_step
+    speaker: ashgrave
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: step_thanks
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  start: desk

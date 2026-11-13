@@ -530252,6 +530252,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7261953553367693872, guid: 138a848d16b415840a402f2a53f3e5ca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2096111068}
+    - targetCorrespondingSourceObject: {fileID: 7261953553367693872, guid: 138a848d16b415840a402f2a53f3e5ca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2096111070}
   m_SourcePrefab: {fileID: 100100000, guid: 138a848d16b415840a402f2a53f3e5ca, type: 3}
 --- !u!4 &2096111066 stripped
 Transform:
@@ -530291,6 +530294,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.People.NamedPerson
   id: lottie
+--- !u!114 &2096111070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2096111067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1e3a5b9d2f4e6a8b0c2d4e6f8a1b3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.PersonTalk
+  dialogue: {fileID: 11400000, guid: 13d2bd81f0594db3b67a178276a06221, type: 2}
+  interactRadius: 2
+  startNode: 
+  opensItself: 1
+  promptKey: ui.prompt.talk
 --- !u!1001 &2096181155
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -81,6 +81,12 @@ namespace GameDev.Slice.Tests
             Assert.IsNotNull(clock);
 
             var street = pickStreet();
+            if (street.Id == GameDev.Slice.Trial.SliceTrial.DoorId)
+            {
+                // S5c.4: Thomas Wren's door locks until it is opened once, with Lottie's key.
+                SliceWorldDriver.Running.State.Raise(GameDev.Slice.Trial.SliceTrial.DoorOpenKey);
+            }
+
             insideId ??= street.Id + ".inside";
             buildingId ??= street.Id;
             var interiorScene = street.Target.SceneName;

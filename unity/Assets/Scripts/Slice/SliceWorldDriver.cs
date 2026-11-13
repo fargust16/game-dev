@@ -154,6 +154,12 @@ namespace GameDev.Slice
         /// <summary>The people's hours (S5c.3; 18 *Townsfolk in the slice*): who stands where at each hour, and the walkers at night.</summary>
         public PersonHours Hours { get; private set; }
 
+        /// <summary>The first-day trial and Faction Entry (S5c.4; SLICE_TRIAL §1); null without the bag.</summary>
+        public GameDev.Slice.Trial.SliceTrial Trial { get; private set; }
+
+        /// <summary>The page of the Faction Gift after a conversation with Ashgrave (S5c.4; 19 §6.2).</summary>
+        public GameDev.Slice.Trial.TrialRun TrialRun { get; private set; }
+
         /// <summary>
         /// The hours switched people on or off (S5c.3): a keeper come to work gets its counter, a walker back from home its
         /// purse, and the HUD looks again for names and prompts.
@@ -399,6 +405,8 @@ namespace GameDev.Slice
             {
                 Advancement = new GameDev.Slice.Alchemy.SliceAdvancement(State, Clock, Bag, Character, Sanity, Standing, () => Fights != null && Fights.InFight);
                 Advancement.Advanced += Advanced;
+                Trial = new GameDev.Slice.Trial.SliceTrial(State, Bag, Tips, seed, settings.Items, () => Clock.Tick);
+                OpenTrialDoor(); // the first scene's counters were opened before the trial existed
                 Conduct = new GameDev.Slice.Alchemy.SliceConduct(State, Advancement);
                 Conduct.Felt += key => Hud()?.ShowMessage(Loc.Get(key)); // 05.1: one short line, no counter
                 if (Fights != null)
@@ -493,6 +501,8 @@ namespace GameDev.Slice
             Save.Refusals.Add(() => Advancement != null && Advancement.Assimilating ? "ui.save.refused.settling" : null); // 05.1 *Assimilation*
             Sleep = gameObject.AddComponent<GameDev.Slice.Mind.SleepRun>();
             Sleep.Configure(this);
+            TrialRun = gameObject.AddComponent<GameDev.Slice.Trial.TrialRun>();
+            TrialRun.Configure(this);
             Save.Refusals.Add(() => Sleep.Sleeping ? "ui.save.refused.sleep" : null); // 17 X.3: not while asleep
             _offer = Save.ShouldOffer();
             Creation = gameObject.AddComponent<GameDev.Slice.Creation.CharacterCreation>();
@@ -547,6 +557,7 @@ namespace GameDev.Slice
         private void Advanced(Arcana arcana, int limit, int cost)
         {
             Hud()?.ShowMessage(Loc.Format("ui.limit.reached", Loc.Get(SliceConfront.ArcanaName(arcana)), limit));
+            Trial?.Advanced(arcana, limit);
             Debug.Log($"[Slice] Limit {limit} of {arcana} reached; Sanity -{cost}, now {Sanity.Value}.");
             Refresh();
         }
@@ -1130,6 +1141,7 @@ namespace GameDev.Slice
 
             added |= Alchemy != null && OpenBenches();
             added |= OpenBed();
+            OpenTrialDoor();
 
             var hud = Hud();
             if (added && hud != null)
@@ -1197,6 +1209,23 @@ namespace GameDev.Slice
 
         /// <summary>The Soot &amp; Bell's scene, whose let room's bed is rented for a night (S5c.2).</summary>
         public const string TavernScene = "SootAndBell";
+
+        /// <summary>Thomas Wren's door from Draught Lane locks until it is opened (S5c.4; SLICE_TRIAL §1.2).</summary>
+        private void OpenTrialDoor()
+        {
+            if (Trial == null)
+            {
+                return;
+            }
+
+            foreach (var portal in FindObjectsByType<GameDev.World.Portals.Portal>(FindObjectsInactive.Include))
+            {
+                if (portal.Id == GameDev.Slice.Trial.SliceTrial.DoorId && portal.GetComponent<GameDev.Slice.Trial.TrialDoor>() == null)
+                {
+                    portal.gameObject.AddComponent<GameDev.Slice.Trial.TrialDoor>();
+                }
+            }
+        }
 
         /// <summary>18 §3, 11 *Sleep* (S5c.2): the bed of the Soot &amp; Bell's let room is rented for a night; true when it was opened now.</summary>
         private static bool OpenBed()
@@ -1333,6 +1362,7 @@ namespace GameDev.Slice
 
                 Standing?.Dispose();
                 Director?.Dispose();
+                Trial?.Detach();
                 _running = null;
             }
         }

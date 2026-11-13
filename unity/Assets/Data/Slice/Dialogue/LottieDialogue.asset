@@ -1,0 +1,323 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a7c9e1b3d5f4a7c9e1b3d5f7a9c1e3b, type: 3}
+  m_Name: LottieDialogue
+  m_EditorClassIdentifier: 
+  id: lottie
+  listeners:
+  - id: lottie
+    nameKey: person.lottie.name
+    enemy: 0
+    strength: 4
+    intelligence: 5
+    will: 5
+  nodes:
+  - id: lottie
+    speaker: lottie
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: look
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy:
+      - trial.key
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: key
+        raises: 
+        - trial.key
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: habits
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy:
+      - arg.trial.boards
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: boards
+        raises: 
+        - arg.trial.boards
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: leave_lottie
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: key
+    speaker: lottie
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: key_habits
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy:
+      - arg.trial.boards
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: boards
+        raises: 
+        - arg.trial.boards
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: key_go
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  - id: boards
+    speaker: lottie
+    saysTips: 0
+    source: 0
+    lies: 0
+    options:
+    - id: boards_key
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy:
+      - trial.key
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: key
+        raises: 
+        - trial.key
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+    - id: boards_go
+      approach: 0
+      kind: 0
+      arguments: []
+      needs: []
+      hiddenBy: []
+      item: 
+      skill: 0
+      request: 1
+      listener: 
+      asks: 
+      success:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      failure:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      won:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+      lost:
+        next: 
+        raises: []
+        settles: {fileID: 0}
+        tells: []
+        minutes: 0
+        fights: 0
+  start: lottie

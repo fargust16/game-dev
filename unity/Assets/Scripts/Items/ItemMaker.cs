@@ -81,7 +81,6 @@ namespace GameDev.Items
         /// <summary>Makes one piece of <paramref name="item"/> at <paramref name="stage"/>, each addition at chance <paramref name="p"/>.</summary>
         public static ItemPiece Make(ItemDefinition item, int stage, double p, Random rolls)
         {
-            var piece = new ItemPiece(item.id, stage);
             var count = 0;
             for (var i = 0; i < MostModifiers; i++)
             {
@@ -91,6 +90,17 @@ namespace GameDev.Items
                 }
             }
 
+            return MakeWith(item, stage, count, rolls);
+        }
+
+        /// <summary>
+        /// Makes one piece of <paramref name="item"/> at <paramref name="stage"/> with <paramref name="count"/> modifiers
+        /// already decided, as a Faction Gift's quality decides them (19 §6.2).
+        /// </summary>
+        public static ItemPiece MakeWith(ItemDefinition item, int stage, int count, Random rolls)
+        {
+            var piece = new ItemPiece(item.id, stage);
+            count = Math.Max(0, Math.Min(MostModifiers, count));
             int majors = 0, minors = 0;
             var favoured = Favoured(item);
             for (var i = 0; i < count; i++)

@@ -226,7 +226,8 @@ namespace GameDev.Slice
         private void Update()
         {
             var world = SliceWorldDriver.Running;
-            var lying = world != null && poi != null && Lies(world.State, world.Director.Phase(poi), world.Clock.Tick, anyOf, clearedAt);
+            // A trace of no POI, as the trial's in Thomas Wren's room (S5c.4), lies by its conditions alone.
+            var lying = world != null && Lies(world.State, poi != null ? world.Director.Phase(poi) : PoiPhase.Open, world.Clock.Tick, anyOf, clearedAt);
             if (!_applied || lying != _lying)
             {
                 _applied = true;

@@ -133,3 +133,43 @@ dialogue.poic.fled,"He lifts his hands, smiling as if at a joke, and goes up the
 dialogue.poic.fled.done_fled,Let him go.,Отпустить его.
 dialogue.poic.took,"He tuts, takes the glass bead from behind the shutters, and goes up the stair, unhurried. The folded note is left on the shelf.","Он цокает языком, забирает стеклянную бусину из-за ставней и неторопливо поднимается по лестнице. Сложенная записка остаётся на полке."
 dialogue.poic.took.done_took,Let him go.,Отпустить его.
+# The first-day trial (S5c.4; SLICE_TRIAL §1): Mr Ashgrave at the faction's house, Father Hale at the old chapel, Lottie Wren
+dialogue.ashgrave.desk,Yes? Be brief.,Да? Только коротко.
+dialogue.ashgrave.desk.work,I'm looking for work.,Я ищу работу.
+dialogue.ashgrave.desk.who,Who are you people?,Кто вы такие?
+dialogue.ashgrave.desk.cache,Here is what Thomas Wren left behind.,Вот что оставил после себя Томас Рен.
+dialogue.ashgrave.desk.thomas,About Thomas Wren...,Насчёт Томаса Рена…
+dialogue.ashgrave.desk.vouched,Father Hale has vouched for me.,Отец Хейл поручился за меня.
+dialogue.ashgrave.desk.step,The Limit 9 potion is in me.,Зелье Предела 9 выпито.
+dialogue.ashgrave.desk.leave,Good day.,Всего доброго.
+dialogue.ashgrave.offer,"A mill clerk walked out of Draught Lane three nights ago and didn't come back. Find out what took him, and bring me what he left behind. Do it well, and there may be a place for you here.","Три ночи назад конторщик с фабрики ушёл из переулка Сквозняк и не вернулся. Выясни, что его забрало, и принеси мне то, что он оставил. Справишься — может, и для тебя здесь найдётся место."
+dialogue.ashgrave.offer.accept,I'll find out.,Я выясню.
+dialogue.ashgrave.who,We keep the church's quiet business. The rest you hear once you're one of us.,"Мы ведём тихие дела церкви. Остальное услышишь, когда будешь с нами."
+dialogue.ashgrave.who.who_back,I see.,Понятно.
+dialogue.ashgrave.handed,So he went to them. Father Hale at the old chapel will vouch for you. Go now; I'll send word.,"Значит, он ушёл к ним. Отец Хейл в старой часовне поручится за тебя. Ступай, я дам ему знать."
+dialogue.ashgrave.handed.handed_go,On my way.,Уже иду.
+dialogue.ashgrave.again,A clerk doesn't vanish and leave nothing. Look again.,Конторщики не исчезают бесследно. Ищи ещё.
+dialogue.ashgrave.again.again_ok,I'll look again.,Поищу ещё.
+dialogue.ashgrave.entry,Welcome to the quiet business. This is what we drink to see more than other men. Harrow teaches the brewing; the table in the archive is yours.,"Добро пожаловать в тихое дело. Вот что мы пьём, чтобы видеть больше прочих. Варить учит Харроу; стол в архиве — твой."
+dialogue.ashgrave.entry.entry_thanks,Thank you.,Спасибо.
+dialogue.ashgrave.next_step,You've drunk and you're still yourself. Good. Here is the next step. Don't rush it.,"Выпито, а ты всё ещё в себе. Хорошо. Вот следующий шаг. Не торопись с ним."
+dialogue.ashgrave.next_step.step_thanks,I won't rush it.,Не стану торопиться.
+dialogue.hale.rostrum,Peace be with you.,Мир тебе.
+dialogue.hale.rostrum.sent,Mr Ashgrave sent me.,Меня прислал мистер Эшгрейв.
+dialogue.hale.rostrum.leave_hale,"And with you, Father.","И вам, святой отец."
+dialogue.hale.why,"Ashgrave's sent me another one. Tell me, child: why do you want to serve?","Эшгрейв опять кого-то прислал. Скажи, дитя: зачем тебе служить?"
+dialogue.hale.why.serve_people,To keep people safe.,Чтобы люди были в безопасности.
+dialogue.hale.why.serve_faith,The church has need of it.,Церкви это нужно.
+dialogue.hale.why.serve_self,"I need the work, Father.","Мне нужна работа, святой отец."
+dialogue.hale.vouched,"Then go with God, and with Ashgrave. I'll put my name to you.",Тогда ступай с Богом — и с Эшгрейвом. Я поручусь за тебя.
+dialogue.hale.vouched.vouched_go,"Thank you, Father.","Спасибо, святой отец."
+dialogue.lottie.lottie,Have you seen my brother? Thomas. He's been gone three nights.,Вы не видели моего брата? Томаса. Его нет уже три ночи.
+dialogue.lottie.lottie.look,I'll look for him.,Я поищу его.
+dialogue.lottie.lottie.habits,Tell me about his habits.,Расскажите о его привычках.
+dialogue.lottie.lottie.leave_lottie,I have to go.,Мне пора.
+dialogue.lottie.key,"Bless you. Here, his key: Draught Lane, the room on the second floor.","Храни вас Бог. Вот его ключ: переулок Сквозняк, комната на втором этаже."
+dialogue.lottie.key.key_habits,What was he like?,Каким он был?
+dialogue.lottie.key.key_go,I'll do what I can.,"Сделаю, что смогу."
+dialogue.lottie.boards,"He hid his wages from Father under the boards, when we were small.","Когда мы были маленькими, он прятал заработок от отца под половицами."
+dialogue.lottie.boards.boards_key,I'll look for him.,Я поищу его.
+dialogue.lottie.boards.boards_go,Thank you.,Спасибо.

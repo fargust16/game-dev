@@ -797,3 +797,25 @@ MonoBehaviour:
     - item: glow_essence_8
       count: 1
     arcana: 2
+  - id: key_thomas
+    kind: 2
+    weight: 0
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 9
+    family:
+    fight: {fileID: 0}
+    recipe: []
+    arcana: 0
+  - id: letter_introduction
+    kind: 5
+    weight: 0
+    price: 0
+    sale: 0
+    slot: 0
+    stage: 9
+    family:
+    fight: {fileID: 0}
+    recipe: []
+    arcana: 0

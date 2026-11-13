@@ -55,7 +55,8 @@ namespace GameDev.Slice.Tests
 
                     Assert.IsNull(person.GetComponent<TipSourcePoint>(), $"{entry.Name} is asked in conversation, not read as a board");
                     var talk = person.GetComponent<PersonTalk>();
-                    if (person.Id == "nell" || person.Id == "kit")
+                    // Nell and Kit since S2.4; Lottie Wren, Mr Ashgrave and Father Hale since the trial (S5c.4).
+                    if (new[] { "nell", "kit", "lottie", "ashgrave", "hale" }.Contains(person.Id))
                     {
                         Assert.IsNotNull(talk, $"{entry.Name} can be talked to");
                         Assert.AreSame(SlicePeople.DialogueOf(person.Id), talk.Dialogue, $"{entry.Name}'s conversation");

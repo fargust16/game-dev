@@ -517,7 +517,7 @@ namespace GameDev.Slice.EditorTools
         }
 
         // Placeholders of our own: no collider, on NoGrid, so neither the Combat Grid nor walking reads them.
-        private static void Piece(Transform parent, PrimitiveType shape, Vector3 at, Quaternion turn, Vector3 size, Material material)
+        internal static void Piece(Transform parent, PrimitiveType shape, Vector3 at, Quaternion turn, Vector3 size, Material material)
         {
             var piece = GameObject.CreatePrimitive(shape);
             Object.DestroyImmediate(piece.GetComponent<Collider>());

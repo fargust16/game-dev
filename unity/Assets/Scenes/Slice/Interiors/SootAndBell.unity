@@ -7687,6 +7687,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7261953553367693872, guid: 138a848d16b415840a402f2a53f3e5ca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 319897264}
+    - targetCorrespondingSourceObject: {fileID: 7261953553367693872, guid: 138a848d16b415840a402f2a53f3e5ca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 319897265}
   m_SourcePrefab: {fileID: 100100000, guid: 138a848d16b415840a402f2a53f3e5ca, type: 3}
 --- !u!4 &319897261 stripped
 Transform:
@@ -7726,6 +7729,23 @@ MonoBehaviour:
   person: lottie
   post: tavern
   primary: 1
+--- !u!114 &319897265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 319897262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1e3a5b9d2f4e6a8b0c2d4e6f8a1b3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.PersonTalk
+  dialogue: {fileID: 11400000, guid: 13d2bd81f0594db3b67a178276a06221, type: 2}
+  interactRadius: 2
+  startNode: 
+  opensItself: 1
+  promptKey: ui.prompt.talk
 --- !u!1 &322113667
 GameObject:
   m_ObjectHideFlags: 0
@@ -13187,54 +13207,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 659020648}
     m_Modifications:
-    - target: {fileID: 5155638480230170762, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
-      propertyPath: m_Name
-      value: Nell Garrow
-      objectReference: {fileID: 0}
-    - target: {fileID: 5155638480230170762, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
-      propertyPath: m_Layer
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 10.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.11172414
-      objectReference: {fileID: 0}
-    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 10.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: -0.00000004371139
-      objectReference: {fileID: 0}
-    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 26625315936806098, guid: 67fcd39322c5e9c4ab0eb785909c1ad7, type: 3}
       propertyPath: m_Layer
       value: 12
@@ -13486,6 +13458,54 @@ PrefabInstance:
     - target: {fileID: 9183946551920334240, guid: 67fcd39322c5e9c4ab0eb785909c1ad7, type: 3}
       propertyPath: m_Layer
       value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 5155638480230170762, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
+      propertyPath: m_Name
+      value: Nell Garrow
+      objectReference: {fileID: 0}
+    - target: {fileID: 5155638480230170762, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 10.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.11172414
+      objectReference: {fileID: 0}
+    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.00000004371139
+      objectReference: {fileID: 0}
+    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8834096695558318248, guid: 56ca67dfce040fe48b5416d0e04c2006, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

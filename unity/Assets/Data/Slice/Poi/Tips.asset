@@ -454,3 +454,48 @@ MonoBehaviour:
     requiresKey: 
     requiresAtLeast: 1
     needsApproach: 1
+  - id: trial.ledger
+    source: 3
+    day: 0
+    fromMinute: 0
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: 
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: trial.letter
+    source: 3
+    day: 0
+    fromMinute: 0
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: 
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: trial.grate
+    source: 3
+    day: 0
+    fromMinute: 0
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: 
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: trial.cache
+    source: 3
+    day: 0
+    fromMinute: 0
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: trial.cache.found
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: trial.vouch
+    source: 4
+    day: 0
+    fromMinute: 0
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: trial.vouched
+    requiresAtLeast: 1
+    needsApproach: 0

@@ -2,7 +2,7 @@
 
 Status: Draft — written by the agent on 2026-11-13 as authoring defaults on the owner's grant of autonomous work for S5, with no review stop; shown to the owner in S5's final report. Every name, line and number here may be changed by the owner.
 Created: 2026-11-13
-Last Updated: 2026-11-13 (§1.5, §4: the benches as built in S5b.4: the faction's in its archive, the house having one storey; the den in the warehouse by Tipsy Pier; Kit tells of it every day; no keeper stands at the den's bench (99 VS-BREW). Earlier: first version, D1)
+Last Updated: 2026-11-13 (§1.6: the trial as built in S5c.4, the agent's readings in 99 VS-TRIAL. Earlier: §1.5, §4: the benches as built in S5b.4: the faction's in its archive, the house having one storey; the den in the warehouse by Tipsy Pier; Kit tells of it every day; no keeper stands at the den's bench (99 VS-BREW). Earlier: first version, D1)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md) *Limited forms* and *The first-day trial*, [05.1 Arcana and Limits](../../../05.1%20Arcana%20and%20Limits.md), [19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.2–6.3, [20 Alchemy and Potioncraft](../../../20%20Alchemy%20and%20Potioncraft.md) §3, [09 Information Sources](../../../09%20Information%20Sources.md) § News Pool, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) S5b, S5c and §5
 Related: [SLICE_PEOPLE.md](SLICE_PEOPLE.md) (the people, their schedules and Чужой сон's lines), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §21, §29 (places)
 
@@ -70,6 +70,21 @@ Thomas lodged alone on the second floor of a tenement on Draught Lane, in Lower 
 | Father Hale | "Ashgrave's sent me another one. Tell me, child: why do you want to serve?" — any answer — "Then go with God, and with Ashgrave. I'll put my name to you." |
 | Ashgrave, the entry | "Welcome to the quiet business. This is what we drink to see more than other men. Harrow teaches the brewing; the table in the archive is yours." |
 | Ashgrave, at Limit 9 | "You've drunk and you're still yourself. Good. Here is the next step. Don't rush it." |
+
+### 1.6 As built in S5c.4
+
+Built on 2026-11-13. The agent's readings are in [99](../../../99%20Open%20Questions.md) VS-TRIAL.
+
+- **The state.** The trial is told in the world's state. Lottie Wren's, Mr Ashgrave's and Father Hale's conversations (`LottieDialogue`, `AshgraveDialogue`, `HaleDialogue`) raise its keys, and `SliceTrial` answers each key the moment it is raised, with what that step brings. A load restores the keys without raising them, so nothing is given twice.
+- **The first note.** The Notice Board's own Wren notice (`board.wren`) is the first note from every door in. Ashgrave's offer and Lottie's key tell the same note.
+- **Lottie.** She is talked to at both her posts, beside her tenement's street door by day and at the Soot & Bell in the evening. "I'll look for him" gives Thomas's key. Asking about his habits gives the Argument about the boards.
+- **Thomas's door.** The door from Draught Lane (`missing-room.street`) says *Locked* until it is opened once. With the key, E opens it for good and goes through. Picking the lock comes with S5c.5.
+- **Thomas's room.** The room is the authored MissingRoom scene, not the generated Dwelling. Three Physical Traces of no POI lie in it: the ledger and the letter on the table, and the burnt page in the cold grate. The loose board lies under the bed. The box that stood for the cache is a plain box.
+- **The loose board.** Each time the character comes within 2 m, one Perception check at stage 9 is rolled, at difficulty 2, with Intelligence as its secondary attribute, and the check trains them. Lottie's Argument finds the board with no roll. *E  Lift the loose board* then takes the cache.
+- **Ashgrave.** He offers the trial to a Factionless, uninitiated character. "About Thomas Wren…" gets "Look again" until the cache is handed in. Handing in the found cache takes the two formulas and the letter. "Father Hale has vouched for me" is Faction Entry. Once the character has drunk the Limit 9 potion of Жрица, he gives the formula of Limit 8. Once the character has an Arcana, the offer, the hand-in and the entry are gone.
+- **Father Hale.** "Mr Ashgrave sent me" opens his question, and any of the three answers vouches. His word is a note.
+- **The Faction Gift.** Faction Entry gives the formula of Limit 9, Жрица, and the recruit's purse. When the conversation ends, a page offers three different bases at stage 9: the pistol, the rifle, or one of the 24 armour pieces. They are set by the World Seed's own stream: Magic 70 % (one or two modifiers), Rare 28 % (three), Epic 2 % (four). A firearm comes with a plain Cartridge Pouch. One is taken. A page closed unchosen opens again at the end of the next conversation with Ashgrave.
+- **Not yet built.** The faction's tasks and the Masters' orders (§3) come with S5c.7. The trace slot of §1.2 waits for C6 (S6).
 
 ---
 

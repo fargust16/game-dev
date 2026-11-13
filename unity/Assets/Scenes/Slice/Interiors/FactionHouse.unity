@@ -8409,6 +8409,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
       insertIndex: -1
       addedObject: {fileID: 646234482}
+    - targetCorrespondingSourceObject: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 646234483}
   m_SourcePrefab: {fileID: 100100000, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
 --- !u!4 &646234479 stripped
 Transform:
@@ -8448,6 +8451,23 @@ MonoBehaviour:
   person: ashgrave
   post: work
   primary: 1
+--- !u!114 &646234483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646234480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1e3a5b9d2f4e6a8b0c2d4e6f8a1b3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameDev.Slice::GameDev.Slice.PersonTalk
+  dialogue: {fileID: 11400000, guid: 91e365d4018f405fbff38853b2bfa1bd, type: 2}
+  interactRadius: 2.5
+  startNode: 
+  opensItself: 1
+  promptKey: ui.prompt.talk
 --- !u!1001 &666003338
 PrefabInstance:
   m_ObjectHideFlags: 0

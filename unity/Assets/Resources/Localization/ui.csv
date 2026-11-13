@@ -614,3 +614,16 @@ ui.sleep.fault.here,You cannot sleep here.,Здесь не уснуть.
 ui.sleep.fault.indoors,"Sleep in the street, or in a room rented at the Soot & Bell.","Спать можно на улице или в комнате, снятой в «Саже и Колоколе»."
 ui.prompt.sleep_room,E  Rent the room for the night ({0}),E  Снять комнату на ночь ({0})
 ui.save.refused.sleep,Not while asleep.,Не во время сна.
+# The first-day trial (S5c.4; SLICE_TRIAL §1, 19 §6.2): Thomas Wren's door, the loose board, the Faction Gift
+ui.prompt.trial.unlock,E  Unlock with Thomas Wren's key,E  Отпереть ключом Томаса Рена
+ui.prompt.locked,Locked,Заперто
+ui.prompt.trial.board,E  Lift the loose board,E  Поднять расшатанную доску
+ui.trial.door.locked,The door is locked.,Дверь заперта.
+ui.trial.cache.noticed,A floorboard under the bed is loose.,Под кроватью шатается половица.
+ui.trial.cache.remembered,"Under the boards, as Lottie said.","Под половицами, как говорила Лотти."
+ui.trial.cache.taken,"Under the board: two formulas, a letter and 600 bronze.","Под доской: две формулы, письмо и 600 бронзы."
+ui.trial.gift.title,The Faction Gift,Дар фракции
+ui.trial.gift.heading,Take one,Возьмите одно
+ui.trial.gift.pouch,(with a Cartridge Pouch),(с патронной сумкой)
+ui.trial.gift.hint,Click an item to take it. Esc closes the page; the gift waits for the next talk with Mr Ashgrave.,Щелчок по предмету — взять его. Esc закрывает страницу; дар подождёт следующего разговора с мистером Эшгрейвом.
+ui.trial.gift.taken,Taken: {0},Взято: {0}

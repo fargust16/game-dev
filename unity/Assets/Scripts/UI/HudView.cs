@@ -755,8 +755,14 @@ namespace GameDev.UI
             _dialogue.AddToClassList(DialogueVisible);
             if (last != null)
             {
-                // Once laid out, the latest line is in view.
-                _dialogueLines.schedule.Execute(() => _dialogueLines.ScrollTo(last));
+                // Once laid out, the latest line is in view; a line already replaced by the next answer is not scrolled to.
+                _dialogueLines.schedule.Execute(() =>
+                {
+                    if (_dialogueLines.contentContainer.Contains(last))
+                    {
+                        _dialogueLines.ScrollTo(last);
+                    }
+                });
             }
         }
 
@@ -981,7 +987,7 @@ namespace GameDev.UI
             {
                 if (portal != null && portal.InReach(position))
                 {
-                    return Loc.Get(portal.Sealed ? "ui.prompt.sealed" : "ui.prompt.enter");
+                    return Loc.Get(portal.Sealed ? portal.SealedPrompt ?? "ui.prompt.sealed" : "ui.prompt.enter");
                 }
             }
 
