@@ -160,6 +160,9 @@ namespace GameDev.Slice
         /// <summary>The first-day trial and Faction Entry (S5c.4; SLICE_TRIAL §1); null without the bag.</summary>
         public GameDev.Slice.Trial.SliceTrial Trial { get; private set; }
 
+        /// <summary>The run's Hidden Caches (S5c.6; SLICE_TRIAL §5); null without the bag.</summary>
+        public GameDev.Slice.Caches.SliceCaches Caches { get; private set; }
+
         /// <summary>The page of the Faction Gift after a conversation with Ashgrave (S5c.4; 19 §6.2).</summary>
         public GameDev.Slice.Trial.TrialRun TrialRun { get; private set; }
 
@@ -410,6 +413,11 @@ namespace GameDev.Slice
                 Advancement.Advanced += Advanced;
                 Trial = new GameDev.Slice.Trial.SliceTrial(State, Bag, Tips, seed, settings.Items, () => Clock.Tick);
                 OpenTrialDoor(); // the first scene's counters were opened before the trial existed
+                Caches = new GameDev.Slice.Caches.SliceCaches(State, Bag, Character, seed, settings.Items, Tips, () => Clock.Tick); // S5c.6
+                for (var i = 0; i < SceneManager.sceneCount; i++)
+                {
+                    PlaceCaches(SceneManager.GetSceneAt(i));
+                }
                 Conduct = new GameDev.Slice.Alchemy.SliceConduct(State, Advancement);
                 Conduct.Felt += key => Hud()?.ShowMessage(Loc.Get(key)); // 05.1: one short line, no counter
                 if (Fights != null)
@@ -1034,6 +1042,17 @@ namespace GameDev.Slice
             if (Theft != null)
             {
                 FindPurses();
+            }
+
+            PlaceCaches(scene);
+        }
+
+        /// <summary>S5c.6: the run's Hidden Caches in the city's scene, once it stands.</summary>
+        private void PlaceCaches(Scene scene)
+        {
+            if (Caches != null && scene.name == cityScene)
+            {
+                GameDev.Slice.Caches.HiddenCache.Place(scene, Caches);
             }
         }
 

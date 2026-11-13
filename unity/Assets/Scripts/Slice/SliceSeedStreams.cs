@@ -110,11 +110,19 @@ namespace GameDev.Slice
 
         public const string TheftAnswer = "slice.theft.answer";
 
+        /// <summary>
+        /// Hidden Caches (11, SLICE_TRIAL §5; S5c.6): which twenty of the forty spots hold one and which are locked, forked
+        /// with no keys, and what each holds, forked with its spot's number; a lock's bar is forked with the number and the tick.
+        /// </summary>
+        public const string Caches = "slice.caches";
+
+        public const string CacheLocks = "slice.caches.locks";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
             ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens, Roles, Search, Shots, Boldness, News, GodNotices,
-            Prepared, Alchemy, Abilities, Sleep, FactionGift, Locks, Residents, Stash, TheftAnswer,
+            Prepared, Alchemy, Abilities, Sleep, FactionGift, Locks, Residents, Stash, TheftAnswer, Caches, CacheLocks,
 
         };
     }

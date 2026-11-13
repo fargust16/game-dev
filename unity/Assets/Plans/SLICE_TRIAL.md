@@ -2,7 +2,7 @@
 
 Status: Draft — written by the agent on 2026-11-13 as authoring defaults on the owner's grant of autonomous work for S5, with no review stop; shown to the owner in S5's final report. Every name, line and number here may be changed by the owner.
 Created: 2026-11-13
-Last Updated: 2026-11-13 (§1.6: the trial as built in S5c.4, the agent's readings in 99 VS-TRIAL. Earlier: §1.5, §4: the benches as built in S5b.4: the faction's in its archive, the house having one storey; the den in the warehouse by Tipsy Pier; Kit tells of it every day; no keeper stands at the den's bench (99 VS-BREW). Earlier: first version, D1)
+Last Updated: 2026-11-13 (§5.2: the Hidden Caches as built in S5c.6, the agent's readings in 99 VS-CACHES. Earlier: §1.6: the trial as built in S5c.4, the agent's readings in 99 VS-TRIAL. Earlier: §1.5, §4: the benches as built in S5b.4: the faction's in its archive, the house having one storey; the den in the warehouse by Tipsy Pier; Kit tells of it every day; no keeper stands at the den's bench (99 VS-BREW). Earlier: first version, D1)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md) *Limited forms* and *The first-day trial*, [05.1 Arcana and Limits](../../../05.1%20Arcana%20and%20Limits.md), [19](../../../19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md) §6.2–6.3, [20 Alchemy and Potioncraft](../../../20%20Alchemy%20and%20Potioncraft.md) §3, [09 Information Sources](../../../09%20Information%20Sources.md) § News Pool, [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) S5b, S5c and §5
 Related: [SLICE_PEOPLE.md](SLICE_PEOPLE.md) (the people, their schedules and Чужой сон's lines), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §21, §29 (places)
 
@@ -229,6 +229,17 @@ Stage 9 spots are in plain places; stage 8 ones are tucked away or outside the w
 | 40 | Outside the walls | Under an old boundary stone on the hunting grounds | 8 |
 
 S5c.6 places each spot in the scene by its description, and moves one whose place the scene does not have to the nearest that fits.
+
+### 5.2 As built in S5c.6
+
+Built on 2026-11-13 as authoring defaults; the agent's readings are in [99](../../../99%20Open%20Questions.md) VS-CACHES.
+
+- **The spots.** `CacheSpots` holds the forty, each measured in the Veilmouth scene by probing its ground and its things. A cache lies on the scene's ground at its spot, or on the prop its row names (the coil, the firewood, the crate, the dustbin), never inside a wall. Where the scene lacks the thing a row names, the cache lies where it would stand: #22's cellar window is on Nettle Street, Squint Lane having gone with C5's rectangular blocks; #30 lies on a farm's hay, #31 on Crooked Hamlet's green, #32 at a roadside post, #33 at a pine at Gloomwood's edge, #34–#36 in Gloomwood and its clearings, #37 at a wolf pack's middle, #38 on the bank below Last Farthing Bridge, and #40 at a boar ground's middle. No well, hay wagon, milestone, oak, fallen trunk, cairn, hide, den mouth, boat or boundary stone is modelled.
+- **The choice.** The seed's own stream shuffles the forty and takes each while its district holds fewer than three and, inside the walls, while fewer than fourteen are inside, so at least six lie outside; then it locks seven of the twenty. Who holds what is rolled from the seed and the spot, so a save keeps it.
+- **Noticing.** Within 3 m, the spot seen from the eyes (what lies at the spot itself and people and beasts block nothing), one Perception check of 07.1 at difficulty 2 for a stage 9 spot and 4 for a stage 8 one, while the world runs and out of a fight. Each roll trains Perception, Intelligence its formula's second attribute, a failure half; a cache noticed gives Luck 2 XP and says "Something's hidden here". A failed roll waits until the character has been 10 m away. A noticed cache shows a faint pulsing glint, a small warm light; no model marks it.
+- **Opening.** Within 2 m, E takes a noticed cache whole, in no tick. A locked one is a lock of Lock 2 at stage 9 and 4 at stage 8, picked with Lockpicks as a door's: the try's tick first, the world paused at the clip's key frame, a bad result breaking a pick. Nobody notices it, and no Arcana's conduct counts it, a cache having no owner. A door in reach keeps E for itself.
+- **Contents** follow §5's table. A jewel is a stage 9 ring, necklace or belt made by the catalogue with one or two modifiers (Magic), or with three (Rare) one time in four in a locked cache. The screen tells what was taken.
+- **The notes.** Four true rumours, each a Tip found where it lies and noted in the Character Notes, none about a Weak Point: a glowing beast walks alone, shunned by its kind; one Warden in three takes a bribe and the rest add it to the fine; the Wardens learn of every killing, seen or not; Dace of the Veinmarket keeps lockpicks at home. A note found twice is noted once.
 
 ---
 

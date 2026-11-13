@@ -499,3 +499,39 @@ MonoBehaviour:
     requiresKey: trial.vouched
     requiresAtLeast: 1
     needsApproach: 0
+  - id: cache.note.1
+    source: 3
+    day: 0
+    fromMinute: 0
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: cache.note.1.found
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: cache.note.2
+    source: 3
+    day: 0
+    fromMinute: 0
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: cache.note.2.found
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: cache.note.3
+    source: 3
+    day: 0
+    fromMinute: 0
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: cache.note.3.found
+    requiresAtLeast: 1
+    needsApproach: 0
+  - id: cache.note.4
+    source: 3
+    day: 0
+    fromMinute: 0
+    poi: {fileID: 0}
+    effect: 0
+    requiresKey: cache.note.4.found
+    requiresAtLeast: 1
+    needsApproach: 0
