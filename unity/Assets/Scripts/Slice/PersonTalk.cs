@@ -87,7 +87,7 @@ namespace GameDev.Slice
         public string PromptFor(Vector3 player) => opensItself && Available && dialogue != null && !IsOpen && InReach(player) && !Asleep ? Loc.Get(promptKey) : null;
 
         /// <summary>05.1 Дрёма (S5b.8): one asleep is not talked to.</summary>
-        private bool Asleep => GameDev.Slice.Fights.HeldStill.Sleeping(transform);
+        private bool Asleep => GameDev.Slice.People.Slumber.Asleep(transform);
 
         /// <summary>
         /// 05.1 Чуткое ухо (S5b.8): a line in which the speaker lies is marked for a character who knows it, which tells

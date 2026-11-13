@@ -117,6 +117,10 @@ namespace GameDev.Slice.Dwellings
 
             // Veinmarket's den keeps its bench on its office desk, for one who heard of it (S5b.4; SLICE_TRIAL §4).
             GameDev.Slice.Alchemy.AlchemyBench.AtDwelling(key.DwellingId, _built);
+
+            // Who is at home, and the household's Stash (S5c.5; 10.3 §6.1, 19 §6.3).
+            var residents = DwellingResidents.Populate(key, Plan, _built, settings);
+            DwellingStash.At(_built, key, residents, settings);
             return door;
         }
 

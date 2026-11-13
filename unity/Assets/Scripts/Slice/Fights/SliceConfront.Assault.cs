@@ -119,7 +119,7 @@ namespace GameDev.Slice.Fights
 
             var warden = PeopleAround.IsWarden(victim);
             var frozen = HeldStill.Frozen(victim); // 05.1 Стой! out of a fight (S5b.8): it calls no help
-            var asleep = HeldStill.Sleeping(victim);
+            var asleep = Slumber.Asleep(victim);
             var struck = Person(victim, warden ? Wardens : Residents, 1, fighter);
             if (frozen)
             {

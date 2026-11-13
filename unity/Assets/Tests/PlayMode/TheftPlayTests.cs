@@ -49,9 +49,13 @@ namespace GameDev.Slice.Tests
             yield return LoadScene("Assets/Scenes/Slice/Veilmouth.unity");
             var world = SliceWorldDriver.Running;
             Assert.IsNotNull(world?.Theft, "the world keeps theft");
-            var targets = Object.FindObjectsByType<PurseTarget>(FindObjectsInactive.Exclude);
+            var purses = Object.FindObjectsByType<PurseTarget>(FindObjectsInactive.Exclude);
+            Assert.AreEqual(purses.Length, purses.Select(t => t.Person).Distinct().Count(), "each one its own name");
+
+            // S5c.5: the named people, the Wardens and the merchants carry purses too; this test robs the walkers.
+            var targets = purses.Where(t => t.GetComponent<TownsfolkWalker>() != null).ToArray();
             Assert.AreEqual(Object.FindObjectsByType<TownsfolkWalker>(FindObjectsInactive.Exclude).Length, targets.Length, "a purse on every walker");
-            Assert.AreEqual(targets.Length, targets.Select(t => t.Person).Distinct().Count(), "each one its own name");
+            Assert.Greater(purses.Length, targets.Length, "and on the people who stand at their posts");
 
             // A practised hand: the zone at its widest, 35 %, and a quiet step so the walkers do not notice it sneak up.
             world.Character.Set(CharacterAttribute.Dexterity, 30);
@@ -115,11 +119,16 @@ namespace GameDev.Slice.Tests
             var eyes = second.GetComponent<StealthObserver>();
             if (eyes != null)
             {
-                Assert.AreEqual("Thief!", eyes.Line, "the person cries out");
+                // S5c.5: it catches the thief, runs off or goes to the guards by the seed, and its cry says which.
+                var answer = world.Theft.Answer(second.Person);
+                var cry = answer == TheftAnswer.Catch ? "ui.theft.answer.catch" : answer == TheftAnswer.RunOff ? "ui.theft.answer.runoff" : "ui.theft.answer.guards";
+                Assert.AreEqual(Loc.Get(cry), eyes.Line, "the person cries out");
+                Assert.AreEqual(answer != TheftAnswer.RunOff, world.BreakIns.Wanted, "caught or reported, the character is Wanted");
                 Assert.IsTrue(eyes.Meter == null || eyes.Meter.Noticed, "and has noticed the character");
             }
 
             Assert.AreEqual(Loc.Get("ui.theft.noticed"), hud.MessageText, "on the screen, not on the person");
+            world.BreakIns.ClearWanted(); // the Arrest that would follow is BreakInPlayTests'
             Assert.AreNotEqual(hud.MessageText, second.PromptFor(player.transform.position));
             yield return GatheringPlayTests.PlayedOut(world);
 

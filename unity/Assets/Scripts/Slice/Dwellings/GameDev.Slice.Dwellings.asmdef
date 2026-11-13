@@ -7,7 +7,16 @@
         "GameDev.World.Portals",
         "GameDev.World.Interiors",
         "GameDev.Core.Scenes",
-        "GameDev.Locomotion"
+        "GameDev.Locomotion",
+        "GameDev.UI",
+        "GameDev.Core.Localization",
+        "GameDev.Input",
+        "GameDev.Items",
+        "GameDev.Player.Standing",
+        "GameDev.Player.Progression",
+        "GameDev.World.State",
+        "GameDev.World.Time",
+        "GameDev.Confront"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

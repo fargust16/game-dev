@@ -17,7 +17,8 @@ namespace GameDev.Slice.Theft
     /// Alert or not. The world does not pause for it, and the try is called off, not spent, once the person has moved
     /// 1 m from where it stood (the owner's second direction of 2026-11-11, 10.3 §6). A good result takes the purse
     /// unseen; a bad one makes the person notice the character, cry out and stop to face it. The driver puts one on every
-    /// walking townsperson when a scene loads.
+    /// walking townsperson when a scene loads, and since S5c.5 on the named people and the Wardens, their purses by kind
+    /// (19 §6.3). One who noticed answers as 10.3 §6 says (<see cref="TheftAnswer"/>), and a Warden stops the character itself.
     /// </summary>
     public sealed class PurseTarget : MonoBehaviour, IPromptSource
     {
@@ -36,6 +37,9 @@ namespace GameDev.Slice.Theft
         /// <summary>Authoring default: the Perception of a person with no Vision Cone, a townsman's (10.3 §6).</summary>
         public const int PlainPerception = 2;
 
+        /// <summary>10.3 §6: a Warden's Perception, for one with no Vision Cone.</summary>
+        public const int WardenPerception = 4;
+
         private SliceTheft _theft;
         private PlayerWork _work;
         private Func<bool> _busy;
@@ -44,14 +48,16 @@ namespace GameDev.Slice.Theft
         private PlayerLocomotion _player;
         private HudView _hud;
         private bool _settled;
+        private PurseKind _kind;
 
         /// <summary>The person's name and place among its siblings in the scene, the same in every run, for the world state's keys.</summary>
         public string Person => $"{name}.{transform.GetSiblingIndex()}";
 
         /// <param name="work">The character's work by its animation, the check where the hand reaches the pocket.</param>
         /// <param name="sneaking">Whether the character is in Stealth Mode, the only state it steals in.</param>
-        public void Configure(SliceTheft theft, PlayerWork work, Func<bool> busy, Func<bool> sneaking)
+        public void Configure(SliceTheft theft, PlayerWork work, Func<bool> busy, Func<bool> sneaking, PurseKind kind = PurseKind.Townsman)
         {
+            _kind = kind;
             _theft = theft;
             _work = work;
             _busy = busy;
@@ -106,7 +112,7 @@ namespace GameDev.Slice.Theft
             {
                 // The stealth host gives a townsperson its eyes after the scene loads, so they are looked up now.
                 _eyes = GetComponent<StealthObserver>();
-                var perception = _eyes != null ? _eyes.Perception : PlainPerception;
+                var perception = _eyes != null ? _eyes.Perception : _kind == PurseKind.Guard ? WardenPerception : PlainPerception;
                 var alert = _eyes != null && _eyes.Meter != null && _eyes.Meter.Alert;
                 var stood = Flat(transform.position);
                 _settled = false;
@@ -149,7 +155,7 @@ namespace GameDev.Slice.Theft
         private void Settle(ReactionResult result, int perception, bool alert)
         {
             _settled = true;
-            if (_theft.Resolve(Person, result, out var bronze, perception, alert) == TheftOutcome.Lifted)
+            if (_theft.Resolve(Person, result, out var bronze, perception, alert, _kind) == TheftOutcome.Lifted)
             {
                 Say(Loc.Format("ui.theft.lifted", Coins.Show(bronze)));
                 return;
@@ -163,22 +169,38 @@ namespace GameDev.Slice.Theft
             }
 
             held?.Release(); // a sleeper the theft wakes
+            var world = SliceWorldDriver.Running;
+            var warden = PeopleAround.IsWarden(transform);
+            var answer = warden ? TheftAnswer.Catch : _theft.Answer(Person);
+            var cry = warden ? "ui.theft.answer.warden" : answer == TheftAnswer.Catch ? "ui.theft.answer.catch"
+                : answer == TheftAnswer.RunOff ? "ui.theft.answer.runoff" : "ui.theft.answer.guards";
+            var at = _player != null ? _player.transform.position : transform.position;
             if (_eyes != null)
             {
-                var at = _player != null ? _player.transform.position : transform.position;
                 _eyes.Meter?.See(1e-6, 1f, at);
 
                 // Noticed as Stealth Mode notices: the cry over its head, and a character in Stealth Mode stands up.
-                var hiding = SliceWorldDriver.Running != null ? SliceWorldDriver.Running.Hiding : null;
+                var hiding = world != null ? world.Hiding : null;
                 if (hiding != null)
                 {
-                    hiding.NoticedBy(_eyes, Loc.Get("ui.theft.shout"));
+                    hiding.NoticedBy(_eyes, Loc.Get(cry));
                 }
                 else
                 {
-                    _eyes.Say(Loc.Get("ui.theft.shout"), NoteSeconds);
+                    _eyes.Say(Loc.Get(cry), NoteSeconds);
                 }
             }
+
+            // 10.3 §6, §6.2 (S5c.5): one who catches the thief or goes to the guards makes the character Wanted and
+            // brings a Warden, at once or after its run; one who runs off does nothing more. The noticed theft already
+            // counted against Reputation. A Warden robbed stops the character itself.
+            if (answer == TheftAnswer.RunOff || world == null || world.BreakIns == null)
+            {
+                return;
+            }
+
+            world.BreakIns.Noticed(null, warden, GameDev.Player.Standing.Deed.TheftNoticed);
+            world.Fights?.ReportCrime(at, transform, warden, answer == TheftAnswer.Catch);
         }
 
         // The outcome on the screen, never in the prompt, so it never keeps E from the next try (owner, 2026-11-12).

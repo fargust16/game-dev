@@ -349,6 +349,7 @@ namespace GameDev.Slice.Fights
             {
                 // 05.1: the sleeper wakes, and the character loses a little Sanity.
                 HeldStill.Of(body)?.Release();
+                Slumber.Of(body)?.Wake(); // one asleep at home (S5c.5)
                 Startle(body);
                 Mind?.Sanity.Lose(DreamSanity);
                 Note(Loc.Get("ui.ability.dream.failed"));
@@ -530,7 +531,7 @@ namespace GameDev.Slice.Fights
             var bestScore = float.MaxValue;
             foreach (var body in PeopleAround.InSight())
             {
-                if (body == null || IsPlayer(body) || Lying(body) || HeldStill.Sleeping(body))
+                if (body == null || IsPlayer(body) || Lying(body) || Slumber.Asleep(body))
                 {
                     continue;
                 }
@@ -571,6 +572,17 @@ namespace GameDev.Slice.Fights
                 if (distance <= bestDistance)
                 {
                     best = held.transform;
+                    bestDistance = distance;
+                }
+            }
+
+            // Those asleep at home by their hours (S5c.5; VS-HOURS (f)) are sleepers as much.
+            foreach (var slumber in Slumber.All)
+            {
+                var distance = slumber != null ? Vector3.Distance(slumber.transform.position, at) : float.MaxValue;
+                if (distance <= bestDistance)
+                {
+                    best = slumber.transform;
                     bestDistance = distance;
                 }
             }

@@ -87,6 +87,12 @@ namespace GameDev.Slice.Tests
                 SliceWorldDriver.Running.State.Raise(GameDev.Slice.Trial.SliceTrial.DoorOpenKey);
             }
 
+            if (GameDev.Slice.Dwellings.DwellingKey.TryParse(street.Target.Context, out var dwelling))
+            {
+                // S5c.5: a dwelling's door is locked; this one stands open, as a good try leaves it until morning.
+                SliceWorldDriver.Running.BreakIns.Open(dwelling.DwellingId);
+            }
+
             insideId ??= street.Id + ".inside";
             buildingId ??= street.Id;
             var interiorScene = street.Target.SceneName;

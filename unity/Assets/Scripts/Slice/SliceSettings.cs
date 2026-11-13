@@ -91,7 +91,42 @@ namespace GameDev.Slice
         [Tooltip("07 *Creation choices in V1*: the player's bodies offered at creation, each a player prefab whose Model is worn, men and women. SlicePlayerBodies sets them.")]
         [SerializeField] private GameDev.Slice.Creation.PlayerLook[] playerLooks = new GameDev.Slice.Creation.PlayerLook[0];
 
+        [Header("Dwellings' residents (S5c.5)")]
+        [Tooltip("10.3 §6.1: who lives in a poor home, each a people prefab with its PersonRole. SliceResidentsSetup sets them.")]
+        [SerializeField] private GameObject[] poorResidents = new GameObject[0];
+
+        [Tooltip("10.3 §6.1: who lives in a middling home.")]
+        [SerializeField] private GameObject[] middlingResidents = new GameObject[0];
+
+        [Tooltip("10.3 §6.1: who lives in a rich home.")]
+        [SerializeField] private GameObject[] richResidents = new GameObject[0];
+
+        [Tooltip("10.3 §6.1: a rich house's servants (INTERIOR_FURNISHING_RULES §9).")]
+        [SerializeField] private GameObject[] servants = new GameObject[0];
+
+        [Tooltip("VS-HOURS (f): each named person's model at home, by roster id. SliceResidentsSetup sets them by the asset map's looks.")]
+        [SerializeField] private NamedLook[] namedLooks = new NamedLook[0];
+
         public GameDev.Slice.Creation.PlayerLook[] PlayerLooks => playerLooks;
+
+        /// <summary>Who may live in a home of the wealth: 0 poor, 1 middling, 2 rich.</summary>
+        public GameObject[] Residents(int wealth) => wealth <= 0 ? poorResidents : wealth == 1 ? middlingResidents : richResidents;
+
+        public GameObject[] Servants => servants;
+
+        /// <summary>The named person's model at home, or null.</summary>
+        public GameObject NamedLookOf(string person)
+        {
+            foreach (var look in namedLooks ?? new NamedLook[0])
+            {
+                if (look != null && look.person == person)
+                {
+                    return look.prefab;
+                }
+            }
+
+            return null;
+        }
 
         public int Seed => seed;
 
@@ -147,5 +182,13 @@ namespace GameDev.Slice
         {
             return new WorldSeed(seed);
         }
+    }
+
+    /// <summary>A named person's model at home (VS-HOURS (f)): the roster id and the people prefab it wears.</summary>
+    [System.Serializable]
+    public sealed class NamedLook
+    {
+        public string person;
+        public GameObject prefab;
     }
 }

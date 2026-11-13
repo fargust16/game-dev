@@ -90,3 +90,40 @@ MonoBehaviour:
   - id: working_woman
     female: 1
     player: {fileID: 996923433036572468, guid: 6f1702021cf68ef45891b4ffa149a76b, type: 3}
+  poorResidents:
+  - {fileID: 7261953553367693872, guid: 138a848d16b415840a402f2a53f3e5ca, type: 3}
+  - {fileID: 570788627449479376, guid: f4ed8ce485c7888488019b92c9fc93b3, type: 3}
+  - {fileID: 851797075887621679, guid: 3c46d1a7c92f8994c85d0afa579abfff, type: 3}
+  - {fileID: 4758106923492574931, guid: e12277c035c725f4bac2839819a5c4b0, type: 3}
+  middlingResidents:
+  - {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
+  - {fileID: 825703266475951285, guid: ead87aefc7e76b74bad948cc0ce54418, type: 3}
+  - {fileID: 7261953553367693872, guid: 138a848d16b415840a402f2a53f3e5ca, type: 3}
+  - {fileID: 3902869044327929009, guid: 594c0921d406fab4abfb7caf31a8c010, type: 3}
+  richResidents:
+  - {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
+  - {fileID: 825703266475951285, guid: ead87aefc7e76b74bad948cc0ce54418, type: 3}
+  servants:
+  - {fileID: 7261953553367693872, guid: 138a848d16b415840a402f2a53f3e5ca, type: 3}
+  - {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
+  namedLooks:
+  - person: edda
+    prefab: {fileID: 7261953553367693872, guid: 138a848d16b415840a402f2a53f3e5ca, type: 3}
+  - person: silas
+    prefab: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
+  - person: ada
+    prefab: {fileID: 825703266475951285, guid: ead87aefc7e76b74bad948cc0ce54418, type: 3}
+  - person: tobias
+    prefab: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
+  - person: kettle
+    prefab: {fileID: 2355215988200064199, guid: 1d9885a468f126848bc032b6263aef5d, type: 3}
+  - person: ilse
+    prefab: {fileID: 825703266475951285, guid: ead87aefc7e76b74bad948cc0ce54418, type: 3}
+  - person: coyle
+    prefab: {fileID: 8755413562499794411, guid: 9e1bf74a2f7b3b1438113504dab29124, type: 3}
+  - person: lottie
+    prefab: {fileID: 7261953553367693872, guid: 138a848d16b415840a402f2a53f3e5ca, type: 3}
+  - person: dace
+    prefab: {fileID: 834033506932431442, guid: 0de46428ce487e94c9023c72e2d159ef, type: 3}
+  - person: market_trader
+    prefab: {fileID: 2801026938874276235, guid: d2c266e751ce9c14d94044f1f76761f1, type: 3}

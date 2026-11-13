@@ -1,59 +1,34 @@
-using GameDev.Core.Localization;
-using GameDev.Core.Scenes;
-using GameDev.Input;
-using GameDev.Locomotion;
-using GameDev.UI;
+using GameDev.Slice.BreakIns;
 using GameDev.World.Portals;
 using UnityEngine;
 
 namespace GameDev.Slice.Trial
 {
     /// <summary>
-    /// Thomas Wren's door from Draught Lane (S5c.4; SLICE_TRIAL §1.2): locked until it is opened once. With Lottie's key
-    /// <c>E  Unlock with Thomas's key</c> opens it for good and goes through; without it the door says it is locked, and
-    /// picking the lock comes with S5c.5. Added by the world's driver to the <c>missing-room.street</c> portal.
+    /// Thomas Wren's door from Draught Lane (S5c.4; SLICE_TRIAL §1.2): a lock of a poor home, Lock 2, until it is opened
+    /// once. With Lottie's key <c>E  Unlock with Thomas's key</c> opens it for good and goes through; without it the lock is
+    /// picked as any dwelling's, a break-in by every rule of 10.3 §6.1–6.2 (S5c.5). Added by the world's driver to the
+    /// <c>missing-room.street</c> portal.
     /// </summary>
     [RequireComponent(typeof(Portal))]
     public sealed class TrialDoor : MonoBehaviour
     {
-        private Portal _portal;
-        private PlayerLocomotion _player;
-        private HudView _hud;
+        /// <summary>The place Thomas Wren's lock is kept under, and its Lock: a poor home's (10.3 §6.1).</summary>
+        public const string Place = "missing-room";
 
-        private void Awake() => _portal = GetComponent<Portal>();
+        public const int Lock = 2;
 
-        private void Update()
+        private void Awake()
         {
-            var trial = SliceWorldDriver.Running != null ? SliceWorldDriver.Running.Trial : null;
-            if (_portal == null || trial == null)
-            {
-                return;
-            }
-
-            _portal.Sealed = !trial.DoorOpen;
-            _portal.SealedPrompt = trial.HasThomasKey ? "ui.prompt.trial.unlock" : "ui.prompt.locked";
-            var input = GameInputService.Instance;
-            if (!_portal.Sealed || input == null || !input.InteractPressed || SceneTransition.IsTraveling)
-            {
-                return;
-            }
-
-            _player = _player != null ? _player : FindAnyObjectByType<PlayerLocomotion>();
-            _hud = _hud != null ? _hud : FindAnyObjectByType<HudView>();
-            if (_player == null || !_portal.InReach(_player.transform.position) || (_hud != null && _hud.AnyWindowOpen))
-            {
-                return;
-            }
-
-            if (!trial.HasThomasKey)
-            {
-                _hud?.ShowMessage(Loc.Get("ui.trial.door.locked"));
-                return;
-            }
-
-            SliceWorldDriver.Running.State.Raise(SliceTrial.DoorOpenKey);
-            _portal.Sealed = false;
-            SceneTransition.Travel(_portal.Target);
+            var door = GetComponent<LockedDoor>();
+            door = door != null ? door : gameObject.AddComponent<LockedDoor>();
+            door.Configure(Place, Lock);
+            door.OpenForGood = () => Trial != null && Trial.DoorOpen;
+            door.HasKey = () => Trial != null && Trial.HasThomasKey;
+            door.KeyPrompt = "ui.prompt.trial.unlock";
+            door.UseKey = () => SliceWorldDriver.Running.State.Raise(SliceTrial.DoorOpenKey);
         }
+
+        private static SliceTrial Trial => SliceWorldDriver.Running != null ? SliceWorldDriver.Running.Trial : null;
     }
 }

@@ -22,6 +22,9 @@ namespace GameDev.Slice.People
     /// an Argument, fights, or runs. Paid, by the fine, the lock-up or a bribe taken, its Reputation rises to where no
     /// Warden accuses it; talked round, the Wardens let it off until its Reputation falls lower. The numbers are authoring
     /// defaults.
+    /// While the character is Wanted for a noticed break-in or theft (S5c.5; 10.3 §6.2), the Warden who sees it opens an
+    /// **Arrest** instead (10.4 §6): surrender, a bribe, Deception and Persuasion with their Arguments, a fight, or flight,
+    /// and no fine to pay. Settled, the Wardens look for the character no more.
     /// </summary>
     public sealed class WardenAccusation : MonoBehaviour
     {
@@ -34,7 +37,13 @@ namespace GameDev.Slice.People
             Persuade,
             Fight,
             Run,
+
+            /// <summary>The Arrest's Deception (10.4 §6): "Easy to mistake a door", with nothing stolen on the character.</summary>
+            Deceive,
         }
+
+        /// <summary>10.4 §6 *Arrest*, Persuasion's Argument: a Reputation of +5 or more (authoring default's reading in points).</summary>
+        public const int GoodNameReputation = 5;
 
         /// <summary>Authoring defaults: how near a Warden sees the character to stop it, m; the bribe, half the fine (10.4 §6 *Arrest*); one Warden in three takes it.</summary>
         public const float Reach = 8f;
@@ -69,11 +78,18 @@ namespace GameDev.Slice.People
         private bool _open;
         private bool _refused;
         private bool _failed;
+        private bool _arrest;
+        private bool _seen;
+        private bool _lied;
+        private bool _giveBack;
         private long _quietUntil = long.MinValue;
         private float _look;
 
         /// <summary>Whether a Warden's Accusation is open now.</summary>
         public bool IsOpen => _open;
+
+        /// <summary>Whether the open column is an Arrest for a noticed crime (S5c.5), not an Accusation.</summary>
+        public bool IsArrest => _open && _arrest;
 
         /// <summary>Whether a Warden is on its way to stop the character or stands talking to it.</summary>
         public bool Busy => _open || _warden != null;
@@ -114,6 +130,9 @@ namespace GameDev.Slice.People
             _open = true;
             _warden = warden;
             _wardenFacing = warden.rotation;
+            _arrest = Wanted;
+            _seen = _arrest && _world.BreakIns.Seen;
+            _world.Fights?.CallOff(warden); // stopped on its way to the place, it is there
             var way = Vector3.ProjectOnPlane(_player.transform.position - warden.position, Vector3.up);
             if (way.sqrMagnitude > 1e-4f)
             {
@@ -126,8 +145,18 @@ namespace GameDev.Slice.People
             Fine = SliceConfront.WardensFine;
             _refused = false;
             _failed = false;
+            _lied = false;
             _said.Clear();
-            _said.Add(() => (Loc.Get("ui.fight.warden"), Loc.Format("ui.accuse.line", Coins.Show(SliceConfront.WardensFine))));
+            if (_arrest)
+            {
+                var line = _seen ? "ui.arrest.line.seen" : "ui.arrest.line.heard";
+                _said.Add(() => (Loc.Get("ui.fight.warden"), Loc.Get(line)));
+            }
+            else
+            {
+                _said.Add(() => (Loc.Get("ui.fight.warden"), Loc.Format("ui.accuse.line", Coins.Show(SliceConfront.WardensFine))));
+            }
+
             Show();
             return true;
         }
@@ -152,13 +181,31 @@ namespace GameDev.Slice.People
                     break;
                 case Choice.LockUp:
                     var extra = Fine - SliceConfront.WardensFine;
-                    _world.Standing.Settle();
+                    if (_arrest)
+                    {
+                        // 10.4 §6: a surrender is the lock-up, and the stolen goods carried go back to their owners.
+                        _world.BreakIns.GiveBack();
+                        _world.BreakIns.ClearWanted();
+                    }
+                    else
+                    {
+                        _world.Standing.Settle();
+                    }
+
                     Close();
                     _world.Fights.GoToLockUp(extra); // its terms cost the dialogue's tick
                     break;
                 case Choice.Bribe when Corrupt(_warden):
                     _world.Bag.Spend(Bribe);
-                    _world.Standing.Settle();
+                    if (_arrest)
+                    {
+                        _world.BreakIns.ClearWanted();
+                    }
+                    else
+                    {
+                        _world.Standing.Settle();
+                    }
+
                     End("ui.accuse.bribe.taken");
                     break;
                 case Choice.Bribe:
@@ -170,6 +217,9 @@ namespace GameDev.Slice.People
                     break;
                 case Choice.Persuade:
                     Persuade();
+                    break;
+                case Choice.Deceive:
+                    Deceive();
                     break;
                 case Choice.Fight:
                     var warden = _warden;
@@ -183,10 +233,12 @@ namespace GameDev.Slice.People
             }
         }
 
-        /// <summary>The Persuasion check's chance and what stands behind it (10.4 §3), as the column shows it.</summary>
-        public CheckPreview Preview()
+        /// <summary>
+        /// A Social Check's chance and what stands behind it (10.4 §3), as the column shows it: Persuasion, or the Arrest's
+        /// Deception. The request is Ordinary when the Warden only heard of the crime, Large when it saw it (10.4 §6).
+        /// </summary>
+        public CheckPreview Preview(CharacterSkill skill = CharacterSkill.Persuasion)
         {
-            const CharacterSkill skill = CharacterSkill.Persuasion;
             var rules = _world.CheckRules;
             var listener = new CharacterSheet();
             listener.Set(CharacterAttribute.Strength, ListenerValues);
@@ -194,7 +246,7 @@ namespace GameDev.Slice.People
             listener.Set(CharacterAttribute.Will, ListenerValues);
             var characterValue = SocialCheck.CharacterValue(rules, _world.Character, skill);
             var listenerValue = SocialCheck.ListenerValue(rules, listener, skill);
-            var difficulty = SocialCheck.Difficulty(rules, RequestSize.Ordinary, listenerValue, false);
+            var difficulty = SocialCheck.Difficulty(rules, _arrest && _seen ? RequestSize.Large : RequestSize.Ordinary, listenerValue, false);
             var attitude = _world.Standing.Attitude(Listener);
             var standing = _world.Standing.Reading(skill, false);
             var mind = _world.Mind != null ? _world.Mind.SocialPenalty : 0; // 07.2 §3.3–3.4
@@ -217,6 +269,18 @@ namespace GameDev.Slice.People
             if (success)
             {
                 _world.Conduct?.Deed(GameDev.Slice.Alchemy.ConductDeed.Convince, "accusation." + Path(_warden)); // 05.1
+                if (_arrest)
+                {
+                    if (_giveBack)
+                    {
+                        _world.BreakIns.GiveBack(); // the Argument was giving back what was stolen
+                    }
+
+                    _world.BreakIns.ClearWanted();
+                    End(_giveBack ? "ui.arrest.returned" : "ui.arrest.letoff");
+                    return;
+                }
+
                 _world.Standing.LetOff();
                 End("ui.accuse.letoff");
                 return;
@@ -228,13 +292,43 @@ namespace GameDev.Slice.People
             Show();
         }
 
+        // 10.4 §6 *Arrest*: the evidence is the Argument, nothing stolen on the character and the crime itself unseen; a
+        // lie is Жрица's Convince as any (05.1, VS-CONDUCT (b)), and a failure is not tried again here.
+        private void Deceive()
+        {
+            const CharacterSkill skill = CharacterSkill.Deception;
+            var rolls = _world.Seed.Fork(SliceSeedStreams.SocialChecks, StableHash.Of("arrest.lie." + Path(_warden)), (int)_world.Clock.Tick);
+            var success = SocialCheck.Roll(Preview(skill).Chance, rolls);
+            var listener = new CharacterSheet();
+            listener.Set(CharacterAttribute.Intelligence, ListenerValues);
+            listener.Set(CharacterAttribute.Will, ListenerValues);
+            SocialCheck.Train(_world.Character, skill, listener, success);
+            _world.Fights?.Persuaded(skill, Listener, success);
+            if (success)
+            {
+                _world.Conduct?.Deed(GameDev.Slice.Alchemy.ConductDeed.Convince, "accusation." + Path(_warden));
+                _world.BreakIns.ClearWanted();
+                End("ui.arrest.deceived");
+                return;
+            }
+
+            _lied = true;
+            _said.Add(() => (null, Loc.Format("ui.dialogue.failure", PersonTalk.SkillName(skill))));
+            _said.Add(() => (Loc.Get("ui.fight.warden"), Loc.Get("ui.arrest.deceive.failed")));
+            Show();
+        }
+
+        /// <summary>Whether the Wardens look for the character for a noticed crime (S5c.5).</summary>
+        private bool Wanted => _world != null && _world.BreakIns != null && _world.BreakIns.Wanted;
+
         private void Show()
         {
             _choices.Clear();
             var bronze = _world.Bag != null ? _world.Bag.Bronze : 0;
-            if (bronze >= Fine)
+            var debt = _world.State.IsSet(SliceConfront.DebtKey(SliceConfront.Wardens));
+            if (bronze >= Fine && !_arrest)
             {
-                _choices.Add(Choice.Pay);
+                _choices.Add(Choice.Pay); // an Arrest has no fine to pay on the spot (10.4 §6)
             }
 
             _choices.Add(Choice.LockUp);
@@ -243,7 +337,15 @@ namespace GameDev.Slice.People
                 _choices.Add(Choice.Bribe);
             }
 
-            if (!_failed && _world.State.IsSet(SliceConfront.DebtKey(SliceConfront.Wardens)))
+            if (_arrest && !_lied && !_seen && _world.BreakIns.NothingStolenCarried)
+            {
+                _choices.Add(Choice.Deceive);
+            }
+
+            // Persuasion's Arguments: the Wardens' debt; in an Arrest also a good name, or giving back what was stolen.
+            var goodName = _arrest && _world.Standing.ReputationPoints >= GoodNameReputation;
+            _giveBack = _arrest && !debt && !goodName && _world.BreakIns.CanGiveBack;
+            if (!_failed && (debt || goodName || _giveBack))
             {
                 _choices.Add(Choice.Persuade);
             }
@@ -261,11 +363,16 @@ namespace GameDev.Slice.People
                 case Choice.Pay:
                     return Loc.Format("ui.accuse.pay", Coins.Show(Fine));
                 case Choice.LockUp:
-                    return Loc.Get("ui.accuse.lockup");
+                    return Loc.Get(_arrest ? "ui.arrest.surrender" : "ui.accuse.lockup");
+                case Choice.Deceive:
+                    var lie = Loc.Get("ui.arrest.deceive");
+                    return tagged
+                        ? PersonTalk.CheckTag(_world.CheckRules, CharacterSkill.Deception, Preview(CharacterSkill.Deception), DebugSight.Read(_world.Character.Get(CharacterAttribute.Intelligence))) + " " + lie
+                        : lie;
                 case Choice.Bribe:
                     return Loc.Format("ui.accuse.bribe", Coins.Show(Bribe));
                 case Choice.Persuade:
-                    var words = Loc.Get("ui.accuse.persuade");
+                    var words = Loc.Get(_giveBack ? "ui.arrest.giveback" : "ui.accuse.persuade");
                     if (!tagged)
                     {
                         return words;
@@ -362,8 +469,9 @@ namespace GameDev.Slice.People
             var fights = _world.Fights;
             var clock = _world.Clock;
             var hud = Hud();
-            return standing != null && standing.Accused && fights != null && clock != null && hud != null && !clock.IsPaused
-                   && clock.Tick >= _quietUntil && !fights.InFight && fights.Terms == null && !fights.Assaulting && fights.WardensComing == 0
+            var wanted = Wanted; // S5c.5: a Warden on its way to the place still stops the character it sees
+            return standing != null && (standing.Accused || wanted) && fights != null && clock != null && hud != null && !clock.IsPaused
+                   && clock.Tick >= _quietUntil && !fights.InFight && fights.Terms == null && !fights.Assaulting && (fights.WardensComing == 0 || wanted)
                    && _player.enabled && !_player.InWater && (_world.Work == null || !_world.Work.Busy)
                    && !hud.IsDialogueOpen && !hud.IsReadingOpen && !hud.IsBagOpen && !hud.IsShopOpen && !hud.IsMapOpen && !hud.IsNotesOpen;
         }

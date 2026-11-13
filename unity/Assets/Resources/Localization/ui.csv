@@ -618,7 +618,6 @@ ui.save.refused.sleep,Not while asleep.,Не во время сна.
 ui.prompt.trial.unlock,E  Unlock with Thomas Wren's key,E  Отпереть ключом Томаса Рена
 ui.prompt.locked,Locked,Заперто
 ui.prompt.trial.board,E  Lift the loose board,E  Поднять расшатанную доску
-ui.trial.door.locked,The door is locked.,Дверь заперта.
 ui.trial.cache.noticed,A floorboard under the bed is loose.,Под кроватью шатается половица.
 ui.trial.cache.remembered,"Under the boards, as Lottie said.","Под половицами, как говорила Лотти."
 ui.trial.cache.taken,"Under the board: two formulas, a letter and 600 bronze.","Под доской: две формулы, письмо и 600 бронзы."
@@ -627,3 +626,38 @@ ui.trial.gift.heading,Take one,Возьмите одно
 ui.trial.gift.pouch,(with a Cartridge Pouch),(с патронной сумкой)
 ui.trial.gift.hint,Click an item to take it. Esc closes the page; the gift waits for the next talk with Mr Ashgrave.,Щелчок по предмету — взять его. Esc закрывает страницу; дар подождёт следующего разговора с мистером Эшгрейвом.
 ui.trial.gift.taken,Taken: {0},Взято: {0}
+"# Break-ins (S5c.5; 10.3 §6.1–6.2, 10.4 §6 Arrest): the lock, the witness, the Wardens fetched and the Arrest"
+ui.prompt.lock.pick,E  Pick the lock,E  Взломать замок
+ui.lock.caption,Picking the lock,Вскрываем замок
+ui.lock.opened,The lock gives.,Замок поддался.
+ui.lock.broke,A pick breaks: {0} left.,Отмычка сломалась: осталось {0}.
+ui.lock.nopicks,Locked: you need lockpicks.,Заперто: нужны отмычки.
+ui.breakin.witness,Hey! What are you doing at that door?,Эй! Что вы делаете у этой двери?
+ui.breakin.noticed,You were seen at someone else's door.,Вас заметили у чужой двери.
+ui.crime.call,Wardens! Over here!,Стража! Сюда!
+ui.crime.runs,I'm fetching the Wardens!,Бегу за стражей!
+ui.arrest.line.heard,Stop there. You've been reported for a break-in. Explain yourself.,Стоять. На вас донесли: взлом. Объяснитесь.
+ui.arrest.line.seen,Stop! I saw you at that lock.,Стоять! Взлом на моих глазах.
+ui.arrest.surrender,Surrender,Сдаться
+ui.arrest.deceive,It's easy to mistake a door. I carry nothing of theirs.,Дверь спутать недолго. Чужого при мне нет.
+ui.arrest.deceive.failed,Spare me the stories.,Не надо мне сказок.
+ui.arrest.deceived,"Hm. Go on, then. I'll remember your face.",Хм. Ступайте. Но лицо ваше я запомню.
+ui.arrest.giveback,I'll give back everything that was taken.,"Я верну всё, что взято."
+ui.arrest.returned,You give back what was taken. The Wardens let you go.,Вы вернули взятое. Стража вас отпускает.
+ui.arrest.letoff,"Go, then. And keep away from other people's doors.",Ступайте. И держитесь подальше от чужих дверей.
+ui.breakin.resident.1,Who's there?! Help! Thieves!,Кто здесь?! На помощь! Воры!
+ui.breakin.resident.2,Get out of my house! Wardens!,Вон из моего дома! Стража!
+ui.breakin.resident.3,Burglars! Someone fetch the Wardens!,Грабят! Позовите Стражу!
+ui.breakin.noticed.inside,You were seen inside someone else's home.,Вас заметили в чужом доме.
+ui.prompt.stash,E  Open the chest,E  Открыть сундук
+ui.prompt.stash.empty,E  Look in the chest,E  Заглянуть в сундук
+ui.stash.empty,"Empty, nothing left.",Пусто: ничего не осталось.
+ui.stash.bronze,In the chest: {0}.,В сундуке: {0}.
+ui.stash.goods,In the chest: {0} × {1}.,В сундуке: {0} × {1}.
+ui.stash.papers.1,"Under it, a note of debt: someone owes the house a good sum.","Под ним — долговая расписка: кто-то задолжал хозяевам немалую сумму."
+ui.stash.papers.2,"Under it, an unsigned letter: ""Not before the bells, and not by the front door.""","Под ним — письмо без подписи: «Не раньше колоколов и не через парадную дверь»."
+ui.stash.papers.3,"Under it, an old pawn ticket from Kettle's, for a ring never redeemed.","Под ним — старая квитанция ломбарда Кеттла на кольцо, которое так и не выкупили."
+ui.theft.answer.warden,"Hands where I can see them, thief!","Руки на виду, вор!"
+ui.theft.answer.catch,Got you! Wardens! Thief!,Попались! Стража! Вор!
+ui.theft.answer.runoff,Thief! Keep away from me!,Вор! Не подходите ко мне!
+ui.theft.answer.guards,Thief! I'm fetching the Wardens!,Вор! Я за Стражей!

@@ -18,6 +18,27 @@ namespace GameDev.Slice.Theft
         Noticed,
     }
 
+    /// <summary>Whose purse it is (19 §6.3): a townsman's, a guard's, or a merchant's.</summary>
+    public enum PurseKind
+    {
+        Townsman,
+        Guard,
+        Merchant,
+    }
+
+    /// <summary>10.3 §6: what a robbed person who noticed does: catches the thief, runs off, or goes to the guards.</summary>
+    public enum TheftAnswer
+    {
+        /// <summary>It holds on and cries for the Wardens: the nearest is called at once.</summary>
+        Catch,
+
+        /// <summary>It runs off, and nothing follows.</summary>
+        RunOff,
+
+        /// <summary>It goes to the guards, and a Warden comes after its run.</summary>
+        Guards,
+    }
+
     /// <summary>
     /// Theft from a person (S5a.8; 10.3 §6, 19 §6.3): one Reaction Check, whose good zone Theft skill and Dexterity widen
     /// and the target's Perception narrows. A good result takes the purse unseen, its bronze from 19's range for a
@@ -64,8 +85,21 @@ namespace GameDev.Slice.Theft
         public ReactionBar Bar(string person, int perception, bool alert) =>
             ReactionCheck.For(Delta(perception, alert), _seed.Fork(SliceSeedStreams.Theft, Hash(person), _clock.Day * 2));
 
-        /// <summary>The person's purse today, by the seed.</summary>
-        public int Purse(string person) => _seed.Fork(SliceSeedStreams.Theft, Hash(person), (_clock.Day * 2) + 1).Next(PurseLeast, PurseMost + 1);
+        /// <summary>19 §6.3: a guard's and a merchant's purse, by theft, in bronze.</summary>
+        public static readonly (int Least, int Most)[] Purses = { (PurseLeast, PurseMost), (300, 800), (1000, 3000) };
+
+        /// <summary>The person's purse today, by the seed, in its kind's range.</summary>
+        public int Purse(string person, PurseKind kind = PurseKind.Townsman)
+        {
+            var (least, most) = Purses[(int)kind];
+            return _seed.Fork(SliceSeedStreams.Theft, Hash(person), (_clock.Day * 2) + 1).Next(least, most + 1);
+        }
+
+        /// <summary>
+        /// 10.3 §6: what the robbed person does today once it noticed, one of three by the seed (VS-BREAKIN). A Warden
+        /// needs none: it stops the character itself.
+        /// </summary>
+        public TheftAnswer Answer(string person) => (TheftAnswer)_seed.Fork(SliceSeedStreams.TheftAnswer, Hash(person), _clock.Day).Next(3);
 
         /// <summary>
         /// Settles a try by the Reaction Check's result; <paramref name="bronze"/> is what was taken. Every try grows Theft
@@ -75,7 +109,7 @@ namespace GameDev.Slice.Theft
         /// <summary>The character's Conduct Progress (S5b.7): a theft is against Император, one unseen a deed of Жрица.</summary>
         public GameDev.Slice.Alchemy.SliceConduct Conduct { get; set; }
 
-        public TheftOutcome Resolve(string person, ReactionResult result, out int bronze, int perception = 1, bool alert = false)
+        public TheftOutcome Resolve(string person, ReactionResult result, out int bronze, int perception = 1, bool alert = false, PurseKind kind = PurseKind.Townsman)
         {
             Conduct?.Against(Arcana.Emperor);
             _state.Set(TriedKey(person), _clock.Day + 1);
@@ -88,7 +122,7 @@ namespace GameDev.Slice.Theft
                 return TheftOutcome.Noticed;
             }
 
-            bronze = Purse(person);
+            bronze = Purse(person, kind);
             _bag.Earn(bronze);
             _state.Set(LiftedKey, _state.Get(LiftedKey) + 1);
             Conduct?.Deed(GameDev.Slice.Alchemy.ConductDeed.TakeUnseen, "theft." + person);

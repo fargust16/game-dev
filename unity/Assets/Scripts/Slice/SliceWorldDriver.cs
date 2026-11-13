@@ -111,6 +111,9 @@ namespace GameDev.Slice
         /// <summary>Theft from the townsfolk (S5a.8); null without a bag or the Deeds Record.</summary>
         public GameDev.Slice.Theft.SliceTheft Theft { get; private set; }
 
+        /// <summary>Break-ins (S5c.5; 10.3 §6.1–6.2): locks, Lockpicks, the Wanted and the night's loot.</summary>
+        public GameDev.Slice.BreakIns.SliceBreakIns BreakIns { get; private set; }
+
         /// <summary>11's start: plain clothes with no defence and 500 bronze, with no weapon or tool.</summary>
         public const int StartingBronze = 500;
 
@@ -468,6 +471,7 @@ namespace GameDev.Slice
             if (Bag != null && Standing != null)
             {
                 Theft = new GameDev.Slice.Theft.SliceTheft(Bag, State, Clock, Character, Standing, seed) { Conduct = Conduct };
+                BreakIns = new GameDev.Slice.BreakIns.SliceBreakIns(Bag, State, Clock, Character, Standing, seed) { Conduct = Conduct }; // S5c.5
                 FindPurses();
             }
 
@@ -1053,7 +1057,11 @@ namespace GameDev.Slice
             }
         }
 
-        /// <summary>A purse to lift on each walking townsperson in the loaded scenes (S5a.8).</summary>
+        /// <summary>19 §6.3's merchants among the named people: the keepers of a shop, a stall or the tavern (authoring default).</summary>
+        private static readonly System.Collections.Generic.HashSet<string> Merchants =
+            new System.Collections.Generic.HashSet<string> { "nell", "harrow", "edda", "silas", "ada", "tobias", "kettle", SliceHours.MarketTrader };
+
+        /// <summary>A purse to lift on each walking townsperson in the loaded scenes (S5a.8), and on the named people and the Wardens (S5c.5).</summary>
         private void FindPurses()
         {
             var added = false;
@@ -1064,6 +1072,24 @@ namespace GameDev.Slice
                     walker.gameObject.AddComponent<GameDev.Slice.Theft.PurseTarget>().Configure(Theft, Work, () => Fights != null && Fights.InFight, () => Hiding != null && Hiding.Active);
                     added = true;
                 }
+            }
+
+            // S5c.5: the named people, the Wardens and the merchants too, each purse by its kind (19 §6.3).
+            foreach (var body in PeopleAround.InSight())
+            {
+                var named = body.GetComponent<NamedPerson>();
+                var post = body.GetComponent<PersonPost>();
+                var id = named != null ? named.Id : post != null ? post.Person : null;
+                var warden = PeopleAround.IsWarden(body);
+                if ((id == null && !warden) || body.GetComponent<TownsfolkWalker>() != null || body.GetComponent<GameDev.Slice.Theft.PurseTarget>() != null)
+                {
+                    continue;
+                }
+
+                var kind = warden ? GameDev.Slice.Theft.PurseKind.Guard
+                    : Merchants.Contains(id) ? GameDev.Slice.Theft.PurseKind.Merchant : GameDev.Slice.Theft.PurseKind.Townsman;
+                body.gameObject.AddComponent<GameDev.Slice.Theft.PurseTarget>().Configure(Theft, Work, () => Fights != null && Fights.InFight, () => Hiding != null && Hiding.Active, kind);
+                added = true;
             }
 
             var hud = Hud();

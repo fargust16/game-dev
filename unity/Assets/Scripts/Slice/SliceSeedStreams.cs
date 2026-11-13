@@ -98,11 +98,23 @@ namespace GameDev.Slice
         /// <summary>The three items of the Faction Gift (19 §6.2, S5c.4); forked with no keys, so the same seed offers the same three.</summary>
         public const string FactionGift = "slice.faction.gift";
 
+        /// <summary>
+        /// Break-ins (10.3 §6.1–6.2, 19 §6.3; S5c.5): a lock's bar by its place and the tick, who is at home in a dwelling
+        /// and what its Stash holds by its place and the day, and how a noticed theft is answered by the person and the day.
+        /// </summary>
+        public const string Locks = "slice.locks";
+
+        public const string Residents = "slice.residents";
+
+        public const string Stash = "slice.stash";
+
+        public const string TheftAnswer = "slice.theft.answer";
+
         public static readonly IReadOnlyList<string> All = new[]
         {
             RitualSite, RitualWeakPoints, GlowingBeasts, Combat, Dwellings, PoiUnattended, ActionChecks, SocialChecks, Lies, Conditions,
             ShopStock, Workshop, Gathering, Skinning, Theft, BeastWander, Wardens, Roles, Search, Shots, Boldness, News, GodNotices,
-            Prepared, Alchemy, Abilities, Sleep, FactionGift,
+            Prepared, Alchemy, Abilities, Sleep, FactionGift, Locks, Residents, Stash, TheftAnswer,
 
         };
     }
