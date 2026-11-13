@@ -1,10 +1,10 @@
 # 09 Information Sources
 
-Version: 0.15
+Version: 0.16
 
 Status: Draft
 
-Last Updated: 2026-11-13 (News Pool: built in the slice with deaths as its first items, told on the Notice Board (PB8d). Earlier: 2026-11-12 (News Pool: a death enters 1–2 game hours after it, with the place and how long ago, who killed only if seen, by the owner's acceptance of [10.2](10.2%20Combat%20System%20Draft.md) §5e. Earlier: the News Pool, by the owner: what a city talks about for 8 game hours, in the present tense while current and the past tense after. Earlier: tasks pay money, not gold, by 19 §6.3. Earlier: tips a day, Hinted to Marked, and false tips, authoring defaults. Earlier: Character Notes added. Earlier: rumours carry Reputation. Earlier: Confront runs in place. Earlier: the rituals' purpose excluded from every source until manifestation. Earlier: the secret purpose of rituals excluded from public sources. Earlier: reported City Control recorded as the public reading of campaign progress. Earlier: private daily action summary separated from public news; public event/map reporting and source-limited NPC awareness clarified.))
+Last Updated: 2026-11-13 (News Pool: the owner confirmed NEWS-1 … NEWS-3: the board, the bartender and Street Rumour tell news, each by its bias; an item is current while its event lasts; no false news; POI A's and B's items come with S5c. Earlier: News Pool: built in the slice with deaths as its first items, told on the Notice Board (PB8d). Earlier: 2026-11-12 (News Pool: a death enters 1–2 game hours after it, with the place and how long ago, who killed only if seen, by the owner's acceptance of [10.2](10.2%20Combat%20System%20Draft.md) §5e. Earlier: the News Pool, by the owner: what a city talks about for 8 game hours, in the present tense while current and the past tense after. Earlier: tasks pay money, not gold, by 19 §6.3. Earlier: tips a day, Hinted to Marked, and false tips, authoring defaults. Earlier: Character Notes added. Earlier: rumours carry Reputation. Earlier: Confront runs in place. Earlier: the rituals' purpose excluded from every source until manifestation. Earlier: the secret purpose of rituals excluded from public sources. Earlier: reported City Control recorded as the public reading of campaign progress. Earlier: private daily action summary separated from public news; public event/map reporting and source-limited NPC awareness clarified.))
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md)
@@ -177,7 +177,7 @@ Owner, 2026-11-09. The **News Pool** holds what a city is talking about. When an
 
 An item is told in the **present tense** while its event is still current, and in the **past tense** once the event has happened but is no longer current. So every item has a present and a past text in each language ([17](17%20Game%20Systems%20Architecture.md) X.7).
 
-Working readings, agent, 2026-11-09, not owner decisions; NEWS-1 … NEWS-5 in [99 Open Questions](99%20Open%20Questions.md) ask the owner:
+Working readings, agent, 2026-11-09. On 2026-11-13 the owner confirmed reading 3 (NEWS-2) and reading 4 (NEWS-1) and ruled that no News item is false (NEWS-3, reading 8); the rest stay working readings, and NEWS-4 is open in [99 Open Questions](99%20Open%20Questions.md):
 
 1. **News is not a Tip.** A Tip is authored for its source and day and points to a POI before it happens; a News item is made by an event that has already happened. They do not replace each other. A line that must outlast 8 hours, such as the slice's residue on day 2, stays a Tip read from the world state.
 2. **Only a known event enters the pool**: one an eligible witness saw, a record holds, or someone announced (§ Public news and map information; [18](18%20World%20Time%20and%20Living%20Simulation.md) §8). A hidden deed never does, as a hidden one never counts against a capture ([21](21%20Cult%20Campaign%20and%20City%20Control.md)).
@@ -186,10 +186,11 @@ Working readings, agent, 2026-11-09, not owner decisions; NEWS-1 … NEWS-5 in [
 5. **A heard item is kept like a heard Tip.** It enters the Character Notes, may serve as an Argument ([10.4](10.4%20Dialogue%20and%20Social%20Checks.md) §1), and stays heard after it leaves the pool. Leaving the pool ends only the telling.
 6. Each occurrence of an event is its own item, so the same kind of event can stand in the pool twice.
 7. The pool is not the daily public digest: the digest reaches the player at the day boundary, and the pool is what people say during the day.
+8. **No false news** (owner, 2026-11-13): a News item tells what happened, its teller's bias choosing what it stresses, never wrong on a fact; a false tip stays a Tip of Street Rumour's (§ False tips).
 
 **Deaths** (owner, 2026-11-12; [10.2](10.2%20Combat%20System%20Draft.md) §5e). Any death of a person, a resident, a Warden or anyone else, enters its city's pool 1–2 game hours after it (authoring default, drawn by the seed), told with the place and how long ago. A death is a known event by reading 2, since the goddess tells the Wardens of every kill and the body lies where it fell; who killed is told only if someone saw it. Its 8 hours start when it enters.
 
-*In the slice* (PB8d, 2026-11-13; the agent's readings): the pool is built, Veilmouth's, in the world state, so a save keeps it, and deaths are its first items. The Notice Board pins every item it holds, the newest first, after its notices, with the place the player's map names; other people who tell news, heard items in the Character Notes, and the present tense wait for NEWS-1 and NEWS-5 ([10.2](10.2%20Combat%20System%20Draft.md) §5e *In the slice*).
+*In the slice* (PB8d, 2026-11-13; the agent's readings): the pool is built, Veilmouth's, in the world state, so a save keeps it, and deaths are its first items. The Notice Board pins every item it holds, the newest first, after its notices, with the place the player's map names; the bartender and Street Rumour, heard items in the Character Notes, the present tense, and POI A's and B's items come with S5c (S5-8) ([10.2](10.2%20Combat%20System%20Draft.md) §5e *In the slice*).
 
 # Reliability and Bias
 

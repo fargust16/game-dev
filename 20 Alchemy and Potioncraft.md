@@ -1,10 +1,10 @@
 # 20 Alchemy and Potioncraft
 
-Version: 0.11
+Version: 0.12
 
 Status: Draft — owner-approved foundation; skill progression, mini-game, recipes, and balance remain open
 
-Last Updated: 2026-11-11 (§3: brewing's bar is brought to 07.1 §8a's rule in S5b, by the owner's direction of 2026-11-11. Earlier: the price in bronze, by 19 §6.3. Earlier: an interrupted brewing loses its ordinary ingredients and keeps the magical one, authoring default. Earlier: the brewing mini-game is a Reaction Check once a tick, and its results change the potion's Sanity cost and attribute rise, by the owner. Earlier: the potion shop's Master teaches Alchemy as a working reading. Earlier: the Alchemical Flask rejected by the owner. Earlier: the Alchemical Flask proposal noted. Earlier: the V1 question follows the slice's Limits. Earlier: terms renamed to Arcana and Limit. Earlier: potion-making included in the Vertical Slice.)
+Last Updated: 2026-11-13 (§3: by the owner's answers to S5-2: the checks run with the world paused and 6 ticks pass after them; their difficulty grows with the potion's Limit and stays passable at Limit 0; three places to brew; drinking a Limit potion warns of an hour defenceless, then 60 ticks of Assimilation, Stunned if attacked; the numbers authoring defaults. Earlier: §3: brewing's bar is brought to 07.1 §8a's rule in S5b, by the owner's direction of 2026-11-11. Earlier: the price in bronze, by 19 §6.3. Earlier: an interrupted brewing loses its ordinary ingredients and keeps the magical one, authoring default. Earlier: the brewing mini-game is a Reaction Check once a tick, and its results change the potion's Sanity cost and attribute rise, by the owner. Earlier: the potion shop's Master teaches Alchemy as a working reading. Earlier: the Alchemical Flask rejected by the owner. Earlier: the Alchemical Flask proposal noted. Earlier: the V1 question follows the slice's Limits. Earlier: terms renamed to Arcana and Limit. Earlier: potion-making included in the Vertical Slice.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [05 Progression](05%20Progression.md), [07.1 Character Attributes, Skills, and Action Checks](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md), [18 World Time and Living Simulation](18%20World%20Time%20and%20Living%20Simulation.md)
@@ -47,15 +47,31 @@ The six-tick duration and the presence of a mini-game are approved.
 
 Owner-approved, 2026-11-03: the mini-game is a series of Reaction Checks. A **Reaction Check** is a timing check: a marker runs once along a bar, the bar has a large good zone and a smaller perfect zone inside it, and the player presses Space. Stopping in the perfect zone is a perfect result, in the good zone a good one, anywhere else or not at all a bad one.
 
-- A brewing plays its animation, and once a tick, every ten real seconds, a Reaction Check appears, so a six-tick brewing has six. The world does not pause.
+- A brewing plays its animation and has six Reaction Checks. *Owner, 2026-11-13 (S5-2), replacing "once a tick, every ten real seconds, with the world running":* the checks run with the world paused, each at its stroke's key frame, as every Reaction Check but theft's does ([07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §8a); after the sixth, 6 ticks pass with the world running, the brewing's time, for a Limit potion and for Основа ритуала's substitute alike.
 - Six good results give the standard potion: the Limit's standard Sanity cost and its standard attribute rise.
 - Perfect results lower the Sanity cost, and they add one or two points to the Arcana's primary attributes above the standard rise.
 - A bad result still gives a potion, but each one raises the Sanity cost. Six bad results take a great deal of Sanity and give almost none of the attribute rise.
 - The correct potion still grants its Limit: brewing changes only its price and its rise ([05 Progression](05%20Progression.md)).
 
-Authoring defaults: each perfect result lowers the Limit's mandatory Sanity cost by 10 % and each bad one raises it by 25 %, so six perfect results take 40 % of it and six bad ones 250 %. Three perfect results add 1 to both primary attributes and six add 2. Each bad result takes 15 % of the attribute rise away, so six leave a tenth of it. The good zone is a quarter of the bar and the perfect zone 6 %, and the marker crosses the bar in 1.5 seconds; Alchemy skill widens both zones, to 40 % and 10 % at skill 100 (working reading). Owner's direction, 2026-11-11: every Reaction Check's zone and marker pace follow attribute and skill, with a widest zone and a slowest marker ([07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §8a); brewing's numbers here are brought to that rule when S5b builds brewing.
+Authoring defaults: each perfect result lowers the Limit's mandatory Sanity cost by 10 % and each bad one raises it by 25 %, so six perfect results take 40 % of it and six bad ones 250 %. Three perfect results add 1 to both primary attributes and six add 2. Each bad result takes 15 % of the attribute rise away, so six leave a tenth of it. The old fixed zones (a quarter of the bar, a perfect zone of 6 %, widened by Alchemy to 40 % and 10 %) are replaced by the rule below. Owner's direction, 2026-11-11: every Reaction Check's zone and marker pace follow attribute and skill, with a widest zone and a slowest marker ([07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §8a); brewing follows it since S5b.
 
-**Interruption.** Authoring default, 2026-11-04: moving away, being attacked, or a fight starting interrupts a brewing. The ordinary ingredients are lost and the magical one is kept, so an interruption costs time and herbs but never the trip for a glowing beast or 15 000 bronze.
+**Difficulty by Limit** (owner, 2026-11-13: the deeper the potion's Limit, the harder its checks, and even a Limit 0 potion stays passable, not necessarily perfect or all good, but never out of reach). Authoring defaults, checked in slice iteration S5b.4: a brewing check is Intelligence and Alchemy against the potion's difficulty on 07.1 §8a's rule, `Δ = (Intelligence + Alchemy) / 2 − D`, with the perfect zone a quarter of the good zone, in its middle. D by the potion's Limit:
+
+| Limit | 9 | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| D | 1 | 3 | 6 | 10 | 15 | 21 | 28 | 36 | 45 | 55 |
+
+Brewing keeps its own floor so that the hardest check stays passable: its good zone is never narrower than 12 % of the bar and its marker never faster than 1.0 s across it, so the shortest good window is 0.12 s, applied after every narrowing by Fatigue and Sanity. The perfect window may fall to 0.03 s at the hardest, a feat rather than a norm. Each check is a use of Alchemy for growth ([07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §3), at the stage of the potion's Limit.
+
+**Interruption.** Since the owner's answer of 2026-11-13 the checks run with the world paused, so nothing interrupts them, and the potion is made with the sixth. A fight that begins in the 6 ticks after stops the time passing, and the potion is kept (authoring default, 2026-11-13). This replaces the default of 2026-11-04, under which an interrupted brewing lost its ordinary ingredients and kept the magical one.
+
+**Where brewing is done** (owner, 2026-11-13). Every bench needs the Alchemy lesson.
+
+- **Harrow's apothecary:** the alchemist's bench, for a fee, during the shop's hours, as Item Creation's anvil is in its Master's yard; 100 bronze a brewing (authoring default).
+- **The faction's house:** a bench for its members, free.
+- **Veinmarket's den** in Lower Veil: half-lawful, found by word of mouth, open at night, at a higher fee, 300 bronze a brewing (authoring default), and closed to a character who went against Veinmarket in POI B (authoring default).
+
+**Drinking a Limit potion** (owner, 2026-11-13). The character is asked first, with the warning that it will be defenceless for an hour. Once it drinks, 60 ticks of **Assimilation** pass with the world running, as a sleep's ticks do ([18](18%20World%20Time%20and%20Living%20Simulation.md) §3), the character sitting where it drank. An attack in them, or a fight that takes it in, finds it **Stunned** ([10.2](10.2%20Combat%20System%20Draft.md)): it neither moves, attacks, uses abilities nor reacts, its evasion is zero, and everyone else chooses targets as against a stunned fighter, until the 60 ticks are spent, each round counting as a tick. Authoring defaults, 2026-11-13: the Limit, its attribute rise and its Sanity cost take effect when Assimilation ends; a Limit potion is never drunk in a fight; the Suspend Save is refused during Assimilation; and Assimilation is waking time for Fatigue ([07.2](07.2%20Derived%20Character%20Statistics.md) §3.3).
 
 # 4. Boundaries
 
@@ -75,7 +91,7 @@ Authoring defaults: each perfect result lowers the Limit's mandatory Sanity cost
 6. Resolved, 2026-11-03: the checks run within the six ticks, and the clock does not pause.
 7. Which potion categories beyond Arcana advancement exist, if any, and how do they respect the current prohibition on HP-restoring potions? The owner rejected a thrown Alchemical Flask on 2026-11-02: no consumable may change a battle's result that much (CC-46).
 8. Resolved, 2026-11-03: the slice brews only Limit potions and the substitute base for Основа ритуала, and the formulas of Limits 9 and 8 come as [11 Vertical Slice](11%20Vertical%20Slice.md) describes. Limit 7 is for NPCs only.
-9. What recipe costs, station requirements, ingredient quantities, and numeric balance values should the later balance pass propose?
+9. What recipe costs, station requirements, ingredient quantities, and numeric balance values should the later balance pass propose? The slice's stations and fees are in §3 *Where brewing is done* (owner and authoring defaults, 2026-11-13).
 
 ---
 

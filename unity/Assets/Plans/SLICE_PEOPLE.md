@@ -2,7 +2,7 @@
 
 Status: Draft — proposed by the agent on 2026-11-06 and **accepted by the owner on 2026-11-07**: all fourteen, with the agent's placeholder names, which stay mutable.
 Created: 2026-11-06
-Last Updated: 2026-11-10 (since C5 the market and its Masters, with Kit, stand at Bawling Row round Stone Grandad on the Penny (city plan §29.6). Earlier: names since C4: Bell Street is the Black Puddle, Loom Lane Draught Lane, the Market square Bawling Square; the records keep their day's names (city plan §28.10). Earlier: S2.7: Nell's lie and her day-2 lines by outcome, authoring defaults. Earlier: S2.4: Nell and Kit are talked to; Nell's Approaches, their Arguments and the Exchange, authoring defaults. Earlier: S2.0: the names, roles and lines are in the string tables, in English and Russian. Earlier: accepted by the owner: the roster and the placeholder names. Earlier: first draft for the owner)
+Last Updated: 2026-11-13 (by the owner's answer to S5-9: Nell Garrow takes the tavern keeper's model, and the pawnbroker is Mortimer Kettle, a gentleman, in place of Ruth Kettle. Earlier: 2026-11-10: since C5 the market and its Masters, with Kit, stand at Bawling Row round Stone Grandad on the Penny (city plan §29.6). Earlier: names since C4: Bell Street is the Black Puddle, Loom Lane Draught Lane, the Market square Bawling Square; the records keep their day's names (city plan §28.10). Earlier: S2.7: Nell's lie and her day-2 lines by outcome, authoring defaults. Earlier: S2.4: Nell and Kit are talked to; Nell's Approaches, their Arguments and the Exchange, authoring defaults. Earlier: S2.0: the names, roles and lines are in the string tables, in English and Russian. Earlier: accepted by the owner: the roster and the placeholder names. Earlier: first draft for the owner)
 Authority: [11 Vertical Slice](../../../11%20Vertical%20Slice.md), [11.1 Vertical Slice POIs](../../../11.1%20Vertical%20Slice%20POIs.md), [09 Information Sources](../../../09%20Information%20Sources.md), [VERTICAL_SLICE_IMPLEMENTATION_PLAN.md](VERTICAL_SLICE_IMPLEMENTATION_PLAN.md) §5
 Related: [SLICE_ASSET_MAP.md](SLICE_ASSET_MAP.md) §1 (colours), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §21 (places)
 
@@ -27,7 +27,7 @@ Every person below is required by a document above; none is new content. The pla
 | 5 | Master of Enchanting | Silas Quill | green | His stall, Market square | Magical ingredients (11) |
 | 6 | Master of First Aid | Ada Merrow | green | Her stall, Market square | Lessons, bandages, splints, antidotes (11) |
 | 7 | The trader | Tobias Penn | orange | His stall, Market square | Ordinary goods (11, 19 §6.1) |
-| 8 | The pawnbroker | Ruth Kettle | orange | Pawn Corner, Loom Lane | Посланник's token in pawn (11) |
+| 8 | The pawnbroker | Mortimer Kettle (Ruth Kettle until 2026-11-13, S5-9) | orange | Pawn Corner, Loom Lane | Посланник's token in pawn (11) |
 | 9 | The seer | Madame Ilse | orange | Her stall, Market square | Predicts the invasion's hour for a price (11, 19 §6.3) |
 | 10 | Warden sergeant, brass number 14 | Sergeant Coyle | blue | The Wardens' station, Ridge | POI A's arrest; the lock-up; the Arrest (10.3 §6.2) |
 | 11 | The faction's recruiter | Mr Ashgrave | teal | The faction's house, Ridge Street | Offers the first-day trial (11) |

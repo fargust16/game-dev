@@ -1,10 +1,10 @@
 # 18 World Time and Living Simulation
 
-Version: 0.22
+Version: 0.23
 
 Status: Draft — owner-approved design direction, incomplete tuning
 
-Last Updated: 2026-11-12 (leaving a fight: the action Сбежать, seen by no enemy and 15 cells from the nearest, by the owner's direction after the play test of 2026-11-12 ([10.2](10.2%20Combat%20System%20Draft.md) §9); question 15 answered. Earlier: open question 1 gets the working answer of the S0.1 clock. Earlier: sleep restores 3 Sanity; the slice's townsfolk schedules, by the owner's answer, with authoring-default hours. Earlier: Bleeding and Poison rates and First Aid treatment in 10.2, authoring defaults. Earlier: a Master teaches First Aid and sells its supplies. Earlier: the question on reports names forces, not numeric Influence. Earlier: ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
+Last Updated: 2026-11-13 (§2 brewing: six Reaction Checks with the world paused, then 6 ticks, and 60 ticks of Assimilation after a Limit potion; §3 sleep until 07:00 or for 6 hours, the street's thief and the beast outside the walls; questions 6 and 8 answered for the slice, by the owner's answers to S5-2 and S5-6. Earlier: 2026-11-12: leaving a fight: the action Сбежать, seen by no enemy and 15 cells from the nearest, by the owner's direction after the play test of 2026-11-12 ([10.2](10.2%20Combat%20System%20Draft.md) §9); question 15 answered. Earlier: open question 1 gets the working answer of the S0.1 clock. Earlier: sleep restores 3 Sanity; the slice's townsfolk schedules, by the owner's answer, with authoring-default hours. Earlier: Bleeding and Poison rates and First Aid treatment in 10.2, authoring defaults. Earlier: a Master teaches First Aid and sells its supplies. Earlier: the question on reports names forces, not numeric Influence. Earlier: ordinary HP recovery and the escape distance follow the approved rules. Earlier: any dialogue pauses the world and costs one tick when it ends; the ritual exception removed. Earlier: a dialogue at a running ritual costs ticks. Earlier: sleep restores a little Sanity. Earlier: fighters cross the grid's edge into simulation. Earlier: fights away from the player are simulated by tick; time inside a building; doors. Earlier: the world lives only between rounds during a fight; a ritual lasts one in-game hour; the ten-cell exit stands. Earlier: tactical combat runs in place; the world keeps its clock around it. Earlier: residents in captured cities and the Cult Thought Link recorded. Earlier: force generation on the shared clock and ordinary residents during City Capture recorded. Earlier: daily player summary and public-news boundary defined; six-hour ritual window reconciled with the shared clock; public dissemination and off-screen group resolution remain open.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [07 Character Life](07%20Character%20Life.md), [08 Confront Constraints](08%20Confront%20Constraints.md), [09 Information Sources](09%20Information%20Sources.md), [10.1 Grid World and Environment Actions](10.1%20Grid%20World%20and%20Environment%20Actions.md), [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -74,7 +74,7 @@ During ordinary free exploration, the shared game clock advances continuously at
 - Item-creation recipes, Enchanting operations, and Alchemy brewing use the shared world-time model; none has a separate clock.
 - The existing target remains that ordinary complex item crafting should not create long waits (currently no more than about six world ticks as a design target). Item Creation recipe timing must follow this shared rule.
 - Enchanting operation durations, including modifier addition, reforging, locking, extraction/insertion, tier increase, and value change, remain open.
-- Alchemy is a separate profession that creates potions only. Brewing a potion takes six world ticks and includes a mini-game. How the mini-game fits within those six ticks, whether player input pauses or advances the clock, and interruption/outcome rules remain open.
+- Alchemy is a separate profession that creates potions only. Brewing a potion is six Reaction Checks played with the world paused, after which six world ticks pass; a fight in those ticks stops the clock, and the potion is kept. A drunk Limit potion then takes 60 ticks of Assimilation (owner, 2026-11-13; [20](20%20Alchemy%20and%20Potioncraft.md) §3, [05.1](05.1%20Arcana%20and%20Limits.md)).
 - Item bases, costs, modifier operations, and equipment professions are described in [19 Items, Crafting, Inventory, Equipment, and Enchanting](19%20Items%2C%20Crafting%2C%20Inventory%2C%20Equipment%2C%20and%20Enchanting.md); Alchemy is described in [20 Alchemy and Potioncraft](20%20Alchemy%20and%20Potioncraft.md).
 
 # 3. Sleep, rest, and sleep safety
@@ -86,6 +86,8 @@ During ordinary free exploration, the shared game clock advances continuously at
 - NPCs also sleep and rest according to their needs and schedules; sleep is part of the living-world simulation, not a player-only time skip.
 - The entire external world continues to be simulated during the sleep interval. NPCs move and act, schedules advance, and world events may occur.
 - Sleep is interruptible. The player does not receive the full time skip or its full recovery benefits if sleep ends early.
+- In the slice (owner, 2026-11-13, the answer to S5-6) the player chooses to sleep until morning, 07:00, or for 6 hours; a sleep of 6 hours or more is full, so one begun at 03:00 until 07:00 is not.
+- Sleep in the street: in the city a Veinmarket thief comes about one night in three and takes half the coins, never an item; outside the walls a beast may find the sleeper, who wakes, and the fight opens with the beast's attack. A tavern room is safe (authoring defaults).
 
 ## Recovery during sleep
 
@@ -316,9 +318,9 @@ Information transmission is not automatic universal knowledge. Each channel need
 3. How are long-running player and NPC actions represented, interrupted, paused, and resumed?
 4. What are the final gathering-cycle durations, yields, node reserves, and rare-find probability curves?
 5. What are the final shop interaction windows and NPC waiting/inactivity timeouts?
-6. What are the final sleep duration rules within the 6–8 hour range, and what can the player choose?
+6. What are the final sleep duration rules within the 6–8 hour range, and what can the player choose? *Answered for the slice by the owner, 2026-11-13: until 07:00 or for 6 hours (§3).*
 7. What is the comfort score, how is it calculated, and what temporary rest bonuses can it grant?
-8. How are sleep safety, detection, waking, alarm response, and ambush opening attacks resolved?
+8. How are sleep safety, detection, waking, alarm response, and ambush opening attacks resolved? *Answered for the slice by the owner, 2026-11-13: the street's thief and the beast outside the walls (§3); detection and waking in the full game stay open.*
 9. How does ordinary natural HP recovery interact with rest outside sleep?
 10. Resolved, 2026-11-03 (authoring default): the Poison and Bleeding rates and treatment are in [10.2 Combat System Draft](10.2%20Combat%20System%20Draft.md).
 11. What injury categories exist, what penalties do they impose, and what are their natural-healing probabilities and time curves?

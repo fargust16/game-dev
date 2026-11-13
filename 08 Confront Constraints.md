@@ -1,10 +1,10 @@
 # 08 Confront Constraints
 
-Version: 0.9
+Version: 0.10
 
 Status: Draft
 
-Last Updated: 2026-11-02 (cover works only against ranged attacks. Earlier: the Combat Grid forms around the player; fights can follow through doors. Earlier: Confront runs in place on a Combat Grid. Earlier: Character Life row reconciled with post-manifestation defeat; 21 added as a dependent document.)
+Last Updated: 2026-11-13 (§1: every attack trains its skill and attributes as every use does, by the owner's answer to S5-1; kills, wounds and wins still give nothing of their own. Earlier: cover works only against ranged attacks. Earlier: the Combat Grid forms around the player; fights can follow through doors. Earlier: Confront runs in place on a Combat Grid. Earlier: Character Life row reconciled with post-manifestation defeat; 21 added as a dependent document.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md), [07 Character Life](07%20Character%20Life.md), [16 Architecture Pivot](16%20Architecture%20Pivot.md)
@@ -49,7 +49,7 @@ Withdraw may become unavailable once Confront has fully locked in.
 
 ## 1. No XP from violence
 
-Kills, wounds, and wins do not grant experience levels.
+Kills, wounds, and wins grant no XP of their own and no levels: the character has no level. Since the owner's answer to S5-1 (2026-11-13) every attack, like every other use of a skill, trains that skill and the attributes in its formula ([07.1](07.1%20Character%20Attributes%2C%20Skills%2C%20and%20Action%20Checks.md) §3): a hit gives a normal success's XP, a miss half, a critical hit double, whoever the target and however the fight ends. A kill, a wound or a win adds nothing to that, and V0's zero floor keeps weak opponents from teaching a trained hand.
 
 They may:
 
@@ -158,7 +158,7 @@ Required in V1:
 - player can fight, attempt Break Away, and respond to Yield Threshold;
 - outcomes include win, lose/death, costly escape, spare/yield;
 - residue is applied to world state;
-- no XP pipeline;
+- no XP pipeline of kills or wins (attacks train their skill as every use does, §1);
 - no mandatory deep combo system.
 
 Not required in V1:
@@ -267,7 +267,7 @@ If the honest answers collapse to “just fight,” redesign.
 
 - **Vision / Pillars:** Compatible. Violence is costly, curious alternatives remain, knowledge beats grind.
 - **Approaches:** Compatible. Confront is fenced so it cannot erase the other five.
-- **Progression / Character Life:** Compatible. No XP; death is real; Conduct may care about open violence.
+- **Progression / Character Life:** Compatible. No XP from kills or wins, only from each use of a skill (§1); death is real; Conduct may care about open violence.
 - **World Laws / POI:** Compatible. Fights are world events with Symptoms and possible Traces.
 - **Glossary / Open Questions:** Presentation locked to Turn-Based Mode in place on a Combat Grid ([16 Architecture Pivot](16%20Architecture%20Pivot.md)). Exact action economy numbers remain open.
 

@@ -1,10 +1,10 @@
 # 07 Character Life
 
-Version: 0.10
+Version: 0.11
 
 Status: Draft
 
-Last Updated: 2026-11-02 (9 free points and three archetypes set. Earlier: every character starts Uninitiated and Factionless; attribute start and Character Archetypes recorded; the Starting Faction retired. Earlier: terms renamed to Arcana and Limit. Earlier: Last Free City Rule recorded. Earlier: manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
+Last Updated: 2026-11-13 (Creation choices in the slice: a name, the sex and one of two or three models of that sex, by the owner's answer to S5-4; the archetypes measured again after the combat rework. Earlier: 2026-11-02: 9 free points and three archetypes set. Earlier: every character starts Uninitiated and Factionless; attribute start and Character Archetypes recorded; the Starting Faction retired. Earlier: terms renamed to Arcana and Limit. Earlier: Last Free City Rule recorded. Earlier: manifestation event and campaign closure reconciled with 02; Death Gap covers the war for cities. Earlier: player death permanently ends same-world succession after the Stage 0 being manifests.)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [00 Vision](00%20Vision.md), [00.1 Core Loop](00.1%20Core%20Loop.md), [00.2 Meta Loop](00.2%20Meta%20Loop.md), [00.5 Design Pillars](00.5%20Design%20Pillars.md), [01 Player Experience](01%20Player%20Experience.md), [02 World Laws](02%20World%20Laws.md), [03 Decision Engine](03%20Decision%20Engine.md), [04 Points of Interest](04%20Points%20of%20Interest.md), [05 Progression](05%20Progression.md), [06 Approaches](06%20Approaches.md)
@@ -119,6 +119,14 @@ No free faction swap menu.
 ## Creation choices in V1
 
 When creating a character, the player sets the starting attributes as above and may choose light identity options later defined by content.
+
+In the slice (owner, 2026-11-13, the answer to S5-4) the player chooses:
+- the attributes, 9 free points or one Character Archetype;
+- a name;
+- the sex, which changes no rule, only the model and the words addressed to the character;
+- one of two or three models of that sex. The owner makes them in Tripo; until then the choice offers the slice's present Tripo people.
+
+Russian lines are written so that they do not depend on the character's sex, and where they cannot, they carry two variants (authoring rule). The archetypes' spreads are measured again after the combat rework (S5b.1), since with firearms first the Strength of a Боец gives little.
 
 System-critical rules for V1:
 
