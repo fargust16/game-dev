@@ -1,10 +1,10 @@
 # Veilmouth on the Island — World Audit and Plan of Correction
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft — the audit the owner ordered on 2026-11-14 (stage 1 of the world polish); its plan is the agent's and waits for no further approval except where §6 names the owner
 
-Last Updated: 2026-11-14 (§8: stage 2 built and checked, one ground for the town. Earlier: first version: the faults the owner's walk found, their causes by measurement, and the plan)
+Last Updated: 2026-11-14 (§9: the geometry of the one network, worked out and not yet drawn. Earlier: §8: stage 2 built and checked, one ground for the town. Earlier: first version: the faults the owner's walk found, their causes by measurement, and the plan)
 
 Depends On:
 [ISLAND_CITY_REBUILD_PLAN.md](ISLAND_CITY_REBUILD_PLAN.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §29, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [ISLAND_CONCEPTS.md](../../Documentation/Terrain/ISLAND_CONCEPTS.md), [91 Agent Decision Record](../../../91%20Agent%20Decision%20Record.md) *World polish before gameplay*
@@ -194,3 +194,44 @@ In `tools/slice/island/islandgen.py` (`town_ground`, `platforms`) and `concept_b
 **What the same views show, for the stages after:** the districts still stand apart on turf, and a district's pavement ends in the air at its corner (stage 4); the slots between houses are still there (stage 3); the walls and the bridges are plain stone (stages 4 and 5); the open ground of the town carries the woodland's leaf litter in places (stage 6). The audit tool's exit code is 2: slots, and bridge ends.
 
 **For the next stage.** The slots cannot be closed by the planner's rule alone: a single building 30 m wide in a side of 52 m with side rows 10 m deep leaves 1 m either side whatever the rule says. The blocks' own sizes must fit what stands in them, which is the plan of the one network (stage 4). So stages 3 and 4 are planned together, the plan is drawn and shown to the owner, and then built.
+
+---
+
+# 9. The one network: its geometry, worked out (2026-11-14)
+
+Working numbers of the agent for stages 3 and 4, from the layout I1 and the river's line. **Not drawn and not built yet;** the plan is drawn from them, checked by the audit tool, and shown to the owner before anything is built. Plan metres, x east and y south.
+
+## 9.1 Why the districts can join
+
+The Veil runs through the town in two straight reaches: about 63.4° above the bend and 45° below it. The districts already lie along them: the Sleepy Quarter (63.435°) faces the Penny (243.435°) across the upper reach, and the Reek (45°) faces Lower Veil (225°) across the lower. So **the two districts of a reach are parallel, and a bridge can be one straight length of a street on both banks.** The reaches differ by 18.4°, and that turn is taken once on each bank:
+
+- **The west bank is the bend's outer side.** The lines of the two districts' river sides meet at (474, 574). From there the two grids part as they leave the river: a wedge of open ground, nothing at the embankment and 42 m wide at the districts' backs, 120 m from the river. It is a green made on purpose, where the two embankments meet as one street with a turn.
+- **The east bank is the inner side,** where two grids would run into each other away from the river; and the Beck comes in exactly there. So the east bank is two bodies with the Beck between them: the Penny above it, Lower Veil below. The land along the Beck's two banks, a wedge 70 m wide at the Veil and 7 m at the Penny's upper corner between the Beck and the Penny's lower side, and a strip of 9 to 25 m between the Beck and Lower Veil, is the town's public ground by the water (the Bawling Wedge and the Beck's walk), paved or green, never a block cut to a chance shape.
+
+## 9.2 The districts' new sizes
+
+Street sections are 12 m, as in I1. A block's side is a multiple of 5 m, so that houses of 10 and 15 m fill it.
+
+| District | Origin, turn | Columns along the river | Why |
+|---|---|---|---|
+| Sleepy Quarter | (384, 394), 63.435° | 65, 45, 45 (U 203) | reaches the meeting point (474, 574); its first cross street lies at 83 m |
+| The Reek | (478, 578), 45° | 55, 60, 60 (U 223) | begins at the meeting point and fills the bank that I1 left as turf; its second cross street lies at 151 m |
+| The Penny | (518, 554), 243.435° | 40, 50, 40 (U 178) | the market's column is 50 m, which a civic building of 30 m between two rows of 10 m fills with no slot; its Smoked Street lies at 120 m |
+| Lower Veil | (696, 736), 225° | 45, 40, 40 (U 173) | one block more upstream, its upper side 9 to 25 m from the Beck's line; its second cross street lies at 115 m |
+
+The Reek's origin is (478, 578) and not (476, 576): two nodes down its line the sum of the two districts' street stations across the lower reach comes within 3 cm of a whole metre (266), so a bridge's two ends can both stand on a street's middle.
+
+## 9.3 The bridges, as lengths of streets
+
+- **Last Farthing Bridge:** the Penny's Smoked Street (station 120) and the Sleepy Quarter's first cross street (station 83) lie on one line across the upper reach (their stations sum to 203): 48 m, within 0.04° of square to the streets.
+- **Grubby Bridge:** Lower Veil's second cross street (station 115) and the Reek's second (station 151) lie on one line across the lower reach: from about (615, 655) to (585, 685), 42 m, within 0.2° of square.
+- **Beck Bridge:** Lower Veil's street along the river runs on over the Beck into the Bawling Wedge, where the Penny's streets begin.
+- **No Lenten Bridge:** the ground is level there.
+
+## 9.4 Still to settle in the drawing
+
+- The districts' depths (rows away from the river) and what fills each new block, with no cap on the count.
+- The Penny's market at a crossing of streets.
+- The way up to the close: a street due east from the Penny's upper side to the close's west side, about 84 m, climbing the ridge's foot at 7 to 10 %, with no row of houses on the slope.
+- The wall's line round the larger town (stage 5).
+
