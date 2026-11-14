@@ -104,7 +104,7 @@ public static class VeilmouthIslandLab
         ground.name = "Ground";
         ground.transform.position = new Vector3(-Size * 0.5f, 0f, -Size * 0.5f);
         var terrain = ground.GetComponent<Terrain>();
-        terrain.heightmapPixelError = 5f;
+        terrain.heightmapPixelError = 2f;   // 5 drew the water's edge in steps from the air (IC3's views)
         terrain.materialTemplate = AssetDatabase.LoadAssetAtPath<Material>(FallbackTerrainMaterial);
 
         Sheet("Water", SeaLevel, SeaMaterial());
@@ -560,6 +560,11 @@ public static class VeilmouthIslandLab
         ("13_long_tongue_eye", new Vector3(337.5f, 439.6f, 0f), new Vector3(395.6f, 555.7f, 3f), 60f),
         ("14_tar_row_eye", new Vector3(693.8f, 724f, 0f), new Vector3(623.1f, 653.3f, 3f), 60f),
         ("15_sleepy_from_the_river", new Vector3(470f, 470f, 28f), new Vector3(370f, 500f, 6f), 55f),
+        ("16_creaking_gate_from_the_road", new Vector3(346f, 353f, 0f), new Vector3(371f, 379f, 4f), 60f),
+        ("17_lower_veil_quay", new Vector3(622f, 722f, 5f), new Vector3(656f, 694f, 2f), 60f),
+        ("18_last_farthing_bridge", new Vector3(482f, 542f, 5f), new Vector3(465f, 508f, 2f), 60f),
+        ("19_reek_and_south_gate", new Vector3(470f, 880f, 90f), new Vector3(545f, 760f, 0f), 55f),
+        ("20_walls_from_the_north_west", new Vector3(240f, 240f, 220f), new Vector3(480f, 520f, 0f), 50f),
     };
 
     /// <summary>Batch: the lab built again and its views taken, in one run.</summary>
@@ -572,6 +577,15 @@ public static class VeilmouthIslandLab
     public static void Render()
     {
         EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        // A scene opened again has no ambient probe until its colours are set again: without this the shade stood near
+        // black in the city's views (IC3). The colours are the slice's day, as Build sets them.
+        // Setting the three colours again did not bring it back in a batch run (seen in IC5's views), so the probe is
+        // given outright: the three colours' mean all round, and the sky's lead over the ground from above.
+        var ambient = new UnityEngine.Rendering.SphericalHarmonicsL2();
+        ambient.AddAmbientLight(new Color(0.41f, 0.40f, 0.38f));
+        ambient.AddDirectionalLight(Vector3.up, new Color(0.23f, 0.27f, 0.32f), 0.5f);
+        RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Custom;
+        RenderSettings.ambientProbe = ambient;
         var terrain = Object.FindFirstObjectByType<Terrain>();
         Directory.CreateDirectory("Logs/IslandLab");
         var rig = new GameObject("Lab Camera") { hideFlags = HideFlags.HideAndDontSave };

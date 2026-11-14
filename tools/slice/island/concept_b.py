@@ -107,7 +107,8 @@ CONCEPT = dict(
     ],
     districts=[quay, centre, close, sleepy, works],
     pads=[
-        dict(poly=[(588, 612), (612, 636), (644, 604), (630, 572), (608, 572)], level=2.4, kind="square", name="Bawling Wedge"),
+        # Its sixth corner takes in the Beck Bridge's south end, which stood 0.2 m over the tide (IC5's first build).
+        dict(poly=[(588, 612), (612, 636), (644, 604), (630, 572), (608, 572), (592, 580)], level=2.4, kind="square", name="Bawling Wedge"),
         dict(poly=[(722, 566), (792, 636), (850, 566)], level=8.5, apron=18, kind="park", name="Bishop's Park"),
     ],
     roads=[
@@ -117,7 +118,7 @@ CONCEPT = dict(
         dict(name="Salt Gullet", cls="main", smooth=False, pts=[(572, 530), (600, 584)]),
         dict(name="Lenten Street", cls="side", smooth=False, pts=[(606, 450), (660, 470), (716, 486)]),
         dict(name="Spit Lane", cls="road", pts=[(700, 726), (740, 740), (800, 790), (828, 850), (822, 886)]),
-        dict(name="South Road", cls="road", pts=[(558, 812), (540, 870), (520, 928)]),
+        dict(name="South Road", cls="road", pts=[(545, 801), (533, 815), (528, 870), (520, 928)]),
         dict(name="West track", cls="track", pts=[(318, 524), (280, 560), (236, 580), (196, 540), (184, 476)]),
         dict(name="Ridge track", cls="track", pts=[(856, 500), (872, 440)]),
     ],
@@ -125,12 +126,15 @@ CONCEPT = dict(
              dict(name="Beck Bridge", a=(578, 544), b=(594, 574), w=22.0), dict(name="Lenten Bridge", a=(650, 466), b=(668, 474), w=17.0),
              dict(name="Head footbridge", a=(296, 202), b=(258, 214), w=3.0)],
     piers=[dict(a=(650, 696), b=(634, 712), w=7.0)],
-    walls=[[(396, 374), (266, 438), (346, 622), (458, 730), (552, 824), (640, 746)],
-           [(432, 378), (548, 322), (640, 396), (716, 440)],
-           [(858, 560), (820, 680), (742, 754)]],
-    points=[dict(at=(822, 890), kind="lighthouse", name="The One-Eye"), dict(at=(374, 384), kind="gate", name="Creaking Gate"),
-            dict(at=(306, 530), kind="gate", name="West Gate"), dict(at=(548, 820), kind="gate", name="South Gate"),
-            dict(at=(470, 360), kind="gate", name="Farthing Gate"), dict(at=(750, 746), kind="gate", name="Salt Gate")],
+    # Drawn again round the districts as the planner laid them (IC5, 2026-11-14): each line keeps 14 m or more from a
+    # district's edge, room for a back lane and the wall's foot, and joins Parsons' End at its corners, where the
+    # close's own retaining wall begins. A gate stands where its road crosses its wall.
+    walls=[[(393, 369), (253, 435), (351, 632), (453, 735), (554, 836), (647, 754)],
+           [(430, 374), (566, 312), (652, 392), (711, 451)],
+           [(862, 574), (820, 680), (735, 761)]],
+    points=[dict(at=(822, 890), kind="lighthouse", name="The One-Eye"), dict(at=(371, 379), kind="gate", name="Creaking Gate"),
+            dict(at=(304, 538), kind="gate", name="West Gate"), dict(at=(533, 815), kind="gate", name="South Gate"),
+            dict(at=(449, 365), kind="gate", name="Farthing Gate"), dict(at=(749, 747), kind="gate", name="Salt Gate")],
     hamlets=[dict(name="Crooked Hamlet", at=(268, 294), angle=227, n=8, pitch=22.0)],
     farmland=[[(300, 304), (352, 340), (372, 378), (330, 380), (290, 340)], [(390, 270), (450, 300), (470, 350), (430, 360), (380, 300)]],
     marsh=[[(680, 790), (740, 850), (760, 925), (700, 905), (672, 840)], [(780, 800), (800, 830), (800, 870), (784, 850)],

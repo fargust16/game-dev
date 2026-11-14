@@ -1,10 +1,10 @@
 # Veilmouth on the Island — the City's Rebuild
 
-Version: 0.2
+Version: 0.3
 
 Status: Draft — the rebuild is authorised by the owner (2026-11-14); this plan is the agent's, and its stages are built in order
 
-Last Updated: 2026-11-14 (§3 and §8: IC3 and IC4 built, the five districts stand in the lab scene; the builder's frame is a slip, not a current frame under the primitives. Earlier: first version: the way of building, the map of what must change, the stages)
+Last Updated: 2026-11-14 (§8: IC5's first part built: the town's walls and gates, quays with stairs, retaining walls, bridges, the pier, garden plots at the town's edge, the hamlet, the lighthouse and the dress passes; what the owner is asked to judge before IC6. Earlier: §3 and §8: IC3 and IC4 built, the five districts stand in the lab scene; the builder's frame is a slip, not a current frame under the primitives. Earlier: first version: the way of building, the map of what must change, the stages)
 
 Depends On:
 [ISLAND_CONCEPTS.md](../../Documentation/Terrain/ISLAND_CONCEPTS.md), [TERRAIN_POLISH_REPORT.md](../../Documentation/Terrain/TERRAIN_POLISH_REPORT.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §28–§29, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md) §1, [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md) R4–R5, [91 Agent Decision Record](../../../91%20Agent%20Decision%20Record.md) *Island redesign*
@@ -190,4 +190,27 @@ In `tools/slice/island/islandgen.py` (`fit_surface`, `frame_edges`, `platforms`)
 
 1. **Each district is a paved rectangle on open turf.** Its ground follows the relief, but its outline is a ruled line with a street all round it. This is what the owner's first principle forbids, and it is the first thing IC5 answers: the walls, the quays and the roads tie the five together, and on the land sides the last street is a back lane with gardens beyond it, of uneven depth.
 2. **The Veil's banks show steps at the water's edge** along the town's reach, where the 1.3 m bank of IC1 runs across the terrain's 1 m grid at an angle. In the town the quays and embankment walls cover it; outside it the bank is eased in the generator.
-3. **The lab's light is not the game's:** shadows are near black and roofs read as one dark mass, because the lab scene has no baked ambient light or reflection probes. Materials are judged by day and by night in IC7, after the look pass.
+3. **The lab's light is not the game's:** shadows are near black and roofs read as one dark mass, because the lab scene has no baked ambient light or reflection probes. Materials are judged by day and by night in IC7, after the look pass. (The near-black shade was the missing ambient probe, given outright since IC5; the steps at the water's edge were the terrain's pixel error of 5, not the bank.)
+
+## IC5, between the districts (2026-11-14)
+
+`VeilmouthCity.IslandTissue.cs`, called by `BuildIsland` after the districts. Built in place, in the world's own metres, from the layout and the terrain as it lies; plain stone throughout (principle 5). Every size is an authoring default.
+
+- **The town's walls were drawn again round the districts as the planner laid them** (`concept_b.py`): the north wall ran through the Penny's far corner and stood 1.4 m from Parsons' End. Each line now keeps 14 m or more from a district, and a gate stands where its road crosses its wall. Built: **1 323 m of wall** in three runs, 6 m high, in 4 m pieces that follow the ground, a coping course of lighter stone, **13 towers** at its turns and ends and **5 gates** (two towers and a lintel each). The wall ends at the water on both banks of the Veil.
+- **A district's sides are read from the ground, not from a list:** 1 m inside the side and 3 m outside it, in 4 m pieces. Water outside gives a quay wall down to the bed; a difference over 0.7 m gives a retaining wall (with a parapet where the town stands more than 1.2 m over the land); less is left to the bank. Built: **264 m of quay** with **6 stairs to the water** where a street comes out on it (risers of 0.17 m), **159 m of wall holding the town** and **28 m holding the hill**.
+- **Bridges** rise from the ground's own height at each end to a level crown that lets the tide pass under, each length of deck a sloped box, so a walker meets no step: Last Farthing Bridge 46 m, Grubby Bridge 59 m, Beck Bridge 34 m, the Head footbridge 40 m. **The Lenten Bridge is not built:** the ground is level under its line, so Lenten Street runs on it. The Bawling Wedge's pad was widened to carry the Beck Bridge's south end, which stood 0.2 m over the tide; it stands at 0.8 m now, still the lowest ground in the town. The pier is 23 m, its deck at the quay's top.
+- **The town's edge** (principles 1 and 2): beyond each district's last street on the land lie **85 walled garden plots** of uneven width and depth, kitchen gardens of bare earth, orchards on lush turf (56 fruit trees in all, few by the frame budget) and rough grass, none between an embankment or a quay and its water, none across a road or within 3.5 m of the town's wall. Their walls are in each district's own stone works: no new mesh.
+- **Salt Gullet and Lenten Street** between districts are laid in setts on the ground as it lies.
+- **The hamlet's eight cottages and the lighthouse** are built as frames of their own; the lighthouse's lantern and the clock tower's faces, the cemetery's stones, the tree pits' grates and the covers in the paving are dressed on the slip, where a district still lies along the axes their rays expect. A sewer cover's road is the terrain, which on the slip is not the district's own, so its height and tilt are read where the district will lie.
+- **The kit check:** 1 433 blocks, no fault. No tracked file under `Assets/Prefabs` or `Assets/Art` changed.
+- **The lab's terrain is drawn at a pixel error of 2** (it was 5): at 5 the water's edge stood in steps from the air, which IC3 took for the bank. **The lab's views give the ambient probe outright** after the scene is opened (the three colours' mean all round, the sky's lead from above): a scene opened again in a batch run has none, setting the three colours again did not bring it back, and without it the shade stood near black in IC3's views.
+- **The views** are kept in `Documentation/Terrain/City/` (`11` to `20`): the town from the south and from the north-west, the Penny from the air, two streets at eye level, the Sleepy Quarter's embankment, the Creaking Gate, Lower Veil's quay with its stair, Last Farthing Bridge, the Reek with the South Gate.
+
+**Not built yet in IC5:** the gates' and the wall's dress, lamps on the quays and the bridges, cargo on the quays, the hamlet's road posts, and the dwellings' doors (IC6, with the Portals).
+
+**For the owner to judge before IC6.** Gameplay is placed from the layout, so the layout should be accepted first:
+
+1. **The composition.** Veilmouth is five districts of 110 to 180 m with 60 to 100 m of open land between them, inside one wall. Each district's ground follows the relief and its edge is broken by gardens, but from the air a district still reads as a rectangle of streets, and the land between is turf. At eye level the streets, the embankments, the quay and the bridges read as a town. Bringing the districts closer, or building along the roads between them, changes the layout and the count of buildings (149 of 135 to 150).
+2. **The walls.** A wall of 6 m round a town of this size is a strong line in the land. It is plain stone with a coping; its dress (plinth, pilasters, the gatehouses) follows C5's.
+3. **The low ground at the Beck's mouth** (0.8 m over the tide at the Beck Bridge) reads as a tidal flat in the town's middle.
+

@@ -722,6 +722,32 @@ namespace GameDev.Slice.EditorTools
         private static void Hamlet()
         {
             var rng = new Random(2525);
+            var farms = Cottages(rng);
+            var road = _layout.roads.First(r => r.name == "West Road");
+            var posts = 0;
+            for (var px = road.x0 + 30f; px < road.x1 - 6f; px += PostEvery)
+            {
+                posts += Prop("RoadPost", Facing.N, px, road.y1 + 0.5f) != null ? 1 : 0;
+            }
+
+            for (var i = 0; i < 140; i++)
+            {
+                var px = 230f + rng.Next(145);
+                var py = 404f + rng.Next(72);
+                if (py > road.y0 - 2f && py < road.y1 + 2f)
+                {
+                    continue;
+                }
+
+                Prop(i % 6 == 0 ? "Shrub" : i % 9 == 0 ? "Poppy" : "Grass", Facing.N, px, py);
+            }
+
+            Debug.Log($"[VeilmouthCity] Crooked Hamlet: {_layout.cottages.Length} cottages, {farms} farm yards, {posts} road posts.");
+        }
+
+        /// <summary>The layout's cottages, each farm with its fenced yard, its bed and two fruit trees behind it; the farms' count.</summary>
+        private static int Cottages(Random rng)
+        {
             var farms = 0;
             foreach (var c in _layout.cottages)
             {
@@ -744,26 +770,7 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
-            var road = _layout.roads.First(r => r.name == "West Road");
-            var posts = 0;
-            for (var px = road.x0 + 30f; px < road.x1 - 6f; px += PostEvery)
-            {
-                posts += Prop("RoadPost", Facing.N, px, road.y1 + 0.5f) != null ? 1 : 0;
-            }
-
-            for (var i = 0; i < 140; i++)
-            {
-                var px = 230f + rng.Next(145);
-                var py = 404f + rng.Next(72);
-                if (py > road.y0 - 2f && py < road.y1 + 2f)
-                {
-                    continue;
-                }
-
-                Prop(i % 6 == 0 ? "Shrub" : i % 9 == 0 ? "Poppy" : "Grass", Facing.N, px, py);
-            }
-
-            Debug.Log($"[VeilmouthCity] Crooked Hamlet: {_layout.cottages.Length} cottages, {farms} farm yards, {posts} road posts.");
+            return farms;
         }
 
         /// <summary>

@@ -36,11 +36,18 @@ namespace GameDev.Slice.EditorTools
         /// <summary>The generated meshes of the island's districts, apart from C5's and written again by each build.</summary>
         public const string IslandWorksFolder = SliceKitCatalogue.Folder + "/Works/Island";
 
+        /// <summary>The island's layout while it is built: what a district's step asks of the town round it.</summary>
+        private static IslandFile _island;
+
         [Serializable]
         private sealed class IslandFile
         {
             public string version;
             public IslandFrame[] frames;
+            public IslandLine[] walls, roads;
+            public IslandPlace[] gates;
+            public IslandSpan[] bridges, piers;
+            public IslandPlace lighthouse;
         }
 
         [Serializable]
@@ -57,6 +64,10 @@ namespace GameDev.Slice.EditorTools
             public VeilmouthLayout.BoxSpec[] boxes;
             public VeilmouthLayout.PlazaSpec plaza;
             public VeilmouthLayout.Candidate[] candidates;
+            public VeilmouthLayout.Cottage[] cottages;
+
+            /// <summary>A tower standing alone in a frame of its own (the lighthouse); set by the builder, not read.</summary>
+            [NonSerialized] public IslandPlace tower;
         }
 
         public static void BuildIsland()
@@ -75,6 +86,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             var file = JsonUtility.FromJson<IslandFile>(File.ReadAllText(IslandLayoutPath));
+            _island = file;
             var missing = file.frames.SelectMany(f => f.buildings ?? Array.Empty<VeilmouthLayout.BuildingSpec>())
                 .Select(b => KitKey(b.key)).Distinct().Where(k => !_kit.ContainsKey(k)).ToList();
             if (missing.Count > 0)
@@ -97,15 +109,29 @@ namespace GameDev.Slice.EditorTools
 
             try
             {
-                foreach (var f in file.frames.Where(f => f.streets != null && f.streets.Length > 0))
+                foreach (var f in file.frames)
                 {
                     BuildFrame(f, city, maps, paving, report);
                 }
+
+                // The lighthouse stands alone, in a frame of its own of 20 m, square to the world.
+                if (file.lighthouse != null && !string.IsNullOrEmpty(file.lighthouse.key))
+                {
+                    var at = file.lighthouse;
+                    BuildFrame(new IslandFrame
+                    {
+                        id = at.id, name = at.name, district = "", angle = 0f, U = 20f, V = 20f, tower = at,
+                        origin = new VeilmouthLayout.Point { x = Mathf.Round(at.x) - 10f, y = Mathf.Round(at.y) - 10f },
+                    }, city, maps, paving, report);
+                }
+
+                IslandTissue(file, city, maps, paving, report);
             }
             finally
             {
                 // Whatever happened, the builder is C5's again: built in place, its meshes in its own folder.
                 _frameWorld = null;
+                _island = null;
                 _worksFolder = SliceKitCatalogue.Folder + "/Works";
             }
 
@@ -184,6 +210,27 @@ namespace GameDev.Slice.EditorTools
                 }
             }
 
+            if (f.streets == null || f.streets.Length == 0)
+            {
+                // Outside the town: the hamlet's cottages along their road, or a tower standing alone.
+                _parent = Group("Cottages");
+                Step("cottages", () => Cottages(new System.Random(2525)));
+                if (f.tower != null)
+                {
+                    var key = KitKey(f.tower.key);
+                    Step("tower", () => House(key, Facing.S, 10f + (_kit[key].Depth / 2f), 10f - (_kit[key].Width / 2f), name: f.tower.name, force: true));
+                }
+
+                Step("stone works", () => _works.Finish(WallStone));
+                if (f.tower != null)
+                {
+                    Step("towers' dress", () => TowersDressOf(_root));
+                }
+
+                Place();
+                return;
+            }
+
             Step("streets", Streets);
             Step("paint", () => PaintFrame(maps, paving));
             _pavements = new VeilmouthPavements(_lanes.Where(l => l.Pavement).Select(l => l.Quad),
@@ -237,24 +284,44 @@ namespace GameDev.Slice.EditorTools
             Step("parks", Parks);
             _parent = Group("Yards");
             Step("yards", Yards);
+            _parent = Group("Edge Gardens");
+            Step("edge gardens", () => EdgeGardens(f, maps, paving));
             Step("stone works", () => _works.Finish(WallStone));
             Step("pavements", () => _pavements.Build(_root, _houses, _worksFolder));
-            _worksFolder = SliceKitCatalogue.Folder + "/Works";
+            // The dress passes read the built district, by its bounds and by rays along the axes: so they run here, on
+            // the slip, where it still lies along them.
+            if (_root.GetComponentsInChildren<Transform>(true).Any(t => t.name == ClockTowerName))
+            {
+                Step("towers' dress", () => TowersDressOf(_root));
+            }
+
+            if (_layout.squares.Any(s => s.id == "cemetery"))
+            {
+                Step("graves' dress", () => GravesDressOf(_root));
+            }
+
+            Step("grates", () => GratesOf(_root));
+            Step("covers", () => CoversOf(_root));
+            Place();
 
             // To its place: the frame on its whole-metre node with its turn; the district under it, its plan point
             // (u, v) at the frame's local (u, 0, -v).
-            var frame = new GameObject(f.name);
-            frame.AddComponent<KitFrame>();
-            frame.transform.SetParent(city, false);
-            frame.transform.SetPositionAndRotation(new Vector3(f.origin.x - 500f, 0f, 500f - f.origin.y), Quaternion.Euler(0f, yaw, 0f));
-            _root.SetParent(frame.transform, false);
-            _root.localPosition = new Vector3(500f, 0f, -500f);
-            _root.localRotation = Quaternion.identity;
-            _frameWorld = null;
+            void Place()
+            {
+                _worksFolder = SliceKitCatalogue.Folder + "/Works";
+                var frame = new GameObject(f.name);
+                frame.AddComponent<KitFrame>();
+                frame.transform.SetParent(city, false);
+                frame.transform.SetPositionAndRotation(new Vector3(f.origin.x - 500f, 0f, 500f - f.origin.y), Quaternion.Euler(0f, yaw, 0f));
+                _root.SetParent(frame.transform, false);
+                _root.localPosition = new Vector3(500f, 0f, -500f);
+                _root.localRotation = Quaternion.identity;
+                _frameWorld = null;
 
-            report.AppendLine($"{f.name} at ({f.origin.x:0}, {f.origin.y:0}), {yaw:0.###} deg: {_houses.Count} footprints, {_doors.Count} doors, {_lanes.Count} lanes, " +
-                              $"{_passages} passages; rows on one level: raised {_terraceLift:0.00} m at most, {_terraceCuts} runs cut");
-            report.AppendLine("   " + string.Join("; ", ran));
+                report.AppendLine($"{f.name} at ({f.origin.x:0}, {f.origin.y:0}), {yaw:0.###} deg: {_houses.Count} footprints, {_doors.Count} doors, {_lanes.Count} lanes, " +
+                                  $"{_passages} passages; rows on one level: raised {_terraceLift:0.00} m at most, {_terraceCuts} runs cut");
+                report.AppendLine("   " + string.Join("; ", ran));
+            }
         }
 
         /// <summary>
@@ -291,7 +358,7 @@ namespace GameDev.Slice.EditorTools
                 passages = f.passages ?? Array.Empty<VeilmouthLayout.PassageSpec>(),
                 roads = Array.Empty<VeilmouthLayout.Area>(),
                 plaza = f.plaza ?? new VeilmouthLayout.PlazaSpec(),
-                cottages = Array.Empty<VeilmouthLayout.Cottage>(),
+                cottages = f.cottages ?? Array.Empty<VeilmouthLayout.Cottage>(),
                 forest = new VeilmouthLayout.ForestSpec { rects = Array.Empty<VeilmouthLayout.Area>() },
                 spawn = new VeilmouthLayout.Point(),
             };

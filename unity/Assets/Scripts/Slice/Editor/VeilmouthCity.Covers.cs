@@ -73,7 +73,24 @@ namespace GameDev.Slice.EditorTools
                 {
                     var (px, py) = s.AlongX ? (along, mid) : (mid, along);
                     var at = new Vector3(px - 500f, 0f, 500f - py);
-                    if (!Surface(at, 200f, ground, true, out var hit) || sewer.Any(c => (c - hit.point).sqrMagnitude < SewerApart * SewerApart))
+                    RaycastHit hit;
+                    if (_frameWorld != null)
+                    {
+                        // A district of the island on the slip: the terrain under it here is not its own, so the road's
+                        // height and tilt are read where the district will lie.
+                        var here = BareGround(px, py);
+                        hit = new RaycastHit
+                        {
+                            point = new Vector3(at.x, here, at.z),
+                            normal = new Vector3(here - BareGround(px + 1f, py), 1f, BareGround(px, py + 1f) - here).normalized,
+                        };
+                    }
+                    else if (!Surface(at, 200f, ground, true, out hit))
+                    {
+                        continue;
+                    }
+
+                    if (sewer.Any(c => (c - hit.point).sqrMagnitude < SewerApart * SewerApart))
                     {
                         continue;
                     }
