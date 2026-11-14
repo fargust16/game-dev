@@ -149,3 +149,28 @@ The woodland is not in these stages: it is a task of its own (`AGENTS.md`, *Isla
 | The terrain's layers by index and the `Overworld_` names | The duplicate site names its own layers; the tests change at the swap |
 | The frame budget | IC7 probes before the swap; far LODs of the houses are unchanged |
 | Dwelling ids from door positions | IC6 gives the two named dwellings a name in the layout |
+
+---
+
+# 8. What each stage found
+
+## IC1, the ground under the city (2026-11-14)
+
+In `tools/slice/island/islandgen.py` (`fit_surface`, `frame_edges`, `platforms`) and `concept_b.py`.
+
+- **Fitting showed what the level platforms had hidden.** The Veil's valley was 60 to 100 m wide at its floor, and the districts are 120 to 150 m deep from the water: they stood on valley sides of 15 %. Fitted to that land they needed retaining walls of 5 to 11 m along hundreds of metres.
+- **So the valley is wider where the town stands:** a floor of 220 to 300 m, rising 2.2 m in a hundred from a bank of 1.3 m over the tide. A town is built where a valley gives it room; the ridges begin behind it.
+- **The land round each frame is eased toward the frame's ground** across 35 to 70 m, unevenly, before the water runs, and never over water.
+- **Result**, each frame's ground a plane: Lower Veil 0.0 % and 1.7 %; the Penny 0.7 % and 1.8 %; Sleepy Quarter 0.2 % and 3.5 %; the Reek 0.3 % and 3.2 %; Parsons' End 6.0 % and 4.8 %, the steepest, on the ridge's foot. Quays: 126 m at Lower Veil and 126 m at the Reek, 4.7 m from the bed to the quay's top. Retaining wall: about 140 m at Parsons' End, 1.5 m high on average and 2 m at most. Every other edge is a bank under a metre. (`Documentation/Terrain/Concepts/B/stats.txt` has the figures of the last build.)
+- Seen in the lab: no rectangular platform shows in the valley (`Documentation/Terrain/Polish/Island/02_valley_from_the_estuary.jpg`).
+
+## IC2, the planner (2026-11-14)
+
+`tools/slice/veilmouth_island_plan.py` writes `Assets/Data/Slice/Map/VeilmouthIslandLayout.json` (version `I1`) and draws `VEILMOUTH_ISLAND_PLAN.png`.
+
+- Five district frames and the hamlet's, each with C5's lists in its own metres: 32 streets, 18 blocks, **149 buildings** (116 row houses, 18 single buildings, 7 works sheds, 8 cottages). Every block passes C5's rules; the run fails otherwise.
+- **Every named place of C5 keeps its id:** the 16 named buildings, the 12 squares the game looks for, and the streets `main_e`, `draught` and `rats_choir`.
+- What changed from the concept's sketch: the Penny's second row is 52 m, so the market is the 52 m square C5's plaza is; Parsons' End's first row is 56 m, for the cathedral's transept; the Reek's first row is one works yard round the Deaf Boiler; the Black Puddle is the open north part of its cell, with the Soot & Bell and Harrow & Tincture on its south side; two villas in gardens take a block of the Sleepy Quarter, and two blocks open their yards to the town's last street, to keep to 150 buildings.
+- A single building in the middle of a side needs the two side rows to stop a passage short of its back: the block's `limit`. Without it the corner houses overlap it or stand 1 m off it.
+- **Still the concept's, to be drawn again in IC5:** the town's walls and gates (the Penny's far corner now touches the north wall's line), the bridges' ends, the country roads' ends at the frames.
+- **New street names** (the island has 32 streets, C5 has 24): Sleepers' Embankment, Eel Row, Hook Street, Gull Lane, Wet Hem, Bishop's Walk, Bellman's Row, Candle Row, Mourners' Lane, Tallow Lane, Parsons' Row. They need their Russian text in the string tables with the player's map (IC6).

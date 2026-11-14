@@ -23,7 +23,7 @@ quay = District(
     label="Lower Veil and Fishlip Quay")
 
 centre = District(
-    "The Penny", (518, 554), 270 - T, cols=[40, 52, 40], rows=[45, 40], border=("street", "street", "emb", "street"),
+    "The Penny", (518, 554), 270 - T, cols=[40, 52, 40], rows=[45, 52], border=("street", "street", "emb", "street"),
     level=4.6, apron=14, fit=True, pin=("v0", 1.9), regrade=45, family="shop", wealth="rich",   # the embankment 1.9 m over the tide
     cells={(1, 1): {"kind": "market", "singles": [("Stone Grandad", 22, 16, 8, 8, 12, "church")]},
            (1, 0): {"kind": "square", "singles": [("Town Hall", 11, 6, 30, 15, 19, "civic"), ("Clock tower", 3, 6, 5, 5, 30, "civic"), ("Guild hall", 11, 26, 30, 15, 15, "civic")]},
@@ -32,7 +32,7 @@ centre = District(
     label="The Penny")
 
 close = District(
-    "Parsons' End", (716, 455), 0, cols=[70, 40], rows=[50, 30], border=("lane",) * 4, sx=["lane"], sy=["lane"],
+    "Parsons' End", (716, 455), 0, cols=[70, 40], rows=[56, 30], border=("lane",) * 4, sx=["lane"], sy=["lane"],
     level=12.0, tilt=(0.03, -0.02), apron=16, fit=True, grade=0.06, regrade=70, family="low", wealth="poor",   # on the ridge's foot, the steepest
     cells={(0, 0): {"kind": "park", "singles": [("Cathedral", 8, 12, 46, 22, 24, "church"), ("Cathedral tower", 54, 16, 12, 14, 44, "church")]},
            (1, 0): {"kind": "cemetery", "singles": [("Old chapel", 14, 36, 13, 10, 9, "church")]},
