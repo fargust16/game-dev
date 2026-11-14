@@ -321,7 +321,14 @@ class District:
     """
 
     def __init__(self, name, origin, angle, cols, rows, sx=None, sy=None, border=("street",) * 4, level=2.0,
-                 tilt=(0.0, 0.0), apron=16.0, family="town", wealth="mid", cells=None, label=None):
+                 tilt=(0.0, 0.0), apron=16.0, family="town", wealth="mid", cells=None, label=None,
+                 fit=False, grade=0.05, pin=None, floor=1.6, regrade=0.0):
+        # regrade: how far round the frame, m, the land is eased toward the frame's own ground before the water runs.
+        self.regrade = regrade
+        # fit: the frame's ground is a plane fitted to the land under it, its grade held to `grade` along and across,
+        # no level platform; pin = (side, height) holds one side's middle at a height over the sea (a quay, an
+        # embankment), side one of "u0", "u1", "v0", "v1"; floor is the lowest any corner may lie over the sea.
+        self.fit, self.grade, self.pin, self.floor, self.surface, self.edges = fit, grade, pin, floor, None, []
         self.name, self.origin, self.angle = name, origin, angle
         self.cols, self.rows = cols, rows
         self.sx = sx or ["street"] * (len(cols) - 1)
@@ -397,6 +404,54 @@ class District:
         return out
 
 
+def fit_surface(D, ground, sd, du, dv):
+    """The plane a district's ground takes: fitted by least squares to the land inside its frame, its grade limited."""
+    inside = sd <= 0
+    z = ground[inside]
+    A = np.column_stack([np.ones(z.size), du[inside], dv[inside]])
+    coef = np.linalg.lstsq(A, z, rcond=None)[0]
+    b, c = (float(np.clip(k, -D.grade, D.grade)) for k in coef[1:])
+    a = float((z - b * du[inside] - c * dv[inside]).mean())
+    if D.pin:
+        side, height = D.pin
+        at = {"u0": -b * D.U / 2, "u1": b * D.U / 2, "v0": -c * D.V / 2, "v1": c * D.V / 2}[side]
+        a = height - at
+    low = a - abs(b) * D.U / 2 - abs(c) * D.V / 2
+    if low < D.floor:
+        a += D.floor - low
+    return a, b, c
+
+
+def frame_edges(D, ground, step=2.0, out=4.0):
+    """
+    What stands along a frame's four sides (ISLAND_CITY_REBUILD_PLAN.md §4), by the land just outside it: a quay where
+    that is water, a retaining wall where the frame's ground stands over 1 m above the land ("hold") or lies over 1 m
+    under it ("cut"), a bank elsewhere. Runs of one kind, each with its ends in plan metres and its mean height, m.
+    """
+    a, b, c = D.surface
+    sides = [("v0", (0, 0), (D.U, 0), (0, -1)), ("u1", (D.U, 0), (D.U, D.V), (1, 0)),
+             ("v1", (D.U, D.V), (0, D.V), (0, 1)), ("u0", (0, D.V), (0, 0), (-1, 0))]
+    runs = []
+    for name, p, q, normal in sides:
+        length = math.hypot(q[0] - p[0], q[1] - p[1])
+        n = max(1, int(length / step))
+        last = None
+        for k in range(n):
+            t = (k + 0.5) / n
+            u, v = p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t
+            own = a + b * (u - D.U / 2) + c * (v - D.V / 2)
+            wx, wy = D.world(u + normal[0] * out, v + normal[1] * out)
+            land_z = float(bil(ground, np.array([wx]), np.array([wy]))[0])
+            kind = "quay" if land_z < 0.3 else "hold" if own - land_z > 1.0 else "cut" if land_z - own > 1.0 else "bank"
+            height = own - min(land_z, 0.0) if kind == "quay" else abs(own - land_z)
+            if last is not None and last["kind"] == kind:
+                last["b"], last["n"], last["sum"], last["top"] = D.world(u, v), last["n"] + 1, last["sum"] + height, max(last["top"], height)
+            else:
+                last = dict(side=name, kind=kind, a=D.world(u, v), b=D.world(u, v), n=1, sum=height, top=height)
+                runs.append(last)
+    return [dict(side=r["side"], kind=r["kind"], a=r["a"], b=r["b"], length=r["n"] * step, height=r["sum"] / r["n"], top=r["top"]) for r in runs]
+
+
 def fronts(length):
     """Fronts of 10 and 15 m that fill a run on the kit's 5 m step."""
     k, seq = int(length // 5), []
@@ -444,6 +499,8 @@ def build_land(C, log=print):
     """The concept's height field, metres over Sea Level, and the fields the plan and the checks read."""
     seed = C.get("seed", 1)
     F = {}
+    for D in C.get("districts", []):
+        D.surface, D.edges = None, []   # fitted again for this build
 
     # The coast: a spline through the control points, each with its shore type, then the shore's own unevenness.
     pts = np.array([(p[0], p[1]) for p in C["coast"]], float)
@@ -559,7 +616,7 @@ def build_land(C, log=print):
         side = r.get("side", 0.34)
         water = bed + depth
         beyond = np.maximum(d - cw / 2, 0.0)
-        floor = water + 0.5 + 0.015 * beyond
+        floor = water + r.get("bank", 0.5) + r.get("rise", 0.015) * beyond
         valley = np.where(d <= cw / 2, bed + depth * 0.25 * (d / np.maximum(cw / 2, 0.5)) ** 2,
                           np.where(beyond < 3.0, bed + (floor - bed) * smoothstep(0, 3.0, beyond),
                                    floor + side * np.maximum(d - fw / 2, 0.0)))
@@ -580,8 +637,31 @@ def build_land(C, log=print):
         on = np.zeros_like(ground)
         for D in C.get("districts", []):
             sd, u, v = rect_sdf(GX, GY, D.origin, D.angle, D.U, D.V)
-            plane = D.level + D.tilt[0] * (u - D.U / 2) + D.tilt[1] * (v - D.V / 2)
-            ground = ground + (plane - ground) * smoothstep(D.apron, 0.0, sd)
+            du, dv = u - D.U / 2, v - D.V / 2
+            if D.surface is None:
+                D.surface = fit_surface(D, ground, sd, du, dv) if D.fit else (D.level, D.tilt[0], D.tilt[1])
+                a, b, c = D.surface
+                if D.fit and D.regrade > 0:
+                    # The land round a town is not left as it was: a slope over it is eased toward the town's own
+                    # ground across some tens of metres, unevenly, as a shoulder worn and worked for centuries. Done
+                    # once, before the water runs, so the drainage shapes it after.
+                    reach = D.regrade * (0.55 + 0.9 * (0.5 + 0.5 * fbm(GX, GY, 41.0, seed + 99, 3)))
+                    dry = np.ones_like(ground)   # never the water: a quay meets it upright, it is not filled in
+                    for r in rivers:
+                        if not r["dry"]:
+                            dry = dry * smoothstep(r["cw"] / 2 + 1.0, r["cw"] / 2 + 7.0, r["d"])
+                    ground = ground + (a + b * du + c * dv - ground) * 0.85 * smoothstep(reach, 0.0, sd) * dry * land
+                D.edges = frame_edges(D, ground)
+            a, b, c = D.surface
+            plane = a + b * du + c * dv
+            if D.fit:
+                # A town's edge is a bank of uneven width, and a wall where the difference is too great for a bank
+                # (ISLAND_CITY_REBUILD_PLAN.md §4): never one ruled apron round a rectangle.
+                bank = D.apron * (0.45 + 1.1 * (0.5 + 0.5 * fbm(GX, GY, 23.0, seed + 97, 3)))
+                walled = smoothstep(0.9, 1.5, blur(np.abs(plane - ground), 6.0))
+                ground = ground + (plane - ground) * smoothstep(bank + (1.5 - bank) * walled, 0.0, sd)
+            else:
+                ground = ground + (plane - ground) * smoothstep(D.apron, 0.0, sd)
             on = np.maximum(on, (sd <= 0) * 1.0)
         for pad in C.get("pads", []):
             poly = np.array(pad["poly"], float)
@@ -603,6 +683,7 @@ def build_land(C, log=print):
                 tidal |= r["d"] <= r["cw"] / 2 + 0.5
         # A little unevenness of 30 m first, so that water on an even slope winds and does not rule lines.
         H = H + 0.5 * fbm(GX, GY, 30.0, seed + 95, 3) * smoothstep(10, 40, dl)
+        F["before_city"] = H.copy()
         H, town = platforms(H)
         base_level = (~land) | tidal | (H <= 0.05)
         # Rock resists unevenly, and most where the coast is cliff: harder ground stands as steps and knolls.
@@ -862,7 +943,7 @@ def draw_city(C, F, canvas, plots_out=None, detail=True):
                 for box in spec.get("boxes", [(4, 4, bw - 4, bd * 0.55), (4, bd * 0.55 + 6, bw * 0.6, bd - 4)]):
                     canvas.poly(q(*box), COL["works"])
                     if plots_out is not None:
-                        plots_out.append(dict(quad=q(*box), h=spec.get("h", 14.0), base=D.level, kind="works", district=D.name))
+                        plots_out.append(dict(quad=q(*box), h=spec.get("h", 14.0), base=D.surface[0] if D.surface else D.level, kind="works", district=D.name))
             else:
                 canvas.poly(q(0, 0, bw, bd), COL["yard_" + {"rich": "rich", "mid": "mid", "poor": "poor"}[wealth]])
                 if kind == "built":
@@ -871,12 +952,12 @@ def draw_city(C, F, canvas, plots_out=None, detail=True):
                         if detail:
                             canvas.line(q(*p) + [q(*p)[0]], 0.0, (60, 46, 40))
                         if plots_out is not None:
-                            plots_out.append(dict(quad=q(*p), h=FAMILIES[family][0], base=D.level, kind=family, district=D.name))
+                            plots_out.append(dict(quad=q(*p), h=FAMILIES[family][0], base=D.surface[0] if D.surface else D.level, kind=family, district=D.name))
             for single in spec.get("singles", []):
                 name, a0, b0, w, d, h, kind_s = single
                 canvas.poly(q(a0, b0, a0 + w, b0 + d), COL[kind_s])
                 if plots_out is not None:
-                    plots_out.append(dict(quad=q(a0, b0, a0 + w, b0 + d), h=h, base=D.level, kind=kind_s, district=D.name, name=name))
+                    plots_out.append(dict(quad=q(a0, b0, a0 + w, b0 + d), h=h, base=D.surface[0] if D.surface else D.level, kind=kind_s, district=D.name, name=name))
     for hamlet in C.get("hamlets", []):
         for quad in hamlet_quads(hamlet):
             canvas.poly(quad, COL["cottage"])
@@ -1017,8 +1098,19 @@ def stats(C, F, plots, dens):
         wet = (inside & F["wet"]).sum() * cell
         if wet > 30:
             add("WATER under %s: %.0f m2" % (D.name, wet))
-        was = F["natural"][inside]
-        add("  %s stands at %.1f m; the ground under it was %.1f m (%.1f to %.1f)" % (D.name, D.level, was.mean(), was.min(), was.max()))
+        was = F.get("before_city", F["natural"])[inside]
+        a, b, c = D.surface
+        if D.fit:
+            low, high = a - abs(b) * D.U / 2 - abs(c) * D.V / 2, a + abs(b) * D.U / 2 + abs(c) * D.V / 2
+            add("  %s: fitted, %.1f m at its middle, %.1f to %.1f m at its corners, grade %.1f %% along and %.1f %% across; the land under it was %.1f m (%.1f to %.1f)" % (
+                D.name, a, low, high, abs(b) * 100, abs(c) * 100, was.mean(), was.min(), was.max()))
+            for kind, words in (("quay", "quay or embankment wall"), ("hold", "retaining wall holding the town"), ("cut", "retaining wall holding the hill"), ("bank", "bank")):
+                runs = [e for e in D.edges if e["kind"] == kind]
+                if runs:
+                    add("      %s: %.0f m in %d runs, %.1f m high on average, %.1f m at most" % (
+                        words, sum(e["length"] for e in runs), len(runs), sum(e["height"] * e["length"] for e in runs) / sum(e["length"] for e in runs), max(e["top"] for e in runs)))
+        else:
+            add("  %s stands at %.1f m; the ground under it was %.1f m (%.1f to %.1f)" % (D.name, D.level, was.mean(), was.min(), was.max()))
     add("beast territories that fit (98 m apart): %d of 17" % len(dens))
     wild = natural & (F["farm"] < 0.5)
     add("wild land %.0f m2; forest %.0f m2; farmland %.0f m2; marsh %.0f m2" % (

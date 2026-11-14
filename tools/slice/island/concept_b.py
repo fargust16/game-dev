@@ -17,14 +17,14 @@ T = 26.565
 
 quay = District(
     "Lower Veil", (696, 736), 225, cols=[45, 40], rows=[40, 40], border=("street", "street", "quay", "street"),
-    level=1.9, apron=6, family="tenement", wealth="poor",
+    level=1.9, apron=10, fit=True, pin=("v0", 1.9), regrade=40, family="tenement", wealth="poor",   # the quay 1.9 m over the tide
     cells={(0, 0): {"kind": "built", "family": "warehouse"}, (1, 0): {"kind": "built", "family": "warehouse"},
            (1, 1): {"kind": "square", "singles": [("Soot & Bell", 3, 3, 15, 15, 12, "town"), ("Harrow & Tincture", 27, 3, 10, 10, 15, "shop")]}},
     label="Lower Veil and Fishlip Quay")
 
 centre = District(
     "The Penny", (518, 554), 270 - T, cols=[40, 52, 40], rows=[45, 40], border=("street", "street", "emb", "street"),
-    level=4.6, apron=18, family="shop", wealth="rich",
+    level=4.6, apron=14, fit=True, pin=("v0", 1.9), regrade=45, family="shop", wealth="rich",   # the embankment 1.9 m over the tide
     cells={(1, 1): {"kind": "market", "singles": [("Stone Grandad", 22, 16, 8, 8, 12, "church")]},
            (1, 0): {"kind": "square", "singles": [("Town Hall", 11, 6, 30, 15, 19, "civic"), ("Clock tower", 3, 6, 5, 5, 30, "civic"), ("Guild hall", 11, 26, 30, 15, 15, "civic")]},
            (0, 1): {"kind": "square", "singles": [("Assize and Wardens", 5, 5, 30, 15, 15, "civic")]},
@@ -33,7 +33,7 @@ centre = District(
 
 close = District(
     "Parsons' End", (716, 455), 0, cols=[70, 40], rows=[50, 30], border=("lane",) * 4, sx=["lane"], sy=["lane"],
-    level=12.0, tilt=(0.03, -0.02), apron=30, family="low", wealth="poor",
+    level=12.0, tilt=(0.03, -0.02), apron=16, fit=True, grade=0.06, regrade=70, family="low", wealth="poor",   # on the ridge's foot, the steepest
     cells={(0, 0): {"kind": "park", "singles": [("Cathedral", 8, 12, 46, 22, 24, "church"), ("Cathedral tower", 54, 16, 12, 14, 44, "church")]},
            (1, 0): {"kind": "cemetery", "singles": [("Old chapel", 14, 36, 13, 10, 9, "church")]},
            (0, 1): {"kind": "park", "singles": [("Faction's house", 6, 8, 15, 15, 13, "villa"), ("Brothers' House", 36, 6, 28, 18, 12, "church")]}},
@@ -41,14 +41,14 @@ close = District(
 
 sleepy = District(
     "Sleepy Quarter", (384, 394), 90 - T, cols=[40, 45, 45], rows=[40, 40], border=("street", "street", "emb", "street"),
-    level=4.6, tilt=(0.0, 0.03), apron=24, family="town", wealth="mid",
+    level=4.6, tilt=(0.0, 0.03), apron=14, fit=True, pin=("v0", 1.9), regrade=45, family="town", wealth="mid",
     cells={(0, 1): {"kind": "square", "wealth": "rich", "singles": [("Governor's House", 5, 4, 30, 15, 15, "civic"), ("Villa", 3, 23, 15, 15, 13, "villa"), ("Villa", 22, 23, 15, 15, 13, "villa")]},
            (2, 1): {"kind": "park"}, (0, 0): {"kind": "built", "family": "town", "wealth": "rich"}},
     label="Sleepy Quarter")
 
 works = District(
     "The Reek", (548, 648), 45, cols=[45, 40], rows=[40, 35], border=("works", "lane", "works", "lane"), sx=["works"], sy=["lane"],
-    level=2.0, apron=8, family="low", wealth="poor",
+    level=2.0, apron=8, fit=True, floor=1.8, regrade=35, family="low", wealth="poor",
     cells={(0, 0): {"kind": "works"}, (1, 0): {"kind": "works", "h": 16.0}, (0, 1): {"kind": "works", "boxes": [(4, 4, 34, 31)], "h": 11.0}},
     label="The Reek")
 
@@ -77,11 +77,13 @@ CONCEPT = dict(
     hills=[(420, 190, 10, 100), (150, 590, 18, 90), (140, 170, 20, 100), (500, 250, 9, 80), (600, 840, 6, 70)],
     rivers=[
         # open_head: the valley is cut right up to the mere, or the creek's first metres run in a slot (seen in the lab)
-        dict(name="Veil", side=0.30, open_head=True, pts=[
+        # The valley widens where the town stands, a floor of 240 to 300 m rising 2.2 m in a hundred from the water
+        # (the polish for the city, 2026-11-14): before, the districts climbed valley sides of 15 %.
+        dict(name="Veil", side=0.30, rise=0.022, bank=1.3, open_head=True, pts=[
             # 1.8 m of water and more everywhere: deep enough to swim (10.1: from 1.3 m), and for the water's own colour
-            (256, 180, -1.8, 6, 40, 1.8), (292, 222, -1.9, 6, 44, 1.9), (296, 268, -2.0, 7, 50, 2.0), (340, 300, -2.1, 8, 56, 2.1),
-            (366, 348, -2.2, 10, 62, 2.2), (430, 430, -2.4, 12, 70, 2.4),
-            (470, 520, -2.6, 16, 80, 2.6), (510, 580, -2.8, 26, 90, 2.8), (590, 660, -3.0, 36, 100, 3.0), (690, 760, -3.2, 46, 110, 3.2)]),
+            (256, 180, -1.8, 6, 40, 1.8), (292, 222, -1.9, 6, 44, 1.9), (296, 268, -2.0, 7, 60, 2.0), (340, 300, -2.1, 8, 110, 2.1),
+            (366, 348, -2.2, 10, 220, 2.2), (430, 430, -2.4, 12, 300, 2.4),
+            (470, 520, -2.6, 16, 300, 2.6), (510, 580, -2.8, 26, 290, 2.8), (590, 660, -3.0, 36, 260, 3.0), (690, 760, -3.2, 46, 220, 3.2)]),
         dict(name="the Beck", side=0.40, pts=[
             (650, 490, -1.6, 5, 22, 1.6), (640, 512, -1.7, 6, 24, 1.7), (600, 560, -1.8, 7, 26, 1.8), (568, 606, -1.9, 8, 28, 1.9),
             (556, 624, -2.0, 9, 30, 2.0)]),
