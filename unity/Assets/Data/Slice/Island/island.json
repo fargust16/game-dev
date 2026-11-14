@@ -1,0 +1,37 @@
+{
+ "concept": "B",
+ "name": "The Valley: a river city between two ridges",
+ "size": 1000.0,
+ "heightmap": 1025,
+ "alphamap": 1024,
+ "seaLevel": 24.0,
+ "heightBudget": 100.0,
+ "layers": [
+  "grass_ground",
+  "forest_ground_04",
+  "forest_leaves_03",
+  "brown_mud_03",
+  "dirt_floor",
+  "gravel_ground_01",
+  "river_small_rocks",
+  "rock_face_03",
+  "mossy_rock",
+  "coast_sand_03",
+  "rocks_ground_06"
+ ],
+ "landArea": 559573,
+ "highest": 57.4,
+ "landShare": {
+  "grass_ground": 0.5674,
+  "forest_ground_04": 0.1543,
+  "forest_leaves_03": 0.0441,
+  "brown_mud_03": 0.0601,
+  "dirt_floor": 0.0384,
+  "gravel_ground_01": 0.0152,
+  "river_small_rocks": 0.0031,
+  "rock_face_03": 0.0391,
+  "mossy_rock": 0.0077,
+  "coast_sand_03": 0.0527,
+  "rocks_ground_06": 0.0179
+ }
+}

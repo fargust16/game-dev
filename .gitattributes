@@ -10,5 +10,10 @@
 *.fbx binary
 *.tgz binary
 
+# The slice terrain's CC0 texture sets (tools/assets/fetch_terrain_textures.py; owner, 2026-11-14): large and required,
+# so they go through Git LFS. MANIFEST.json beside them names each file's source and MD5.
+unity/Assets/Art/CC0/Terrain/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+unity/Assets/Art/CC0/Terrain/**/*.png filter=lfs diff=lfs merge=lfs -text
+
 # Shell scripts break on CRLF, so they stay LF on every checkout.
 *.sh text eol=lf

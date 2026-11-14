@@ -110,6 +110,14 @@ unity/Documentation/Terrain/Concepts/*/preview.npz
 unity/Documentation/Terrain/Concepts/*/texture.png
 unity/Documentation/Terrain/Concepts/*/views.json
 
+# The island lab: VeilmouthIslandLab.Build writes these again from Assets/Data/Slice/Island/island_*.bytes and the
+# texture sets. MicroSplatData holds the vendor's generated shader and the packed arrays; its settings are in the tool.
+unity/Assets/Data/Slice/Island/MicroSplatData/
+unity/Assets/Data/Slice/Island/MicroSplatData.meta
+unity/Assets/Data/Slice/Island/IslandLab_*
+unity/Assets/Scenes/Slice/Lab/IslandLab.unity
+unity/Assets/Scenes/Slice/Lab/IslandLab.unity.meta
+
 # Test and editor logs
 unity/*.log
 unity/ShellTestLog.txt

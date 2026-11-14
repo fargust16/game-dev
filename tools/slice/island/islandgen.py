@@ -19,7 +19,8 @@ import zlib
 import numpy as np
 
 SIZE = 1000.0
-N = 513
+# 513 for a quick look; ISLAND_N=1025 for the height map the scene takes, one sample for each of the terrain's.
+N = int(os.environ.get("ISLAND_N", "513"))
 STEP = SIZE / (N - 1)
 SEA_LEVEL = 24.0
 BUDGET = 100.0
@@ -479,7 +480,7 @@ def build_land(C, log=print):
     small = np.zeros(len(line))
     for _ in range(5):
         small += np.sin(int(total / rng.uniform(26.0, 72.0)) * phase + rng.random() * 6.283)
-    line = line + normal * (wobble * attr["rag"] * 1.5 + small * hard * 1.9)[:, None]
+    line = line + normal * (wobble * attr["rag"] * 1.5 + small * hard * 1.3)[:, None]
     coast = np.vstack([line, line[:1]])
     F["coast"] = line
     land = poly_mask(line, AX, AX)
@@ -547,7 +548,7 @@ def build_land(C, log=print):
         # The river's own end fades in over its first metres, so a source is a hollow, not a wall.
         reach = smoothstep(0.0, 60.0, rs) if not r.get("tributary") else 1.0
         H = np.where(reach > 0, smin(H, valley + (1 - reach) * 40.0, 3.0), H)
-        rivers.append(dict(name=r.get("name", ""), line=rp, d=d, cw=cw, bed=bed, water=water, depth=depth, s=rs))
+        rivers.append(dict(name=r.get("name", ""), line=rp, d=d, cw=cw, bed=bed, water=water, depth=depth, s=rs, dry=r.get("dry", False)))
     F["rivers"] = rivers
 
     # The shore: the inland ground brought down to the waterline over the shore type's ramp.
@@ -556,9 +557,12 @@ def build_land(C, log=print):
 
     # Gullies: water gathers down the steepest way and cuts where it gathers, so slopes carry drainage lines and
     # not a noise pattern. Two passes; beaches and built ground are left out later by the platforms.
+    F["gully"] = np.zeros_like(H)
     for _ in range(C.get("gully_passes", 2)):
         # Routed over the ground with a little unevenness added, so a smooth slope's water winds and does not rule lines.
-        H = H - gullies(H + 0.9 * fbm(GX, GY, 46.0, seed + 71 + _, 3), land, C.get("gully", 2.2)) * smoothstep(20, 70, dl)
+        cut = gullies(H + 0.9 * fbm(GX, GY, 46.0, seed + 71 + _, 3), land, C.get("gully", 2.2)) * smoothstep(20, 70, dl)
+        H = H - cut
+        F["gully"] += cut
 
     for st in C.get("stamps", []):
         if st.get("stage") == "post":
@@ -566,6 +570,7 @@ def build_land(C, log=print):
 
     # Built ground: each district's frame is a level platform (or a gently tilted one) with an apron, then pads for
     # the squares and parks between frames, then the roads benched into the slope.
+    F["natural"] = H.copy()
     built = np.zeros_like(H)
     for D in C.get("districts", []):
         sd, u, v = rect_sdf(GX, GY, D.origin, D.angle, D.U, D.V)
@@ -583,6 +588,7 @@ def build_land(C, log=print):
     F["built"] = built
     soft = blur(H, 30.0)
     roadmask = np.zeros_like(H)
+    F["road_soft"] = np.zeros_like(H)
     for road in C.get("roads", []):
         line_r = catmull(road["pts"], False, 12) if road.get("smooth", True) else np.array(road["pts"], float)
         rp, _ = resample(line_r, 4.0)
@@ -591,6 +597,8 @@ def build_land(C, log=print):
         m = smoothstep(half + 7.0, half, d) * (1 - built)
         H = H + (soft - H) * m * land
         roadmask = np.maximum(roadmask, d <= half)
+        if road["cls"] not in STREETS:
+            F["road_soft"] = np.maximum(F["road_soft"], smoothstep(half + 2.0, half * 0.6, d) * (1 - built))
         road["line"] = rp
     F["roadmask"] = roadmask
 
@@ -601,7 +609,8 @@ def build_land(C, log=print):
         inside = r["d"] <= r["cw"] / 2 + 0.5
         bowl = r["bed"] + r["depth"] * 0.25 * np.clip(r["d"] / np.maximum(r["cw"] / 2, 0.5), 0, 1) ** 2
         H = np.where(inside, np.minimum(H, bowl), H)
-        wet |= inside
+        if not r["dry"]:
+            wet |= inside
     k0, a = blur(at_coast("k0"), 40.0), blur(at_coast("a"), 40.0)
     seabed = -(k0 * (1 - np.exp(-ds / a)) + 0.022 * ds)
     H = np.where(land | wet, H, np.maximum(seabed, -16.0))
@@ -656,7 +665,7 @@ def gullies(H, land, strength):
             recv = np.where(ok, target, recv)
     flat_land = land.ravel()
     order = np.argsort(-H.ravel(), kind="stable")
-    acc = np.where(flat_land, 1.0, 0.0).tolist()
+    acc = np.where(flat_land, STEP * STEP, 0.0).tolist()
     recv_list = recv.ravel().tolist()
     for i in order.tolist():
         j = recv_list[i]
@@ -664,8 +673,9 @@ def gullies(H, land, strength):
             acc[j] += acc[i]
     A = np.array(acc).reshape(n, n)
     slope = best / STEP
-    cut = strength * (1 - np.exp(-A / 260.0)) * np.clip(slope / 0.22, 0.15, 1.0) * land
-    return box_blur(box_blur(cut, 3), 3)
+    cut = strength * (1 - np.exp(-A / 1000.0)) * np.clip(slope / 0.22, 0.15, 1.0) * land
+    k = max(3, int(5.0 / STEP) | 1)
+    return box_blur(box_blur(cut, k), k)
 
 
 # ---------------------------------------------------------------------------------------------------- drawing
@@ -750,6 +760,8 @@ def terrain_image(F, C, canvas, zones=True):
     under = H < 0
     rgb[under] = sea[under]
     for r in F["rivers"]:
+        if r["dry"]:
+            continue
         d = bil(r["d"], canvas.X, canvas.Y)
         cw = bil(r["cw"], canvas.X, canvas.Y)
         rgb[(d <= np.maximum(cw / 2, 1.6)) & ~under] = COL["water"]
@@ -869,7 +881,7 @@ def territories(C, F, apart=98.0, radius=25.0):
     """Where the beasts' territories fit (25 m round a den, 98 m apart): wild, standable ground away from people."""
     H, slope = F["H"], F["slope"]
     ok = F["land"] & (H > 1.5) & (slope < 16) & (F["dl"] > 40) & (F["away"] > 70.0) & (F["farm"] < 0.5) & (F["marsh"] < 0.3)
-    step = 5
+    step = max(1, int(round(10.0 / STEP)))
     cand = np.argwhere(ok[::step, ::step]) * step
     if len(cand) == 0:
         return []
@@ -944,6 +956,8 @@ def stats(C, F, plots, dens):
         wet = (inside & F["wet"]).sum() * cell
         if wet > 30:
             add("WATER under %s: %.0f m2" % (D.name, wet))
+        was = F["natural"][inside]
+        add("  %s stands at %.1f m; the ground under it was %.1f m (%.1f to %.1f)" % (D.name, D.level, was.mean(), was.min(), was.max()))
     add("beast territories that fit (98 m apart): %d of 17" % len(dens))
     wild = natural & (F["farm"] < 0.5)
     add("wild land %.0f m2; forest %.0f m2; farmland %.0f m2; marsh %.0f m2" % (
@@ -1057,8 +1071,9 @@ def build(C, out, log=print):
         base_z = p["base"] if p["base"] is not None else float(bil(F["H"], np.array([[np.mean([q[0] for q in p["quad"]])]]),
                                                                   np.array([[np.mean([q[1] for q in p["quad"]])]]))[0, 0])
         boxes.append([c for q in p["quad"] for c in q] + [base_z, p["h"], {"works": 2, "civic": 1, "church": 1}.get(p["kind"], 0)])
-    trees = np.argwhere((F["forest"][::4, ::4] > 0.55)) * 4
-    np.savez(os.path.join(out, "preview.npz"), H=F["H"].astype(np.float32), boxes=np.array(boxes, np.float32),
+    every = max(1, int(round(7.8 / STEP)))
+    trees = np.argwhere((F["forest"][::every, ::every] > 0.55)) * every
+    np.savez(os.path.join(out, "preview.npz"), H=F["H"][::(N - 1) // 512, ::(N - 1) // 512].astype(np.float32), boxes=np.array(boxes, np.float32),
              trees=np.stack([AX[trees[:, 1]], AX[trees[:, 0]], F["H"][trees[:, 0], trees[:, 1]]], 1).astype(np.float32),
              views=np.array([v["eye"] + v["look"] + (v.get("lens", 35.0),) for v in C.get("views", [])], np.float32))
     with open(os.path.join(out, "views.json"), "w", encoding="utf-8") as fh:
