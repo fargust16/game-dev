@@ -632,9 +632,60 @@ def build_land(C, log=print):
     ramp = smoothstep(0.0, 1.0, (dl - bench) / W)
     H = H * ramp + 0.35 * smoothstep(0, 6, dl) + 0.5 * smoothstep(0.0, 1.0, bench / 3.0) * smoothstep(0, 4, dl)
 
+    def town_ground(ground, on, T):
+        """
+        One ground for the whole town (ISLAND_WORLD_AUDIT.md, stage 2): everything inside the town's line stands on
+        one level, and each terrace named with it on its own. A district has no ground of its own, so two rows that
+        meet at a corner stand at one height, as the kit's joins need, and no district is a platform beside the next.
+        The land round the town is eased toward it once, before the water runs, so the valley's sides begin behind
+        the town; the river's channel is cut into the town's level afterwards, upright, as a quay's wall is.
+        """
+        parts = [T] + T.get("terraces", [])
+        fields = []
+        for part in parts:
+            poly = np.array(part["poly"], float)
+            inside = poly_mask(poly, AX, AX)
+            d_edge, _ = dist_field(np.vstack([poly, poly[:1]]))
+            fields.append((part, inside, np.where(inside, -d_edge, d_edge)))
+        if not T.get("eased"):
+            dry = np.ones_like(ground)   # never the water: a quay meets it upright, it is not filled in
+            for r in rivers:
+                if not r["dry"]:
+                    dry = dry * smoothstep(r["cw"] / 2 + 1.0, r["cw"] / 2 + 7.0, r["d"])
+            # The terraces first, the town last: the town's own level stands where the two eased grounds meet.
+            for part, inside, sd in reversed(fields):
+                reach = part.get("regrade", 60.0) * (0.55 + 0.9 * (0.5 + 0.5 * fbm(GX, GY, 41.0, seed + 99, 3)))
+                ground = ground + (part["level"] - ground) * 0.85 * smoothstep(reach, 0.0, sd) * dry * land
+            T["eased"] = True
+        for part, inside, sd in fields:
+            # Its edge is a bank of uneven width. A terrace with a foot comes down to the ground round it as a hill's
+            # foot does, over that many metres and a little unevenly, so a street climbs it and no wall stands in the
+            # town's middle; one that is walled keeps a wall where the difference is too great for a bank.
+            uneven = 0.5 + 0.5 * fbm(GX, GY, 23.0, seed + 97, 3)
+            bank = part.get("apron", 14.0) * (0.45 + 1.1 * uneven)
+            if part.get("foot"):
+                bank = part["foot"] * (0.85 + 0.3 * uneven)
+            elif part.get("walled"):
+                bank = bank + (0.6 - bank) * smoothstep(0.9, 1.5, blur(np.abs(part["level"] - ground), 6.0))
+            ground = ground + (part["level"] - ground) * smoothstep(bank, 0.0, sd)
+            on = np.maximum(on, inside * 1.0)
+        return ground, on
+
     def platforms(ground):
-        """Built ground: each district's frame a level or gently tilted platform with an apron, then the pads."""
+        """Built ground: the town's one ground where the concept names a town; else each district's frame a level or
+        gently tilted platform with an apron, then the pads."""
         on = np.zeros_like(ground)
+        T = C.get("town")
+        if T:
+            ground, on = town_ground(ground, on, T)
+            for D in C.get("districts", []):
+                if D.surface is None:
+                    cx, cy = D.centre()
+                    level = next((t["level"] for t in T.get("terraces", [])
+                                  if poly_mask(np.array(t["poly"], float), np.array([cx]), np.array([cy]))[0, 0]), T["level"])
+                    D.surface, D.fit = (float(level), 0.0, 0.0), True
+                    D.edges = frame_edges(D, ground)
+            return ground, on
         for D in C.get("districts", []):
             sd, u, v = rect_sdf(GX, GY, D.origin, D.angle, D.U, D.V)
             du, dv = u - D.U / 2, v - D.V / 2

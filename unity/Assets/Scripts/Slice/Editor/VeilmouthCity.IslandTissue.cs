@@ -107,7 +107,11 @@ namespace GameDev.Slice.EditorTools
             }
 
             Part("Town Walls", (w, _) => IslandWalls(file, w, report));
-            Part("Waterside", (w, _) => IslandEdges(file, w, report));
+            Part("Waterside", (w, _) =>
+            {
+                IslandEmbankments(file, w, report);
+                IslandEdges(file, w, report);
+            });
             Part("Bridges", (w, owner) => IslandBridges(file, w, owner, report));
             IslandStreets(file, maps, paving, report);
         }
@@ -215,6 +219,8 @@ namespace GameDev.Slice.EditorTools
         {
             float quay = 0f, hold = 0f, cut = 0f;
             var stairs = 0;
+            // Where the town has its embankment, the wall stands on the channel's line and a district's side is no quay.
+            var embanked = file.embankments != null && file.embankments.Length > 0;
             foreach (var f in file.frames.Where(f => f.streets != null && f.streets.Length > 0))
             {
                 var yaw = KitLayoutCheck.NearestMeasuredTurn(f.angle) * Mathf.Deg2Rad;
@@ -246,7 +252,8 @@ namespace GameDev.Slice.EditorTools
                         var sm = (s0 + s1) / 2f;
                         var gi = Mathf.Max(Inside(s0), Mathf.Max(Inside(sm), Inside(s1)));
                         var go = Mathf.Min(Outside(s0), Mathf.Min(Outside(sm), Outside(s1)));
-                        kinds[k] = go < IslandSea + 0.3f ? SideKind.Quay : gi - go > WallOver ? SideKind.Hold : go - gi > WallOver ? SideKind.Cut : SideKind.Bank;
+                        kinds[k] = go < IslandSea + 0.3f ? (embanked ? SideKind.Bank : SideKind.Quay)
+                            : gi - go > WallOver ? SideKind.Hold : go - gi > WallOver ? SideKind.Cut : SideKind.Bank;
                         tops[k] = gi;
                         // The first and the last piece run on round the corner, by the widest wall's reach.
                         var (r0, r1) = (k == 0 ? s0 - QuayOut : s0, k == count - 1 ? s1 + QuayOut : s1);
@@ -312,6 +319,83 @@ namespace GameDev.Slice.EditorTools
             }
 
             report.AppendLine($"districts' sides: {quay:0} m of quay wall with {stairs} stairs to the water, {hold:0} m of wall holding the town, {cut:0} m holding the hill");
+        }
+
+        // ------------------------------------------------------------------------------------------- the town's water edge
+
+        /// <summary>
+        /// The embankment's wall along the town's water (ISLAND_WORLD_AUDIT.md, stage 2): the town stands on one level,
+        /// and the river's channel is cut into it upright, so the wall follows the channel's own line from one end of
+        /// the town to the other, its coping on one level because the ground behind it is. A stair goes down it to
+        /// the tide every 110 m or so, on a straight length, outside the wall and over the water.
+        /// </summary>
+        private static void IslandEmbankments(IslandFile file, Works w, StringBuilder report)
+        {
+            var metres = 0f;
+            var stairs = 0;
+            foreach (var e in file.embankments ?? Array.Empty<IslandLine>())
+            {
+                var pts = e.line.Select(p => new Vector2(p.x, p.y)).ToArray();
+                if (pts.Length < 3)
+                {
+                    continue;
+                }
+
+                // Which side of the line the water lies on: the lower ground 3 m either side of the run's middle.
+                var mid = pts.Length / 2;
+                var along = (pts[mid + 1 < pts.Length ? mid + 1 : mid] - pts[mid - 1]).normalized;
+                var right = new Vector2(-along.y, along.x);
+                var water = IslandGround(pts[mid] + (right * 3f)) < IslandGround(pts[mid] - (right * 3f)) ? 1f : -1f;
+                var sinceStair = 60f;
+                for (var k = 0; k + 1 < pts.Length; k++)
+                {
+                    var a = pts[k];
+                    var length = (pts[k + 1] - a).magnitude;
+                    if (length < 0.05f)
+                    {
+                        continue;
+                    }
+
+                    var d = (pts[k + 1] - a) / length;
+                    var toWater = new Vector2(-d.y, d.x) * water;
+                    var ground = IslandGround(a + (d * (length / 2f)) - (toWater * 1.5f));
+                    if (ground < IslandSea + 0.5f)
+                    {
+                        continue; // no town ground behind this length: another river's water
+                    }
+
+                    var top = ground + QuayKerb;
+                    var foot = Mathf.Min(IslandGround(a + (d * (length / 2f)) + (toWater * 2.5f)), IslandSea) - 1.5f;
+                    (float C0, float C1) Band(float o0, float o1) => water > 0f ? (o0, o1) : (-o1, -o0);
+                    var (c0, c1) = Band(-QuayIn, QuayOut);
+                    // Each length laps its neighbours by a hand's breadth, so the line's turn opens no seam.
+                    Along(w, a, d, -0.15f, length + 0.15f, c0, c1, foot, top);
+                    metres += length;
+                    sinceStair += length;
+                    if (sinceStair < 110f || k + 3 >= pts.Length || Vector2.Angle(d, pts[k + 3] - pts[k + 2]) > 6f)
+                    {
+                        continue;
+                    }
+
+                    var (s0, s1) = Band(QuayOut, QuayOut + StairWide);
+                    void Tread(float from, float to, float level) => Along(w, a, d, from, to, s0, s1, IslandSea - 3f, level, StepStone);
+                    Tread(0f, 2f, top);
+                    var at = 2f;
+                    var y = top;
+                    while (y - StairRise > IslandSea + 0.1f)
+                    {
+                        y -= StairRise;
+                        Tread(at, at + StairRun, y);
+                        at += StairRun;
+                    }
+
+                    Tread(at, at + 1.8f, y); // the landing at the tide
+                    stairs++;
+                    sinceStair = 0f;
+                }
+            }
+
+            report.AppendLine($"embankments: {metres:0} m of wall along the town's water, its coping on the town's level, {stairs} stairs to the tide");
         }
 
         // ------------------------------------------------------------------------------------------- bridges and the pier
@@ -482,188 +566,6 @@ namespace GameDev.Slice.EditorTools
                     }
 
                     Solid(new Vector3(side * ((width / 2f) - (parapet / 2f)), parapetHeight / 2f, 0f), new Vector3(parapet, parapetHeight, (q - p).magnitude));
-                }
-            }
-        }
-
-        // ------------------------------------------------------------------------------------------- the town's edge
-
-        // A garden plot beyond a district's last street: it begins GardenNear m off the district's side, is 9 to 16 m
-        // wide and 6 to GardenDeep m deep, behind a stone wall GardenWall m high; one place in seven is left open.
-        private const float GardenWall = 1.1f;
-        private const int GardenNear = 2, GardenDeep = 12;
-
-        /// <summary>
-        /// The town's edge on the land (the owner's first and second principles): beyond a district's last street lie
-        /// walled garden plots of uneven width and depth, kitchen gardens of bare earth, orchards on lush turf and
-        /// rough grass, so a district's side is no ruled line between paving and turf. A plot is left out where the
-        /// ground falls to the water or climbs, where a road or a bridge leaves the district, and where the town's
-        /// wall stands close. Built on the slip, in the district's own metres, its walls in the district's stone
-        /// works: no new mesh. Few trees, by the frame budget: the island's woodland brings the cheap ones.
-        /// </summary>
-        private static void EdgeGardens(IslandFrame f, float[,,] maps, (int Grass, int Earth, int Setts, int Cobbles) paving)
-        {
-            var rng = new System.Random(4100 + (int)f.origin.x);
-            var lush = Array.FindIndex(_terrain.terrainData.terrainLayers, l => l != null && l.name.Contains("leafy_grass"));
-            Vector2 Plan(Vector2 local)
-            {
-                var world = _frameWorld(local.x, local.y);
-                return new Vector2(world.x + 500f, 500f - world.z);
-            }
-
-            // What a plot keeps clear of, each with its distance, m: the town's walls, the roads, the bridges.
-            var lines = new List<(Vector2 A, Vector2 B, float Keep)>();
-            foreach (var wall in _island.walls ?? Array.Empty<IslandLine>())
-            {
-                for (var k = 0; k + 1 < wall.line.Length; k++)
-                {
-                    lines.Add((new Vector2(wall.line[k].x, wall.line[k].y), new Vector2(wall.line[k + 1].x, wall.line[k + 1].y), 3.5f));
-                }
-            }
-
-            foreach (var road in _island.roads ?? Array.Empty<IslandLine>())
-            {
-                for (var k = 0; k + 1 < road.line.Length; k++)
-                {
-                    lines.Add((new Vector2(road.line[k].x, road.line[k].y), new Vector2(road.line[k + 1].x, road.line[k + 1].y), 8f));
-                }
-            }
-
-            foreach (var b in _island.bridges ?? Array.Empty<IslandSpan>())
-            {
-                lines.Add((new Vector2(b.ax, b.ay), new Vector2(b.bx, b.by), 6f + (b.width / 2f)));
-            }
-
-            bool Clear(Vector2 p) => lines.All(l =>
-            {
-                var ab = l.B - l.A;
-                var t = Mathf.Clamp01(Vector2.Dot(p - l.A, ab) / ab.sqrMagnitude);
-                return (p - l.A - (ab * t)).magnitude > l.Keep;
-            });
-
-            int plots = 0, trees = 0;
-            // A side: whether it lies along x, its line, the way out of the district across it, and its length.
-            foreach (var (alongX, line, sign, length) in new[] { (true, 0f, -1, f.U), (true, f.V, 1, f.U), (false, 0f, -1, f.V), (false, f.U, 1, f.V) })
-            {
-                // The side's own street: an embankment and a quay look on the water, and nothing stands between.
-                var along = f.streets.Where(s => s.AlongX == alongX).ToList();
-                var last = along.Count == 0 ? null : sign < 0 ? along.OrderBy(s => s.c0).First() : along.OrderByDescending(s => s.c1).First();
-                if (last != null && (last.kind == "embankment" || last.kind == "quay"))
-                {
-                    continue;
-                }
-
-                // A point of the side's own frame: t m along the side, c m out of the district.
-                Vector2 Local(float t, float c) => alongX ? new Vector2(t, line + (sign * c)) : new Vector2(line + (sign * c), t);
-                // A wall across the side, at t; and one along it, at c, with a way in if one is given.
-                void Across(int t, int c0, int c1)
-                {
-                    var (p, q) = (Local(t, c0), Local(t, c1));
-                    if (alongX)
-                    {
-                        WallRun(true, t - 0.2f, t + 0.2f, (int)Mathf.Min(p.y, q.y), (int)Mathf.Max(p.y, q.y), GardenWall);
-                    }
-                    else
-                    {
-                        WallRun(false, t - 0.2f, t + 0.2f, (int)Mathf.Min(p.x, q.x), (int)Mathf.Max(p.x, q.x), GardenWall);
-                    }
-                }
-
-                void Lengthwise(int c, int t0, int t1, params (int, int)[] way)
-                {
-                    var at = alongX ? Local(t0, c).y : Local(t0, c).x;
-                    WallRun(!alongX, at - 0.2f, at + 0.2f, t0, t1, GardenWall, way);
-                }
-
-                var from = 3;
-                var (lastEnd, lastFar) = (-1, 0);
-                while (from < length - 12f)
-                {
-                    var to = Mathf.Min(from + 9 + rng.Next(8), (int)length - 3);
-                    var far = GardenNear + 6 + rng.Next(GardenDeep - 5);
-                    var kind = rng.Next(7);
-                    var mid = (from + to) / 2f;
-                    var edge = IslandGround(Plan(Local(mid, -1f)));
-                    var fits = to - from >= 7 && kind != 6 &&
-                               new[] { (from, GardenNear), (to, GardenNear), (from, far), (to, far), (mid, far), (mid, (GardenNear + far) / 2f) }.All(c =>
-                               {
-                                   var p = Plan(Local(c.Item1, c.Item2));
-                                   var g = IslandGround(p);
-                                   return g > IslandSea + 0.8f && Mathf.Abs(g - edge) < 2.2f && Clear(p);
-                               });
-                    if (!fits)
-                    {
-                        from = to;
-                        continue;
-                    }
-
-                    // The wall round it; the side it shares with the plot before it is built once, by the deeper of the two.
-                    var way = from + 2 + rng.Next(Mathf.Max(1, to - from - 5));
-                    Lengthwise(GardenNear, from, to, (way, way + 2));
-                    Lengthwise(far, from, to);
-                    Across(to, GardenNear, far);
-                    if (lastEnd != from)
-                    {
-                        Across(from, GardenNear, far);
-                    }
-                    else if (far > lastFar)
-                    {
-                        Across(from, lastFar, far);
-                    }
-
-                    // Its ground: a kitchen garden's bare earth, an orchard's lush turf, or the land as it lies.
-                    var (a, b) = (Local(from, GardenNear), Local(to, far));
-                    var (x0, y0, x1, y1) = (Mathf.Min(a.x, b.x), Mathf.Min(a.y, b.y), Mathf.Max(a.x, b.x), Mathf.Max(a.y, b.y));
-                    var layer = kind <= 1 ? paving.Earth : kind <= 3 ? lush : -1;
-                    if (layer >= 0)
-                    {
-                        PaintLocal(maps, x0 + 0.3f, y0 + 0.3f, x1 - 0.3f, y1 - 0.3f, layer);
-                    }
-
-                    if (kind == 2 || kind == 3)
-                    {
-                        var count = to - from >= 14 ? 3 : 2;
-                        for (var k = 0; k < count; k++)
-                        {
-                            var p = Local(Mathf.Round(Mathf.Lerp(from + 2f, to - 3f, (k + 0.5f) / count)), GardenNear + 2 + rng.Next(Mathf.Max(1, far - GardenNear - 5)));
-                            trees += Prop("Tree_Fruit", Facing.N, p.x, p.y) != null ? 1 : 0;
-                        }
-                    }
-
-                    plots++;
-                    (lastEnd, lastFar) = (to, far);
-                    from = to;
-                }
-            }
-
-            Debug.Log($"[VeilmouthCity] {f.name}: {plots} garden plots beyond its last streets, {trees} fruit trees.");
-        }
-
-        /// <summary>The terrain's texels inside a rectangle of the district's own metres take one layer, where the district will lie.</summary>
-        private static void PaintLocal(float[,,] maps, float x0, float y0, float x1, float y1, int layer)
-        {
-            var size = maps.GetLength(0);
-            var layers = maps.GetLength(2);
-            var cell = VeilmouthScene.Extent / size;
-            var quad = new[] { _frameWorld(x0, y0), _frameWorld(x1, y0), _frameWorld(x1, y1), _frameWorld(x0, y1) }
-                .Select(w => new Vector2(w.x + 500f, 500f - w.z)).ToArray();
-            var ix0 = Mathf.Max(0, Mathf.FloorToInt(quad.Min(p => p.x) / cell) - 1);
-            var ix1 = Mathf.Min(size - 1, Mathf.CeilToInt(quad.Max(p => p.x) / cell) + 1);
-            var iz0 = Mathf.Max(0, Mathf.FloorToInt((VeilmouthScene.Extent - quad.Max(p => p.y)) / cell) - 1);
-            var iz1 = Mathf.Min(size - 1, Mathf.CeilToInt((VeilmouthScene.Extent - quad.Min(p => p.y)) / cell) + 1);
-            for (var z = iz0; z <= iz1; z++)
-            {
-                for (var x = ix0; x <= ix1; x++)
-                {
-                    if (!Inside(quad, new Vector2((x + 0.5f) * cell, VeilmouthScene.Extent - ((z + 0.5f) * cell))))
-                    {
-                        continue;
-                    }
-
-                    for (var l = 0; l < layers; l++)
-                    {
-                        maps[z, x, l] = l == layer ? 1f : 0f;
-                    }
                 }
             }
         }

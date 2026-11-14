@@ -106,6 +106,16 @@ CONCEPT = dict(
         dict(name="Rock Shapes 22", at=(904, 440), size=120, rot=10, amp=7.0, stage="post", mask=False),
     ],
     districts=[quay, centre, close, sleepy, works],
+    # One ground for the whole town (ISLAND_WORLD_AUDIT.md, stage 2): the town's line, as the walls draw it from
+    # water to water on both banks, stands 2.0 m over the tide, the height C5's streets stood over its sea. The
+    # cathedral's close is the town's one upper terrace, on purpose: it stands on the ridge's foot and comes down to
+    # the town over 60 m, a slope of 7 to 10 % that a street climbs. (A wall of 5 m toward the town was tried first
+    # and stood as a platform in the town's middle.)
+    town=dict(level=2.0, regrade=70.0, apron=14.0,
+              poly=[(393, 369), (253, 435), (351, 632), (453, 735), (554, 836), (647, 754), (735, 761), (820, 680), (862, 574),
+                    (856, 571), (716, 571), (716, 455), (711, 451), (652, 392), (566, 312), (430, 374)],   # round the close, not over it
+              terraces=[dict(name="The Close", level=7.0, regrade=70.0, foot=60.0,
+                             poly=[(716, 455), (856, 455), (856, 571), (716, 571)])]),
     pads=[
         # Its sixth corner takes in the Beck Bridge's south end, which stood 0.2 m over the tide (IC5's first build).
         dict(poly=[(588, 612), (612, 636), (644, 604), (630, 572), (608, 572), (592, 580)], level=2.4, kind="square", name="Bawling Wedge"),

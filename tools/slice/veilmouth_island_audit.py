@@ -169,8 +169,50 @@ def built(buildings):
     return sum((r[2] - r[0]) * (r[3] - r[1]) for _, r in houses(buildings))
 
 
+def town_ground():
+    """The exported height map inside the town's line and inside each terrace: how much of the dry ground stands on
+    its level, and how far the rest lies from it. Returns the lines to print and whether the ground passes."""
+    import gzip
+    import numpy as np
+    sys.path.insert(0, os.path.join(HERE, "island"))
+    with contextlib.redirect_stdout(io.StringIO()):
+        import islandgen as g
+        from concept_b import CONCEPT
+    town = CONCEPT.get("town")
+    if not town:
+        return ["  the concept names no town: each district has a ground of its own"], False
+    path = os.path.join(MAPS, "..", "Island", "island_heights.bytes")
+    raw = np.frombuffer(gzip.open(path, "rb").read(), "<u2")
+    n = int(round(math.sqrt(raw.size)))
+    H = raw.reshape(n, n)[::-1].astype(np.float64) / 65535.0 * g.BUDGET - g.SEA_LEVEL   # row 0 the plan's north
+    axis = np.linspace(0.0, 1000.0, n)
+    out, ok = [], True
+    taken = np.zeros((n, n), bool)
+    for part in town.get("terraces", []) + [town]:
+        inside = g.poly_mask(np.array(part["poly"], float), axis, axis) & ~taken
+        taken |= inside
+        if part is not town:
+            # The ground round a terrace is its foot or its wall's, not the town's level.
+            for _ in range(int(math.ceil(part.get("foot", 2.5) * 1.2 * (n - 1) / 1000.0))):
+                taken[1:, :] |= taken[:-1, :]; taken[:-1, :] |= taken[1:, :]
+                taken[:, 1:] |= taken[:, :-1]; taken[:, :-1] |= taken[:, 1:]
+        dry = inside & (H > 0.3)
+        off = np.abs(H[dry] - part["level"])
+        on = float((off <= 0.05).mean())
+        # What is off the level and dry: the river's walls are a metre or two wide, so a few per cent is the channels' edge.
+        out.append("  %-10s level %.1f m over the tide: %.0f m2 dry, %.1f %% within 0.05 m of its level, %.1f %% over 0.5 m off it (the water's edge); highest %.2f m, lowest dry %.2f m"
+                   % (part.get("name", "the town"), part["level"], dry.sum() * (1000.0 / (n - 1)) ** 2, 100 * on, 100 * float((off > 0.5).mean()), H[dry].max(), H[dry].min()))
+        ok &= on > 0.93 and H[dry].max() < part["level"] + 0.06
+    return out, ok
+
+
 def main():
     fails = 0
+    lines, level = town_ground()
+    print("The town's ground, from the exported height map")
+    print("\n".join(lines))
+    fails += not level
+    print()
     print("C5, the city in production: %d buildings; slots %d; open row ends %d; its ground is level, so its rows meet on one level"
           % (len(C5["buildings"]), len(slots(C5["passages"])), len(open_ends(C5["buildings"]))))
     blocks = C5["blocks"]

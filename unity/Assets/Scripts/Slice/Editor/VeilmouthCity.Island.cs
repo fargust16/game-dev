@@ -44,7 +44,7 @@ namespace GameDev.Slice.EditorTools
         {
             public string version;
             public IslandFrame[] frames;
-            public IslandLine[] walls, roads;
+            public IslandLine[] walls, roads, embankments;
             public IslandPlace[] gates;
             public IslandSpan[] bridges, piers;
             public IslandPlace lighthouse;
@@ -322,8 +322,6 @@ namespace GameDev.Slice.EditorTools
             Step("parks", Parks);
             _parent = Group("Yards");
             Step("yards", Yards);
-            _parent = Group("Edge Gardens");
-            Step("edge gardens", () => EdgeGardens(f, maps, paving));
             Step("stone works", () => _works.Finish(WallStone));
             Step("pavements", () => _pavements.Build(_root, _houses, _worksFolder));
             // The dress passes read the built district, by its bounds and by rays along the axes: so they run here, on

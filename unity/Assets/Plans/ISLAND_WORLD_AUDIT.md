@@ -1,10 +1,10 @@
 # Veilmouth on the Island — World Audit and Plan of Correction
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft — the audit the owner ordered on 2026-11-14 (stage 1 of the world polish); its plan is the agent's and waits for no further approval except where §6 names the owner
 
-Last Updated: 2026-11-14 (first version: the faults the owner's walk found, their causes by measurement, and the plan)
+Last Updated: 2026-11-14 (§8: stage 2 built and checked, one ground for the town. Earlier: first version: the faults the owner's walk found, their causes by measurement, and the plan)
 
 Depends On:
 [ISLAND_CITY_REBUILD_PLAN.md](ISLAND_CITY_REBUILD_PLAN.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §29, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [ISLAND_CONCEPTS.md](../../Documentation/Terrain/ISLAND_CONCEPTS.md), [91 Agent Decision Record](../../../91%20Agent%20Decision%20Record.md) *World polish before gameplay*
@@ -126,7 +126,7 @@ In the owner's order of stages. The three systems are corrected where they are; 
 ## Stage 2 — one ground for the town
 
 - **The generator makes one town surface, not a plane a district.** `platforms` takes the town's whole extent as one designed ground: the valley's floor under the town is near level, falling toward the Veil by no more than 0.5 % (for the eye and for water), so that a block of 40 m differs by 0.2 m at most and its rows meet on one level, as C5's do. The valley's rise of 2.2 % that IC1 gave the floor moves to the valley's sides, behind the town.
-- **One upper terrace, on purpose:** the cathedral's close on the ridge's foot stands higher, level, held by a retaining wall, reached by a ramped street and a flight of steps. It is the town's one great change of level, and it is built as architecture.
+- **One upper terrace, on purpose:** the cathedral's close on the ridge's foot stands higher, level. (As built, §8: it comes down to the town as the ridge's foot, a slope a street climbs, and not by a wall.)
 - **Pads are part of the same surface**, written once with the districts, never after them.
 - **No fill over water without its wall to the bed.** Where the town's ground meets the river it is a quay or an embankment whose wall is read down to the lowest ground before it, and the stair's place is cut in the ground.
 - **Done when:** the audit tool finds no corner join over 0.15 m apart; a section through the town in any direction shows no step that is not a designed wall.
@@ -175,3 +175,22 @@ Nothing stops stage 2. Two things are shown to the owner when they are reached, 
 
 - **Gameplay is not moved** until this work is done and checked (the owner's first constraint). IC6 of the rebuild's plan stops at IC6.1, the player's rig in the lab scene, which is kept because the world is judged by walking it.
 - **The layout I1 is not accepted.** The acceptance of 2026-11-14, given on views from the air, is withdrawn by the owner's walk.
+
+---
+
+# 8. Stage 2 as built: one ground for the town (2026-11-14)
+
+In `tools/slice/island/islandgen.py` (`town_ground`, `platforms`) and `concept_b.py` (`town`); the embankment in `veilmouth_island_plan.py` (`embankments`) and `VeilmouthCity.IslandTissue.cs` (`IslandEmbankments`).
+
+- **The town has one ground.** Everything inside the town's line, which runs as the walls do from water to water on both banks, stands 2.0 m over the tide, the height C5's streets stood over its sea. A district has no ground of its own: it takes the town's. The land round the town is eased toward it over about 70 m before the water runs, so the valley's sides begin behind the town. The squares' pads are no longer written over it.
+- **The close is the one upper terrace,** level at 7.0 m. A wall of 5 m toward the town was built first and failed at a walker's height: it stood as a platform in the town's middle, with the terrain's bank bare under the wall's foot. It now comes down to the town as the ridge's foot does, over 60 m, a slope of 7 to 10 % that a street climbs.
+- **Measured** (`veilmouth_island_audit.py`): 100.0 % of the town's dry ground, 13.2 ha, lies within 0.05 m of its level, and all of the close's. **No corner join of two rows stands apart in level: 0 of 38, where 27 did.**
+- **The embankment follows the water.** The channel is cut into the town's level upright, so the wall stands on the channel's own line for the whole of the town: **1 244 m** along both banks of the Veil and the Beck, its coping on one level, with 10 stairs to the tide set outside the wall over the water, where no ground stands in them. A district's side is no longer a quay of its own.
+- **Bridges** meet the ground at one height at both ends, 2.0 m. They still continue no street (stage 4).
+- **The garden plots are removed** from the build and from the code.
+- **Seen from a walker's height** (`Documentation/Terrain/City/Stage2/`): a block's corner in each of the five districts, each closed in wall and roof; the Veil between its embankments from Last Farthing Bridge; the close on its rise from the town; the town from the north.
+- **The kit check:** 1 377 blocks, no fault. No tracked file under `Assets/Prefabs` or `Assets/Art` changed.
+
+**What the same views show, for the stages after:** the districts still stand apart on turf, and a district's pavement ends in the air at its corner (stage 4); the slots between houses are still there (stage 3); the walls and the bridges are plain stone (stages 4 and 5); the open ground of the town carries the woodland's leaf litter in places (stage 6). The audit tool's exit code is 2: slots, and bridge ends.
+
+**For the next stage.** The slots cannot be closed by the planner's rule alone: a single building 30 m wide in a side of 52 m with side rows 10 m deep leaves 1 m either side whatever the rule says. The blocks' own sizes must fit what stands in them, which is the plan of the one network (stage 4). So stages 3 and 4 are planned together, the plan is drawn and shown to the owner, and then built.

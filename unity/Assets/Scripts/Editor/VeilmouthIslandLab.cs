@@ -566,6 +566,22 @@ public static class VeilmouthIslandLab
         ("19_reek_and_south_gate", new Vector3(470f, 880f, 90f), new Vector3(545f, 760f, 0f), 55f),
         ("20_walls_from_the_north_west", new Vector3(240f, 240f, 220f), new Vector3(480f, 520f, 0f), 50f),
         ("21_the_start_eye", new Vector3(676f, 628f, 0f), new Vector3(648f, 660f, 3f), 60f),
+        // Close views from a walker's height (ISLAND_WORLD_AUDIT.md §5.5): two corners of a block in each district, where
+        // two rows join; the embankment's wall, the close's wall from the town, a bridge's end.
+        ("22_penny_pa_corner", new Vector3(522.0f, 550.9f, 0.0f), new Vector3(529.6f, 528.1f, 5.0f), 60f),
+        ("32_penny_pa_far_corner", new Vector3(554.2f, 465.5f, 0.0f), new Vector3(546.6f, 488.3f, 5.0f), 60f),
+        ("23_sleepy_sb_corner", new Vector3(403.2f, 443.6f, 0.0f), new Vector3(395.6f, 466.4f, 5.0f), 60f),
+        ("33_sleepy_sb_far_corner", new Vector3(377.7f, 531.3f, 0.0f), new Vector3(385.3f, 508.5f, 5.0f), 60f),
+        ("24_lower_la_corner", new Vector3(698.1f, 732.5f, 0.0f), new Vector3(698.1f, 708.4f, 5.0f), 60f),
+        ("34_lower_la_far_corner", new Vector3(694.6f, 641.2f, 0.0f), new Vector3(694.6f, 665.3f, 5.0f), 60f),
+        ("25_parsons_nw1_corner", new Vector3(795.0f, 520.0f, 0.0f), new Vector3(812.0f, 537.0f, 5.0f), 60f),
+        ("35_parsons_nw1_far_corner", new Vector3(857.0f, 572.0f, 0.0f), new Vector3(840.0f, 555.0f, 5.0f), 60f),
+        ("26_reek_rd_corner", new Vector3(554.4f, 729.3f, 0.0f), new Vector3(554.4f, 753.4f, 5.0f), 60f),
+        ("36_reek_rd_far_corner", new Vector3(557.9f, 813.5f, 0.0f), new Vector3(557.9f, 789.4f, 5.0f), 60f),
+        ("27_embankments_from_the_bridge", new Vector3(465f, 508f, 7.2f), new Vector3(430f, 440f, 4.5f), 60f),
+        ("28_the_close_from_the_town", new Vector3(660f, 530f, 0f), new Vector3(730f, 500f, 6f), 60f),
+        ("29_last_farthing_bridge_end", new Vector3(503f, 517f, 0f), new Vector3(486f, 499f, 1.5f), 60f),
+        ("30_town_section_from_the_north", new Vector3(470f, 300f, 60f), new Vector3(520f, 560f, 0f), 50f),
     };
 
     /// <summary>

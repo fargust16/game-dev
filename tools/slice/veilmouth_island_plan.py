@@ -360,6 +360,37 @@ def hamlet(h):
                 streets=[], squares=[], blocks=[], buildings=[], passages=[], boxes=[], plaza=None, candidates=[], cottages=cottages), D
 
 
+def embankments(C, F):
+    """The town's water edge (ISLAND_WORLD_AUDIT.md, stage 2): along each tidal river, the two lines where the town's
+    ground is cut down to the channel, as far as they run inside the town's line or a terrace's. The generator cuts
+    the channel half a metre beyond the water's width, upright; an embankment's wall stands on that line."""
+    np = g.np
+    town = C.get("town")
+    if not town:
+        return []
+    polys = [np.array(p["poly"], float) for p in [town] + town.get("terraces", [])]
+    inside = lambda x, y: any(g.poly_mask(P, np.array([x]), np.array([y]))[0, 0] for P in polys)
+    out = []
+    for r in F["rivers"]:
+        if r["dry"]:
+            continue
+        line = r["line"]
+        t = np.gradient(line[:, :2], axis=0)
+        t = t / np.maximum(np.hypot(t[:, 0], t[:, 1]), 1e-6)[:, None]
+        normal = np.column_stack([-t[:, 1], t[:, 0]])
+        for sign, side in ((1.0, "right"), (-1.0, "left")):
+            edge = line[:, :2] + sign * normal * (line[:, 3:4] / 2 + 0.5)
+            run = []
+            for x, y in list(edge) + [(None, None)]:
+                if x is not None and inside(x, y):
+                    run.append(dict(x=round(float(x), 2), y=round(float(y), 2)))
+                    continue
+                if len(run) >= 3:
+                    out.append(dict(name=r["name"], kind=side, line=run))
+                run = []
+    return out
+
+
 def main():
     C = CONCEPT
     F = g.build_land(C, lambda s: None)
@@ -377,6 +408,7 @@ def main():
     layout["bridges"] = [dict(name=b["name"], ax=b["a"][0], ay=b["a"][1], bx=b["b"][0], by=b["b"][1], width=b["w"]) for b in C.get("bridges", [])]
     layout["piers"] = [dict(ax=p["a"][0], ay=p["a"][1], bx=p["b"][0], by=p["b"][1], width=p["w"]) for p in C.get("piers", [])]
     layout["roads"] = [dict(name=r["name"], kind=r["cls"], line=[dict(x=round(float(p[0]), 1), y=round(float(p[1]), 1)) for p in r["pts"]]) for r in C.get("roads", [])]
+    layout["embankments"] = embankments(C, F)
     layout["pads"] = [dict(name=p["name"], kind=p["kind"], level=p["level"], line=[dict(x=q[0], y=q[1]) for q in p["poly"]]) for p in C.get("pads", [])]
 
     # ---- counts and checks
