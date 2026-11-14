@@ -384,48 +384,6 @@
    ]
   },
   {
-   "id": "coast_sand_03",
-   "use": "coastal sand",
-   "page": "https://polyhaven.com/a/coast_sand_03",
-   "files": [
-    {
-     "map": "diff",
-     "file": "coast_sand_03_diff_2k.jpg",
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/coast_sand_03/coast_sand_03_diff_2k.jpg",
-     "size": 4278557,
-     "md5": "9515eccb1cc53cb07615012076e0e5b2"
-    },
-    {
-     "map": "nor_gl",
-     "file": "coast_sand_03_nor_gl_2k.jpg",
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/coast_sand_03/coast_sand_03_nor_gl_2k.jpg",
-     "size": 5636070,
-     "md5": "db16a7a0ea5fe5a346f7b51422720bd6"
-    },
-    {
-     "map": "rough",
-     "file": "coast_sand_03_rough_2k.jpg",
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/coast_sand_03/coast_sand_03_rough_2k.jpg",
-     "size": 2134040,
-     "md5": "00b1f45c8e4dde533df782ce8d32cf69"
-    },
-    {
-     "map": "ao",
-     "file": "coast_sand_03_ao_2k.jpg",
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/coast_sand_03/coast_sand_03_ao_2k.jpg",
-     "size": 3942093,
-     "md5": "b7d54cc9d0d6ad465693cb07a4729941"
-    },
-    {
-     "map": "disp",
-     "file": "coast_sand_03_disp_2k.png",
-     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/coast_sand_03/coast_sand_03_disp_2k.png",
-     "size": 8928266,
-     "md5": "4e14d039b34409491d39956da8e3ec26"
-    }
-   ]
-  },
-  {
    "id": "rocks_ground_06",
    "use": "rocky shore",
    "page": "https://polyhaven.com/a/rocks_ground_06",
@@ -464,6 +422,90 @@
      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/rocks_ground_06/rocks_ground_06_disp_2k.png",
      "size": 6992404,
      "md5": "472567148d5f0dbda3a45221e246fa26"
+    }
+   ]
+  },
+  {
+   "id": "sand_03",
+   "use": "beach sand",
+   "page": "https://polyhaven.com/a/sand_03",
+   "files": [
+    {
+     "map": "diff",
+     "file": "sand_03_diff_2k.jpg",
+     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/sand_03/sand_03_diff_2k.jpg",
+     "size": 3353581,
+     "md5": "7732acef12dc23c8f7eda65f5cea0ab6"
+    },
+    {
+     "map": "nor_gl",
+     "file": "sand_03_nor_gl_2k.jpg",
+     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/sand_03/sand_03_nor_gl_2k.jpg",
+     "size": 3654915,
+     "md5": "c87f87cc0cdf6c88fdc227b119f8a77b"
+    },
+    {
+     "map": "rough",
+     "file": "sand_03_rough_2k.jpg",
+     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/sand_03/sand_03_rough_2k.jpg",
+     "size": 1543849,
+     "md5": "7ee62cdf779c0fb37a5db58af5f3522e"
+    },
+    {
+     "map": "ao",
+     "file": "sand_03_ao_2k.jpg",
+     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/sand_03/sand_03_ao_2k.jpg",
+     "size": 2610676,
+     "md5": "f748850fbc4dd9dc088b2642b194f9df"
+    },
+    {
+     "map": "disp",
+     "file": "sand_03_disp_2k.png",
+     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/sand_03/sand_03_disp_2k.png",
+     "size": 6224292,
+     "md5": "49703a520b2bfc5771d2fe888d2ab034"
+    }
+   ]
+  },
+  {
+   "id": "leafy_grass",
+   "use": "lush turf",
+   "page": "https://polyhaven.com/a/leafy_grass",
+   "files": [
+    {
+     "map": "diff",
+     "file": "leafy_grass_diff_2k.jpg",
+     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/leafy_grass/leafy_grass_diff_2k.jpg",
+     "size": 4766204,
+     "md5": "8014f4dace676a62ed71b3dd76119dae"
+    },
+    {
+     "map": "nor_gl",
+     "file": "leafy_grass_nor_gl_2k.jpg",
+     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/leafy_grass/leafy_grass_nor_gl_2k.jpg",
+     "size": 6047262,
+     "md5": "ea5e91abe01dc5e5d7028c68c3bc9194"
+    },
+    {
+     "map": "rough",
+     "file": "leafy_grass_rough_2k.jpg",
+     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/leafy_grass/leafy_grass_rough_2k.jpg",
+     "size": 2274652,
+     "md5": "b5c551ed91162aab5afbfb03b73ae3f5"
+    },
+    {
+     "map": "ao",
+     "file": "leafy_grass_ao_2k.jpg",
+     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/leafy_grass/leafy_grass_ao_2k.jpg",
+     "size": 4175463,
+     "md5": "f25065162a26693b29a10587582df688"
+    },
+    {
+     "map": "disp",
+     "file": "leafy_grass_disp_2k.png",
+     "url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/leafy_grass/leafy_grass_disp_2k.png",
+     "size": 7311977,
+     "md5": "540555d31b8bf2d674b818a7e2e61125"
     }
    ]
   }

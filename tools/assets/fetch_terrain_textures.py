@@ -24,7 +24,10 @@ SETS = [
     ("grass_ground", "meadow grass"), ("forest_ground_04", "forest floor"), ("forest_leaves_03", "leaf litter"),
     ("brown_mud_03", "mud"), ("dirt_floor", "dry earth and paths"), ("gravel_ground_01", "gravel"),
     ("river_small_rocks", "river stones"), ("rock_face_03", "rock faces"), ("mossy_rock", "mossy rock"),
-    ("coast_sand_03", "coastal sand"), ("rocks_ground_06", "rocky shore"),
+    ("rocks_ground_06", "rocky shore"),
+    # The owner's second leave, 2026-11-14 (TERRAIN_POLISH_REPORT.md §8): an even beach sand in place of coast_sand_03,
+    # whose patches of tone read as a grid from the air and as blotches under the stochastic read, and a second turf.
+    ("sand_03", "beach sand"), ("leafy_grass", "lush turf"),
 ]
 # map name in our files -> (the API's keys to try, format)
 MAPS = [("diff", ("Diffuse", "diff", "Color"), "jpg"), ("nor_gl", ("nor_gl",), "jpg"), ("rough", ("Rough", "rough"), "jpg"),

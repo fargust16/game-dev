@@ -28,6 +28,7 @@ public static class VeilmouthIslandLab
     private const string LayerFolder = "Assets/Settings/TerrainLayers/Island";
     private const string SplatFolder = DataFolder + "/MicroSplatData";
     private const string WaterMaterial = "Assets/Settings/Water/OverworldWater.mat";
+    internal const string SliceSeaMaterial = "Assets/Settings/Water/VeilmouthSea.mat";
     private const string FallbackTerrainMaterial = "Assets/Settings/OverworldTerrain.mat";
     internal const string RenderLoop = "_MSRENDERLOOP_UNITYURP6P3";
     private const float Size = 1000f, Budget = 100f, SeaLevel = 24f, Ocean = 8000f;
@@ -50,7 +51,7 @@ public static class VeilmouthIslandLab
     {
         { "grass_ground", 8f }, { "forest_ground_04", 9f }, { "forest_leaves_03", 7f }, { "brown_mud_03", 6f },
         { "dirt_floor", 7f }, { "gravel_ground_01", 6f }, { "river_small_rocks", 6f }, { "rock_face_03", 11f },
-        { "mossy_rock", 9f }, { "coast_sand_03", 8f }, { "rocks_ground_06", 8f },
+        { "mossy_rock", 9f }, { "sand_03", 5f }, { "rocks_ground_06", 8f }, { "leafy_grass", 6f },
     };
 
     /// <summary>
@@ -60,8 +61,8 @@ public static class VeilmouthIslandLab
     private static readonly Dictionary<string, Color> Tint = new Dictionary<string, Color>
     {
         { "grass_ground", new Color(0.74f, 1f, 0.56f) }, { "forest_ground_04", new Color(0.86f, 0.88f, 0.8f) },
-        { "forest_leaves_03", new Color(0.82f, 0.8f, 0.74f) }, { "brown_mud_03", new Color(0.8f, 0.8f, 0.78f) },
-        { "dirt_floor", new Color(0.6f, 0.59f, 0.56f) }, { "coast_sand_03", new Color(0.96f, 0.94f, 0.9f) },
+        { "forest_leaves_03", new Color(0.82f, 0.8f, 0.74f) }, { "brown_mud_03", new Color(1.2f, 1.12f, 1f) },
+        { "dirt_floor", new Color(0.6f, 0.59f, 0.56f) }, { "sand_03", new Color(1.7f, 1.62f, 1.42f) }, { "leafy_grass", new Color(0.8f, 0.95f, 0.66f) },
     };
 
     private static string Map(string set, string map) => $"{TextureRoot}/{set}/{set}_{map}_2k.{(map == "disp" ? "png" : "jpg")}";
@@ -82,7 +83,7 @@ public static class VeilmouthIslandLab
         terrain.heightmapPixelError = 5f;
         terrain.materialTemplate = AssetDatabase.LoadAssetAtPath<Material>(FallbackTerrainMaterial);
 
-        Sheet("Water", SeaLevel, AssetDatabase.LoadAssetAtPath<Material>(WaterMaterial));
+        Sheet("Water", SeaLevel, SeaMaterial());
         Sheet("Sea Floor", 7.5f, FloorMaterial());
 
         var sun = new GameObject("Sun").AddComponent<Light>();
@@ -291,6 +292,26 @@ public static class VeilmouthIslandLab
         }
     }
 
+    /// <summary>
+    /// The slice's own sea (owner, 2026-11-14; TERRAIN_POLISH_REPORT.md §4): the project's water material with the
+    /// foam off, since WaterWorks draws its foam band's edge by a per-pixel threshold that steps along every shore.
+    /// WaterWorks and the Overworld's material are not changed. Made once and kept in git.
+    /// </summary>
+    internal static Material SeaMaterial()
+    {
+        var sea = AssetDatabase.LoadAssetAtPath<Material>(SliceSeaMaterial);
+        if (sea == null)
+        {
+            AssetDatabase.CopyAsset(WaterMaterial, SliceSeaMaterial);
+            sea = AssetDatabase.LoadAssetAtPath<Material>(SliceSeaMaterial);
+        }
+
+        sea.SetFloat("_UseFoam", 0f);
+        EditorUtility.SetDirty(sea);
+        AssetDatabase.SaveAssets();
+        return sea;
+    }
+
     private static Material FloorMaterial()
     {
         var path = DataFolder + "/IslandSeaFloor.mat";
@@ -355,7 +376,7 @@ public static class VeilmouthIslandLab
     /// </summary>
     private static readonly HashSet<string> FineGrained = new HashSet<string>
     {
-        "grass_ground", "forest_ground_04", "forest_leaves_03", "brown_mud_03",
+        "grass_ground", "forest_ground_04", "forest_leaves_03", "brown_mud_03", "sand_03", "leafy_grass",
     };
 
     /// <summary>The two packed arrays of the surfaces' texture sets, 2048 px unless -islandArrays1k is given.</summary>

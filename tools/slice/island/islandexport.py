@@ -19,8 +19,8 @@ import islandgen as g
 
 # The surfaces in the order of the terrain's layers; each is one Poly Haven set (tools/assets/fetch_terrain_textures.py).
 SURFACES = ["grass_ground", "forest_ground_04", "forest_leaves_03", "brown_mud_03", "dirt_floor", "gravel_ground_01",
-            "river_small_rocks", "rock_face_03", "mossy_rock", "coast_sand_03", "rocks_ground_06"]
-GRASS, FLOOR, LEAVES, MUD, DIRT, GRAVEL, STONES, ROCK, MOSS, SAND, SHORE = range(11)
+            "river_small_rocks", "rock_face_03", "mossy_rock", "sand_03", "rocks_ground_06", "leafy_grass"]
+GRASS, FLOOR, LEAVES, MUD, DIRT, GRAVEL, STONES, ROCK, MOSS, SAND, SHORE, LUSH = range(12)
 ALPHAMAP = 1024
 ZONES = 512
 ZONE_NAMES = ["forest", "marsh", "farm", "wet", "bare", "sand", "hard"]
@@ -48,7 +48,11 @@ def surfaces(C, F):
     # A rougher, mossier turf in clumps of 10-40 m over the open ground: a second set of the same kind, so that no
     # stretch of meadow is one photograph repeated (TERRAIN_POLISH_REPORT.md §2, the layers' way).
     clump = sm(0.0, 0.2, 0.65 * g.fbm(X, Y, 31.0, seed + 211, 3) + 0.35 * g.fbm(X, Y, 9.0, seed + 213, 2))
-    cover(FLOOR, 0.5 * clump)
+    cover(FLOOR, 0.35 * clump)
+    # A lusher, leafier turf in clumps of its own, and on ground the meadow keeps damp: a second turf of the meadow's
+    # own tone (leafy_grass; the owner's second leave, 2026-11-14), so a mix reads as one sward and not as two things.
+    lush = sm(0.02, 0.24, 0.6 * g.fbm(X, Y, 43.0, seed + 221, 3) + 0.4 * g.fbm(X, Y, 12.0, seed + 223, 2))
+    cover(LUSH, 0.6 * lush * sm(26.0, 14.0, slope))
     # Fields: turned earth in strips.
     strips = 0.5 + 0.5 * np.sin((X * 0.8 + Y * 0.6) * 0.9)
     cover(DIRT, F["farm"] * (0.35 + 0.4 * strips))
@@ -66,7 +70,7 @@ def surfaces(C, F):
     cover(MUD, 0.85 * damp * (0.55 + 0.45 * sm(-0.3, 0.3, mid)))
     # Where the land's water gathers, a valley floor is damp: rough turf and bare mud along it, broken by noise.
     seep = g.blur(sm(700.0, 6000.0, F["flow"]) * land, 5.0) * sm(20.0, 8.0, slope)
-    cover(FLOOR, 0.6 * sm(0.05, 0.5, seep))
+    cover(LUSH, 0.7 * sm(0.05, 0.5, seep))
     cover(MUD, 0.55 * sm(0.25, 0.8, seep + 0.25 * fine))
     # Country roads and tracks: beaten earth with gravel in it.
     cover(DIRT, 0.95 * F["road_soft"])

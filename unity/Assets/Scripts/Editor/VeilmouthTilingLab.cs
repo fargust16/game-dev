@@ -319,7 +319,7 @@ public static class VeilmouthTilingLab
         int At(string set) => System.Array.IndexOf(sets, set);
         var plain = new[] { At("grass_ground"), At("forest_ground_04"), At("brown_mud_03"), At("rocks_ground_06") };
         var second = new[] { At("forest_ground_04"), At("forest_leaves_03"), At("dirt_floor"), At("gravel_ground_01") };
-        var third = new[] { At("dirt_floor"), At("grass_ground"), At("gravel_ground_01"), At("coast_sand_03") };
+        var third = new[] { At("dirt_floor"), At("grass_ground"), At("gravel_ground_01"), At("sand_03") };
         var secondShare = new[] { 0.4f, 0.5f, 0.5f, 0.5f };
         var thirdShare = new[] { 0.2f, 0.25f, 0.3f, 0.35f };
         var maps = new float[Alpha, Alpha, sets.Length];

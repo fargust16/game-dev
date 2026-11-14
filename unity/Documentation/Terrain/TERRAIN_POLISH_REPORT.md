@@ -303,3 +303,15 @@ Unity must be closed. Each lab needs graphics (no `-nographics`).
 | The water's edge | `-executeMethod VeilmouthShoreLab.Run` → `Logs/ShoreLab/` (after the island) |
 
 The lab scenes, their terrains, arrays and shaders are written again by these and stay out of git. The planner's files, the tools, the module and this report are in git.
+
+---
+
+# 10. After the owner's answers, 2026-11-14
+
+Done at once, since each was a decision of §8:
+
+- **Sand.** `coast_sand_03` is out of the slice. `sand_03` (Poly Haven, CC0, 17 MB) takes its place: an even, fine beach sand with no patches of tone, lightened by its tint to a dry beach. It takes the stochastic read. On Kettle Bay's beach at the walker's eye and over the southern flats from the air it shows no grid (`Polish/Island/05_kettle_bay_eye.jpg`, `01_island_from_the_south_east.jpg`).
+- **A second turf.** `leafy_grass` (Poly Haven, CC0, 25 MB), a lusher, leafier sward of the meadow's own tone, lies in clumps of 12 to 43 m and on ground that stays damp. It takes the stochastic read. The terrain now has 12 sets; the two arrays are 256 MB.
+- **The sea** wears `Assets/Settings/Water/VeilmouthSea.mat`, the project's water material with the foam off. WaterWorks and the Overworld's material are as they were.
+
+**A correction to §2.4.** The dark blotches of the rejected trial on the spit were not only the old sand's own patches. The spit is where sand meets the marsh's mud, and MicroSplat blends two layers by their height maps: under the stochastic read each patch of sand has another height, so the blend flips from patch to patch. With the new sand the same border still shows dark patches of mud in the sand, softer than before. A border between two stochastic layers needs a wider, plainer blend; that is still to do. The mud itself was near black on the flats and is lightened by its tint.

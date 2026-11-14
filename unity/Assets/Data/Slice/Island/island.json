@@ -16,8 +16,9 @@
   "river_small_rocks",
   "rock_face_03",
   "mossy_rock",
-  "coast_sand_03",
-  "rocks_ground_06"
+  "sand_03",
+  "rocks_ground_06",
+  "leafy_grass"
  ],
  "zones": [
   "forest",
@@ -32,16 +33,17 @@
  "landArea": 557939,
  "highest": 57.74,
  "landShare": {
-  "grass_ground": 0.4643,
-  "forest_ground_04": 0.26,
-  "forest_leaves_03": 0.0427,
-  "brown_mud_03": 0.0469,
+  "grass_ground": 0.419,
+  "forest_ground_04": 0.2121,
+  "forest_leaves_03": 0.0426,
+  "brown_mud_03": 0.0468,
   "dirt_floor": 0.0341,
   "gravel_ground_01": 0.0189,
   "river_small_rocks": 0.006,
   "rock_face_03": 0.0359,
   "mossy_rock": 0.0075,
-  "coast_sand_03": 0.0541,
-  "rocks_ground_06": 0.0296
+  "sand_03": 0.0541,
+  "rocks_ground_06": 0.0296,
+  "leafy_grass": 0.0933
  }
 }
