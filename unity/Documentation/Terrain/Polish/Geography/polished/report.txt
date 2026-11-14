@@ -1,0 +1,74 @@
+The Valley: a river city between two ridges  N=513, cell 1.95 m
+dry land 532005 m2, of it built platforms 93914 m2; highest 57.8 m
+
+HYPSOMETRY (dry land outside platforms)
+   0- 5 m   36.9 %  #####################################
+   5-10 m   21.9 %  ######################
+  10-15 m   15.4 %  ###############
+  15-20 m    9.0 %  #########
+  20-25 m    5.5 %  #####
+  25-30 m    3.0 %  ###
+  30-35 m    1.7 %  ##
+  35-40 m    1.5 %  ##
+  40-45 m    1.5 %  ##
+  45-50 m    1.8 %  ##
+  50-55 m    1.3 %  #
+  55-60 m    0.4 %  
+  hypsometric integral 0.20 (0.5 a straight profile; under 0.3 old, worn land; over 0.6 young plateaus)
+  median 7.8 m, upper quartile 15.3 m, upper decile 27.1 m
+
+SLOPE (dry land outside platforms), degrees
+   0- 3   15.6 %  ################
+   3- 8   21.8 %  ######################
+   8-15   28.4 %  ############################
+  15-25   22.6 %  #######################
+  25-35    6.4 %  ######
+  35-45    1.8 %  ##
+  45-90    3.5 %  ####
+
+STAMPS: the relief built with them against the relief without
+  the land's own height spread without stamps 11.89 m; what stamps add: RMS 1.41 m, largest +7.1 / -2.3 m
+  dry land the stamps move by over 1 m: 24 %; by over 3 m: 8 %
+  Meadows 28                 420 m square: adds RMS 1.89 m, range -1.4..+6.2 m; on its last 6 % by the edge still 0.06 m
+  Tuscany Rolling Hills 05   380 m square: adds RMS 1.55 m, range -1.5..+5.0 m; on its last 6 % by the edge still 0.07 m
+  Layered Rocks 15           320 m square: adds RMS 1.22 m, range -2.3..+6.1 m; on its last 6 % by the edge still 0.03 m
+  Rough Cliffs 18            260 m square: adds RMS 1.18 m, range -1.4..+4.3 m; on its last 6 % by the edge still 0.05 m
+  Talus Rock Clusters 19     170 m square: adds RMS 2.33 m, range +0.0..+7.1 m; on its last 6 % by the edge still 0.00 m
+  Rock Shapes 22             120 m square: adds RMS 0.94 m, range -0.0..+5.2 m; on its last 6 % by the edge still 0.02 m
+
+DRAINAGE (priority-flood, D8 on the filled ground)
+  closed hollows deeper than 0.3 m: 69 m2 (0.0 % of dry land), deepest 2.4 m
+  dry land draining into the tidal creeks 56 %, straight to the sea 44 %
+  mouths (40 m of shore each) gathering over 1 ha: 16; the ten largest:
+    (652, 488) creek    8.2 ha  15.4 %
+    (217, 715) sea      3.8 ha   7.1 %
+    (863, 721) sea      3.0 ha   5.7 %
+    (629, 549) creek    2.8 ha   5.3 %
+    (617, 764) creek    2.4 ha   4.5 %
+    (352, 309) creek    2.2 ha   4.2 %
+    (371, 367) creek    2.0 ha   3.7 %
+    (518, 941) sea      1.8 ha   3.4 %
+    (248, 168) creek    1.8 ha   3.3 %
+    (439, 465) creek    1.6 ha   2.9 %
+  lines gathering over 0.2 ha: 3.02 km (5.7 km per km2); the ground there lies 1.7 m (median) under its 60 m mean, and under it at all on 84 % of their length
+  lines gathering over 1.0 ha: 0.99 km (1.9 km per km2); the ground there lies 1.5 m (median) under its 60 m mean, and under it at all on 88 % of their length
+
+ROUGHNESS: RMS height difference between points a lag apart (dry land outside platforms)
+    2 m    0.83 m   exponent from the lag before   - 
+    4 m    1.56 m   exponent from the lag before 0.91
+    8 m    2.79 m   exponent from the lag before 0.84
+   16 m    4.61 m   exponent from the lag before 0.73
+   32 m    6.97 m   exponent from the lag before 0.60
+   64 m   10.30 m   exponent from the lag before 0.56
+  128 m   14.31 m   exponent from the lag before 0.47
+  256 m   17.13 m   exponent from the lag before 0.26
+  (natural ground keeps an exponent near 0.7-0.9 across these lags; 1.0 means a plane at that scale, with no form of its own)
+
+CRESTS: the ground along each authored ridge
+  ridge 1, 558 m long: -4.4..57.6 m; 2 summits, 1 saddles of over 2 m: summit 57 m at 273, saddle -4 m at 413, summit 29 m at 473
+  ridge 2, 613 m long: 7.3..25.3 m; 2 summits, 1 saddles of over 2 m: summit 13 m at 108, saddle 9 m at 192, summit 25 m at 437
+
+COAST
+  the outer shore 3455 m round 557880 m2: shoreline development 1.31 (a circle 1.0; natural islands of this size 1.3-2.5)
+  every waterline, creeks too: box-count dimension 1.05 over 4-64 m (a smooth curve 1.0; natural rocky coasts 1.15-1.3)
+  shore kinds by length: sand 17 %, gravel 11 %, rock 24 %, cliff 40 %, marsh 6 %, quay 2 %

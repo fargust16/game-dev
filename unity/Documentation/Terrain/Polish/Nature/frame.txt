@@ -1,0 +1,12 @@
+One camera's render at 1920 x 1080, MSAA 4, no post-processing, median ms of 3 rounds of 12 frames after 3 warm-ups, NVIDIA GeForce RTX 5070 Ti Laptop GPU:
+view                     all the cover   LOD bias halved  no cover shadows   without grass     bare ground
+valley_wood_air                   6.14              6.08              5.55            5.52            4.61
+valley_wood_eye                   9.44              9.51              9.10            5.28            4.42
+east_combes_air                  15.56             15.68             12.80           16.15            4.56
+east_combes_eye                  16.72             16.72             11.23           15.51            4.91
+west_bay_air                     14.80             15.01             15.28           14.42            5.20
+west_bay_eye                      6.43              6.66              6.22            5.48            4.46
+marsh_spit_air                   14.51             14.54             14.68           14.88            5.80
+marsh_spit_eye                    4.57              4.63              4.54            4.49            4.62
+island_air                       13.13             13.44             13.41           13.05            4.78
+LOD bias of the project's quality level: 1

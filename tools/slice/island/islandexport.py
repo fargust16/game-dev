@@ -22,6 +22,8 @@ SURFACES = ["grass_ground", "forest_ground_04", "forest_leaves_03", "brown_mud_0
             "river_small_rocks", "rock_face_03", "mossy_rock", "coast_sand_03", "rocks_ground_06"]
 GRASS, FLOOR, LEAVES, MUD, DIRT, GRAVEL, STONES, ROCK, MOSS, SAND, SHORE = range(11)
 ALPHAMAP = 1024
+ZONES = 512
+ZONE_NAMES = ["forest", "marsh", "farm", "wet", "bare", "sand", "hard"]
 
 
 def surfaces(C, F):
@@ -43,6 +45,10 @@ def surfaces(C, F):
     # Meadow: earth shows through in patches and where the ground steepens.
     cover(DIRT, 0.26 * sm(0.05, 0.7, macro + 0.3 * fine) * sm(-0.3, 0.5, mid + 0.4 * fine))
     cover(DIRT, 0.55 * sm(17.0, 32.0, slope + 6.0 * fine))
+    # A rougher, mossier turf in clumps of 10-40 m over the open ground: a second set of the same kind, so that no
+    # stretch of meadow is one photograph repeated (TERRAIN_POLISH_REPORT.md §2, the layers' way).
+    clump = sm(0.0, 0.2, 0.65 * g.fbm(X, Y, 31.0, seed + 211, 3) + 0.35 * g.fbm(X, Y, 9.0, seed + 213, 2))
+    cover(FLOOR, 0.5 * clump)
     # Fields: turned earth in strips.
     strips = 0.5 + 0.5 * np.sin((X * 0.8 + Y * 0.6) * 0.9)
     cover(DIRT, F["farm"] * (0.35 + 0.4 * strips))
@@ -58,6 +64,10 @@ def surfaces(C, F):
             near = np.minimum(near, r["d"] - r["cw"] / 2)
     damp = np.maximum(np.clip(F["marsh"] * 1.6, 0, 1), sm(1.5, 0.5, H) * sm(45.0, 6.0, near))
     cover(MUD, 0.85 * damp * (0.55 + 0.45 * sm(-0.3, 0.3, mid)))
+    # Where the land's water gathers, a valley floor is damp: rough turf and bare mud along it, broken by noise.
+    seep = g.blur(sm(700.0, 6000.0, F["flow"]) * land, 5.0) * sm(20.0, 8.0, slope)
+    cover(FLOOR, 0.6 * sm(0.05, 0.5, seep))
+    cover(MUD, 0.55 * sm(0.25, 0.8, seep + 0.25 * fine))
     # Country roads and tracks: beaten earth with gravel in it.
     cover(DIRT, 0.95 * F["road_soft"])
     cover(GRAVEL, 0.45 * F["road_soft"] * sm(-0.2, 0.4, fine))
@@ -67,7 +77,9 @@ def surfaces(C, F):
         edge = sm(r["cw"] / 2 + (5.0 if r["dry"] else 3.0), r["cw"] / 2, r["d"])
         cover(STONES, edge * (0.9 if r["dry"] else 0.55 * sm(20.0, 8.0, r["cw"])))
     # The shore by its kind.
-    low = sm(3.0, 1.0, H) * sm(110.0, 55.0, dl)
+    # A beach is the strip the sea reaches, 30 to 70 m of it and under about 2 m; behind it the turf begins, thin at
+    # first (seen in the lab: at 3 m and 110 m the whole south of the island read as bare sand).
+    low = sm(2.2, 0.9, H + 0.5 * mid) * sm(70.0, 30.0, dl + 14.0 * mid)
     hard = np.clip(F["is_r"] + F["is_c"], 0, 1)
     cover(SAND, F["is_b"] * low)
     cover(GRAVEL, F["is_g"] * low)
@@ -112,11 +124,24 @@ def export(C, F, out):
     with gzip.open(os.path.join(out, "island_surfaces.bytes"), "wb", compresslevel=6) as fh:
         fh.write(np.ascontiguousarray(q[:, ::-1, :].astype(np.uint8)).tobytes())
 
+    # What the living cover is placed by (VeilmouthNatureLab): woodland, marsh, fields, where water gathers, and
+    # where nothing grows (built ground, roads, water), each 0..255 on a grid of 2 m, row 0 the south edge.
+    wetness = g.blur(g.smoothstep(700.0, 6000.0, F["flow"]) * F["land"], 6.0)
+    bare = np.clip(F["built"] + F["roadmask"] + (F["H"] < 0.4) + F["road_soft"], 0, 1)
+    zones = np.stack([F["forest"], np.clip(F["marsh"], 0, 1), F["farm"], np.clip(wetness * 1.6, 0, 1), bare,
+                      np.clip(F["is_b"], 0, 1), np.clip(F["is_r"] + F["is_c"], 0, 1)])
+    zc = (np.arange(ZONES) + 0.5) * g.SIZE / ZONES
+    ZX, ZY = np.meshgrid(zc, zc)
+    zq = np.stack([np.clip(g.bil(z.astype(np.float64), ZX, ZY) * 255.0, 0, 255) for z in zones]).astype(np.uint8)
+    with gzip.open(os.path.join(out, "island_zones.bytes"), "wb", compresslevel=6) as fh:
+        fh.write(np.ascontiguousarray(zq[:, ::-1, :]).tobytes())
+
     cell = g.STEP * g.STEP
-    share = {SURFACES[k]: round(float((W[k] * F["land"]).sum() / max(F["land"].sum(), 1)), 4) for k in range(len(SURFACES))}
+    share ={SURFACES[k]: round(float((W[k] * F["land"]).sum() / max(F["land"].sum(), 1)), 4) for k in range(len(SURFACES))}
     with open(os.path.join(out, "island.json"), "w", encoding="utf-8") as fh:
         json.dump({"concept": C["key"], "name": C["name"], "size": g.SIZE, "heightmap": g.HEIGHTMAP, "alphamap": ALPHAMAP,
                    "seaLevel": g.SEA_LEVEL, "heightBudget": g.BUDGET, "layers": SURFACES,
+                   "zones": ZONE_NAMES, "zonemap": ZONES,
                    "landArea": round(float(F["land"].sum() * cell)), "highest": round(float(F["H"].max()), 2),
                    "landShare": share}, fh, indent=1)
     return share

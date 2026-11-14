@@ -117,6 +117,11 @@ unity/Assets/Data/Slice/Island/MicroSplatData.meta
 unity/Assets/Data/Slice/Island/IslandLab_*
 unity/Assets/Scenes/Slice/Lab/IslandLab.unity
 unity/Assets/Scenes/Slice/Lab/IslandLab.unity.meta
+# The tiling lab: VeilmouthTilingLab.Run writes its terrain, arrays, shaders and scene again from the same texture sets.
+unity/Assets/Data/Slice/Island/TilingLab/
+unity/Assets/Data/Slice/Island/TilingLab.meta
+unity/Assets/Scenes/Slice/Lab/TilingLab.unity
+unity/Assets/Scenes/Slice/Lab/TilingLab.unity.meta
 
 # Test and editor logs
 unity/*.log

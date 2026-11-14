@@ -56,7 +56,11 @@ mere = [(254 + 15 * math.cos(a), 178 + 12 * math.sin(a)) for a in [k * math.pi /
 
 CONCEPT = dict(
     key="B", name="The Valley: a river city between two ridges", seed=202,
-    base=3.0, base_reach=160.0, lift_reach=100.0, spurs=0.20, gully=2.6, forest=0.12,
+    base=3.0, base_reach=160.0, lift_reach=100.0, spurs=0.30, gully=2.6, forest=0.12,
+    # The polish of 2026-11-14 (TERRAIN_POLISH_REPORT.md): the relief cut by its own drainage, a rocky shore broken
+    # at every scale with a wave-cut bench under it, and the lone hills warped out of their round caps.
+    coast_noise=15.0, coast_fine=6.0, coast_waves=0.45, bench=7.0, hill_warp=38.0, gully_passes=0,
+    erosion=dict(passes=14, k=0.42, m=0.5, head=230.0, creep=1.0, floor=2.0, floor_area=4000.0, limit=6.0, soften=9.0),
     coast=[
         (150, 96, "c", 22), (250, 70, "c", 22), (340, 112, "r"), (410, 146, "g"), (500, 112, "r"), (600, 90, "c", 24),
         (720, 140, "c", 28), (830, 230, "c", 28), (900, 340, "c", 24), (872, 424, "r"), (930, 500, "c", 20), (936, 600, "r"),
@@ -72,7 +76,8 @@ CONCEPT = dict(
     ],
     hills=[(420, 190, 10, 100), (150, 590, 18, 90), (140, 170, 20, 100), (500, 250, 9, 80), (600, 840, 6, 70)],
     rivers=[
-        dict(name="Veil", side=0.30, pts=[
+        # open_head: the valley is cut right up to the mere, or the creek's first metres run in a slot (seen in the lab)
+        dict(name="Veil", side=0.30, open_head=True, pts=[
             # 1.8 m of water and more everywhere: deep enough to swim (10.1: from 1.3 m), and for the water's own colour
             (256, 180, -1.8, 6, 40, 1.8), (292, 222, -1.9, 6, 44, 1.9), (296, 268, -2.0, 7, 50, 2.0), (340, 300, -2.1, 8, 56, 2.1),
             (366, 348, -2.2, 10, 62, 2.2), (430, 430, -2.4, 12, 70, 2.4),
@@ -92,8 +97,9 @@ CONCEPT = dict(
     stamps=[
         dict(name="Meadows 28", at=(400, 300), size=420, rot=30, amp=5.0),
         dict(name="Tuscany Rolling Hills 05", at=(470, 850), size=380, rot=25, amp=4.0),
-        dict(name="Layered Rocks 15", at=(800, 400), size=320, rot=100, amp=10.0, mask=False),
-        dict(name="Rough Cliffs 18", at=(200, 150), size=260, rot=200, amp=9.0),
+        # Halved in the polish of 2026-11-14: at 9-10 m these two stood as teeth and a quarry face (seen in the lab).
+        dict(name="Layered Rocks 15", at=(800, 400), size=320, rot=100, amp=5.0, mask=False),
+        dict(name="Rough Cliffs 18", at=(200, 150), size=260, rot=200, amp=4.0),
         dict(name="Talus Rock Clusters 19", at=(240, 790), size=170, rot=40, amp=7.0, stage="post"),
         dict(name="Rock Shapes 22", at=(904, 440), size=120, rot=10, amp=7.0, stage="post", mask=False),
     ],

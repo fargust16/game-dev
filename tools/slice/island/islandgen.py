@@ -480,7 +480,7 @@ def build_land(C, log=print):
     small = np.zeros(len(line))
     for _ in range(5):
         small += np.sin(int(total / rng.uniform(26.0, 72.0)) * phase + rng.random() * 6.283)
-    line = line + normal * (wobble * attr["rag"] * 1.5 + small * hard * 1.3)[:, None]
+    line = line + normal * ((wobble * attr["rag"] * 1.5 + small * hard * 1.3) * C.get("coast_waves", 1.0))[:, None]
     coast = np.vstack([line, line[:1]])
     F["coast"] = line
     land = poly_mask(line, AX, AX)
@@ -494,6 +494,20 @@ def build_land(C, log=print):
     def at_coast(key):
         return np.interp(s, arc_full, np.append(attr[key], attr[key][0]))
 
+    # A rocky shore is broken at every scale: the waterline is moved by a noise of 6-48 m where the shore is rock or
+    # cliff, so it has points, clefts and skerries, and by a little on shingle; sand, marsh and quays keep their line.
+    ragged = C.get("coast_noise", 0.0)
+    if ragged > 0:
+        signed = np.where(land, dist, -dist)
+        hard_at = blur(np.clip(at_coast("is_r") + at_coast("is_c"), 0, 1) + 0.25 * at_coast("is_g"), 24.0)
+        teeth = fbm(GX, GY, 48.0, seed + 81, 4, gain=0.6) + 0.5 * fbm(GX, GY, 150.0, seed + 83, 2)
+        # and by a finer one of 3-13 m on rock and cliff alone: clefts, ledges and stacks at the walker's scale
+        fine_teeth = C.get("coast_fine", 0.0) * fbm(GX, GY, 13.0, seed + 85, 3, gain=0.65) * blur(np.clip(at_coast("is_r") + at_coast("is_c"), 0, 1), 24.0)
+        signed = signed + ragged * hard_at * teeth + fine_teeth
+        land = signed > 0
+        for islet in C.get("islets", []):
+            land |= poly_mask(catmull(islet, True, 10), AX, AX)
+        dist = np.abs(signed)
     dl = np.where(land, dist, 0.0)
     ds = np.where(land, 0.0, dist)
     # The nearest shore point changes abruptly across a headland's axis, so what is read from it is smoothed.
@@ -515,8 +529,12 @@ def build_land(C, log=print):
         height, width = np.interp(rs, seg, rp[:, 2]), np.interp(rs, seg, rp[:, 3])
         t = np.clip(d / width, 0.0, 1.0)
         acc += (height * (np.exp(-2.4 * t * t) - math.exp(-2.4)) / (1 - math.exp(-2.4))) ** p
+    # A hill on its own is warped further than a ridge, or it stands as a round cap.
+    hill_warp = C.get("hill_warp", 0.0)
+    hwx = wx + hill_warp * fbm(GX, GY, 120.0, seed + 13, 3)
+    hwy = wy + hill_warp * fbm(GX, GY, 120.0, seed + 15, 3)
     for hx, hy, hh, hr in C.get("hills", []):
-        t = np.clip(np.hypot(wx - hx, wy - hy) / hr, 0.0, 1.0)
+        t = np.clip(np.hypot(hwx - hx, hwy - hy) / hr, 0.0, 1.0)
         acc += (hh * (np.exp(-2.4 * t * t) - math.exp(-2.4)) / (1 - math.exp(-2.4))) ** p
     acc += (np.maximum(lift, 0.0) * np.exp(-dl / C.get("lift_reach", 110.0))) ** p
     high = acc ** (1.0 / p)
@@ -546,14 +564,63 @@ def build_land(C, log=print):
                           np.where(beyond < 3.0, bed + (floor - bed) * smoothstep(0, 3.0, beyond),
                                    floor + side * np.maximum(d - fw / 2, 0.0)))
         # The river's own end fades in over its first metres, so a source is a hollow, not a wall.
-        reach = smoothstep(0.0, 60.0, rs) if not r.get("tributary") else 1.0
+        reach = smoothstep(0.0, 60.0, rs) if not (r.get("tributary") or r.get("open_head")) else 1.0
         H = np.where(reach > 0, smin(H, valley + (1 - reach) * 40.0, 3.0), H)
         rivers.append(dict(name=r.get("name", ""), line=rp, d=d, cw=cw, bed=bed, water=water, depth=depth, s=rs, dry=r.get("dry", False)))
     F["rivers"] = rivers
 
     # The shore: the inland ground brought down to the waterline over the shore type's ramp.
-    ramp = smoothstep(0.0, 1.0, dl / W)
-    H = H * ramp + 0.35 * smoothstep(0, 6, dl)
+    # Under rock and cliff the sea has cut a bench: a few metres of low rock before the face rises.
+    bench = C.get("bench", 0.0) * blur(np.clip(at_coast("is_r") + at_coast("is_c"), 0, 1), 24.0) * (0.35 + 0.65 * (0.5 + 0.5 * fbm(GX, GY, 38.0, seed + 87, 3)))
+    ramp = smoothstep(0.0, 1.0, (dl - bench) / W)
+    H = H * ramp + 0.35 * smoothstep(0, 6, dl) + 0.5 * smoothstep(0.0, 1.0, bench / 3.0) * smoothstep(0, 4, dl)
+
+    def platforms(ground):
+        """Built ground: each district's frame a level or gently tilted platform with an apron, then the pads."""
+        on = np.zeros_like(ground)
+        for D in C.get("districts", []):
+            sd, u, v = rect_sdf(GX, GY, D.origin, D.angle, D.U, D.V)
+            plane = D.level + D.tilt[0] * (u - D.U / 2) + D.tilt[1] * (v - D.V / 2)
+            ground = ground + (plane - ground) * smoothstep(D.apron, 0.0, sd)
+            on = np.maximum(on, (sd <= 0) * 1.0)
+        for pad in C.get("pads", []):
+            poly = np.array(pad["poly"], float)
+            inside = poly_mask(poly, AX, AX)
+            d, _ = dist_field(np.vstack([poly, poly[:1]]))
+            ground = ground + (pad["level"] - ground) * np.where(inside, 1.0, smoothstep(pad.get("apron", 12.0), 0.0, d))
+            on = np.maximum(on, inside * 1.0)
+        return ground, on
+
+    # Erosion: the land cut by the water it gathers (islanderode.py). The sea and the tidal water are its base level.
+    # The city's platforms stand before the water runs, as ground it cannot cut, so the valleys find their way round
+    # the town and are not dammed by it afterwards.
+    F["flow"] = np.zeros_like(H)
+    if C.get("erosion"):
+        import islanderode
+        tidal = np.zeros(H.shape, bool)
+        for r in rivers:
+            if not r["dry"]:
+                tidal |= r["d"] <= r["cw"] / 2 + 0.5
+        # A little unevenness of 30 m first, so that water on an even slope winds and does not rule lines.
+        H = H + 0.5 * fbm(GX, GY, 30.0, seed + 95, 3) * smoothstep(10, 40, dl)
+        H, town = platforms(H)
+        base_level = (~land) | tidal | (H <= 0.05)
+        # Rock resists unevenly, and most where the coast is cliff: harder ground stands as steps and knolls.
+        resist = np.exp(0.9 * fbm(GX, GY, 110.0, seed + 91, 3) + 0.5 * fbm(GX, GY, 34.0, seed + 93, 2)) * (1.0 + 1.5 * smoothstep(60.0, 0.0, dl) * F["is_c"])
+        resist = resist * (1.0 + 60.0 * blur(town, 8.0))
+        # The water works on a grid of about 2 m whatever the height map's own, so a quick look and the scene's map
+        # are cut alike; what it cut is then laid on the full grid.
+        sub = max(1, int(round(2.0 / STEP)))
+        small = (slice(None, None, sub), slice(None, None, sub))
+        uneven = lambda p: 1.6 * fbm(GX[small], GY[small], 70.0, seed + 300 + p, 2) + 0.5 * fbm(GX[small], GY[small], 22.0, seed + 340 + p, 2)
+        cut_to, flow, cut = islanderode.erode(H[small], base_level[small], STEP * sub, C["erosion"], resist[small], uneven, log)
+        change = islanderode.resize(cut_to - np.where(base_level[small], np.maximum(H[small], 0.0), H[small]), N)
+        # A valley's sides lie back: what was cut is spread over some metres, so a combe is a soft trough in turf
+        # and not a slot with rock walls.
+        if C["erosion"].get("soften", 0.0) > 0:
+            change = np.minimum(blur(change, C["erosion"]["soften"]), 0.35 * change)
+        H = np.where(base_level, H, np.maximum(H + change, np.minimum(H, 0.3)))
+        F["flow"], F["cut"] = islanderode.resize(flow, N), islanderode.resize(cut, N)
 
     # Gullies: water gathers down the steepest way and cuts where it gathers, so slopes carry drainage lines and
     # not a noise pattern. Two passes; beaches and built ground are left out later by the platforms.
@@ -564,6 +631,10 @@ def build_land(C, log=print):
         H = H - cut
         F["gully"] += cut
 
+    if C.get("erosion"):
+        # Where over a quarter of a hectare gathers, a stream bed shows: the stones of the surface rule lie there.
+        F["gully"] = np.maximum(F["gully"], 2.0 * blur(smoothstep(1500.0, 5000.0, F["flow"]) * land, 3.0 * STEP) * smoothstep(8, 30, dl))
+
     for st in C.get("stamps", []):
         if st.get("stage") == "post":
             H = apply_stamp(H, st, land)
@@ -571,20 +642,7 @@ def build_land(C, log=print):
     # Built ground: each district's frame is a level platform (or a gently tilted one) with an apron, then pads for
     # the squares and parks between frames, then the roads benched into the slope.
     F["natural"] = H.copy()
-    built = np.zeros_like(H)
-    for D in C.get("districts", []):
-        sd, u, v = rect_sdf(GX, GY, D.origin, D.angle, D.U, D.V)
-        plane = D.level + D.tilt[0] * (u - D.U / 2) + D.tilt[1] * (v - D.V / 2)
-        m = smoothstep(D.apron, 0.0, sd)
-        H = H + (plane - H) * m
-        built = np.maximum(built, (sd <= 0) * 1.0)
-    for pad in C.get("pads", []):
-        poly = np.array(pad["poly"], float)
-        inside = poly_mask(poly, AX, AX)
-        d, _ = dist_field(np.vstack([poly, poly[:1]]))
-        m = np.where(inside, 1.0, smoothstep(pad.get("apron", 12.0), 0.0, d))
-        H = H + (pad["level"] - H) * m
-        built = np.maximum(built, inside * 1.0)
+    H, built = platforms(H)
     F["built"] = built
     soft = blur(H, 30.0)
     roadmask = np.zeros_like(H)
@@ -601,6 +659,9 @@ def build_land(C, log=print):
             F["road_soft"] = np.maximum(F["road_soft"], smoothstep(half + 2.0, half * 0.6, d) * (1 - built))
         road["line"] = rp
     F["roadmask"] = roadmask
+    if C.get("erosion"):
+        # What a road's bench or a platform's apron has dammed is filled level: made ground, not a dry pond.
+        H = islanderode.fill(H, (~land) | (H <= 0.05), built > 0.5)
 
     # Water: the channels cut into whatever stands beside them, so a quay or an embankment meets the water upright;
     # then harbour basins, and the sea bed beyond the shore.

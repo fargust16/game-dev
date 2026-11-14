@@ -1,10 +1,10 @@
 # MicroSplat and StampIT — Research for the Veilmouth Island Overhaul
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft
 
-Last Updated: 2026-11-13 (first version: what the three installed packages do, what they cannot do, and how the overhaul will use them)
+Last Updated: 2026-11-14 (§9: what the terrain polish found in Core, its extension points, its hybrid blend and a trap of Sync. Earlier: 2026-11-13, first version: what the three installed packages do, what they cannot do, and how the overhaul will use them)
 
 Depends On:
 [CURRENT_WORLD_AUDIT.md](CURRENT_WORLD_AUDIT.md), [AGENTS.md](../../../AGENTS.md), [VEILMOUTH_CITY_PLAN.md](../../Assets/Plans/VEILMOUTH_CITY_PLAN.md)
@@ -352,3 +352,16 @@ The questions that the research and the audit cannot settle are put to the owner
 5. Where the natural surfaces' PBR textures come from: the project holds none with height, occlusion and roughness.
 6. Whether MicroSplat's generated shader and arrays stay out of git.
 7. When the owner's editor is closed, so that the batch runs can begin.
+
+---
+
+# 9. Found during the terrain polish, 2026-11-14
+
+Read in the source and then run on Unity 6000.6.8f1 with URP 17.6.0 ([TERRAIN_POLISH_REPORT.md](TERRAIN_POLISH_REPORT.md) §2).
+
+- **Core can be extended by the project.** The compiler makes one instance of every `FeatureDescriptor` it finds by reflection in any loaded assembly, calls its `WriteProperties`, `WritePerMaterialCBuffer`, `WriteSharedFunctions` and `WriteFunctions`, and then its `OnPostGeneration` on the finished shader text (*source*: `CORE/Editor/MicroSplatShaderGUI_Compiler.cs:244-283, 359-399, 566-571`). A keyword it does not know is still written as a `#define` in every pass (`WriteDefines`, :348-353). `Assets/Scripts/Editor/VeilmouthTerrainVariation.cs` is such a module (*run*: 8 passes, no shader error).
+- **Every array read goes through two macros**, `MICROSPLAT_SAMPLE_DIFFUSE` and `MICROSPLAT_SAMPLE_NORMAL` (*source*: `Fragments/microsplat_shared.txt:1205-1214`). With `_USEGRADMIP` their third argument is the pair of screen derivatives. A module that changes how textures are read needs to change only these.
+- **The Anti-Tiling module's calls are in Core's body under that module's keywords** (`_DISTANCERESAMPLE`, `_DETAILNOISE`, `_ANTITILEARRAY*`; *source*: `Fragments/microsplat_terrain_body.txt:1021, 1232, 1251`). The project's module does not use those keywords or names.
+- **`_HYBRIDHEIGHTBLEND` is Core's own**: the layers blend by their height maps near the eye and plainly by their weights from `_HybridHeightBlendDistance` (*source*: `Fragments/microsplat_terrain_body.txt` at the height blend; *run*).
+- **A trap: `MicroSplatTerrain.Sync` keeps the shader.** Where the terrain already wears MicroSplat's material instance, `Sync` copies the template's properties onto it and leaves its shader (*source*: `CORE/MicroSplatTerrain.cs:216-219`). A terrain given another template with another shader goes on drawing with the old shader, with no message. Set `terrain.materialTemplate = null` before `Sync` (*run*: the tiling lab's first comparison showed seven ways alike for this reason).
+- **The editor's frame counters read nothing** for a camera rendered by hand in batch mode: `UnityStats` and the profiler's recorders gave 0 (*run*).

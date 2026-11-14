@@ -29,7 +29,7 @@ public static class VeilmouthIslandLab
     private const string SplatFolder = DataFolder + "/MicroSplatData";
     private const string WaterMaterial = "Assets/Settings/Water/OverworldWater.mat";
     private const string FallbackTerrainMaterial = "Assets/Settings/OverworldTerrain.mat";
-    private const string RenderLoop = "_MSRENDERLOOP_UNITYURP6P3";
+    internal const string RenderLoop = "_MSRENDERLOOP_UNITYURP6P3";
     private const float Size = 1000f, Budget = 100f, SeaLevel = 24f, Ocean = 8000f;
 
     [System.Serializable]
@@ -164,7 +164,7 @@ public static class VeilmouthIslandLab
     }
 
     /// <summary>Normal maps as normal maps, the grey maps linear, every map at its 2K: set once, so a second run imports nothing.</summary>
-    private static void ImportTextures(string[] sets)
+    internal static void ImportTextures(string[] sets)
     {
         foreach (var set in sets)
         {
@@ -193,7 +193,7 @@ public static class VeilmouthIslandLab
     }
 
     /// <summary>The island's own terrain layers, one for each surface, made once; the Overworld's are not touched.</summary>
-    private static TerrainLayer[] Layers(string[] sets)
+    internal static TerrainLayer[] Layers(string[] sets)
     {
         Directory.CreateDirectory(LayerFolder);
         AssetDatabase.Refresh();
@@ -317,15 +317,50 @@ public static class VeilmouthIslandLab
         AssetDatabase.DeleteAsset(SplatFolder);
         Directory.CreateDirectory(SplatFolder);
         AssetDatabase.Refresh();
+        var config = Arrays(SplatFolder, sets, layers);
+        var material = Splat(SplatFolder, "VeilmouthIsland", Variation, sets, config, Size);
+        var loop = Attach(terrain, material);
+        var words = MicroSplatUtilities.FindOrCreateKeywords(material);
 
-        var keywords = new[]
+        var report = new StringBuilder();
+        report.AppendLine($"render loop: {loop} (wanted {RenderLoop})");
+        report.AppendLine($"shader: {material.shader.name}, supported {material.shader.isSupported}, passes {material.passCount}");
+        report.AppendLine($"arrays: diffuse {Describe(config.diffuseArray)}, normalSAO {Describe(config.normalSAOArray)}");
+        report.AppendLine($"terrain layers after sync: {string.Join(", ", terrain.terrainData.terrainLayers.Select(l => l == null ? "null" : l.name))}");
+        report.AppendLine($"keywords: {string.Join(" ", words.keywords)}");
+        foreach (var message in ShaderUtil.GetShaderMessages(material.shader))
         {
-            "_MICROSPLAT", "_MICROTERRAIN", "_BRANCHSAMPLES", "_BRANCHSAMPLESAGR", "_USEGRADMIP", RenderLoop,
-            "_MAX12TEXTURES", "_PERTEXUVSCALEOFFSET", "_PERTEXTINT",
-        };
-        var material = MicroSplatShaderGUI.NewShaderAndMaterial(SplatFolder, "VeilmouthIsland", keywords);
-        material.enableInstancing = true;
+            report.AppendLine($"shader message [{message.severity}] {message.message} ({message.file}:{message.line})");
+        }
 
+        Directory.CreateDirectory("Logs/IslandLab");
+        File.WriteAllText("Logs/IslandLab/microsplat.txt", report.ToString());
+        Debug.Log("[IslandLab] MicroSplat\n" + report);
+        if (loop != RenderLoop)
+        {
+            throw new System.InvalidOperationException("MicroSplat compiled for " + loop);
+        }
+    }
+
+    /// <summary>
+    /// What the island's material takes against a texture's repeat, from the project's own module
+    /// (<see cref="VeilmouthTerrainVariation"/>; TERRAIN_POLISH_REPORT.md §2): the macro variation and the distance
+    /// resampling. The stochastic read was measured and is not taken.
+    /// </summary>
+    internal static readonly string[] Variation = { "_HYBRIDHEIGHTBLEND", VeilmouthTerrainVariation.Macro, VeilmouthTerrainVariation.Stochastic };
+
+    /// <summary>
+    /// The sets with no form larger than a hand and no patches of tone: turf, woodland floor, litter, mud. These alone
+    /// take the stochastic read; bare earth and sand were tried and showed the honeycomb from 60 m up (2026-11-14).
+    /// </summary>
+    private static readonly HashSet<string> FineGrained = new HashSet<string>
+    {
+        "grass_ground", "forest_ground_04", "forest_leaves_03", "brown_mud_03",
+    };
+
+    /// <summary>The two packed arrays of the surfaces' texture sets, 2048 px unless -islandArrays1k is given.</summary>
+    internal static TextureArrayConfig Arrays(string folder, string[] sets, TerrainLayer[] layers)
+    {
         var config = ScriptableObject.CreateInstance<TextureArrayConfig>();
         for (var i = 0; i < sets.Length; i++)
         {
@@ -348,17 +383,64 @@ public static class VeilmouthIslandLab
         config.defaultTextureSettings.normalSettings.textureSize = size;
         config.defaultTextureSettings.diffuseSettings.Aniso = 4;
         config.defaultTextureSettings.normalSettings.Aniso = 4;
-        AssetDatabase.CreateAsset(config, SplatFolder + "/MicroSplatConfig.asset");
+        AssetDatabase.CreateAsset(config, folder + "/MicroSplatConfig.asset");
         AssetDatabase.SaveAssets();
         TextureArrayConfigEditor.CompileConfig(config);
+        return config;
+    }
+
+    /// <summary>
+    /// A MicroSplat shader and material in a folder of its own, over arrays already packed: Core's keywords and the
+    /// given ones, each surface at its tile on a terrain of the given size (m), and its tint.
+    /// </summary>
+    internal static Material Splat(string folder, string name, string[] extra, string[] sets, TextureArrayConfig config, float terrainSize)
+    {
+        var keywords = new[]
+        {
+            "_MICROSPLAT", "_MICROTERRAIN", "_BRANCHSAMPLES", "_BRANCHSAMPLESAGR", "_USEGRADMIP", RenderLoop,
+            "_MAX12TEXTURES", "_PERTEXUVSCALEOFFSET", "_PERTEXTINT",
+        }.Concat(extra).ToArray();
+        var material = MicroSplatShaderGUI.NewShaderAndMaterial(folder, name, keywords);
+        material.enableInstancing = true;
+        if (material.HasProperty("_HybridHeightBlendDistance"))
+        {
+            // Core's hybrid blend: by the height maps under the walker, plainly by the weights from 140 m off.
+            material.SetFloat("_HybridHeightBlendDistance", 140f);
+        }
+
+        if (material.HasProperty("_VeilLayers"))
+        {
+            // The stochastic read takes the fine-grained sets alone: on a set with forms of its own size (stones,
+            // rock faces) the patches' honeycomb shows (seen in the tiling lab, 2026-11-14).
+            // A trial's switches: -veilAlso set,set adds sets to the stochastic read, -veilSharpness n sets how sharply
+            // its patches meet (the default 7; lower is softer and reads more patches a pixel).
+            var args = System.Environment.GetCommandLineArgs();
+            var also = System.Array.IndexOf(args, "-veilAlso");
+            var extraSets = also >= 0 && also + 1 < args.Length ? args[also + 1].Split(',') : new string[0];
+            var mask = 0;
+            for (var i = 0; i < sets.Length; i++)
+            {
+                mask |= FineGrained.Contains(sets[i]) || extraSets.Contains(sets[i]) ? 1 << i : 0;
+            }
+
+            material.SetFloat("_VeilLayers", mask);
+            var sharp = System.Array.IndexOf(args, "-veilSharpness");
+            if (sharp >= 0 && sharp + 1 < args.Length && material.HasProperty("_VeilTiling"))
+            {
+                var tiling = material.GetVector("_VeilTiling");
+                tiling.y = float.Parse(args[sharp + 1], System.Globalization.CultureInfo.InvariantCulture);
+                material.SetVector("_VeilTiling", tiling);
+            }
+        }
+
         material.SetTexture("_Diffuse", config.diffuseArray);
         material.SetTexture("_NormalSAO", config.normalSAOArray);
 
-        var prop = MicroSplatShaderGUI.FindOrCreatePropTex(material);
+        var prop =MicroSplatShaderGUI.FindOrCreatePropTex(material);
         material.SetVector("_UVScale", new Vector4(1f, 1f, 0f, 0f));
         for (var i = 0; i < prop.maxTextures; i++)
         {
-            var repeats = i < sets.Length ? Mathf.Round(Size / Tile[sets[i]]) : 1f;
+            var repeats = i < sets.Length ? Mathf.Round(terrainSize / Tile[sets[i]]) : 1f;
             prop.SetValue(i, MicroSplatPropData.PerTexVector2.SplatUVScale, new Vector2(repeats, repeats));
             prop.SetValue(i, MicroSplatPropData.PerTexVector2.SplatUVOffset, Vector2.zero);
         }
@@ -371,8 +453,12 @@ public static class VeilmouthIslandLab
         prop.SetValue(0, 15, Color.white); // each row's "set" mark, or the material's GUI writes its defaults over it
         prop.SetValue(1, 15, Color.white);
         EditorUtility.SetDirty(prop);
+        return material;
+    }
 
-        var words = MicroSplatUtilities.FindOrCreateKeywords(material);
+    /// <summary>The material on a terrain: MicroSplat's component, the shader compiled for it, and the adapter it was compiled for.</summary>
+    internal static string Attach(Terrain terrain, Material material)
+    {
         var splat = terrain.GetComponent<MicroSplatTerrain>();
         if (splat == null)
         {
@@ -380,37 +466,17 @@ public static class VeilmouthIslandLab
         }
 
         splat.templateMaterial = material;
-        splat.propData = prop;
-        splat.keywordSO = words;
+        splat.propData = MicroSplatShaderGUI.FindOrCreatePropTex(material);
+        splat.keywordSO = MicroSplatUtilities.FindOrCreateKeywords(material);
         EditorUtility.SetDirty(splat);
-
         var compiler = new MicroSplatShaderGUI.MicroSplatCompiler();
         compiler.Compile(material);
-        var loop = compiler.renderLoop == null ? "none" : compiler.renderLoop.GetRenderLoopKeyword();
         MicroSplatTerrain.SyncAll();
         AssetDatabase.SaveAssets();
-
-        var report = new StringBuilder();
-        report.AppendLine($"render loop: {loop} (wanted {RenderLoop})");
-        report.AppendLine($"shader: {material.shader.name}, supported {material.shader.isSupported}, passes {material.passCount}");
-        report.AppendLine($"arrays: diffuse {Describe(config.diffuseArray)}, normalSAO {Describe(config.normalSAOArray)}");
-        report.AppendLine($"terrain layers after sync: {string.Join(", ", terrain.terrainData.terrainLayers.Select(l => l == null ? "null" : l.name))}");
-        report.AppendLine($"keywords: {string.Join(" ", words.keywords)}");
-        foreach (var message in ShaderUtil.GetShaderMessages(material.shader))
-        {
-            report.AppendLine($"shader message [{message.severity}] {message.message} ({message.file}:{message.line})");
-        }
-
-        Directory.CreateDirectory("Logs/IslandLab");
-        File.WriteAllText("Logs/IslandLab/microsplat.txt", report.ToString());
-        Debug.Log("[IslandLab] MicroSplat\n" + report);
-        if (loop != RenderLoop)
-        {
-            throw new System.InvalidOperationException("MicroSplat compiled for " + loop);
-        }
+        return compiler.renderLoop == null ? "none" : compiler.renderLoop.GetRenderLoopKeyword();
     }
 
-    private static string Describe(Texture2DArray array) =>
+    internal static string Describe(Texture2DArray array) =>
         array == null ? "MISSING" : $"{array.width} px x {array.depth} ({array.format})";
 
     // ----------------------------------------------------------------------------------------------- views
@@ -466,6 +532,7 @@ public static class VeilmouthIslandLab
             shot.Apply();
             RenderTexture.active = null;
             File.WriteAllBytes($"Logs/IslandLab/{name}.png", shot.EncodeToPNG());
+            File.WriteAllBytes($"Logs/IslandLab/{name}.jpg", shot.EncodeToJPG(90));
         }
 
         camera.targetTexture = null;

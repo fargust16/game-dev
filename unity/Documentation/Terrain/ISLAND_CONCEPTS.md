@@ -1,16 +1,16 @@
 # Veilmouth Island and City — Constraint Reassessment and Three Concepts
 
-Version: 0.1
+Version: 0.3
 
-Status: Draft — waits for the owner's choice of a concept (Phase 3)
+Status: Draft — the owner chose concept B (§8); its ground was polished and waits for the owner's review before the city is rebuilt (§11)
 
-Last Updated: 2026-11-14 (first version: the constraints reassessed after the owner's new direction, the turns a district may take measured on the Combat Grid, and three concepts with plans, height maps and 3D previews)
+Last Updated: 2026-11-14 (§11: the terrain polish and where its report is. Earlier: §8 to §10, the owner's choice of B, B worked out, and its ground in the engine. Earlier: first version: the constraints reassessed after the owner's new direction, the turns a district may take measured on the Combat Grid, and three concepts with plans, height maps and 3D previews)
 
 Depends On:
 [CURRENT_WORLD_AUDIT.md](CURRENT_WORLD_AUDIT.md), [MICROSPLAT_STAMPIT_RESEARCH.md](MICROSPLAT_STAMPIT_RESEARCH.md), [VEILMOUTH_CITY_PLAN.md](../../Assets/Plans/VEILMOUTH_CITY_PLAN.md), [SLICE_MODULAR_KIT_STANDARD.md](../../Assets/Plans/SLICE_MODULAR_KIT_STANDARD.md)
 
 Referenced By:
-[99 Open Questions](../../../99%20Open%20Questions.md) VS-ISLAND
+[99 Open Questions](../../../99%20Open%20Questions.md) VS-ISLAND, [TERRAIN_POLISH_REPORT.md](TERRAIN_POLISH_REPORT.md)
 
 ---
 
@@ -328,3 +328,20 @@ The approved ground was laid on a terrain of its own in a lab scene (`VeilmouthI
 **Not measured yet:** the frame. The lab holds a terrain and a sea; `FrameProbe` is run when the city stands on the ground, against the table in the audit (§7 there).
 
 **The scene's source data** is written by `ISLAND_N=1025 python tools/slice/island/build.py b --export` into `Assets/Data/Slice/Island/`: the heights at the terrain's own 1025 samples, and the weights of eleven surfaces at 1024, painted by rule from the finished relief (`islandexport.py`). Share of the land: grass 43 %, forest floor 25 %, leaf litter 8 %, mud 6 %, sand 5 %, rock 4 %, earth 3 %, gravel 2 %, rocky shore 2 %, river stones 1 %, mossy rock 1 %.
+
+---
+
+# 11. The polish of the ground, 2026-11-14
+
+Before the city is rebuilt the owner asked for a stage of polish: the relief's naturalness, the textures' repeat, trial plots of living cover, the water's edge, and what each costs. Its result is [TERRAIN_POLISH_REPORT.md](TERRAIN_POLISH_REPORT.md), and it waits for the owner's review. The city is not rebuilt, and the production scene is untouched.
+
+What it changed in concept B, all in the generator:
+
+- The land is cut by the water it gathers (`tools/slice/island/islanderode.py`): no closed hollows, valleys with their heads and tributaries, combes on the ridges.
+- The rocky shore is broken at two scales and has a wave-cut bench; sand, marsh and quays keep their line.
+- The lone hills are warped out of their round caps; two stamps are halved; the creek's valley reaches the mere.
+- The surfaces mix a rougher turf into the meadow and lay damp ground where water gathers; sand lies only on the strip the sea reaches.
+
+§10's three faults stand as follows. The repeat over turf and woodland floor is gone, by the project's own MicroSplat module (`VeilmouthTerrainVariation`); over sand, bare earth and gravel it remains. Steep faces still stretch the texture. The water's stepped line is its foam band, and with the foam off the shore is clean.
+
+The engine's views in `Concepts/B/` (§10) are of the ground before this stage; the plan, the elevation and the height map there are the planner's and show it after. The engine's views after it are in `Polish/Island/`.
