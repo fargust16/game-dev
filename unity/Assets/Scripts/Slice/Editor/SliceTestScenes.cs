@@ -202,8 +202,11 @@ namespace GameDev.Slice.EditorTools
         /// <summary>The scene's name as SceneManager knows it.</summary>
         public static string SceneName(string scenePath) => System.IO.Path.GetFileNameWithoutExtension(scenePath);
 
-        /// <summary>The player, the camera behind them, a clock, and the HUD, so a scene also plays when opened alone.</summary>
-        internal static void AddPlayerRig(Vector3 spawn)
+        /// <summary>
+        /// The player, the camera behind them, a clock, and the HUD, so a scene also plays when opened alone; and the
+        /// slice's world, unless the scene is one the world's places are not yet moved to (the island's lab, IC6).
+        /// </summary>
+        internal static void AddPlayerRig(Vector3 spawn, bool world = true)
         {
             var player = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath));
             player.transform.position = spawn;
@@ -224,7 +227,10 @@ namespace GameDev.Slice.EditorTools
             document.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(HudPath);
             hud.AddComponent<HudView>();
 
-            SliceWorldSetup.AddWorld();
+            if (world)
+            {
+                SliceWorldSetup.AddWorld();
+            }
         }
 
         /// <summary>The slice's one panel: Unity's default runtime theme, scaled from 1920 × 1080 (authoring default).</summary>

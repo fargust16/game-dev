@@ -1,10 +1,10 @@
 # AGENTS.md — Agent Operating Rules
 
-Version: 2.22
+Version: 2.23
 
 Status: Draft
 
-Last Updated: 2026-11-14 (Island redesign: concept B and its polished ground accepted, the city's rebuild authorised; Slice terrain material: way H; Island woodland a task of its own)
+Last Updated: 2026-11-14 (World polish before gameplay: the owner's brief after walking the island's city; no gameplay is moved until it is done)
 
 Depends On:
 [000 Project Rules](000%20Project%20Rules.md), [001 Documentation Standards](001%20Documentation%20Standards.md), [002 AI Collaboration Guide](002%20AI%20Collaboration%20Guide.md)
@@ -432,6 +432,7 @@ An entry marked † is the short binding form. Its full text is in [91 Agent Dec
 - **Tuning page** (owner, 2026-11-12; [ANIMATION_PIPELINE_PLAN.md](unity/Assets/Plans/ANIMATION_PIPELINE_PLAN.md) §14): every value of feel the owner may want to turn goes on `SliceTuning` (`Assets/Resources/SliceTuning.asset`, GameDev → Slice → Tuning), grouped by what it does, named in Russian with a tooltip, read through `SliceTuning.Current` where it is used; never a new such value hidden in code or a prefab.
 - † **Island redesign** (owner, 2026-11-14; [ISLAND_CONCEPTS.md](unity/Documentation/Terrain/ISLAND_CONCEPTS.md), [TERRAIN_POLISH_REPORT.md](unity/Documentation/Terrain/TERRAIN_POLISH_REPORT.md), [99](99%20Open%20Questions.md) VS-ISLAND): the slice's land is concept B, the Valley: a natural island in open ocean, its relief cut by its own drainage, the Veil tidal for its whole length. The city is rebuilt on it, about 146 kit buildings in districts turned to 0°, 26.6°, 45° or 63.4°, and must sit in the relief, never on bare rectangular platforms. Work is on the branch `island-redesign`; the production scene changes only after a duplicate has passed.
 - † **Slice terrain material** (owner, 2026-11-14; [TERRAIN_POLISH_REPORT.md](unity/Documentation/Terrain/TERRAIN_POLISH_REPORT.md) §6): the Veilmouth slice's terrain alone is drawn by MicroSplat, Core and the URP 6.3 adapter with the project's own module `VeilmouthTerrainVariation`, no bought module: macro variation everywhere, the stochastic read on fine-grained sets only, never on stones, rock, sand, bare earth or the city's paving. The sea wears the slice's own material, foam off. Materials are checked by day and by night. The Overworld keeps URP TerrainLit.
+- † **World polish before gameplay** (owner, 2026-11-14; [ISLAND_WORLD_AUDIT.md](unity/Assets/Plans/ISLAND_WORLD_AUDIT.md)): the island's city as built is not accepted, and its correction blocks everything after it. No gameplay is moved to the island until the work is done and checked by the owner's walk. A fault of geometry is removed at its cause in the system that builds the world, never covered by a prop, a stretched texture or a box. The town is one designed whole on one designed ground, with one network of streets that the bridges are part of, built densely with no accidental void; the count of buildings follows the ground, and 135 to 150 is no longer a limit. A result is judged by eye in Unity from a walker's height in several districts, not by a build that ends without error.
 - **Island woodland** (owner, 2026-11-14): a task of its own, after the city: forest trees of five kinds (tall old, broadleaf, conifer if the island's climate suits, young growth, dead), drawn instanced with far LODs at a natural density, with few unique models. A wood never reads as a park or an avenue.
 - **Colour space** (owner, 2026-11-08; [99 Open Questions](99%20Open%20Questions.md) VS-COLOR): the project renders in **Linear**. Materials, light and grades are tuned for Linear; never return to Gamma or tune a value for it.
 - **Localization** (owner, 2026-11-09; [17](17%20Game%20Systems%20Architecture.md) X.7): every player-facing string, lines, names and UI alike, is a key in the project's string tables with its Russian and English text; no player-facing literal in code, scenes or data assets. A new language is a new column, never new code.

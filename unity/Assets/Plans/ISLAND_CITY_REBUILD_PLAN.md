@@ -1,10 +1,10 @@
 # Veilmouth on the Island — the City's Rebuild
 
-Version: 0.3
+Version: 0.4
 
-Status: Draft — the rebuild is authorised by the owner (2026-11-14); this plan is the agent's, and its stages are built in order
+Status: Draft — stopped at IC5 by the owner's walk of 2026-11-14: the layout is not accepted, and the world is corrected by [ISLAND_WORLD_AUDIT.md](ISLAND_WORLD_AUDIT.md) before any stage here goes on
 
-Last Updated: 2026-11-14 (§8: IC5's first part built: the town's walls and gates, quays with stairs, retaining walls, bridges, the pier, garden plots at the town's edge, the hamlet, the lighthouse and the dress passes; what the owner is asked to judge before IC6. Earlier: §3 and §8: IC3 and IC4 built, the five districts stand in the lab scene; the builder's frame is a slip, not a current frame under the primitives. Earlier: first version: the way of building, the map of what must change, the stages)
+Last Updated: 2026-11-14 (§8: the owner's walk; the layout not accepted, gameplay stopped, the audit ordered; IC6.1's rig kept for walking. Earlier: §8: IC5's first part built: the town's walls and gates, quays with stairs, retaining walls, bridges, the pier, garden plots at the town's edge, the hamlet, the lighthouse and the dress passes; what the owner is asked to judge before IC6. Earlier: §3 and §8: IC3 and IC4 built, the five districts stand in the lab scene; the builder's frame is a slip, not a current frame under the primitives. Earlier: first version: the way of building, the map of what must change, the stages)
 
 Depends On:
 [ISLAND_CONCEPTS.md](../../Documentation/Terrain/ISLAND_CONCEPTS.md), [TERRAIN_POLISH_REPORT.md](../../Documentation/Terrain/TERRAIN_POLISH_REPORT.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §28–§29, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md) §1, [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md) R4–R5, [91 Agent Decision Record](../../../91%20Agent%20Decision%20Record.md) *Island redesign*
@@ -214,3 +214,10 @@ In `tools/slice/island/islandgen.py` (`fit_surface`, `frame_edges`, `platforms`)
 2. **The walls.** A wall of 6 m round a town of this size is a strong line in the land. It is plain stone with a coping; its dress (plinth, pilasters, the gatehouses) follows C5's.
 3. **The low ground at the Beck's mouth** (0.8 m over the tide at the Beck Bridge) reads as a tidal flat in the town's middle.
 
+## The owner's walk, and what stops (2026-11-14)
+
+The agent put IC5's layout to the owner on views from the air and recommended accepting it; the owner answered yes, and then walked the city in the lab scene. **The walk withdrew the acceptance.** The owner's brief of the same day, *World and environment polish*, makes the correction of the world a blocking stage before any gameplay: the town reads as separate districts joined afterwards, with slots between houses, joins that do not close, platforms at different heights, bridges and roads apart from the streets, voids in the town, walls that step and break off, and boxes filling space.
+
+- **IC6 stops.** No place of the game is moved to the island until the world's correction is done and checked.
+- **IC6.1 is kept**, because the world is judged by walking it: `BuildIsland` ends by standing the player at the layout's start, in Lower Veil before the Black Puddle (the frame's `spawn`), with the camera, a clock and the HUD and without the slice's world (`IslandWalkRig`; `SliceTestScenes.AddPlayerRig` may now leave the world out). The lab scene keeps its ambient light as a probe of its own. To walk it: open `Assets/Scenes/Slice/Lab/IslandLab.unity` and press Play. `IslandWalkPlayTests` (PlayMode) stands the player on the ground at the start and walks the street; it has not been run yet, since the owner's editor held the project.
+- **What comes next is in [ISLAND_WORLD_AUDIT.md](ISLAND_WORLD_AUDIT.md):** the causes, by measurement, and the plan in the owner's seven stages. The stages IC6 to IC8 here wait for it; the layout they place the game on will be a new one.

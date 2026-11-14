@@ -65,6 +65,7 @@ namespace GameDev.Slice.EditorTools
             public VeilmouthLayout.PlazaSpec plaza;
             public VeilmouthLayout.Candidate[] candidates;
             public VeilmouthLayout.Cottage[] cottages;
+            public VeilmouthLayout.Point spawn;
 
             /// <summary>A tower standing alone in a frame of its own (the lighthouse); set by the builder, not read.</summary>
             [NonSerialized] public IslandPlace tower;
@@ -136,6 +137,7 @@ namespace GameDev.Slice.EditorTools
             }
 
             data.SetAlphamaps(0, 0, maps);
+            IslandWalkRig(file, scene, report);
             EditorUtility.SetDirty(data);
             AssetDatabase.SaveAssets();
             Physics.SyncTransforms();
@@ -157,6 +159,42 @@ namespace GameDev.Slice.EditorTools
             Directory.CreateDirectory("Logs/IslandCity");
             File.WriteAllText("Logs/IslandCity/report.txt", report.ToString());
             Debug.Log("[VeilmouthCity] the island\n" + report);
+        }
+
+        /// <summary>
+        /// The walkable duplicate (IC6.1): the player, the camera, a clock and the HUD at the layout's start, so the
+        /// island's city is walked in Play mode. The slice's world is not added: its places still name the old city's
+        /// points, and come with the rest of IC6.
+        /// </summary>
+        private static void IslandWalkRig(IslandFile file, UnityEngine.SceneManagement.Scene scene, StringBuilder report)
+        {
+            foreach (var old in scene.GetRootGameObjects().Where(g => g.name == "Main Camera" || g.name == "GameClock" || g.name == "HUD" ||
+                                                                      g.GetComponent<GameDev.Locomotion.PlayerLocomotion>() != null))
+            {
+                Object.DestroyImmediate(old);
+            }
+
+            // A frame read from a file always has a spawn object: the one that names a start has a point off its corner.
+            var f = file.frames.FirstOrDefault(x => x.spawn != null && (x.spawn.x != 0f || x.spawn.y != 0f));
+            if (f == null)
+            {
+                report.AppendLine("the start: NO FRAME of the layout names one; no player in the scene");
+                return;
+            }
+
+            var yaw = KitLayoutCheck.NearestMeasuredTurn(f.angle) * Mathf.Deg2Rad;
+            var plan = new Vector2(f.origin.x + (f.spawn.x * Mathf.Cos(yaw)) - (f.spawn.y * Mathf.Sin(yaw)),
+                f.origin.y + (f.spawn.x * Mathf.Sin(yaw)) + (f.spawn.y * Mathf.Cos(yaw)));
+            var at = World(plan.x, plan.y, IslandGround(plan) + 0.3f);
+            var eye = new GameObject("Main Camera") { tag = "MainCamera" };
+            var camera = eye.AddComponent<Camera>();
+            camera.farClipPlane = 3000f;
+            camera.allowHDR = true;
+            eye.AddComponent<AudioListener>();
+            UnityEngine.Rendering.Universal.CameraExtensions.GetUniversalAdditionalCameraData(camera).renderPostProcessing = true;
+            eye.transform.position = at + new Vector3(0f, 2f, -4f);
+            SliceTestScenes.AddPlayerRig(at, false);
+            report.AppendLine($"the start: {f.name}, plan ({plan.x:0.0}, {plan.y:0.0}), {at.y - 0.3f - IslandSea:0.0} m over the tide; the player, the camera, a clock and the HUD, no slice world yet");
         }
 
         private static void BuildFrame(IslandFrame f, Transform city, float[,,] maps, (int Grass, int Earth, int Setts, int Cobbles) paving, StringBuilder report)

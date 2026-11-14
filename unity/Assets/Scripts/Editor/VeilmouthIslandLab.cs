@@ -167,10 +167,10 @@ public static class VeilmouthIslandLab
         volume.sharedProfile = grade;
 
         // The slice's day, as VeilmouthSky sets it: its three ambient colours and its haze.
-        RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
         RenderSettings.ambientSkyColor = new Color(0.5f, 0.51f, 0.53f);
         RenderSettings.ambientEquatorColor = new Color(0.47f, 0.45f, 0.41f);
         RenderSettings.ambientGroundColor = new Color(0.27f, 0.24f, 0.21f);
+        SetAmbient();
         RenderSettings.fog = true;
         RenderSettings.fogMode = FogMode.Exponential;
         // The city's haze is a warm grey, which turns a far sea brown (seen in the lab); over open water it is taken
@@ -565,7 +565,21 @@ public static class VeilmouthIslandLab
         ("18_last_farthing_bridge", new Vector3(482f, 542f, 5f), new Vector3(465f, 508f, 2f), 60f),
         ("19_reek_and_south_gate", new Vector3(470f, 880f, 90f), new Vector3(545f, 760f, 0f), 55f),
         ("20_walls_from_the_north_west", new Vector3(240f, 240f, 220f), new Vector3(480f, 520f, 0f), 50f),
+        ("21_the_start_eye", new Vector3(676f, 628f, 0f), new Vector3(648f, 660f, 3f), 60f),
     };
+
+    /// <summary>
+    /// The slice's day as an ambient probe of the scene's own: the three colours' mean all round, and the sky's lead
+    /// over the ground from above. A probe given outright stands in a batch run, where a gradient's does not.
+    /// </summary>
+    private static void SetAmbient()
+    {
+        var ambient = new UnityEngine.Rendering.SphericalHarmonicsL2();
+        ambient.AddAmbientLight(new Color(0.41f, 0.40f, 0.38f));
+        ambient.AddDirectionalLight(Vector3.up, new Color(0.23f, 0.27f, 0.32f), 0.5f);
+        RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Custom;
+        RenderSettings.ambientProbe = ambient;
+    }
 
     /// <summary>Batch: the lab built again and its views taken, in one run.</summary>
     public static void BuildAndRender()
@@ -580,12 +594,8 @@ public static class VeilmouthIslandLab
         // A scene opened again has no ambient probe until its colours are set again: without this the shade stood near
         // black in the city's views (IC3). The colours are the slice's day, as Build sets them.
         // Setting the three colours again did not bring it back in a batch run (seen in IC5's views), so the probe is
-        // given outright: the three colours' mean all round, and the sky's lead over the ground from above.
-        var ambient = new UnityEngine.Rendering.SphericalHarmonicsL2();
-        ambient.AddAmbientLight(new Color(0.41f, 0.40f, 0.38f));
-        ambient.AddDirectionalLight(Vector3.up, new Color(0.23f, 0.27f, 0.32f), 0.5f);
-        RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Custom;
-        RenderSettings.ambientProbe = ambient;
+        // given outright.
+        SetAmbient();
         var terrain = Object.FindFirstObjectByType<Terrain>();
         Directory.CreateDirectory("Logs/IslandLab");
         var rig = new GameObject("Lab Camera") { hideFlags = HideFlags.HideAndDontSave };
