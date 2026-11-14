@@ -142,11 +142,23 @@ def bridge_ends(layout):
             u0, v0 = to_local(f, b["ax"], b["ay"])
             u1, v1 = to_local(f, b["bx"], b["by"])
             turn = math.degrees(math.atan2(v1 - v0, u1 - u0)) % 90
+            e = 0.05
             on = [s["id"] for s in f["streets"]
-                  if (s["axis"] == "x" and s["c0"] <= v <= s["c1"] and s["a0"] - 1 <= u <= s["a1"] + 1)
-                  or (s["axis"] == "y" and s["c0"] <= u <= s["c1"] and s["a0"] - 1 <= v <= s["a1"] + 1)]
-            out.append((b["name"], end, f["name"], outside, min(turn, 90 - turn), on))
+                  if (s["axis"] == "x" and s["c0"] - e <= v <= s["c1"] + e and s["a0"] - 1 <= u <= s["a1"] + 1)
+                  or (s["axis"] == "y" and s["c0"] - e <= u <= s["c1"] + e and s["a0"] - 1 <= v <= s["a1"] + 1)]
+            # Or on a square named for it: there the streets begin, and the bridge needs no street's line.
+            square = [p["name"] for p in layout.get("pads", []) if p["kind"] == "square" and in_polygon([(q["x"], q["y"]) for q in p["line"]], x, y)]
+            out.append((b["name"], end, f["name"], outside, 0.0 if square and not on else min(turn, 90 - turn), on + ["the square " + n for n in square]))
     return out
+
+
+def in_polygon(poly, x, y):
+    inside = False
+    for k in range(len(poly)):
+        (x0, y0), (x1, y1) = poly[k], poly[(k + 1) % len(poly)]
+        if (y0 > y) != (y1 > y) and x < x0 + (y - y0) * (x1 - x0) / (y1 - y0):
+            inside = not inside
+    return inside
 
 
 def hull_area(points):
@@ -165,8 +177,9 @@ def hull_area(points):
     return abs(sum(H[i][0] * H[(i + 1) % len(H)][1] - H[(i + 1) % len(H)][0] * H[i][1] for i in range(len(H)))) / 2
 
 
-def built(buildings):
-    return sum((r[2] - r[0]) * (r[3] - r[1]) for _, r in houses(buildings))
+def built(buildings, boxes=()):
+    """Ground under houses, and under the stone masses that stand for the works and the cathedral."""
+    return sum((r[2] - r[0]) * (r[3] - r[1]) for _, r in houses(buildings)) + sum((b["x1"] - b["x0"]) * (b["y1"] - b["y0"]) for b in boxes if b.get("material") != "cathedral")
 
 
 def town_ground():
@@ -236,7 +249,7 @@ def main():
         print("  %-15s %3d buildings; slots under %g m: %d %s; open row ends: %d; ground falls %.1f m corner to corner: %d of %d corner joins over %.2f m apart, %.2f m at most"
               % (f["name"], len(f["buildings"]), c5.PASSAGE, len(s), [(x[0], x[3] - x[2]) for x in s] if s else "", len(o), fall, len(apart), len(joins), LEVEL, top))
         print("  %-15s built %.0f m2 of %.0f m2 (%.0f %%); streets with their pavements %.0f m2 (%.0f %%)"
-              % ("", built(f["buildings"]), frame, 100 * built(f["buildings"]) / frame, streets, 100 * streets / frame))
+              % ("", built(f["buildings"], f["boxes"]), frame, 100 * built(f["buildings"], f["boxes"]) / frame, streets, 100 * streets / frame))
         all_slots, all_open, all_apart, worst = all_slots + len(s), all_open + len(o), all_apart + len(apart), max(worst, top)
     print("  in all: %d slots, %d open row ends, %d corner joins apart in level (%.2f m at most)" % (all_slots, all_open, all_apart, worst))
     fails += (all_slots > 0) + (all_open > 0) + (all_apart > 0)
@@ -252,7 +265,7 @@ def main():
 
     area = hull_area([to_plan(f, u, v) for f in town for u in (0, f["U"]) for v in (0, f["V"])])
     frames = sum(f["U"] * f["V"] for f in town)
-    total = sum(built(f["buildings"]) for f in town)
+    total = sum(built(f["buildings"], f["boxes"]) for f in town)
     print("\nThe town's extent (the hull round its districts): %.0f m2; inside a district %.0f %%; built %.1f %% of the extent, %.0f %% of the districts"
           % (area, 100 * frames / area, 100 * total / area, 100 * total / frames))
     return fails

@@ -16,19 +16,16 @@ from islandgen import District
 T = 26.565
 
 quay = District(
-    "Lower Veil", (696, 736), 225, cols=[45, 40], rows=[40, 40], border=("street", "street", "quay", "street"),
+    "Lower Veil", (696, 736), 225, cols=[45, 45, 35], rows=[40, 40], border=("street", "street", "quay", "street"),
     level=1.9, apron=10, fit=True, pin=("v0", 1.9), regrade=40, family="tenement", wealth="poor",   # the quay 1.9 m over the tide
     cells={(0, 0): {"kind": "built", "family": "warehouse"}, (1, 0): {"kind": "built", "family": "warehouse"},
            (1, 1): {"kind": "square", "singles": [("Soot & Bell", 3, 3, 15, 15, 12, "town"), ("Harrow & Tincture", 27, 3, 10, 10, 15, "shop")]}},
     label="Lower Veil and Fishlip Quay")
 
 centre = District(
-    "The Penny", (518, 554), 270 - T, cols=[40, 52, 40], rows=[45, 52], border=("street", "street", "emb", "street"),
+    "The Penny", (518, 554), 270 - T, cols=[45, 45, 40], rows=[45, 45], sx=["main", "street"], sy=["main"], border=("street", "street", "emb", "street"),
     level=4.6, apron=14, fit=True, pin=("v0", 1.9), regrade=45, family="shop", wealth="rich",   # the embankment 1.9 m over the tide
-    cells={(1, 1): {"kind": "market", "singles": [("Stone Grandad", 22, 16, 8, 8, 12, "church")]},
-           (1, 0): {"kind": "square", "singles": [("Town Hall", 11, 6, 30, 15, 19, "civic"), ("Clock tower", 3, 6, 5, 5, 30, "civic"), ("Guild hall", 11, 26, 30, 15, 15, "civic")]},
-           (0, 1): {"kind": "square", "singles": [("Assize and Wardens", 5, 5, 30, 15, 15, "civic")]},
-           (2, 1): {"kind": "built", "family": "town", "wealth": "mid"}},
+    cells={},
     label="The Penny")
 
 close = District(
@@ -40,16 +37,15 @@ close = District(
     label="Parsons' End")
 
 sleepy = District(
-    "Sleepy Quarter", (384, 394), 90 - T, cols=[40, 45, 45], rows=[40, 40], border=("street", "street", "emb", "street"),
+    "Sleepy Quarter", (384, 394), 90 - T, cols=[50, 55, 50], rows=[40, 40], border=("street", "street", "emb", "street"),
     level=4.6, tilt=(0.0, 0.03), apron=14, fit=True, pin=("v0", 1.9), regrade=45, family="town", wealth="mid",
-    cells={(0, 1): {"kind": "square", "wealth": "rich", "singles": [("Governor's House", 5, 4, 30, 15, 15, "civic"), ("Villa", 3, 23, 15, 15, 13, "villa"), ("Villa", 22, 23, 15, 15, 13, "villa")]},
-           (2, 1): {"kind": "park"}, (0, 0): {"kind": "built", "family": "town", "wealth": "rich"}},
+    cells={(1, 1): {"kind": "park"}},
     label="Sleepy Quarter")
 
 works = District(
-    "The Reek", (548, 648), 45, cols=[45, 40], rows=[40, 35], border=("works", "lane", "works", "lane"), sx=["works"], sy=["lane"],
+    "The Reek", (478, 578), 45, cols=[50, 66, 60], rows=[40, 35], border=("street", "lane", "works", "lane"), sx=["street", "street"], sy=["lane"],
     level=2.0, apron=8, fit=True, floor=1.8, regrade=35, family="low", wealth="poor",
-    cells={(0, 0): {"kind": "works"}, (1, 0): {"kind": "works", "h": 16.0}, (0, 1): {"kind": "works", "boxes": [(4, 4, 34, 31)], "h": 11.0}},
+    cells={(0, 0): {"kind": "works"}, (1, 0): {"kind": "works", "h": 16.0}, (2, 0): {"kind": "works"}, (0, 1): {"kind": "works", "boxes": [(4, 4, 34, 31)], "h": 11.0}},
     label="The Reek")
 
 mere = [(254 + 15 * math.cos(a), 178 + 12 * math.sin(a)) for a in [k * math.pi / 5 for k in range(10)]]
@@ -112,39 +108,46 @@ CONCEPT = dict(
     # the town over 60 m, a slope of 7 to 10 % that a street climbs. (A wall of 5 m toward the town was tried first
     # and stood as a platform in the town's middle.)
     town=dict(level=2.0, regrade=70.0, apron=14.0,
-              poly=[(393, 369), (253, 435), (351, 632), (453, 735), (554, 836), (647, 754), (735, 761), (820, 680), (862, 574),
-                    (856, 571), (716, 571), (716, 455), (711, 451), (652, 392), (566, 312), (430, 374)],   # round the close, not over it
+              poly=[(393, 369), (253, 435), (351, 632), (453, 735), (554, 836), (647, 754), (735, 761), (796, 668), (806, 634), (862, 574),
+                    (856, 571), (716, 571), (716, 455), (711, 451), (656, 388), (568, 302), (427, 367)],   # round the close, not over it
               terraces=[dict(name="The Close", level=7.0, regrade=70.0, foot=60.0,
                              poly=[(716, 455), (856, 455), (856, 571), (716, 571)])]),
+    # Named open ground of the town (ISLAND_WORLD_AUDIT.md 9.1): where the river's bend turns the grid, the two turns
+    # meet in a place made for it. None has ground of its own; all lie on the town's.
     pads=[
-        # Its sixth corner takes in the Beck Bridge's south end, which stood 0.2 m over the tide (IC5's first build).
-        dict(poly=[(588, 612), (612, 636), (644, 604), (630, 572), (608, 572), (592, 580)], level=2.4, kind="square", name="Bawling Wedge"),
-        dict(poly=[(722, 566), (792, 636), (850, 566)], level=8.5, apron=18, kind="park", name="Bishop's Park"),
+        # The Beck's mouth: the paved wedge between the Penny's lower side, the Veil and the Beck, where the Beck Bridge
+        # lands; its narrow upper end is a walk by the water; the far bank is a strip of green before Lower Veil.
+        dict(poly=[(522, 561), (586, 529), (600, 548), (563, 602), (552, 620)], level=2.0, kind="square", name="Bawling Wedge"),
+        dict(poly=[(586, 529), (641, 494), (635, 508), (600, 548)], level=2.0, kind="park", name="Beck Walk"),
+        dict(poly=[(576, 612), (656, 532), (650, 504), (644, 518), (606, 564), (576, 608)], level=2.0, kind="park", name="Beckside"),
+        # The bend's outer bank: the green between the Sleepy Quarter's lower side and the Reek's upper.
+        dict(poly=[(476, 577), (368, 630), (401, 655)], level=2.0, kind="park", name="Bend Green"),
+        # The foot of the cathedral's hill, on both sides of Lenten Rise: the town's park, from Lower Veil's back and the
+        # Beck's head up to the close.
+        dict(poly=[(716, 572), (856, 572), (800, 632), (786, 646), (672, 532), (656, 500), (700, 492), (716, 500)], level=2.0, kind="park", name="Bishop's Park"),
     ],
     roads=[
         dict(name="Vale Road", cls="road", pts=[(378, 386), (326, 336), (268, 294), (236, 250), (210, 270), (200, 322)]),
         dict(name="East Lane", cls="road", pts=[(452, 372), (430, 320), (390, 278), (340, 236), (300, 200)]),
         dict(name="Head path", cls="track", pts=[(258, 214), (240, 246)]),
-        dict(name="Salt Gullet", cls="main", smooth=False, pts=[(572, 530), (600, 584)]),
-        dict(name="Lenten Street", cls="side", smooth=False, pts=[(606, 450), (660, 470), (716, 486)]),
         dict(name="Spit Lane", cls="road", pts=[(700, 726), (740, 740), (800, 790), (828, 850), (822, 886)]),
         dict(name="South Road", cls="road", pts=[(545, 801), (533, 815), (528, 870), (520, 928)]),
         dict(name="West track", cls="track", pts=[(318, 524), (280, 560), (236, 580), (196, 540), (184, 476)]),
         dict(name="Ridge track", cls="track", pts=[(856, 500), (872, 440)]),
     ],
-    bridges=[dict(name="Last Farthing Bridge", a=(486, 499), b=(444, 517), w=14.0), dict(name="Grubby Bridge", a=(598, 630), b=(554, 670), w=14.0),
-             dict(name="Beck Bridge", a=(578, 544), b=(594, 574), w=22.0), dict(name="Lenten Bridge", a=(650, 466), b=(668, 474), w=17.0),
-             dict(name="Head footbridge", a=(296, 202), b=(258, 214), w=3.0)],
+    # The town's bridges are lengths of its streets and are laid by the planner (veilmouth_island_plan.py); only the
+    # footbridge at the river's head, out in the country, is drawn here.
+    bridges=[dict(name="Head footbridge", a=(296, 202), b=(258, 214), w=3.0)],
     piers=[dict(a=(650, 696), b=(634, 712), w=7.0)],
     # Drawn again round the districts as the planner laid them (IC5, 2026-11-14): each line keeps 14 m or more from a
     # district's edge, room for a back lane and the wall's foot, and joins Parsons' End at its corners, where the
     # close's own retaining wall begins. A gate stands where its road crosses its wall.
     walls=[[(393, 369), (253, 435), (351, 632), (453, 735), (554, 836), (647, 754)],
-           [(430, 374), (566, 312), (652, 392), (711, 451)],
-           [(862, 574), (820, 680), (735, 761)]],
+           [(427, 367), (568, 302), (656, 388), (711, 451)],
+           [(862, 574), (806, 634), (796, 668), (735, 761)]],
     points=[dict(at=(822, 890), kind="lighthouse", name="The One-Eye"), dict(at=(371, 379), kind="gate", name="Creaking Gate"),
             dict(at=(304, 538), kind="gate", name="West Gate"), dict(at=(533, 815), kind="gate", name="South Gate"),
-            dict(at=(449, 365), kind="gate", name="Farthing Gate"), dict(at=(749, 747), kind="gate", name="Salt Gate")],
+            dict(at=(446, 358), kind="gate", name="Farthing Gate"), dict(at=(746, 745), kind="gate", name="Salt Gate")],
     hamlets=[dict(name="Crooked Hamlet", at=(268, 294), angle=227, n=8, pitch=22.0)],
     farmland=[[(300, 304), (352, 340), (372, 378), (330, 380), (290, 340)], [(390, 270), (450, 300), (470, 350), (430, 360), (380, 300)]],
     marsh=[[(680, 790), (740, 850), (760, 925), (700, 905), (672, 840)], [(780, 800), (800, 830), (800, 870), (784, 850)],

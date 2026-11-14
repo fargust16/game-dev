@@ -1,10 +1,10 @@
 # Veilmouth on the Island — World Audit and Plan of Correction
 
-Version: 0.3
+Version: 0.4
 
 Status: Draft — the audit the owner ordered on 2026-11-14 (stage 1 of the world polish); its plan is the agent's and waits for no further approval except where §6 names the owner
 
-Last Updated: 2026-11-14 (§9: the geometry of the one network, worked out and not yet drawn. Earlier: §8: stage 2 built and checked, one ground for the town. Earlier: first version: the faults the owner's walk found, their causes by measurement, and the plan)
+Last Updated: 2026-11-14 (§10: the plan of the one network drawn, layout I2, for the owner before it is built. Earlier: §9: the geometry of the one network, worked out and not yet drawn. Earlier: §8: stage 2 built and checked, one ground for the town. Earlier: first version: the faults the owner's walk found, their causes by measurement, and the plan)
 
 Depends On:
 [ISLAND_CITY_REBUILD_PLAN.md](ISLAND_CITY_REBUILD_PLAN.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §29, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md), [ISLAND_CONCEPTS.md](../../Documentation/Terrain/ISLAND_CONCEPTS.md), [91 Agent Decision Record](../../../91%20Agent%20Decision%20Record.md) *World polish before gameplay*
@@ -199,7 +199,7 @@ In `tools/slice/island/islandgen.py` (`town_ground`, `platforms`) and `concept_b
 
 # 9. The one network: its geometry, worked out (2026-11-14)
 
-Working numbers of the agent for stages 3 and 4, from the layout I1 and the river's line. **Not drawn and not built yet;** the plan is drawn from them, checked by the audit tool, and shown to the owner before anything is built. Plan metres, x east and y south.
+Working numbers of the agent for stages 3 and 4, from the layout I1 and the river's line, as first worked out; **§10 has the plan as drawn, and where the two differ §10 governs.** Not built yet; the plan is drawn from them, checked by the audit tool, and shown to the owner before anything is built. Plan metres, x east and y south.
 
 ## 9.1 Why the districts can join
 
@@ -235,3 +235,48 @@ The Reek's origin is (478, 578) and not (476, 576): two nodes down its line the 
 - The way up to the close: a street due east from the Penny's upper side to the close's west side, about 84 m, climbing the ridge's foot at 7 to 10 %, with no row of houses on the slope.
 - The wall's line round the larger town (stage 5).
 
+---
+
+# 10. The plan of the one network, drawn: layout I2 (2026-11-14)
+
+`python tools/slice/veilmouth_island_plan.py` writes `Assets/Data/Slice/Map/VeilmouthIslandLayout.json` (version `I2`) and draws [VEILMOUTH_ISLAND_PLAN.png](VEILMOUTH_ISLAND_PLAN.png). **It is a plan: nothing of it is built in Unity yet,** and the lab scene still holds I1 on the new ground. It is put to the owner before it is built.
+
+## 10.1 What the plan is
+
+- **Two bodies of town, one on each bank, and the close above them.** On the west bank the Sleepy Quarter and the Reek meet at the river's bend; on the east the Penny and Lower Veil stand either side of the Beck. Every block of C5's rules passes; the run fails on any slot under a passage, and there is none.
+- **The market stands at a crossing,** as C5's does: Lenten Street and Salt Gullet, both main streets of 22 m, cross in the Penny, and the four blocks round the crossing each give a corner of 15 m to the square, 52 m across. The Town Hall, the Assize and the Guild Hall each fill their block's side up to the square.
+- **Three bridges, each a length of a street.** Last Farthing Bridge carries Lenten Street over the upper reach to Crows' Walk in the Sleepy Quarter: one line from the Sleepy Quarter through the market. Grubby Bridge carries Netmenders' Row over the lower reach to Grubby Street in the Reek. The Beck Bridge carries Draught Lane from Lower Veil over the Beck into the Bawling Wedge. The planner lays each from its two streets and fails if they lie more than 0.25 m apart.
+- **The way up to the close** is Lenten Rise: from the far end of Lenten Street a street of 105 m on the line (2, 1), a measured turn, climbing the ridge's foot to the close's west side, with trees and no house on the slope. So one way runs from the Sleepy Quarter over the bridge, through the market, and up to the cathedral.
+- **Named open ground, each on purpose:** the Bawling Wedge, a paved square at the Beck's mouth where the Beck Bridge lands; Beck Walk and Beckside along the Beck's two banks; Bend Green on the bend's outer bank, between the Sleepy Quarter and the Reek; Bishop's Park on the foot of the cathedral's hill, from Lower Veil's back and the Beck's head up to the close; the Quiet Whistle Garden, the Black Puddle and the works' yard inside their districts. All lie on the town's one ground. None is filled with boxes; their ground is shaped, and their dressing waits, as the owner said.
+- **No cap on the count.** I1's open yards are built round, the block of two villas is a full block with the villas at its corners, the Reek is three columns and not one and a half, and Lower Veil has a block more: **221 buildings** (185 row houses, 18 single buildings, 10 works sheds, 8 cottages), where I1 had 149.
+- **The wall** keeps its three runs for now, moved to clear the larger districts and drawn in on the east to Lower Veil and the park; its design is stage 5.
+
+## 10.2 The districts as drawn
+
+| District | Origin, turn | Columns along the river | Rows from the river | Size |
+|---|---|---|---|---|
+| Sleepy Quarter | (384, 394), 63.435° | 50, 55, 50 | 40, 40 | 203 × 120 m |
+| The Reek | (478, 578), 45° | 50, 66, 60 | 40, 35 | 222 × 109 m |
+| The Penny | (518, 554), 243.435° | 45, 45, 40 | 45, 45 | 188 × 140 m |
+| Lower Veil | (696, 736), 225° | 45, 45, 35 | 40, 40 | 173 × 119 m |
+| Parsons' End | (716, 455), 0° | 70, 40 | 56, 30 | 140 × 116 m, on the close's terrace |
+| Lenten Rise | (622, 426), 26.565° | 105 | | one street of 17 m |
+
+Against §9: the Penny's columns are 45, 45, 40 with a main street between the first two, so that the market is a crossing and not a cell; the Sleepy Quarter's are 50, 55, 50, so that Crows' Walk, at 135 m, lies on Lenten Street's line (their stations sum to 203); Lower Veil's are 45, 45, 35, the middle one widened for the Black Puddle's row (the tavern, a passage, the apothecary, a passage, a tenement), and the Reek's 50, 66, 60, so that Grubby Street, at 146 m, lies on Netmenders' Row's line (120 m; their stations sum to 266).
+
+## 10.3 Measured
+
+`python tools/slice/veilmouth_island_audit.py` ends with exit code 0: no slot, no open row end, no corner join apart in level (0 of 67), **no bridge end that continues no street (0 of 6)**. Built ground is 17.3 % of the town's extent, where I1 had 9.8 % and C5 has 17 % of the rectangle round its blocks; 64 % of the extent lies in a district, where I1 had 53 %.
+
+What the measure still shows: **streets with their pavements take 45 to 63 % of a district.** The sections are the kit's own, 12 m for a street and 22 m for the Penny's two main streets, and the blocks are C5's size, 35 to 66 m. It is the price of small blocks on full streets, and it is the same in C5.
+
+## 10.4 What is not in the plan yet
+
+- The wall's design (stage 5), and whether the wall stays.
+- The works' own buildings from the factory kit in place of the stone masses (stage 3).
+- The bridges' form: on the plan a bridge is a line and a width.
+- The frame budget with 221 buildings: measured when the plan is built (stage 7).
+
+## 10.5 For the owner
+
+The plan is the town's new shape. If it is accepted it is built next: the builder learns the market at a crossing on a turned district, the street of Lenten Rise, the bridges as streets with their own form, and the squares' paving; then the join and see-through checks, and close views in every district.

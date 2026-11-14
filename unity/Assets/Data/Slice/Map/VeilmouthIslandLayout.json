@@ -1,5 +1,5 @@
 {
- "version": "I1",
+ "version": "I2",
  "concept": "B",
  "frames": [
   {
@@ -11,7 +11,7 @@
     "y": 736
    },
    "angle": 225,
-   "U": 121.0,
+   "U": 173.0,
    "V": 119.0,
    "streets": [
     {
@@ -20,7 +20,7 @@
      "kind": "quay",
      "axis": "x",
      "a0": 3.0,
-     "a1": 118.0,
+     "a1": 170.0,
      "c0": 0.0,
      "c1": 15.0,
      "walk0": 3.0,
@@ -34,7 +34,7 @@
      "kind": "street",
      "axis": "x",
      "a0": 3.0,
-     "a1": 118.0,
+     "a1": 170.0,
      "c0": 55.0,
      "c1": 67.0,
      "walk0": 3.0,
@@ -48,7 +48,7 @@
      "kind": "street",
      "axis": "x",
      "a0": 3.0,
-     "a1": 118.0,
+     "a1": 170.0,
      "c0": 107.0,
      "c1": 119.0,
      "walk0": 3.0,
@@ -85,14 +85,28 @@
      "trees": "none"
     },
     {
+     "id": "netmenders",
+     "name": "Netmenders' Row",
+     "kind": "street",
+     "axis": "y",
+     "a0": 3.0,
+     "a1": 116.0,
+     "c0": 114.0,
+     "c1": 126.0,
+     "walk0": 3.0,
+     "walk1": 3.0,
+     "surface": "setts",
+     "trees": "none"
+    },
+    {
      "id": "gull",
      "name": "Gull Lane",
      "kind": "street",
      "axis": "y",
      "a0": 3.0,
      "a1": 116.0,
-     "c0": 109.0,
-     "c1": 121.0,
+     "c0": 161.0,
+     "c1": 173.0,
      "walk0": 3.0,
      "walk1": 3.0,
      "surface": "setts",
@@ -105,7 +119,7 @@
      "name": "Black Puddle",
      "x0": 69.0,
      "y0": 67.0,
-     "x1": 109.0,
+     "x1": 114.0,
      "y1": 92.0,
      "surface": "square"
     },
@@ -114,7 +128,7 @@
      "name": "Fishlip Quay",
      "x0": 0,
      "y0": 0,
-     "x1": 121.0,
+     "x1": 173.0,
      "y1": 15,
      "surface": "setts"
     },
@@ -131,7 +145,7 @@
    "blocks": [
     {
      "id": "LA",
-     "wealth": "poor",
+     "wealth": "middling",
      "district": "LOWER VEIL",
      "x0": 12.0,
      "y0": 15.0,
@@ -147,17 +161,33 @@
     },
     {
      "id": "LB",
-     "wealth": "middling",
+     "wealth": "poor",
      "district": "LOWER VEIL",
      "x0": 69.0,
      "y0": 15.0,
-     "x1": 109.0,
+     "x1": 114.0,
      "y1": 55.0,
      "notch": null,
      "yard": {
       "x0": 77.0,
-      "y0": 15.0,
-      "x1": 101.0,
+      "y0": 23.0,
+      "x1": 106.0,
+      "y1": 47.0
+     }
+    },
+    {
+     "id": "LE",
+     "wealth": "poor",
+     "district": "LOWER VEIL",
+     "x0": 126.0,
+     "y0": 15.0,
+     "x1": 161.0,
+     "y1": 55.0,
+     "notch": null,
+     "yard": {
+      "x0": 134.0,
+      "y0": 23.0,
+      "x1": 153.0,
       "y1": 47.0
      }
     },
@@ -178,18 +208,34 @@
      }
     },
     {
+     "id": "LF",
+     "wealth": "poor",
+     "district": "LOWER VEIL",
+     "x0": 126.0,
+     "y0": 67.0,
+     "x1": 161.0,
+     "y1": 107.0,
+     "notch": null,
+     "yard": {
+      "x0": 134.0,
+      "y0": 75.0,
+      "x1": 153.0,
+      "y1": 99.0
+     }
+    },
+    {
      "id": "LD",
      "wealth": "poor",
      "district": "LOWER VEIL",
      "x0": 69.0,
      "y0": 92.0,
-     "x1": 109.0,
+     "x1": 114.0,
      "y1": 107.0,
      "notch": null,
      "yard": {
       "x0": 69.0,
       "y0": 92.0,
-      "x1": 109.0,
+      "x1": 106.0,
       "y1": 107.0
      }
     }
@@ -197,30 +243,10 @@
    "buildings": [
     {
      "id": "",
-     "key": "Warehouse12_stock_cornerL",
+     "key": "Tenement8_brick_detached",
      "facing": "N",
      "front": 15.0,
-     "a": 12.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "LA"
-    },
-    {
-     "id": "",
-     "key": "Warehouse12_stock",
-     "facing": "N",
-     "front": 15.0,
-     "a": 27.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "LA"
-    },
-    {
-     "id": "",
-     "key": "Warehouse12_stock_cornerR",
-     "facing": "N",
-     "front": 15.0,
-     "a": 42.0,
+     "a": 47.0,
      "name": "",
      "stoop": "plain",
      "block": "LA"
@@ -287,16 +313,6 @@
     },
     {
      "id": "",
-     "key": "Tenement8_brick_cornerL",
-     "facing": "W",
-     "front": 12.0,
-     "a": 23.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "LA"
-    },
-    {
-     "id": "",
      "key": "Tenement8_poor_cornerR",
      "facing": "W",
      "front": 12.0,
@@ -306,10 +322,60 @@
      "block": "LA"
     },
     {
+     "id": "customs",
+     "key": "Civic_white",
+     "facing": "N",
+     "front": 15.0,
+     "a": 12.0,
+     "name": "The Customs House",
+     "stoop": "plain",
+     "block": "LA"
+    },
+    {
      "id": "",
-     "key": "Tenement8_brick_cornerL",
+     "key": "Warehouse12_stock_cornerL",
+     "facing": "N",
+     "front": 15.0,
+     "a": 69.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LB"
+    },
+    {
+     "id": "",
+     "key": "Warehouse12_stock",
+     "facing": "N",
+     "front": 15.0,
+     "a": 84.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LB"
+    },
+    {
+     "id": "",
+     "key": "Warehouse12_stock_cornerR",
+     "facing": "N",
+     "front": 15.0,
+     "a": 99.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LB"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_poor_cornerR",
      "facing": "E",
-     "front": 109.0,
+     "front": 114.0,
+     "a": 23.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LB"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_poor_cornerL",
+     "facing": "E",
+     "front": 114.0,
      "a": 37.0,
      "name": "",
      "stoop": "plain",
@@ -337,10 +403,30 @@
     },
     {
      "id": "",
-     "key": "Tenement12_dark_cornerL",
+     "key": "Tenement8_brick",
      "facing": "S",
      "front": 55.0,
      "a": 94.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LB"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_brick_cornerL",
+     "facing": "S",
+     "front": 55.0,
+     "a": 104.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LB"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_brick_cornerL",
+     "facing": "W",
+     "front": 69.0,
+     "a": 23.0,
      "name": "",
      "stoop": "plain",
      "block": "LB"
@@ -356,14 +442,104 @@
      "block": "LB"
     },
     {
-     "id": "customs",
-     "key": "Civic_white",
+     "id": "",
+     "key": "Warehouse12_stock_cornerL",
      "facing": "N",
      "front": 15.0,
-     "a": 74.0,
-     "name": "The Customs House",
+     "a": 126.0,
+     "name": "",
      "stoop": "plain",
-     "block": "LB"
+     "block": "LE"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_poor",
+     "facing": "N",
+     "front": 15.0,
+     "a": 141.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LE"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_brick_cornerR",
+     "facing": "N",
+     "front": 15.0,
+     "a": 151.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LE"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_brick_cornerR",
+     "facing": "E",
+     "front": 161.0,
+     "a": 23.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LE"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_brick_cornerL",
+     "facing": "E",
+     "front": 161.0,
+     "a": 37.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LE"
+    },
+    {
+     "id": "",
+     "key": "Tenement12_dark_cornerR",
+     "facing": "S",
+     "front": 55.0,
+     "a": 126.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LE"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_poor",
+     "facing": "S",
+     "front": 55.0,
+     "a": 141.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LE"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_brick_cornerL",
+     "facing": "S",
+     "front": 55.0,
+     "a": 151.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LE"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_brick_cornerL",
+     "facing": "W",
+     "front": 126.0,
+     "a": 23.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LE"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_brick_cornerR",
+     "facing": "W",
+     "front": 126.0,
+     "a": 37.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LE"
     },
     {
      "id": "",
@@ -456,6 +632,96 @@
      "block": "LC"
     },
     {
+     "id": "",
+     "key": "Tenement12_dark_cornerL",
+     "facing": "N",
+     "front": 67.0,
+     "a": 138.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LF"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_poor_cornerL",
+     "facing": "E",
+     "front": 161.0,
+     "a": 67.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LF"
+    },
+    {
+     "id": "",
+     "key": "Tenement12_dark",
+     "facing": "E",
+     "front": 161.0,
+     "a": 77.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LF"
+    },
+    {
+     "id": "",
+     "key": "Tenement12_dark_cornerR",
+     "facing": "E",
+     "front": 161.0,
+     "a": 92.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LF"
+    },
+    {
+     "id": "",
+     "key": "Tenement12_dark_cornerR",
+     "facing": "S",
+     "front": 107.0,
+     "a": 138.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LF"
+    },
+    {
+     "id": "",
+     "key": "Tenement12_dark_cornerR",
+     "facing": "W",
+     "front": 126.0,
+     "a": 67.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LF"
+    },
+    {
+     "id": "",
+     "key": "Tenement12_dark",
+     "facing": "W",
+     "front": 126.0,
+     "a": 82.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LF"
+    },
+    {
+     "id": "",
+     "key": "Tenement8_brick_cornerL",
+     "facing": "W",
+     "front": 126.0,
+     "a": 97.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LF"
+    },
+    {
+     "id": "",
+     "key": "Tenement12_dark_detached",
+     "facing": "E",
+     "front": 114.0,
+     "a": 92.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "LD"
+    },
+    {
      "id": "soot_bell",
      "key": "Tavern_brick",
      "facing": "N",
@@ -479,6 +745,14 @@
    "passages": [
     {
      "block": "LA",
+     "facing": "N",
+     "front": 15.0,
+     "a0": 42.0,
+     "a1": 47.0,
+     "depth": 8
+    },
+    {
+     "block": "LA",
      "facing": "E",
      "front": 57.0,
      "a0": 33.0,
@@ -489,15 +763,15 @@
      "block": "LA",
      "facing": "W",
      "front": 12.0,
-     "a0": 33.0,
+     "a0": 30.0,
      "a1": 37.0,
      "depth": 8
     },
     {
      "block": "LB",
      "facing": "E",
-     "front": 109.0,
-     "a0": 34.0,
+     "front": 114.0,
+     "a0": 33.0,
      "a1": 37.0,
      "depth": 8
     },
@@ -505,7 +779,23 @@
      "block": "LB",
      "facing": "W",
      "front": 69.0,
-     "a0": 34.0,
+     "a0": 33.0,
+     "a1": 37.0,
+     "depth": 8
+    },
+    {
+     "block": "LE",
+     "facing": "E",
+     "front": 161.0,
+     "a0": 33.0,
+     "a1": 37.0,
+     "depth": 8
+    },
+    {
+     "block": "LE",
+     "facing": "W",
+     "front": 126.0,
+     "a0": 33.0,
      "a1": 37.0,
      "depth": 8
     },
@@ -534,6 +824,22 @@
      "depth": 8
     },
     {
+     "block": "LF",
+     "facing": "N",
+     "front": 67.0,
+     "a0": 134.0,
+     "a1": 138.0,
+     "depth": 8
+    },
+    {
+     "block": "LF",
+     "facing": "S",
+     "front": 107.0,
+     "a0": 134.0,
+     "a1": 138.0,
+     "depth": 8
+    },
+    {
      "block": "LD",
      "facing": "N",
      "front": 92.0,
@@ -547,13 +853,13 @@
    "candidates": [
     {
      "name": "Ritual Site Candidate 1 - Black Puddle",
-     "x": 89.0,
+     "x": 91.5,
      "y": 79.5,
      "size": 26
     }
    ],
    "spawn": {
-    "x": 89.0,
+    "x": 91.5,
     "y": 58.25
    },
    "ground": {
@@ -567,50 +873,50 @@
      "kind": "bank",
      "ax": 695.3,
      "ay": 735.3,
-     "bx": 611.2,
-     "by": 651.2,
+     "bx": 574.4,
+     "by": 614.4,
      "height": 0.0,
      "top": 0.0
     },
     {
      "side": "u1",
      "kind": "bank",
-     "ax": 611.2,
-     "ay": 649.7,
-     "bx": 675.3,
-     "by": 585.5,
-     "height": 0.09,
-     "top": 0.92
+     "ax": 574.4,
+     "ay": 613.0,
+     "bx": 657.1,
+     "by": 530.2,
+     "height": 0.0,
+     "top": 0.0
     },
     {
-     "side": "u1",
-     "kind": "cut",
-     "ax": 676.8,
-     "ay": 584.1,
-     "bx": 693.9,
-     "by": 567.0,
-     "height": 2.27,
-     "top": 3.23
+     "side": "v1",
+     "kind": "bank",
+     "ax": 658.5,
+     "ay": 530.2,
+     "bx": 667.1,
+     "by": 538.8,
+     "height": 0.57,
+     "top": 0.9
     },
     {
      "side": "v1",
      "kind": "cut",
-     "ax": 695.3,
-     "ay": 567.0,
-     "bx": 743.8,
-     "by": 615.5,
-     "height": 3.42,
+     "ax": 668.5,
+     "ay": 540.2,
+     "bx": 743.9,
+     "by": 615.6,
+     "height": 3.05,
      "top": 4.72
     },
     {
      "side": "v1",
      "kind": "bank",
-     "ax": 745.2,
-     "ay": 616.9,
+     "ax": 745.3,
+     "ay": 617.0,
      "bx": 779.4,
      "by": 651.1,
      "height": 0.21,
-     "top": 0.9
+     "top": 0.89
     },
     {
      "side": "u0",
@@ -633,8 +939,8 @@
     "y": 554
    },
    "angle": 243.435,
-   "U": 180.0,
-   "V": 137.0,
+   "U": 188.0,
+   "V": 140.0,
    "streets": [
     {
      "id": "embankment",
@@ -642,7 +948,7 @@
      "kind": "embankment",
      "axis": "x",
      "a0": 3.0,
-     "a1": 177.0,
+     "a1": 185.0,
      "c0": 0.0,
      "c1": 16.0,
      "walk0": 6.0,
@@ -653,16 +959,16 @@
     {
      "id": "main_e",
      "name": "Salt Gullet",
-     "kind": "street",
+     "kind": "main",
      "axis": "x",
      "a0": 3.0,
-     "a1": 177.0,
+     "a1": 185.0,
      "c0": 61.0,
-     "c1": 73.0,
-     "walk0": 3.0,
-     "walk1": 3.0,
+     "c1": 83.0,
+     "walk0": 6.0,
+     "walk1": 6.0,
      "surface": "setts",
-     "trees": "none"
+     "trees": "both"
     },
     {
      "id": "widows",
@@ -670,9 +976,9 @@
      "kind": "street",
      "axis": "x",
      "a0": 3.0,
-     "a1": 177.0,
-     "c0": 125.0,
-     "c1": 137.0,
+     "a1": 185.0,
+     "c0": 128.0,
+     "c1": 140.0,
      "walk0": 3.0,
      "walk1": 3.0,
      "surface": "setts",
@@ -684,7 +990,7 @@
      "kind": "street",
      "axis": "y",
      "a0": 6.0,
-     "a1": 134.0,
+     "a1": 137.0,
      "c0": 0.0,
      "c1": 12.0,
      "walk0": 3.0,
@@ -695,16 +1001,16 @@
     {
      "id": "lenten",
      "name": "Lenten Street",
-     "kind": "street",
+     "kind": "main",
      "axis": "y",
      "a0": 6.0,
-     "a1": 134.0,
-     "c0": 52.0,
-     "c1": 64.0,
-     "walk0": 3.0,
-     "walk1": 3.0,
+     "a1": 137.0,
+     "c0": 57.0,
+     "c1": 79.0,
+     "walk0": 6.0,
+     "walk1": 6.0,
      "surface": "setts",
-     "trees": "none"
+     "trees": "both"
     },
     {
      "id": "smoked",
@@ -712,9 +1018,9 @@
      "kind": "street",
      "axis": "y",
      "a0": 6.0,
-     "a1": 134.0,
-     "c0": 116.0,
-     "c1": 128.0,
+     "a1": 137.0,
+     "c0": 124.0,
+     "c1": 136.0,
      "walk0": 3.0,
      "walk1": 3.0,
      "surface": "setts",
@@ -726,9 +1032,9 @@
      "kind": "street",
      "axis": "y",
      "a0": 6.0,
-     "a1": 134.0,
-     "c0": 168.0,
-     "c1": 180.0,
+     "a1": 137.0,
+     "c0": 176.0,
+     "c1": 188.0,
      "walk0": 3.0,
      "walk1": 3.0,
      "surface": "setts",
@@ -739,10 +1045,10 @@
     {
      "id": "penny",
      "name": "The Penny",
-     "x0": 64.0,
-     "y0": 73.0,
-     "x1": 116.0,
-     "y1": 125.0,
+     "x0": 42.0,
+     "y0": 46.0,
+     "x1": 94.0,
+     "y1": 98.0,
      "surface": "square"
     }
    ],
@@ -753,13 +1059,18 @@
      "district": "THE PENNY",
      "x0": 12.0,
      "y0": 16.0,
-     "x1": 52.0,
+     "x1": 57.0,
      "y1": 61.0,
-     "notch": null,
+     "notch": {
+      "x0": 42.0,
+      "y0": 46.0,
+      "x1": 57.0,
+      "y1": 61.0
+     },
      "yard": {
       "x0": 22.0,
       "y0": 26.0,
-      "x1": 42.0,
+      "x1": 47.0,
       "y1": 51.0
      }
     },
@@ -767,31 +1078,36 @@
      "id": "PB",
      "wealth": "rich",
      "district": "THE PENNY",
-     "x0": 64.0,
+     "x0": 79.0,
      "y0": 16.0,
-     "x1": 116.0,
+     "x1": 124.0,
      "y1": 61.0,
-     "notch": null,
-     "yard": {
-      "x0": 74.0,
-      "y0": 26.0,
-      "x1": 106.0,
+     "notch": {
+      "x0": 79.0,
+      "y0": 46.0,
+      "x1": 94.0,
       "y1": 61.0
+     },
+     "yard": {
+      "x0": 89.0,
+      "y0": 26.0,
+      "x1": 114.0,
+      "y1": 51.0
      }
     },
     {
      "id": "PC",
      "wealth": "middling",
      "district": "THE PENNY",
-     "x0": 128.0,
+     "x0": 136.0,
      "y0": 16.0,
-     "x1": 168.0,
+     "x1": 176.0,
      "y1": 61.0,
      "notch": null,
      "yard": {
-      "x0": 138.0,
+      "x0": 146.0,
       "y0": 26.0,
-      "x1": 168.0,
+      "x1": 166.0,
       "y1": 51.0
      }
     },
@@ -800,31 +1116,57 @@
      "wealth": "rich",
      "district": "THE PENNY",
      "x0": 12.0,
-     "y0": 73.0,
-     "x1": 52.0,
-     "y1": 125.0,
-     "notch": null,
+     "y0": 83.0,
+     "x1": 57.0,
+     "y1": 128.0,
+     "notch": {
+      "x0": 42.0,
+      "y0": 83.0,
+      "x1": 57.0,
+      "y1": 98.0
+     },
      "yard": {
       "x0": 22.0,
-      "y0": 83.0,
-      "x1": 52.0,
-      "y1": 115.0
+      "y0": 93.0,
+      "x1": 47.0,
+      "y1": 118.0
      }
     },
     {
      "id": "PF",
      "wealth": "middling",
      "district": "THE PENNY",
-     "x0": 128.0,
-     "y0": 73.0,
-     "x1": 168.0,
-     "y1": 125.0,
+     "x0": 79.0,
+     "y0": 83.0,
+     "x1": 124.0,
+     "y1": 128.0,
+     "notch": {
+      "x0": 79.0,
+      "y0": 83.0,
+      "x1": 94.0,
+      "y1": 98.0
+     },
+     "yard": {
+      "x0": 89.0,
+      "y0": 93.0,
+      "x1": 114.0,
+      "y1": 118.0
+     }
+    },
+    {
+     "id": "PE",
+     "wealth": "middling",
+     "district": "THE PENNY",
+     "x0": 136.0,
+     "y0": 83.0,
+     "x1": 176.0,
+     "y1": 128.0,
      "notch": null,
      "yard": {
-      "x0": 128.0,
-      "y0": 83.0,
-      "x1": 158.0,
-      "y1": 115.0
+      "x0": 146.0,
+      "y0": 93.0,
+      "x1": 166.0,
+      "y1": 118.0
      }
     }
    ],
@@ -841,7 +1183,7 @@
     },
     {
      "id": "",
-     "key": "Terrace12_brick",
+     "key": "Terrace8_brick",
      "facing": "N",
      "front": 16.0,
      "a": 22.0,
@@ -851,19 +1193,29 @@
     },
     {
      "id": "",
-     "key": "Terrace12_stock_cornerR",
+     "key": "Terrace12_stock",
      "facing": "N",
      "front": 16.0,
-     "a": 37.0,
+     "a": 32.0,
      "name": "",
      "stoop": "plain",
      "block": "PA"
     },
     {
      "id": "",
-     "key": "ShopTown8_dark",
+     "key": "Shop8_stucco_cornerL",
      "facing": "E",
-     "front": 52.0,
+     "front": 57.0,
+     "a": 16.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PA"
+    },
+    {
+     "id": "",
+     "key": "Shop8_stucco",
+     "facing": "E",
+     "front": 57.0,
      "a": 26.0,
      "name": "",
      "stoop": "plain",
@@ -871,100 +1223,70 @@
     },
     {
      "id": "",
-     "key": "Terrace12_brick",
-     "facing": "E",
-     "front": 52.0,
-     "a": 36.0,
+     "key": "Shop12_rich_detached",
+     "facing": "S",
+     "front": 46.0,
+     "a": 42.0,
      "name": "",
      "stoop": "plain",
      "block": "PA"
     },
     {
      "id": "",
-     "key": "Shop8_stucco_cornerR",
-     "facing": "S",
-     "front": 61.0,
-     "a": 27.0,
+     "key": "Terrace12_stock_cornerL",
+     "facing": "W",
+     "front": 12.0,
+     "a": 26.0,
      "name": "",
      "stoop": "plain",
      "block": "PA"
     },
     {
-     "id": "",
-     "key": "Shop12_rich_cornerL",
+     "id": "town_hall",
+     "key": "Civic_rich",
      "facing": "S",
      "front": 61.0,
-     "a": 37.0,
-     "name": "",
+     "a": 12.0,
+     "name": "The Town Hall",
      "stoop": "plain",
      "block": "PA"
+    },
+    {
+     "id": "clock_tower",
+     "key": "Tower6_white",
+     "facing": "N",
+     "front": 39.5,
+     "a": 24.5,
+     "name": "The clock tower",
+     "stoop": "plain",
+     "block": "PA"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark",
+     "facing": "N",
+     "front": 16.0,
+     "a": 89.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PB"
     },
     {
      "id": "",
      "key": "Terrace12_stock",
-     "facing": "W",
-     "front": 12.0,
-     "a": 26.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PA"
-    },
-    {
-     "id": "",
-     "key": "ShopTown8_dark",
-     "facing": "W",
-     "front": 12.0,
-     "a": 41.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PA"
-    },
-    {
-     "id": "",
-     "key": "Terrace8_brick_cornerL",
-     "facing": "W",
-     "front": 12.0,
-     "a": 51.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PA"
-    },
-    {
-     "id": "",
-     "key": "Shop8_stucco_cornerL",
      "facing": "N",
      "front": 16.0,
-     "a": 64.0,
+     "a": 99.0,
      "name": "",
      "stoop": "plain",
      "block": "PB"
     },
     {
      "id": "",
-     "key": "Shop12_rich_cornerR",
+     "key": "Terrace8_brick_cornerR",
      "facing": "N",
      "front": 16.0,
-     "a": 74.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PB"
-    },
-    {
-     "id": "",
-     "key": "Shop8_stucco_cornerL",
-     "facing": "N",
-     "front": 16.0,
-     "a": 96.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PB"
-    },
-    {
-     "id": "",
-     "key": "Shop8_stucco_cornerR",
-     "facing": "N",
-     "front": 16.0,
-     "a": 106.0,
+     "a": 114.0,
      "name": "",
      "stoop": "plain",
      "block": "PB"
@@ -973,7 +1295,7 @@
      "id": "",
      "key": "Terrace12_brick_cornerR",
      "facing": "E",
-     "front": 116.0,
+     "front": 124.0,
      "a": 26.0,
      "name": "",
      "stoop": "plain",
@@ -981,31 +1303,41 @@
     },
     {
      "id": "",
-     "key": "Terrace12_brick_cornerL",
+     "key": "Shop12_rich_detached",
+     "facing": "S",
+     "front": 46.0,
+     "a": 79.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PB"
+    },
+    {
+     "id": "",
+     "key": "Shop8_brick_cornerR",
      "facing": "W",
-     "front": 64.0,
+     "front": 79.0,
+     "a": 16.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PB"
+    },
+    {
+     "id": "",
+     "key": "Shop8_brick",
+     "facing": "W",
+     "front": 79.0,
      "a": 26.0,
      "name": "",
      "stoop": "plain",
      "block": "PB"
     },
     {
-     "id": "town_hall",
-     "key": "Civic_rich",
+     "id": "assize",
+     "key": "Civic_stucco",
      "facing": "S",
      "front": 61.0,
-     "a": 75.0,
-     "name": "The Town Hall",
-     "stoop": "plain",
-     "block": "PB"
-    },
-    {
-     "id": "clock_tower",
-     "key": "Tower6_white",
-     "facing": "N",
-     "front": 39.5,
-     "a": 85.5,
-     "name": "The clock tower",
+     "a": 94.0,
+     "name": "The Assize and the Wardens' station",
      "stoop": "plain",
      "block": "PB"
     },
@@ -1014,7 +1346,7 @@
      "key": "ShopTown8_dark_cornerL",
      "facing": "N",
      "front": 16.0,
-     "a": 128.0,
+     "a": 136.0,
      "name": "",
      "stoop": "plain",
      "block": "PC"
@@ -1024,7 +1356,7 @@
      "key": "Terrace12_stock",
      "facing": "N",
      "front": 16.0,
-     "a": 138.0,
+     "a": 146.0,
      "name": "",
      "stoop": "plain",
      "block": "PC"
@@ -1034,17 +1366,47 @@
      "key": "Terrace12_stock_cornerR",
      "facing": "N",
      "front": 16.0,
-     "a": 153.0,
+     "a": 161.0,
      "name": "",
      "stoop": "plain",
      "block": "PC"
     },
     {
      "id": "",
-     "key": "Shop8_brick_cornerR",
+     "key": "ShopTown8_dark_cornerR",
+     "facing": "E",
+     "front": 176.0,
+     "a": 26.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PC"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_stock_cornerL",
+     "facing": "E",
+     "front": 176.0,
+     "a": 41.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PC"
+    },
+    {
+     "id": "",
+     "key": "Shop12_rich_cornerR",
      "facing": "S",
      "front": 61.0,
-     "a": 143.0,
+     "a": 136.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PC"
+    },
+    {
+     "id": "",
+     "key": "Shop8_stucco",
+     "facing": "S",
+     "front": 61.0,
+     "a": 151.0,
      "name": "",
      "stoop": "plain",
      "block": "PC"
@@ -1054,7 +1416,17 @@
      "key": "Shop12_rich_cornerL",
      "facing": "S",
      "front": 61.0,
-     "a": 153.0,
+     "a": 161.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PC"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_brick",
+     "facing": "W",
+     "front": 136.0,
+     "a": 26.0,
      "name": "",
      "stoop": "plain",
      "block": "PC"
@@ -1063,28 +1435,8 @@
      "id": "",
      "key": "Terrace12_brick",
      "facing": "W",
-     "front": 128.0,
-     "a": 26.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PC"
-    },
-    {
-     "id": "",
-     "key": "Terrace8_stock",
-     "facing": "W",
-     "front": 128.0,
-     "a": 41.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PC"
-    },
-    {
-     "id": "",
-     "key": "ShopTown8_dark_cornerL",
-     "facing": "W",
-     "front": 128.0,
-     "a": 51.0,
+     "front": 136.0,
+     "a": 36.0,
      "name": "",
      "stoop": "plain",
      "block": "PC"
@@ -1093,7 +1445,7 @@
      "id": "",
      "key": "Shop8_brick_cornerL",
      "facing": "N",
-     "front": 73.0,
+     "front": 83.0,
      "a": 12.0,
      "name": "",
      "stoop": "plain",
@@ -1101,9 +1453,9 @@
     },
     {
      "id": "",
-     "key": "Shop8_brick_cornerR",
+     "key": "Shop8_brick",
      "facing": "N",
-     "front": 73.0,
+     "front": 83.0,
      "a": 22.0,
      "name": "",
      "stoop": "plain",
@@ -1111,110 +1463,160 @@
     },
     {
      "id": "",
-     "key": "ShopTown8_dark_cornerL",
+     "key": "Shop12_rich_detached",
+     "facing": "E",
+     "front": 42.0,
+     "a": 83.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PD"
+    },
+    {
+     "id": "",
+     "key": "Shop12_rich_detached",
+     "facing": "N",
+     "front": 98.0,
+     "a": 42.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PD"
+    },
+    {
+     "id": "",
+     "key": "Shop8_brick",
+     "facing": "E",
+     "front": 57.0,
+     "a": 108.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PD"
+    },
+    {
+     "id": "",
+     "key": "Shop8_stucco_cornerR",
+     "facing": "E",
+     "front": 57.0,
+     "a": 118.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PD"
+    },
+    {
+     "id": "",
+     "key": "Terrace12_stock",
      "facing": "S",
-     "front": 125.0,
+     "front": 128.0,
      "a": 22.0,
      "name": "",
      "stoop": "plain",
      "block": "PD"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_stock",
+     "facing": "S",
+     "front": 128.0,
+     "a": 37.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PD"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_stock_cornerL",
+     "facing": "W",
+     "front": 12.0,
+     "a": 93.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PD"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark_cornerR",
+     "facing": "W",
+     "front": 12.0,
+     "a": 108.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PD"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_brick_cornerL",
+     "facing": "W",
+     "front": 12.0,
+     "a": 118.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PD"
+    },
+    {
+     "id": "",
+     "key": "Shop12_rich_detached",
+     "facing": "N",
+     "front": 98.0,
+     "a": 79.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PF"
     },
     {
      "id": "",
      "key": "Terrace12_brick_cornerL",
-     "facing": "W",
-     "front": 12.0,
-     "a": 83.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PD"
-    },
-    {
-     "id": "",
-     "key": "Terrace8_brick_cornerR",
-     "facing": "W",
-     "front": 12.0,
-     "a": 105.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PD"
-    },
-    {
-     "id": "",
-     "key": "ShopTown8_dark_cornerL",
-     "facing": "W",
-     "front": 12.0,
-     "a": 115.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PD"
-    },
-    {
-     "id": "assize",
-     "key": "Civic_stucco",
      "facing": "E",
-     "front": 52.0,
-     "a": 84.0,
-     "name": "The Assize and the Wardens' station",
-     "stoop": "plain",
-     "block": "PD"
-    },
-    {
-     "id": "",
-     "key": "Shop8_stucco_cornerL",
-     "facing": "N",
-     "front": 73.0,
-     "a": 148.0,
+     "front": 124.0,
+     "a": 103.0,
      "name": "",
      "stoop": "plain",
      "block": "PF"
     },
     {
      "id": "",
-     "key": "Shop8_brick_cornerR",
-     "facing": "N",
-     "front": 73.0,
-     "a": 158.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PF"
-    },
-    {
-     "id": "",
-     "key": "Terrace12_brick_cornerR",
-     "facing": "E",
-     "front": 168.0,
-     "a": 83.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PF"
-    },
-    {
-     "id": "",
-     "key": "ShopTown8_dark_cornerL",
-     "facing": "E",
-     "front": 168.0,
-     "a": 105.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "PF"
-    },
-    {
-     "id": "",
-     "key": "Terrace8_brick_cornerR",
+     "key": "Terrace8_brick",
      "facing": "S",
-     "front": 125.0,
-     "a": 148.0,
+     "front": 128.0,
+     "a": 89.0,
      "name": "",
      "stoop": "plain",
      "block": "PF"
     },
     {
      "id": "",
-     "key": "ShopTown8_dark_cornerL",
+     "key": "ShopTown8_dark",
      "facing": "S",
-     "front": 125.0,
-     "a": 158.0,
+     "front": 128.0,
+     "a": 99.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PF"
+    },
+    {
+     "id": "",
+     "key": "Terrace12_stock_cornerL",
+     "facing": "S",
+     "front": 128.0,
+     "a": 109.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PF"
+    },
+    {
+     "id": "",
+     "key": "Shop8_brick",
+     "facing": "W",
+     "front": 79.0,
+     "a": 108.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PF"
+    },
+    {
+     "id": "",
+     "key": "Shop8_brick_cornerL",
+     "facing": "W",
+     "front": 79.0,
+     "a": 118.0,
      "name": "",
      "stoop": "plain",
      "block": "PF"
@@ -1222,108 +1624,178 @@
     {
      "id": "guild_hall",
      "key": "Civic_white",
-     "facing": "W",
-     "front": 128.0,
-     "a": 84.0,
+     "facing": "N",
+     "front": 83.0,
+     "a": 94.0,
      "name": "The Guild Hall",
      "stoop": "plain",
      "block": "PF"
+    },
+    {
+     "id": "",
+     "key": "Shop12_rich_cornerL",
+     "facing": "N",
+     "front": 83.0,
+     "a": 136.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PE"
+    },
+    {
+     "id": "",
+     "key": "Shop12_rich",
+     "facing": "N",
+     "front": 83.0,
+     "a": 151.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PE"
+    },
+    {
+     "id": "",
+     "key": "Shop8_stucco_cornerR",
+     "facing": "N",
+     "front": 83.0,
+     "a": 166.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PE"
+    },
+    {
+     "id": "",
+     "key": "Terrace12_brick",
+     "facing": "E",
+     "front": 176.0,
+     "a": 93.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PE"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_stock",
+     "facing": "E",
+     "front": 176.0,
+     "a": 108.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PE"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark",
+     "facing": "S",
+     "front": 128.0,
+     "a": 146.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PE"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_stock",
+     "facing": "S",
+     "front": 128.0,
+     "a": 156.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PE"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark_cornerL",
+     "facing": "S",
+     "front": 128.0,
+     "a": 166.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PE"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark_cornerL",
+     "facing": "W",
+     "front": 136.0,
+     "a": 93.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PE"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_brick_cornerR",
+     "facing": "W",
+     "front": 136.0,
+     "a": 108.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PE"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark_cornerL",
+     "facing": "W",
+     "front": 136.0,
+     "a": 118.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "PE"
     }
    ],
    "passages": [
     {
      "block": "PA",
-     "facing": "S",
-     "front": 61.0,
-     "a0": 22.0,
-     "a1": 27.0,
-     "depth": 10
-    },
-    {
-     "block": "PB",
-     "facing": "N",
-     "front": 16.0,
-     "a0": 89.0,
-     "a1": 96.0,
+     "facing": "W",
+     "front": 12.0,
+     "a0": 41.0,
+     "a1": 46.0,
      "depth": 10
     },
     {
      "block": "PB",
      "facing": "E",
-     "front": 116.0,
+     "front": 124.0,
      "a0": 41.0,
-     "a1": 42.0,
-     "depth": 10
-    },
-    {
-     "block": "PB",
-     "facing": "W",
-     "front": 64.0,
-     "a0": 41.0,
-     "a1": 42.0,
+     "a1": 46.0,
      "depth": 10
     },
     {
      "block": "PC",
-     "facing": "S",
-     "front": 61.0,
-     "a0": 138.0,
-     "a1": 143.0,
-     "depth": 10
-    },
-    {
-     "block": "PD",
-     "facing": "N",
-     "front": 73.0,
-     "a0": 32.0,
-     "a1": 33.0,
-     "depth": 10
-    },
-    {
-     "block": "PD",
-     "facing": "S",
-     "front": 125.0,
-     "a0": 32.0,
-     "a1": 33.0,
+     "facing": "E",
+     "front": 176.0,
+     "a0": 36.0,
+     "a1": 41.0,
      "depth": 10
     },
     {
      "block": "PD",
      "facing": "W",
      "front": 12.0,
-     "a0": 98.0,
-     "a1": 105.0,
-     "depth": 10
-    },
-    {
-     "block": "PF",
-     "facing": "N",
-     "front": 73.0,
-     "a0": 147.0,
-     "a1": 148.0,
+     "a0": 103.0,
+     "a1": 108.0,
      "depth": 10
     },
     {
      "block": "PF",
      "facing": "E",
-     "front": 168.0,
+     "front": 124.0,
      "a0": 98.0,
-     "a1": 105.0,
+     "a1": 103.0,
      "depth": 10
     },
     {
-     "block": "PF",
-     "facing": "S",
-     "front": 125.0,
-     "a0": 147.0,
-     "a1": 148.0,
+     "block": "PE",
+     "facing": "W",
+     "front": 136.0,
+     "a0": 103.0,
+     "a1": 108.0,
      "depth": 10
     }
    ],
    "boxes": [],
    "plaza": {
-    "cx": 90.0,
-    "cy": 99.0,
+    "cx": 68.0,
+    "cy": 72.0,
     "half": 26.0,
     "ringOuter": 21.0,
     "ringInner": 13.0,
@@ -1351,38 +1823,38 @@
      "kind": "bank",
      "ax": 517.6,
      "ay": 553.1,
-     "bx": 437.9,
-     "by": 393.9,
+     "bx": 434.4,
+     "by": 386.7,
      "height": 0.0,
      "top": 0.0
     },
     {
      "side": "u1",
      "kind": "bank",
-     "ax": 438.4,
-     "ay": 392.6,
-     "bx": 559.1,
-     "by": 332.2,
+     "ax": 434.8,
+     "ay": 385.4,
+     "bx": 558.2,
+     "by": 323.7,
      "height": 0.0,
      "top": 0.0
     },
     {
      "side": "v1",
      "kind": "bank",
-     "ax": 560.5,
-     "ay": 332.6,
-     "bx": 640.1,
-     "by": 491.8,
+     "ax": 559.6,
+     "ay": 324.1,
+     "bx": 642.8,
+     "by": 490.5,
      "height": 0.0,
      "top": 0.0
     },
     {
      "side": "u0",
      "kind": "bank",
-     "ax": 639.6,
-     "ay": 493.2,
+     "ax": 642.3,
+     "ay": 491.8,
      "bx": 518.9,
-     "by": 553.5,
+     "by": 553.6,
      "height": 0.0,
      "top": 0.0
     }
@@ -1881,7 +2353,7 @@
     "y": 394
    },
    "angle": 63.435,
-   "U": 178.0,
+   "U": 203.0,
    "V": 120.0,
    "streets": [
     {
@@ -1890,7 +2362,7 @@
      "kind": "embankment",
      "axis": "x",
      "a0": 3.0,
-     "a1": 175.0,
+     "a1": 200.0,
      "c0": 0.0,
      "c1": 16.0,
      "walk0": 6.0,
@@ -1904,7 +2376,7 @@
      "kind": "street",
      "axis": "x",
      "a0": 3.0,
-     "a1": 175.0,
+     "a1": 200.0,
      "c0": 56.0,
      "c1": 68.0,
      "walk0": 3.0,
@@ -1918,7 +2390,7 @@
      "kind": "street",
      "axis": "x",
      "a0": 3.0,
-     "a1": 175.0,
+     "a1": 200.0,
      "c0": 108.0,
      "c1": 120.0,
      "walk0": 3.0,
@@ -1947,8 +2419,8 @@
      "axis": "y",
      "a0": 6.0,
      "a1": 117.0,
-     "c0": 52.0,
-     "c1": 64.0,
+     "c0": 62.0,
+     "c1": 74.0,
      "walk0": 3.0,
      "walk1": 3.0,
      "surface": "setts",
@@ -1961,8 +2433,8 @@
      "axis": "y",
      "a0": 6.0,
      "a1": 117.0,
-     "c0": 109.0,
-     "c1": 121.0,
+     "c0": 129.0,
+     "c1": 141.0,
      "walk0": 3.0,
      "walk1": 3.0,
      "surface": "setts",
@@ -1975,8 +2447,8 @@
      "axis": "y",
      "a0": 6.0,
      "a1": 117.0,
-     "c0": 166.0,
-     "c1": 178.0,
+     "c0": 191.0,
+     "c1": 203.0,
      "walk0": 3.0,
      "walk1": 3.0,
      "surface": "setts",
@@ -1987,9 +2459,9 @@
     {
      "id": "quiet",
      "name": "Quiet Whistle Garden",
-     "x0": 121.0,
+     "x0": 74.0,
      "y0": 68.0,
-     "x1": 166.0,
+     "x1": 129.0,
      "y1": 108.0,
      "surface": "grass"
     }
@@ -2001,13 +2473,13 @@
      "district": "SLEEPY QUARTER",
      "x0": 12.0,
      "y0": 16.0,
-     "x1": 52.0,
+     "x1": 62.0,
      "y1": 56.0,
      "notch": null,
      "yard": {
       "x0": 22.0,
       "y0": 26.0,
-      "x1": 42.0,
+      "x1": 52.0,
       "y1": 46.0
      }
     },
@@ -2015,15 +2487,15 @@
      "id": "SB",
      "wealth": "middling",
      "district": "SLEEPY QUARTER",
-     "x0": 64.0,
+     "x0": 74.0,
      "y0": 16.0,
-     "x1": 109.0,
+     "x1": 129.0,
      "y1": 56.0,
      "notch": null,
      "yard": {
-      "x0": 74.0,
+      "x0": 84.0,
       "y0": 26.0,
-      "x1": 99.0,
+      "x1": 119.0,
       "y1": 46.0
      }
     },
@@ -2031,48 +2503,48 @@
      "id": "SC",
      "wealth": "rich",
      "district": "SLEEPY QUARTER",
-     "x0": 121.0,
+     "x0": 141.0,
      "y0": 16.0,
-     "x1": 166.0,
+     "x1": 191.0,
      "y1": 56.0,
      "notch": null,
      "yard": {
-      "x0": 121.0,
-      "y0": 16.0,
-      "x1": 166.0,
-      "y1": 56.0
-     }
-    },
-    {
-     "id": "SD",
-     "wealth": "rich",
-     "district": "SLEEPY QUARTER",
-     "x0": 12.0,
-     "y0": 68.0,
-     "x1": 52.0,
-     "y1": 108.0,
-     "notch": null,
-     "yard": {
-      "x0": 22.0,
-      "y0": 68.0,
-      "x1": 42.0,
-      "y1": 98.0
+      "x0": 151.0,
+      "y0": 26.0,
+      "x1": 181.0,
+      "y1": 46.0
      }
     },
     {
      "id": "SE",
      "wealth": "middling",
      "district": "SLEEPY QUARTER",
-     "x0": 64.0,
+     "x0": 12.0,
      "y0": 68.0,
-     "x1": 109.0,
+     "x1": 62.0,
      "y1": 108.0,
      "notch": null,
      "yard": {
-      "x0": 74.0,
+      "x0": 22.0,
       "y0": 78.0,
-      "x1": 99.0,
-      "y1": 108.0
+      "x1": 52.0,
+      "y1": 98.0
+     }
+    },
+    {
+     "id": "SD",
+     "wealth": "rich",
+     "district": "SLEEPY QUARTER",
+     "x0": 141.0,
+     "y0": 68.0,
+     "x1": 191.0,
+     "y1": 108.0,
+     "notch": null,
+     "yard": {
+      "x0": 151.0,
+      "y0": 78.0,
+      "x1": 181.0,
+      "y1": 98.0
      }
     }
    ],
@@ -2089,7 +2561,7 @@
     },
     {
      "id": "",
-     "key": "Terrace8_brick_cornerR",
+     "key": "Terrace8_brick",
      "facing": "N",
      "front": 16.0,
      "a": 42.0,
@@ -2099,9 +2571,19 @@
     },
     {
      "id": "",
+     "key": "ShopTown8_dark_cornerR",
+     "facing": "N",
+     "front": 16.0,
+     "a": 52.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SA"
+    },
+    {
+     "id": "",
      "key": "ShopTown8_dark",
      "facing": "E",
-     "front": 52.0,
+     "front": 62.0,
      "a": 26.0,
      "name": "",
      "stoop": "plain",
@@ -2111,7 +2593,7 @@
      "id": "",
      "key": "Terrace8_brick",
      "facing": "E",
-     "front": 52.0,
+     "front": 62.0,
      "a": 36.0,
      "name": "",
      "stoop": "plain",
@@ -2119,7 +2601,7 @@
     },
     {
      "id": "",
-     "key": "ShopTown8_dark",
+     "key": "Terrace12_brick",
      "facing": "S",
      "front": 56.0,
      "a": 22.0,
@@ -2132,17 +2614,17 @@
      "key": "Terrace8_stock",
      "facing": "S",
      "front": 56.0,
-     "a": 32.0,
+     "a": 37.0,
      "name": "",
      "stoop": "plain",
      "block": "SA"
     },
     {
      "id": "",
-     "key": "Terrace8_brick_cornerL",
+     "key": "Terrace12_brick_cornerL",
      "facing": "S",
      "front": 56.0,
-     "a": 42.0,
+     "a": 47.0,
      "name": "",
      "stoop": "plain",
      "block": "SA"
@@ -2179,17 +2661,7 @@
     },
     {
      "id": "",
-     "key": "Terrace8_brick_cornerL",
-     "facing": "N",
-     "front": 16.0,
-     "a": 64.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SB"
-    },
-    {
-     "id": "",
-     "key": "ShopTown8_dark",
+     "key": "Terrace12_stock_cornerL",
      "facing": "N",
      "front": 16.0,
      "a": 74.0,
@@ -2199,9 +2671,69 @@
     },
     {
      "id": "",
-     "key": "Terrace12_brick",
+     "key": "Terrace8_stock",
      "facing": "N",
      "front": 16.0,
+     "a": 89.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SB"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_stock",
+     "facing": "N",
+     "front": 16.0,
+     "a": 99.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SB"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_stock",
+     "facing": "N",
+     "front": 16.0,
+     "a": 109.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SB"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark_cornerR",
+     "facing": "N",
+     "front": 16.0,
+     "a": 119.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SB"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark",
+     "facing": "E",
+     "front": 129.0,
+     "a": 26.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SB"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark",
+     "facing": "E",
+     "front": 129.0,
+     "a": 36.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SB"
+    },
+    {
+     "id": "",
+     "key": "Terrace12_brick_cornerL",
+     "facing": "S",
+     "front": 56.0,
      "a": 84.0,
      "name": "",
      "stoop": "plain",
@@ -2210,59 +2742,19 @@
     {
      "id": "",
      "key": "ShopTown8_dark_cornerR",
-     "facing": "N",
-     "front": 16.0,
-     "a": 99.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SB"
-    },
-    {
-     "id": "",
-     "key": "ShopTown8_dark",
-     "facing": "E",
-     "front": 109.0,
-     "a": 26.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SB"
-    },
-    {
-     "id": "",
-     "key": "ShopTown8_dark",
-     "facing": "E",
-     "front": 109.0,
-     "a": 36.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SB"
-    },
-    {
-     "id": "",
-     "key": "Terrace8_brick_cornerL",
      "facing": "S",
      "front": 56.0,
-     "a": 74.0,
+     "a": 104.0,
      "name": "",
      "stoop": "plain",
      "block": "SB"
     },
     {
      "id": "",
-     "key": "ShopTown8_dark_cornerR",
+     "key": "Terrace12_stock_cornerL",
      "facing": "S",
      "front": 56.0,
-     "a": 89.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SB"
-    },
-    {
-     "id": "",
-     "key": "ShopTown8_dark_cornerL",
-     "facing": "S",
-     "front": 56.0,
-     "a": 99.0,
+     "a": 114.0,
      "name": "",
      "stoop": "plain",
      "block": "SB"
@@ -2271,7 +2763,7 @@
      "id": "",
      "key": "ShopTown8_dark",
      "facing": "W",
-     "front": 64.0,
+     "front": 74.0,
      "a": 26.0,
      "name": "",
      "stoop": "plain",
@@ -2281,7 +2773,7 @@
      "id": "",
      "key": "ShopTown8_dark",
      "facing": "W",
-     "front": 64.0,
+     "front": 74.0,
      "a": 36.0,
      "name": "",
      "stoop": "plain",
@@ -2291,18 +2783,88 @@
      "id": "",
      "key": "ShopTown8_dark_cornerL",
      "facing": "W",
-     "front": 64.0,
+     "front": 74.0,
      "a": 46.0,
      "name": "",
      "stoop": "plain",
      "block": "SB"
     },
     {
+     "id": "",
+     "key": "Terrace8_brick_detached",
+     "facing": "N",
+     "front": 16.0,
+     "a": 160.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SC"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_brick_cornerL",
+     "facing": "E",
+     "front": 191.0,
+     "a": 36.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SC"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark",
+     "facing": "S",
+     "front": 56.0,
+     "a": 151.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SC"
+    },
+    {
+     "id": "",
+     "key": "Terrace12_stock",
+     "facing": "S",
+     "front": 56.0,
+     "a": 161.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SC"
+    },
+    {
+     "id": "",
+     "key": "Terrace12_brick_cornerL",
+     "facing": "S",
+     "front": 56.0,
+     "a": 176.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SC"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark_cornerR",
+     "facing": "W",
+     "front": 141.0,
+     "a": 36.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SC"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_brick_cornerL",
+     "facing": "W",
+     "front": 141.0,
+     "a": 46.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SC"
+    },
+    {
      "id": "villa_east",
      "key": "Villa_stucco",
      "facing": "N",
      "front": 16.0,
-     "a": 121.0,
+     "a": 141.0,
      "name": "",
      "stoop": "plain",
      "block": "SC"
@@ -2312,16 +2874,156 @@
      "key": "Villa_stucco",
      "facing": "N",
      "front": 16.0,
-     "a": 151.0,
+     "a": 176.0,
      "name": "",
      "stoop": "plain",
      "block": "SC"
     },
     {
      "id": "",
-     "key": "Terrace8_stock_cornerL",
+     "key": "Terrace12_stock_detached",
+     "facing": "N",
+     "front": 68.0,
+     "a": 12.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SE"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark_cornerL",
+     "facing": "N",
+     "front": 68.0,
+     "a": 32.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SE"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_stock",
+     "facing": "N",
+     "front": 68.0,
+     "a": 42.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SE"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark_cornerL",
      "facing": "E",
-     "front": 52.0,
+     "front": 62.0,
+     "a": 68.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SE"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark",
+     "facing": "E",
+     "front": 62.0,
+     "a": 78.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SE"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_stock",
+     "facing": "E",
+     "front": 62.0,
+     "a": 88.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SE"
+    },
+    {
+     "id": "",
+     "key": "Terrace12_stock",
+     "facing": "S",
+     "front": 108.0,
+     "a": 22.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SE"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_brick",
+     "facing": "S",
+     "front": 108.0,
+     "a": 37.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SE"
+    },
+    {
+     "id": "",
+     "key": "Terrace12_brick_cornerL",
+     "facing": "S",
+     "front": 108.0,
+     "a": 47.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SE"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_stock",
+     "facing": "W",
+     "front": 12.0,
+     "a": 78.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SE"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark",
+     "facing": "W",
+     "front": 12.0,
+     "a": 88.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SE"
+    },
+    {
+     "id": "",
+     "key": "Terrace8_stock_cornerL",
+     "facing": "W",
+     "front": 12.0,
+     "a": 98.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SE"
+    },
+    {
+     "id": "",
+     "key": "Terrace12_stock_detached",
+     "facing": "N",
+     "front": 68.0,
+     "a": 176.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SD"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark",
+     "facing": "E",
+     "front": 191.0,
+     "a": 78.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "SD"
+    },
+    {
+     "id": "",
+     "key": "ShopTown8_dark",
+     "facing": "E",
+     "front": 191.0,
      "a": 88.0,
      "name": "",
      "stoop": "plain",
@@ -2332,27 +3034,27 @@
      "key": "ShopTown8_dark",
      "facing": "S",
      "front": 108.0,
-     "a": 22.0,
+     "a": 151.0,
      "name": "",
      "stoop": "plain",
      "block": "SD"
     },
     {
      "id": "",
-     "key": "Terrace8_brick",
+     "key": "Terrace12_brick",
      "facing": "S",
      "front": 108.0,
-     "a": 32.0,
+     "a": 161.0,
      "name": "",
      "stoop": "plain",
      "block": "SD"
     },
     {
      "id": "",
-     "key": "ShopTown8_dark_cornerL",
+     "key": "Terrace12_brick_cornerL",
      "facing": "S",
      "front": 108.0,
-     "a": 42.0,
+     "a": 176.0,
      "name": "",
      "stoop": "plain",
      "block": "SD"
@@ -2361,7 +3063,7 @@
      "id": "",
      "key": "ShopTown8_dark_cornerR",
      "facing": "W",
-     "front": 12.0,
+     "front": 141.0,
      "a": 88.0,
      "name": "",
      "stoop": "plain",
@@ -2371,7 +3073,7 @@
      "id": "",
      "key": "Terrace8_brick_cornerL",
      "facing": "W",
-     "front": 12.0,
+     "front": 141.0,
      "a": 98.0,
      "name": "",
      "stoop": "plain",
@@ -2382,100 +3084,10 @@
      "key": "Civic_white",
      "facing": "N",
      "front": 68.0,
-     "a": 17.0,
+     "a": 141.0,
      "name": "The Governor's House",
      "stoop": "plain",
      "block": "SD"
-    },
-    {
-     "id": "",
-     "key": "Terrace12_stock_cornerL",
-     "facing": "N",
-     "front": 68.0,
-     "a": 64.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SE"
-    },
-    {
-     "id": "",
-     "key": "ShopTown8_dark",
-     "facing": "N",
-     "front": 68.0,
-     "a": 79.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SE"
-    },
-    {
-     "id": "",
-     "key": "Terrace8_stock",
-     "facing": "N",
-     "front": 68.0,
-     "a": 89.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SE"
-    },
-    {
-     "id": "",
-     "key": "ShopTown8_dark_detached",
-     "facing": "E",
-     "front": 109.0,
-     "a": 68.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SE"
-    },
-    {
-     "id": "",
-     "key": "ShopTown8_dark_cornerL",
-     "facing": "E",
-     "front": 109.0,
-     "a": 83.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SE"
-    },
-    {
-     "id": "",
-     "key": "Terrace12_stock_cornerR",
-     "facing": "E",
-     "front": 109.0,
-     "a": 93.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SE"
-    },
-    {
-     "id": "",
-     "key": "Terrace8_stock",
-     "facing": "W",
-     "front": 64.0,
-     "a": 78.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SE"
-    },
-    {
-     "id": "",
-     "key": "ShopTown8_dark",
-     "facing": "W",
-     "front": 64.0,
-     "a": 88.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SE"
-    },
-    {
-     "id": "",
-     "key": "Terrace8_stock_cornerL",
-     "facing": "W",
-     "front": 64.0,
-     "a": 98.0,
-     "name": "",
-     "stoop": "plain",
-     "block": "SE"
     }
    ],
    "passages": [
@@ -2499,40 +3111,64 @@
      "block": "SB",
      "facing": "S",
      "front": 56.0,
-     "a0": 84.0,
-     "a1": 89.0,
+     "a0": 99.0,
+     "a1": 104.0,
      "depth": 10
     },
     {
      "block": "SC",
      "facing": "N",
      "front": 16.0,
-     "a0": 136.0,
-     "a1": 151.0,
+     "a0": 156.0,
+     "a1": 160.0,
+     "depth": 10
+    },
+    {
+     "block": "SC",
+     "facing": "N",
+     "front": 16.0,
+     "a0": 170.0,
+     "a1": 176.0,
+     "depth": 10
+    },
+    {
+     "block": "SC",
+     "facing": "E",
+     "front": 191.0,
+     "a0": 31.0,
+     "a1": 36.0,
+     "depth": 10
+    },
+    {
+     "block": "SC",
+     "facing": "W",
+     "front": 141.0,
+     "a0": 31.0,
+     "a1": 36.0,
+     "depth": 10
+    },
+    {
+     "block": "SE",
+     "facing": "N",
+     "front": 68.0,
+     "a0": 27.0,
+     "a1": 32.0,
      "depth": 10
     },
     {
      "block": "SD",
-     "facing": "E",
-     "front": 52.0,
-     "a0": 87.0,
-     "a1": 88.0,
+     "facing": "N",
+     "front": 68.0,
+     "a0": 171.0,
+     "a1": 176.0,
      "depth": 10
     },
     {
      "block": "SD",
      "facing": "W",
-     "front": 12.0,
-     "a0": 87.0,
+     "front": 141.0,
+     "a0": 83.0,
      "a1": 88.0,
-     "depth": 10
-    },
-    {
-     "block": "SE",
-     "facing": "E",
-     "front": 109.0,
-     "a0": 78.0,
-     "a1": 83.0,
      "depth": 10
     }
    ],
@@ -2550,26 +3186,26 @@
      "kind": "bank",
      "ax": 384.4,
      "ay": 394.9,
-     "bx": 463.2,
-     "by": 552.3,
+     "bx": 474.3,
+     "by": 574.7,
      "height": 0.0,
      "top": 0.0
     },
     {
      "side": "u1",
      "kind": "bank",
-     "ax": 462.7,
-     "ay": 553.7,
-     "bx": 357.2,
-     "by": 606.4,
+     "ax": 473.9,
+     "ay": 576.0,
+     "bx": 368.3,
+     "by": 628.8,
      "height": 0.0,
      "top": 0.0
     },
     {
      "side": "v1",
      "kind": "bank",
-     "ax": 355.8,
-     "ay": 606.0,
+     "ax": 367.0,
+     "ay": 628.3,
      "bx": 277.1,
      "by": 448.6,
      "height": 0.0,
@@ -2592,11 +3228,11 @@
    "name": "The Reek",
    "district": "THE REEK",
    "origin": {
-    "x": 548,
-    "y": 648
+    "x": 478,
+    "y": 578
    },
    "angle": 45,
-   "U": 123.0,
+   "U": 222.0,
    "V": 109.0,
    "streets": [
     {
@@ -2604,8 +3240,8 @@
      "name": "Ash Bank",
      "kind": "works",
      "axis": "x",
-     "a0": 2.5,
-     "a1": 120.5,
+     "a0": 3.0,
+     "a1": 219.5,
      "c0": 0.0,
      "c1": 14.0,
      "walk0": 2.5,
@@ -2618,8 +3254,8 @@
      "name": "Rats' Choir",
      "kind": "lane",
      "axis": "x",
-     "a0": 2.5,
-     "a1": 120.5,
+     "a0": 3.0,
+     "a1": 219.5,
      "c0": 54.0,
      "c1": 64.0,
      "walk0": 2.5,
@@ -2632,8 +3268,8 @@
      "name": "Coughing Lane",
      "kind": "lane",
      "axis": "x",
-     "a0": 2.5,
-     "a1": 120.5,
+     "a0": 3.0,
+     "a1": 219.5,
      "c0": 99.0,
      "c1": 109.0,
      "walk0": 2.5,
@@ -2644,28 +3280,42 @@
     {
      "id": "works_s",
      "name": "Furnace Road",
-     "kind": "works",
+     "kind": "street",
      "axis": "y",
      "a0": 2.5,
      "a1": 106.5,
      "c0": 0.0,
-     "c1": 14.0,
-     "walk0": 2.5,
-     "walk1": 2.5,
+     "c1": 12.0,
+     "walk0": 3.0,
+     "walk1": 3.0,
      "surface": "setts",
      "trees": "none"
     },
     {
      "id": "works_x",
      "name": "Clinker Road",
-     "kind": "works",
+     "kind": "street",
      "axis": "y",
      "a0": 59.0,
      "a1": 106.5,
-     "c0": 59.0,
-     "c1": 73.0,
-     "walk0": 2.5,
-     "walk1": 2.5,
+     "c0": 62.0,
+     "c1": 74.0,
+     "walk0": 3.0,
+     "walk1": 3.0,
+     "surface": "setts",
+     "trees": "none"
+    },
+    {
+     "id": "grubby",
+     "name": "Grubby Street",
+     "kind": "street",
+     "axis": "y",
+     "a0": 2.5,
+     "a1": 106.5,
+     "c0": 140.0,
+     "c1": 152.0,
+     "walk0": 3.0,
+     "walk1": 3.0,
      "surface": "setts",
      "trees": "none"
     },
@@ -2676,8 +3326,8 @@
      "axis": "y",
      "a0": 2.5,
      "a1": 106.5,
-     "c0": 113.0,
-     "c1": 123.0,
+     "c0": 212.0,
+     "c1": 222.0,
      "walk0": 2.5,
      "walk1": 2.5,
      "surface": "cobbles",
@@ -2700,15 +3350,31 @@
      "id": "RD",
      "wealth": "poor",
      "district": "THE REEK",
-     "x0": 73.0,
+     "x0": 74.0,
      "y0": 64.0,
-     "x1": 113.0,
+     "x1": 140.0,
      "y1": 99.0,
      "notch": null,
      "yard": {
-      "x0": 81.0,
+      "x0": 82.0,
       "y0": 72.0,
-      "x1": 105.0,
+      "x1": 132.0,
+      "y1": 91.0
+     }
+    },
+    {
+     "id": "RE",
+     "wealth": "poor",
+     "district": "THE REEK",
+     "x0": 152.0,
+     "y0": 64.0,
+     "x1": 212.0,
+     "y1": 99.0,
+     "notch": null,
+     "yard": {
+      "x0": 160.0,
+      "y0": 72.0,
+      "x1": 204.0,
       "y1": 91.0
      }
     }
@@ -2716,10 +3382,20 @@
    "buildings": [
     {
      "id": "",
+     "key": "TenementLow8_poor",
+     "facing": "N",
+     "front": 64.0,
+     "a": 82.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RD"
+    },
+    {
+     "id": "",
      "key": "TenementLow8_poor_cornerR",
      "facing": "N",
      "front": 64.0,
-     "a": 81.0,
+     "a": 92.0,
      "name": "",
      "stoop": "plain",
      "block": "RD"
@@ -2729,7 +3405,17 @@
      "key": "TenementLow8_poor_cornerL",
      "facing": "N",
      "front": 64.0,
-     "a": 95.0,
+     "a": 107.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RD"
+    },
+    {
+     "id": "",
+     "key": "TenementLow12_poor",
+     "facing": "N",
+     "front": 64.0,
+     "a": 117.0,
      "name": "",
      "stoop": "plain",
      "block": "RD"
@@ -2738,7 +3424,7 @@
      "id": "",
      "key": "TenementLow8_poor_cornerL",
      "facing": "E",
-     "front": 113.0,
+     "front": 140.0,
      "a": 64.0,
      "name": "",
      "stoop": "plain",
@@ -2748,7 +3434,7 @@
      "id": "",
      "key": "TenementLow12_poor",
      "facing": "E",
-     "front": 113.0,
+     "front": 140.0,
      "a": 74.0,
      "name": "",
      "stoop": "plain",
@@ -2758,7 +3444,7 @@
      "id": "",
      "key": "TenementLow8_poor_cornerR",
      "facing": "E",
-     "front": 113.0,
+     "front": 140.0,
      "a": 89.0,
      "name": "",
      "stoop": "plain",
@@ -2766,20 +3452,40 @@
     },
     {
      "id": "",
-     "key": "TenementLow8_poor_cornerL",
+     "key": "TenementLow12_poor",
      "facing": "S",
      "front": 99.0,
-     "a": 81.0,
+     "a": 82.0,
      "name": "",
      "stoop": "plain",
      "block": "RD"
     },
     {
      "id": "",
-     "key": "TenementLow8_poor_cornerR",
+     "key": "TenementLow8_poor",
      "facing": "S",
      "front": 99.0,
-     "a": 95.0,
+     "a": 97.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RD"
+    },
+    {
+     "id": "",
+     "key": "TenementLow8_poor",
+     "facing": "S",
+     "front": 99.0,
+     "a": 107.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RD"
+    },
+    {
+     "id": "",
+     "key": "TenementLow12_poor",
+     "facing": "S",
+     "front": 99.0,
+     "a": 117.0,
      "name": "",
      "stoop": "plain",
      "block": "RD"
@@ -2788,7 +3494,7 @@
      "id": "",
      "key": "TenementLow12_poor_cornerR",
      "facing": "W",
-     "front": 73.0,
+     "front": 74.0,
      "a": 64.0,
      "name": "",
      "stoop": "plain",
@@ -2798,7 +3504,7 @@
      "id": "",
      "key": "TenementLow8_poor",
      "facing": "W",
-     "front": 73.0,
+     "front": 74.0,
      "a": 79.0,
      "name": "",
      "stoop": "plain",
@@ -2808,11 +3514,131 @@
      "id": "",
      "key": "TenementLow8_poor_cornerL",
      "facing": "W",
-     "front": 73.0,
+     "front": 74.0,
      "a": 89.0,
      "name": "",
      "stoop": "plain",
      "block": "RD"
+    },
+    {
+     "id": "",
+     "key": "TenementLow8_poor_cornerR",
+     "facing": "N",
+     "front": 64.0,
+     "a": 160.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RE"
+    },
+    {
+     "id": "",
+     "key": "TenementLow12_poor_cornerL",
+     "facing": "N",
+     "front": 64.0,
+     "a": 174.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RE"
+    },
+    {
+     "id": "",
+     "key": "TenementLow12_poor",
+     "facing": "N",
+     "front": 64.0,
+     "a": 189.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RE"
+    },
+    {
+     "id": "",
+     "key": "TenementLow12_poor_cornerL",
+     "facing": "E",
+     "front": 212.0,
+     "a": 64.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RE"
+    },
+    {
+     "id": "",
+     "key": "TenementLow8_poor",
+     "facing": "E",
+     "front": 212.0,
+     "a": 79.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RE"
+    },
+    {
+     "id": "",
+     "key": "TenementLow8_poor_cornerR",
+     "facing": "E",
+     "front": 212.0,
+     "a": 89.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RE"
+    },
+    {
+     "id": "",
+     "key": "TenementLow12_poor_cornerL",
+     "facing": "S",
+     "front": 99.0,
+     "a": 160.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RE"
+    },
+    {
+     "id": "",
+     "key": "TenementLow8_poor_cornerR",
+     "facing": "S",
+     "front": 99.0,
+     "a": 179.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RE"
+    },
+    {
+     "id": "",
+     "key": "TenementLow12_poor",
+     "facing": "S",
+     "front": 99.0,
+     "a": 189.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RE"
+    },
+    {
+     "id": "",
+     "key": "TenementLow8_poor_cornerR",
+     "facing": "W",
+     "front": 152.0,
+     "a": 64.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RE"
+    },
+    {
+     "id": "",
+     "key": "TenementLow12_poor",
+     "facing": "W",
+     "front": 152.0,
+     "a": 74.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RE"
+    },
+    {
+     "id": "",
+     "key": "TenementLow8_poor_cornerL",
+     "facing": "W",
+     "front": 152.0,
+     "a": 89.0,
+     "name": "",
+     "stoop": "plain",
+     "block": "RE"
     }
    ],
    "passages": [
@@ -2820,16 +3646,24 @@
      "block": "RD",
      "facing": "N",
      "front": 64.0,
-     "a0": 91.0,
-     "a1": 95.0,
+     "a0": 102.0,
+     "a1": 107.0,
      "depth": 8
     },
     {
-     "block": "RD",
+     "block": "RE",
+     "facing": "N",
+     "front": 64.0,
+     "a0": 170.0,
+     "a1": 174.0,
+     "depth": 8
+    },
+    {
+     "block": "RE",
      "facing": "S",
      "front": 99.0,
-     "a0": 91.0,
-     "a1": 95.0,
+     "a0": 175.0,
+     "a1": 179.0,
      "depth": 8
     }
    ],
@@ -2890,6 +3724,39 @@
      "base": 0.0
     },
     {
+     "id": "ES2_x",
+     "name": "Works ES2 - foundry",
+     "x0": 117,
+     "y0": 14,
+     "x1": 138,
+     "y1": 54,
+     "height": 13.0,
+     "material": "works",
+     "base": 0.0
+    },
+    {
+     "id": "EN_n",
+     "name": "Works EN - gas house",
+     "x0": 154,
+     "y0": 16,
+     "x1": 210,
+     "y1": 32,
+     "height": 12.0,
+     "material": "works",
+     "base": 0.0
+    },
+    {
+     "id": "EN_s",
+     "name": "Works EN - retort house",
+     "x0": 154,
+     "y0": 38,
+     "x1": 210,
+     "y1": 52,
+     "height": 10.0,
+     "material": "works",
+     "base": 0.0
+    },
+    {
      "id": "ES1_n",
      "name": "Works ES1 - north shed",
      "x0": 16,
@@ -2930,8 +3797,8 @@
     {
      "side": "v0",
      "kind": "bank",
-     "ax": 548.7,
-     "ay": 648.7,
+     "ax": 478.7,
+     "ay": 578.7,
      "bx": 634.3,
      "by": 734.3,
      "height": 0.0,
@@ -2952,22 +3819,57 @@
      "kind": "bank",
      "ax": 557.2,
      "ay": 811.3,
-     "bx": 471.6,
-     "by": 725.8,
+     "bx": 401.6,
+     "by": 655.8,
      "height": 0.0,
      "top": 0.0
     },
     {
      "side": "u0",
      "kind": "bank",
-     "ax": 471.6,
-     "ay": 724.4,
-     "bx": 547.3,
-     "by": 648.7,
+     "ax": 401.6,
+     "ay": 654.4,
+     "bx": 477.3,
+     "by": 578.7,
      "height": 0.0,
      "top": 0.0
     }
    ]
+  },
+  {
+   "id": "rise",
+   "name": "Lenten Rise",
+   "district": "PARSONS' END",
+   "origin": {
+    "x": 622,
+    "y": 426
+   },
+   "angle": 26.5651,
+   "U": 105.0,
+   "V": 17.0,
+   "streets": [
+    {
+     "id": "lenten_rise",
+     "name": "Lenten Rise",
+     "kind": "side",
+     "axis": "x",
+     "a0": 0.0,
+     "a1": 105.0,
+     "c0": 0.0,
+     "c1": 17.0,
+     "walk0": 6.0,
+     "walk1": 4.0,
+     "surface": "setts",
+     "trees": "wide"
+    }
+   ],
+   "squares": [],
+   "blocks": [],
+   "buildings": [],
+   "passages": [],
+   "boxes": [],
+   "plaza": null,
+   "candidates": []
   },
   {
    "id": "hamlet",
@@ -3083,16 +3985,16 @@
    "height": 6.0,
    "line": [
     {
-     "x": 430,
-     "y": 374
+     "x": 427,
+     "y": 367
     },
     {
-     "x": 566,
-     "y": 312
+     "x": 568,
+     "y": 302
     },
     {
-     "x": 652,
-     "y": 392
+     "x": 656,
+     "y": 388
     },
     {
      "x": 711,
@@ -3109,8 +4011,12 @@
      "y": 574
     },
     {
-     "x": 820,
-     "y": 680
+     "x": 806,
+     "y": 634
+    },
+    {
+     "x": 796,
+     "y": 668
     },
     {
      "x": 735,
@@ -3137,47 +4043,39 @@
   },
   {
    "name": "Farthing Gate",
-   "x": 449,
-   "y": 365
+   "x": 446,
+   "y": 358
   },
   {
    "name": "Salt Gate",
-   "x": 749,
-   "y": 747
+   "x": 746,
+   "y": 745
   }
  ],
  "bridges": [
   {
    "name": "Last Farthing Bridge",
-   "ax": 486,
-   "ay": 499,
-   "bx": 444,
-   "by": 517,
+   "ax": 487.59,
+   "ay": 493.18,
+   "bx": 444.37,
+   "by": 514.75,
    "width": 14.0
   },
   {
    "name": "Grubby Bridge",
-   "ax": 598,
-   "ay": 630,
-   "bx": 554,
-   "by": 670,
-   "width": 14.0
+   "ax": 611.15,
+   "ay": 651.15,
+   "bx": 581.24,
+   "by": 681.24,
+   "width": 12.0
   },
   {
    "name": "Beck Bridge",
-   "ax": 578,
-   "ay": 544,
-   "bx": 594,
-   "by": 574,
-   "width": 22.0
-  },
-  {
-   "name": "Lenten Bridge",
-   "ax": 650,
-   "ay": 466,
-   "bx": 668,
-   "by": 474,
-   "width": 17.0
+   "ax": 616.8,
+   "ay": 570.54,
+   "bx": 592.76,
+   "by": 546.5,
+   "width": 12.0
   },
   {
    "name": "Head footbridge",
@@ -3265,38 +4163,6 @@
     {
      "x": 240.0,
      "y": 246.0
-    }
-   ]
-  },
-  {
-   "name": "Salt Gullet",
-   "kind": "main",
-   "line": [
-    {
-     "x": 572.0,
-     "y": 530.0
-    },
-    {
-     "x": 600.0,
-     "y": 584.0
-    }
-   ]
-  },
-  {
-   "name": "Lenten Street",
-   "kind": "side",
-   "line": [
-    {
-     "x": 606.0,
-     "y": 450.0
-    },
-    {
-     "x": 660.0,
-     "y": 470.0
-    },
-    {
-     "x": 716.0,
-     "y": 486.0
     }
    ]
   },
@@ -4719,50 +5585,139 @@
   {
    "name": "Bawling Wedge",
    "kind": "square",
-   "level": 2.4,
+   "level": 2.0,
    "line": [
     {
-     "x": 588,
+     "x": 522,
+     "y": 561
+    },
+    {
+     "x": 586,
+     "y": 529
+    },
+    {
+     "x": 600,
+     "y": 548
+    },
+    {
+     "x": 563,
+     "y": 602
+    },
+    {
+     "x": 552,
+     "y": 620
+    }
+   ]
+  },
+  {
+   "name": "Beck Walk",
+   "kind": "park",
+   "level": 2.0,
+   "line": [
+    {
+     "x": 586,
+     "y": 529
+    },
+    {
+     "x": 641,
+     "y": 494
+    },
+    {
+     "x": 635,
+     "y": 508
+    },
+    {
+     "x": 600,
+     "y": 548
+    }
+   ]
+  },
+  {
+   "name": "Beckside",
+   "kind": "park",
+   "level": 2.0,
+   "line": [
+    {
+     "x": 576,
      "y": 612
     },
     {
-     "x": 612,
-     "y": 636
+     "x": 656,
+     "y": 532
+    },
+    {
+     "x": 650,
+     "y": 504
     },
     {
      "x": 644,
-     "y": 604
+     "y": 518
     },
     {
-     "x": 630,
-     "y": 572
+     "x": 606,
+     "y": 564
     },
     {
-     "x": 608,
-     "y": 572
+     "x": 576,
+     "y": 608
+    }
+   ]
+  },
+  {
+   "name": "Bend Green",
+   "kind": "park",
+   "level": 2.0,
+   "line": [
+    {
+     "x": 476,
+     "y": 577
     },
     {
-     "x": 592,
-     "y": 580
+     "x": 368,
+     "y": 630
+    },
+    {
+     "x": 401,
+     "y": 655
     }
    ]
   },
   {
    "name": "Bishop's Park",
    "kind": "park",
-   "level": 8.5,
+   "level": 2.0,
    "line": [
     {
-     "x": 722,
-     "y": 566
+     "x": 716,
+     "y": 572
     },
     {
-     "x": 792,
-     "y": 636
+     "x": 856,
+     "y": 572
     },
     {
-     "x": 850,
-     "y": 566
+     "x": 800,
+     "y": 632
+    },
+    {
+     "x": 786,
+     "y": 646
+    },
+    {
+     "x": 672,
+     "y": 532
+    },
+    {
+     "x": 656,
+     "y": 500
+    },
+    {
+     "x": 700,
+     "y": 492
+    },
+    {
+     "x": 716,
+     "y": 500
     }
    ]
   }

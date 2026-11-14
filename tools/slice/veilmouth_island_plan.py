@@ -36,15 +36,19 @@ ROOT = HERE.parents[1]
 LAYOUT = ROOT / "unity/Assets/Data/Slice/Map/VeilmouthIslandLayout.json"
 PLAN_PNG = ROOT / "unity/Assets/Plans/VEILMOUTH_ISLAND_PLAN.png"
 KIND = {"emb": "embankment"}
+# A block at the market's crossing gives this much of its corner to the square, m (C5's N15); with a main street of
+# 22 m the square is 52 m across.
+NOTCH = 15
 ERRORS, NOTES = [], []
 
 
-def B(bid, wealth, fam, on=(), stand=(), kind=None, limit=None):
+def B(bid, wealth, fam, on=(), stand=(), kind=None, notch=None):
     """A block's content: the family of houses on each side (None for a side of single buildings or an open one),
     its single buildings on a side (facing, metres from the block's low corner, kit key, id, name) or standing free
     (kit key, facing, front and low end from the block's corner, id, name), and a side's rank where it is not its
-    street's own."""
-    return dict(id=bid, wealth=wealth, fam=fam, on=list(on), stand=list(stand), kind=kind or {}, limit=limit or {})
+    street's own. A notch is (corner, family): the block gives 15 x 15 m of that corner to the square at a crossing,
+    as C5's four blocks round the Penny do, and the family is the row along the notch."""
+    return dict(id=bid, wealth=wealth, fam=fam, on=list(on), stand=list(stand), kind=kind or {}, notch=notch)
 
 
 def all_sides(family):
@@ -56,27 +60,27 @@ def all_sides(family):
 SPECS = {
     "The Penny": dict(
         id="penny", district="THE PENNY",
+        # The market stands where the Penny's two main streets cross, as C5's does: Lenten Street comes over Last
+        # Farthing Bridge and runs through it, Salt Gullet crosses it along the river, and the four blocks round it
+        # each give a corner to the square.
         streets=dict(v0=("embankment", "Powder Embankment"), v1=("widows", "Widows' Row"), u0=("thimble", "Thimble Street"),
                      u1=("nettle", "Nettle Street"), sx=[("lenten", "Lenten Street"), ("smoked", "Smoked Street")],
                      sy=[("main_e", "Salt Gullet")]),
         blocks={
-            (0, 0): B("PA", "rich", dict(N="town", E="town", S="shop", W="town")),
-            # The Town Hall faces the Penny across Salt Gullet; the clock tower rises behind it, 1.5 m off its back
-            # wall, its door on the yard (as C5 has them); 2 m clear of the yard's benches, which its cornice overhangs.
-            (1, 0): B("PB", "rich", dict(N="shop_rich", E="town", S=None, W="town"), kind=dict(S="penny"),
-                      limit=dict(E=(0, 26), W=(0, 26)),   # the side rows end a passage short of the Town Hall's back
-                      on=[("S", 11, "Civic_rich", "town_hall", "The Town Hall")],
-                      stand=[("Tower6_white", "N", 23.5, 21.5, "clock_tower", "The clock tower")]),
-            # Its yard is open to Nettle Street, the town's last street on that side, behind a yard wall.
-            (2, 0): B("PC", "middling", dict(N="town", E=None, S="shop", W="town")),
-            (0, 1): B("PD", "rich", dict(N="shop", E=None, S="town", W="town"), kind=dict(E="penny"),
-                      limit=dict(N=(0, 21), S=(0, 21)),
-                      on=[("E", 11, "Civic_stucco", "assize", "The Assize and the Wardens' station")]),
-            (2, 1): B("PF", "middling", dict(N="shop", E="town", S="town", W=None), kind=dict(W="penny"),
-                      limit=dict(N=(19, 40), S=(19, 40)),
-                      on=[("W", 11, "Civic_white", "guild_hall", "The Guild Hall")]),
+            # The Town Hall fills its block's side on Salt Gullet up to the square; the clock tower rises behind it,
+            # its door on the yard (as C5 has them).
+            (0, 0): B("PA", "rich", dict(N="town", E="shop", S=None, W="town"), notch=("SE", "shop_rich"),
+                      on=[("S", 0, "Civic_rich", "town_hall", "The Town Hall")],
+                      stand=[("Tower6_white", "N", 23.5, 12.5, "clock_tower", "The clock tower")]),
+            (1, 0): B("PB", "rich", dict(N="town", E="town", S=None, W="shop"), notch=("SW", "shop_rich"),
+                      on=[("S", 15, "Civic_stucco", "assize", "The Assize and the Wardens' station")]),
+            (2, 0): B("PC", "middling", dict(N="town", E="town", S="shop", W="town")),
+            (0, 1): B("PD", "rich", dict(N="shop", E="shop", S="town", W="town"), notch=("NE", "shop_rich")),
+            (1, 1): B("PF", "middling", dict(N=None, E="town", S="town", W="shop"), notch=("NW", "shop_rich"),
+                      on=[("N", 15, "Civic_white", "guild_hall", "The Guild Hall")]),
+            (2, 1): B("PE", "middling", dict(N="shop", E="town", S="town", W="town")),
         },
-        plaza=(1, 1),
+        plaza="crossing",
         squares=[],
     ),
     "Sleepy Quarter": dict(
@@ -88,31 +92,32 @@ SPECS = {
             # A rich family's villa on the embankment at the quarter's corner, a dwelling like any house.
             (0, 0): B("SA", "rich", all_sides("town"), on=[("N", 0, "Villa_stucco", "villa", "The embankment villa")]),
             (1, 0): B("SB", "middling", all_sides("town")),
-            # Two villas in their gardens at the quarter's quiet end: fewer houses, more green (owner, 2026-11-14:
-            # never more buildings at the picture's cost).
-            (2, 0): B("SC", "rich", all_sides(None), on=[("N", 0, "Villa_stucco", "villa_east", ""), ("N", 30, "Villa_stucco", "villa_end", "")]),
-            (0, 1): B("SD", "rich", dict(N=None, E="town", S="town", W="town"), limit=dict(E=(19, 40), W=(19, 40)),
-                      on=[("N", 5, "Civic_white", "governor", "The Governor's House")]),
-            # Its yard is open to Cold Shoulder, under the town wall, behind a yard wall.
-            (1, 1): B("SE", "middling", dict(N="town", E="town", S=None, W="town")),
+            # Two villas at the corners of the last block on the embankment, a house between them.
+            (2, 0): B("SC", "rich", all_sides("town"), on=[("N", 0, "Villa_stucco", "villa_east", ""), ("N", 35, "Villa_stucco", "villa_end", "")]),
+            (0, 1): B("SE", "middling", all_sides("town")),
+            # The Governor's House at its block's corner on Long Tongue.
+            (2, 1): B("SD", "rich", all_sides("town"), on=[("N", 0, "Civic_white", "governor", "The Governor's House")]),
         },
-        squares=[dict(cell=(2, 1), id="quiet", name="Quiet Whistle Garden", surface="grass")],
+        squares=[dict(cell=(1, 1), id="quiet", name="Quiet Whistle Garden", surface="grass")],
     ),
     "Lower Veil": dict(
         id="lower", district="LOWER VEIL",
         streets=dict(v0=("tar_row", "Tar Row"), v1=("eel_row", "Eel Row"), u0=("hook", "Hook Street"), u1=("gull", "Gull Lane"),
-                     sx=[("wet_hem", "Wet Hem")], sy=[("draught", "Draught Lane")]),
+                     sx=[("wet_hem", "Wet Hem"), ("netmenders", "Netmenders' Row")], sy=[("draught", "Draught Lane")]),
         blocks={
-            (0, 0): B("LA", "poor", dict(N="warehouse", E="tenement", S="tenement", W="tenement")),
-            (1, 0): B("LB", "middling", dict(N=None, E="tenement", S="tenement", W="tenement"), limit=dict(E=(19, 40), W=(19, 40)),
-                      on=[("N", 5, "Civic_white", "customs", "The Customs House")]),
+            # The Customs House at the quay's seaward corner.
+            (0, 0): B("LA", "middling", dict(N="warehouse", E="tenement", S="tenement", W="tenement"),
+                      on=[("N", 0, "Civic_white", "customs", "The Customs House")]),
+            (1, 0): B("LB", "poor", dict(N="warehouse", E="tenement", S="tenement", W="tenement")),
+            (2, 0): B("LE", "poor", dict(N="warehouse", E="tenement", S="tenement", W="tenement")),
             (0, 1): B("LC", "poor", all_sides("tenement"),
                       on=[("S", 17, "Tenement8_poor_detached", "missing", "The missing person's tenement")]),
+            (2, 1): B("LF", "poor", all_sides("tenement")),
         },
         # The Black Puddle: the square's north part is open ground; the tavern and the apothecary stand on its south
-        # side and face it.
+        # side and face it, a passage between them, and a tenement closes the row's end.
         split={(1, 1): dict(square=dict(id="black_puddle", name="Black Puddle", surface="square", depth=25),
-                            block=B("LD", "poor", all_sides(None), kind=dict(N="square"),
+                            block=B("LD", "poor", dict(N=None, E="tenement", S=None, W=None), kind=dict(N="square"),
                                     on=[("N", 0, "Tavern_brick", "soot_bell", "The Soot & Bell"),
                                         ("N", 19, "ShopTown8_dark_detached", "harrow", "Harrow & Tincture")]))},
         squares=[dict(rect=(0, 0, None, 15), id="quay", name="Fishlip Quay", surface="setts", label=True),
@@ -123,16 +128,19 @@ SPECS = {
     "The Reek": dict(
         id="reek", district="THE REEK",
         streets=dict(v0=("ash_bank", "Ash Bank"), v1=("coughing", "Coughing Lane"), u0=("works_s", "Furnace Road"),
-                     u1=("brine", "Brine Lane"), sx=[("works_x", "Clinker Road")], sy=[("rats_choir", "Rats' Choir")]),
-        sx_from={0: 1},   # Clinker Road runs between the second row's blocks only: the first row is one works yard
+                     u1=("brine", "Brine Lane"), sx=[("works_x", "Clinker Road"), ("grubby", "Grubby Street")], sy=[("rats_choir", "Rats' Choir")]),
+        sx_from={0: 1},   # Clinker Road runs between the second row's blocks only: the first row's first two cells are one works yard
         blocks={
             (1, 1): B("RD", "poor", all_sides("low")),
+            (2, 1): B("RE", "poor", all_sides("low")),
         },
-        # The first row is one works block: sheds round the Deaf Boiler Yard, open to the bank.
+        # The works: sheds round the Deaf Boiler Yard, open to the bank; the gas works beyond Grubby Street; a second
+        # yard behind. Stone masses until the works' own buildings come (ISLAND_WORLD_AUDIT.md, stage 3).
         boxes=[
             ("ES2_nw", "Works ES2 - boiler house", 14, 14, 43, 34, 14.0), ("ES2_ne", "Works ES2 - coal store", 84, 14, 113, 34, 10.0),
             ("ES2_w", "Works ES2 - west shed", 14, 38, 43, 54, 12.0), ("ES2_e", "Works ES2 - east shed", 84, 38, 113, 54, 12.0),
-            ("ES2_s", "Works ES2 - south shed", 43, 47, 84, 54, 9.0),
+            ("ES2_s", "Works ES2 - south shed", 43, 47, 84, 54, 9.0), ("ES2_x", "Works ES2 - foundry", 117, 14, 138, 54, 13.0),
+            ("EN_n", "Works EN - gas house", 154, 16, 210, 32, 12.0), ("EN_s", "Works EN - retort house", 154, 38, 210, 52, 10.0),
             ("ES1_n", "Works ES1 - north shed", 16, 66, 57, 78, 13.0), ("ES1_s", "Works ES1 - south shed", 16, 86, 57, 97, 9.0),
         ],
         squares=[dict(rect=(43, 21, 84, 47), id="deaf_boiler", name="Deaf Boiler Yard", surface="cobbles", label=True)],
@@ -243,9 +251,12 @@ class Frame:
         edges = {}
         for f in "NESW":
             kind = b["kind"].get(f, sides[f]) or "wall"
-            base = x0 if f in "NS" else y0   # a limit is given from the block's low corner along that side
-            edges[f] = (kind, b["fam"][f]) + (((base + b["limit"][f][0], base + b["limit"][f][1]),) if f in b["limit"] else ())
-        blk = c5.Block(self.id.upper()[:2] + "_" + b["id"] if False else b["id"], rect, b["wealth"], self.spec["district"], edges)
+            edges[f] = (kind, b["fam"][f])
+        notch = None
+        if b["notch"]:
+            notch = (b["notch"][0], NOTCH, NOTCH)
+            edges["notch"] = ("penny", b["notch"][1])
+        blk = c5.Block(b["id"], rect, b["wealth"], self.spec["district"], edges, notch=notch)
         for facing, off, key, sid, name in b["on"]:
             blk.on(facing, (x0 if facing in "NS" else y0) + off, key, sid, name)
         for key, facing, front_off, a_off, sid, name in b["stand"]:
@@ -279,11 +290,14 @@ class Frame:
                 x0, y0, x1, y1 = sq["rect"]
                 x1 = D.U if x1 is None else x1
             out["squares"].append(dict(id=sq["id"], name=sq["name"] if sq.get("label", True) else "", x0=x0, y0=y0, x1=x1, y1=y1, surface=sq["surface"]))
-        if spec.get("plaza"):
-            x0, y0, x1, y1 = self.cell(*spec["plaza"])
-            half = min(x1 - x0, y1 - y0) / 2
-            out["squares"].append(dict(id="penny", name="The Penny", x0=x0, y0=y0, x1=x1, y1=y1, surface="square"))
-            out["plaza"] = dict(cx=(x0 + x1) / 2, cy=(y0 + y1) / 2, half=half, ringOuter=21.0, ringInner=13.0, island=13.0, plinth=4.0,
+        if spec.get("plaza") == "crossing":
+            # Where the first main street across meets the first main street along: the square is the crossing and the
+            # four blocks' notches round it.
+            wx, wy = g.STREETS[D.sx[0]][0], g.STREETS[D.sy[0]][0]
+            cx, cy = D.u0[0] + D.cols[0] + wx / 2, D.v0[0] + D.rows[0] + wy / 2
+            half = min(wx, wy) / 2 + NOTCH
+            out["squares"].append(dict(id="penny", name="The Penny", x0=cx - half, y0=cy - half, x1=cx + half, y1=cy + half, surface="square"))
+            out["plaza"] = dict(cx=cx, cy=cy, half=half, ringOuter=21.0, ringInner=13.0, island=13.0, plinth=4.0,
                                 statue=12.0, name="Stone Grandad",
                                 stalls=dict(radius=9.0, count=12, width=3.0, depth=2.0, name="Bawling Row"))
 
@@ -310,7 +324,9 @@ class Frame:
             for e in blk.edge_list:
                 if e.family:
                     inset[e.facing] = max(inset[e.facing], e.depth())
-            out["blocks"].append(dict(id=blk.id, wealth=blk.wealth, district=blk.district, x0=x0, y0=y0, x1=x1, y1=y1, notch=None,
+            n = blk.notch_rect()
+            out["blocks"].append(dict(id=blk.id, wealth=blk.wealth, district=blk.district, x0=x0, y0=y0, x1=x1, y1=y1,
+                                      notch=dict(x0=n[0], y0=n[1], x1=n[2], y1=n[3]) if n else None,
                                       yard=dict(x0=x0 + inset["W"], y0=y0 + inset["N"], x1=x1 - inset["E"], y1=y1 - inset["S"])))
         for bx in out["boxes"]:
             self.shapes.append(((bx["x0"], bx["y0"], bx["x1"], bx["y1"]), "church" if bx["material"] == "cathedral" else "works", bx["height"]))
@@ -391,6 +407,37 @@ def embankments(C, F):
     return out
 
 
+# The town's bridges: each a length of a street on both banks (ISLAND_WORLD_AUDIT.md 9.3). The two districts of a reach
+# are parallel, and their columns are set so that the two streets lie on one line; the run fails if they do not.
+BRIDGES = [("Last Farthing Bridge", ("penny", "lenten"), ("sleepy", "crows_walk"), 14.0),
+           ("Grubby Bridge", ("lower", "netmenders"), ("reek", "grubby"), 12.0)]
+
+
+def bridges(frames):
+    by = {f.id: f for f in frames}
+    out = []
+
+    def end(fid, sid):
+        f = by[fid]
+        s = next(s for s in f.out["streets"] if s["id"] == sid)
+        return f, f.D.world((s["c0"] + s["c1"]) / 2, 0.0)
+
+    for name, a, b, width in BRIDGES:
+        (fa, pa), (fb, pb) = end(*a), end(*b)
+        # Square to the streets: its line has no part along the first district's river side.
+        along = (pb[0] - pa[0]) * fa.D.c + (pb[1] - pa[1]) * fa.D.s
+        if abs(along) > 0.25:
+            ERRORS.append("%s: its two streets lie %.2f m apart along the river" % (name, along))
+        out.append(dict(name=name, ax=round(pa[0], 2), ay=round(pa[1], 2), bx=round(pb[0], 2), by=round(pb[1], 2), width=width))
+    # The Beck Bridge: Draught Lane runs on from Lower Veil's upper side over the Beck into the Bawling Wedge.
+    f = by["lower"]
+    s = next(s for s in f.out["streets"] if s["id"] == "draught")
+    v = (s["c0"] + s["c1"]) / 2
+    pa, pb = f.D.world(f.U, v), f.D.world(f.U + 34.0, v)
+    out.append(dict(name="Beck Bridge", ax=round(pa[0], 2), ay=round(pa[1], 2), bx=round(pb[0], 2), by=round(pb[1], 2), width=12.0))
+    return out
+
+
 def main():
     C = CONCEPT
     F = g.build_land(C, lambda s: None)
@@ -398,14 +445,18 @@ def main():
     frames = []
     for D in C["districts"]:
         frames.append(Frame(D, SPECS[D.name]))
-    layout = dict(version="I1", concept=C["key"], frames=[f.plan() for f in frames])
+    # The way up to the close: one street from the far end of Lenten Street, on the line (2, 1), climbing the ridge's
+    # foot; a frame of its own with no block, since no row of houses stands on a slope.
+    rise = g.District("Lenten Rise", (622, 426), math.degrees(math.atan2(1, 2)), cols=[105], rows=[], border=(None, None, "side", None), sx=[], sy=[])
+    frames.append(Frame(rise, dict(id="rise", district="PARSONS' END", streets=dict(v0=("lenten_rise", "Lenten Rise"), v1=None, u0=None, u1=None, sx=[], sy=[]))))
+    layout = dict(version="I2", concept=C["key"], frames=[f.plan() for f in frames])
 
     hm, hD = hamlet(C["hamlets"][0])
     layout["frames"].append(hm)
     layout["lighthouse"] = dict(id="one_eye", key="Tower6_white", name="The One-Eye", x=C["points"][0]["at"][0], y=C["points"][0]["at"][1])
     layout["walls"] = [dict(name="Town wall %d" % (k + 1), height=6.0, line=[dict(x=p[0], y=p[1]) for p in w]) for k, w in enumerate(C.get("walls", []))]
     layout["gates"] = [dict(name=p["name"], x=p["at"][0], y=p["at"][1]) for p in C.get("points", []) if p["kind"] == "gate"]
-    layout["bridges"] = [dict(name=b["name"], ax=b["a"][0], ay=b["a"][1], bx=b["b"][0], by=b["b"][1], width=b["w"]) for b in C.get("bridges", [])]
+    layout["bridges"] = bridges(frames) + [dict(name=b["name"], ax=b["a"][0], ay=b["a"][1], bx=b["b"][0], by=b["b"][1], width=b["w"]) for b in C.get("bridges", [])]
     layout["piers"] = [dict(ax=p["a"][0], ay=p["a"][1], bx=p["b"][0], by=p["b"][1], width=p["w"]) for p in C.get("piers", [])]
     layout["roads"] = [dict(name=r["name"], kind=r["cls"], line=[dict(x=round(float(p[0]), 1), y=round(float(p[1]), 1)) for p in r["pts"]]) for r in C.get("roads", [])]
     layout["embankments"] = embankments(C, F)
@@ -431,8 +482,12 @@ def main():
     for sid in ("main_e", "draught", "rats_choir"):
         if sid not in streets:
             ERRORS.append("the game's street '%s' has no place on the island" % sid)
-    if not 135 <= total <= 150:
-        ERRORS.append("%d buildings: the owner asked for 135 to 150" % total)
+    # No cap on the count (the owner, 2026-11-14): it follows the ground. What is checked is that nothing is left
+    # between two houses that is neither nothing nor a passage.
+    for f in layout["frames"]:
+        for q in f["passages"]:
+            if q["a1"] - q["a0"] < c5.PASSAGE - 0.01:
+                ERRORS.append("%s: block %s, a slot of %g m on its %s side at %g" % (f["name"], q["block"], q["a1"] - q["a0"], q["facing"], q["a0"]))
     for f in layout["frames"]:
         o, a = f["origin"], math.radians(f["angle"])
         vec = (math.cos(a), math.sin(a))
@@ -468,6 +523,10 @@ def draw(C, F, frames, hm, hD, layout):
         line = r.get("line")
         if line is not None:
             cv.line(line, g.road_width(r["cls"]), col["road"] if r["cls"] != "track" else col["track"])
+    for pad in layout["pads"]:
+        cv.poly([(q["x"], q["y"]) for q in pad["line"]], col["square"] if pad["kind"] == "square" else col["park"])
+    for e in layout["embankments"]:
+        cv.line([(q["x"], q["y"]) for q in e["line"]], 2.0, (40, 40, 44))
     for f in frames:
         D, out = f.D, f.out
         for s in out["streets"]:
@@ -499,8 +558,8 @@ def draw(C, F, frames, hm, hD, layout):
         cv.poly([hD.world(fp[0], fp[1]), hD.world(fp[2], fp[1]), hD.world(fp[2], fp[3]), hD.world(fp[0], fp[3])], col["cottage"])
     for wl in C.get("walls", []):
         cv.line(wl, 2.4, col["wall"])
-    for b in C.get("bridges", []):
-        cv.line([b["a"], b["b"]], b["w"], col["bridge"])
+    for b in layout["bridges"]:
+        cv.line([(b["ax"], b["ay"]), (b["bx"], b["by"])], b["width"], col["bridge"])
     for p in C.get("points", []):
         cv.ring(p["at"], 5.0, col["mark"], 1.6)
     g.write_png_rgb(str(PLAN_PNG), cv.img)
