@@ -181,7 +181,12 @@ namespace GameDev.Slice.EditorTools
         /// <summary>Last Turning Cemetery: graves in rows, its walls on the lane's and the garden's sides with a gate.</summary>
         private static void Cemetery()
         {
-            var c = _layout.SquareById("cemetery");
+            var c = _layout.squares.FirstOrDefault(s => s.id == "cemetery");
+            if (c == null)
+            {
+                return; // a district of the island that is not the cemetery's
+            }
+
             var graves = 0;
             for (var px = c.x0 + 4; px <= c.x1 - 4; px += 4)
             {
@@ -213,33 +218,46 @@ namespace GameDev.Slice.EditorTools
         {
             var rng = new Random(480);
             var trees = 0;
-            var bishops = _layout.SquareById("bishops");
-            var mid = (bishops.x0 + bishops.x1) / 2f;
-            for (var py = bishops.y0 + 5; py < bishops.y1 - 8; py += 11)
+            // Each garden where its district is: on the island the three lie in two districts, each built on its own.
+            var bishops = _layout.squares.FirstOrDefault(s => s.id == "bishops");
+            for (var py = bishops != null ? bishops.y0 + 5 : 0f; bishops != null && py < bishops.y1 - 8; py += 11)
             {
                 trees += Prop(GardenTree(rng), Facing.N, bishops.x0 + 3, py) != null ? 1 : 0;
                 trees += Prop(GardenTree(rng), Facing.N, bishops.x1 - 6, py + 5) != null ? 1 : 0;
             }
 
-            for (var py = bishops.y0 + 14; py < bishops.y1 - 10; py += 22)
+            for (var py = bishops != null ? bishops.y0 + 14 : 0f; bishops != null && py < bishops.y1 - 10; py += 22)
             {
+                var mid = (bishops.x0 + bishops.x1) / 2f;
                 Prop("Bench", Facing.E, mid - 3f, py);
                 Prop("Bench", Facing.W, mid + 2f, py + 11f);
             }
 
-            var quiet = _layout.SquareById("quiet");
-            for (var px = quiet.x0 + 4; px < quiet.x1 - 4; px += 10)
+            var quiet = _layout.squares.FirstOrDefault(s => s.id == "quiet");
+            if (quiet != null)
             {
-                for (var py = quiet.y0 + 5; py < quiet.y0 + 45; py += 10)
+                // C5's garden is 82 m deep and its grove fills the first 45; a shallower one is planted to 4 m off its far side.
+                var grove = Mathf.Min(quiet.y0 + 45, quiet.y1 - 4);
+                for (var px = quiet.x0 + 4; px < quiet.x1 - 4; px += 10)
                 {
-                    trees += Prop(GardenTree(rng), Facing.N, px + rng.Next(-2, 3), py + rng.Next(-2, 3)) != null ? 1 : 0;
+                    for (var py = quiet.y0 + 5; py < grove; py += 10)
+                    {
+                        trees += Prop(GardenTree(rng), Facing.N, px + rng.Next(-2, 3), py + rng.Next(-2, 3)) != null ? 1 : 0;
+                    }
                 }
+
+                var seats = Mathf.Min(quiet.y0 + 48, quiet.y1 - 3);
+                Prop("Bench", Facing.S, quiet.x0 + 12, seats);
+                Prop("Bench", Facing.S, quiet.x0 + 26, seats);
             }
 
-            Prop("Bench", Facing.S, quiet.x0 + 12, quiet.y0 + 48);
-            Prop("Bench", Facing.S, quiet.x0 + 26, quiet.y0 + 48);
+            var garth = _layout.squares.FirstOrDefault(s => s.id == "garth");
+            if (garth == null)
+            {
+                Debug.Log($"[VeilmouthCity] parks: {trees} garden trees.");
+                return;
+            }
 
-            var garth = _layout.SquareById("garth");
             var cx = (garth.x0 + garth.x1) / 2f;
             var cy = (garth.y0 + garth.y1) / 2f;
             trees += Prop(GardenTree(rng), Facing.N, cx - 1f, cy - 1f) != null ? 1 : 0;
@@ -432,13 +450,21 @@ namespace GameDev.Slice.EditorTools
                 ("QuenchBucket", Facing.W, -10, 5, null), // the slack tub's bucket, north of the anvil: the smith stands east of it
                 ("LeatherFrame", Facing.S, 8, 6, null),
             };
-            var placed = pieces.Count(s => Prop(s.Key, s.F, p.cx + s.X, p.cy + s.Y, s.Name) != null);
-            Debug.Log($"[VeilmouthCity] {p.stalls.name}: {placed} of {pieces.Length} stalls and pieces round {p.name}.");
+            // On the island the Penny and the Black Puddle lie in two districts, each built on its own: the market
+            // where the plaza is, the pawnbroker where the Puddle is.
+            if (p.half > 0f)
+            {
+                var placed = pieces.Count(s => Prop(s.Key, s.F, p.cx + s.X, p.cy + s.Y, s.Name) != null);
+                Debug.Log($"[VeilmouthCity] {p.stalls.name}: {placed} of {pieces.Length} stalls and pieces round {p.name}.");
+            }
 
             // The pawnbroker's counter in the Black Puddle's north-east corner, 3 m off the fronts: well outside the circle.
-            var puddle = _layout.SquareById("black_puddle");
-            Prop("Counter", Facing.S, puddle.x1 - 8f, puddle.y0 + 3f, "Pawn shop counter");
-            Prop("Chest", Facing.S, puddle.x1 - 4f, puddle.y0 + 3f, "Pawn shop chest");
+            var puddle = _layout.squares.FirstOrDefault(s => s.id == "black_puddle");
+            if (puddle != null)
+            {
+                Prop("Counter", Facing.S, puddle.x1 - 8f, puddle.y0 + 3f, "Pawn shop counter");
+                Prop("Chest", Facing.S, puddle.x1 - 4f, puddle.y0 + 3f, "Pawn shop chest");
+            }
         }
 
         /// <summary>

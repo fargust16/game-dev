@@ -315,8 +315,21 @@ namespace GameDev.Slice.EditorTools
 
         private static Vector2 Plan(Vector3 world) => new Vector2(world.x + 500f, 500f - world.z);
 
+        /// <summary>
+        /// Where a plan point of the district being built lies on the terrain, when the district is built in its own
+        /// frame and set in its place afterwards (VeilmouthCity.Island.cs); null for C5, which is built in place.
+        /// </summary>
+        private static Func<float, float, Vector3> _frameWorld;
+
+        /// <summary>
+        /// Where the stone works' meshes are written, each named by its group (Works.Finish). C5's folder, but for a
+        /// district of the island, which has a folder of its own: built with C5's group names, it would otherwise
+        /// write its cathedral and its works over C5's (it did, once, 2026-11-14; git gave them back).
+        /// </summary>
+        private static string _worksFolder = SliceKitCatalogue.Folder + "/Works";
+
         private static float BareGround(float px, float py) =>
-            _terrain.SampleHeight(World(px, py)) + _terrain.transform.position.y;
+            _terrain.SampleHeight(_frameWorld != null ? _frameWorld(px, py) : World(px, py)) + _terrain.transform.position.y;
 
         /// <summary>What stands at a plan point stands on: a deck's top, a raised pavement's top (R4), or the ground.</summary>
         private static float Ground(float px, float py)
@@ -1991,8 +2004,8 @@ namespace GameDev.Slice.EditorTools
                     var name = pair.Key == "" ? defaultMaterial : pair.Key;
                     var (v, n, uv, i) = pair.Value;
                     var meshName = $"{_owner.name} - {name}";
-                    var path = $"{SliceKitCatalogue.Folder}/Works/{meshName.Replace("&", "and")}.asset";
-                    KitStandIns.EnsureFolder(SliceKitCatalogue.Folder + "/Works");
+                    var path = $"{_worksFolder}/{meshName.Replace("&", "and")}.asset";
+                    KitStandIns.EnsureFolder(_worksFolder);
                     // The asset's own mesh is written in place: a copy into it leaves the old geometry on the GPU for the
                     // rest of the session, so renders made after a rebuild showed C1's walls (2026-11-06).
                     var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(path);

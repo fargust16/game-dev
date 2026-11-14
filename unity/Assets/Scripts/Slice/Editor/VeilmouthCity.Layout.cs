@@ -130,7 +130,8 @@ namespace GameDev.Slice.EditorTools
             var plaza = _layout.plaza;
             var centre = new Vector2(plaza.cx, plaza.cy);
             Vector2 Dir(int k) => new Vector2(Mathf.Cos(k * 2f * Mathf.PI / RingSides), Mathf.Sin(k * 2f * Mathf.PI / RingSides));
-            for (var k = 0; k < RingSides; k++)
+            // A district with no plaza of its own (the island's frames but the Penny's) has neither ring nor island.
+            for (var k = 0; k < (plaza.half > 0f ? RingSides : 0); k++)
             {
                 var quad = new[]
                 {
@@ -140,7 +141,10 @@ namespace GameDev.Slice.EditorTools
                 Lanes("The Penny's ring", Setts, true, quad, Use.Road);
             }
 
-            Lanes("The Penny's island", Flags, false, Disc(centre, plaza.island), Use.Walk);
+            if (plaza.half > 0f)
+            {
+                Lanes("The Penny's island", Flags, false, Disc(centre, plaza.island), Use.Walk);
+            }
 
             foreach (var s in _layout.streets)
             {
@@ -543,7 +547,12 @@ namespace GameDev.Slice.EditorTools
             // The Notice Board on the Black Puddle by the Soot & Bell, 3 m out from the square's west fronts, beyond the reach of
             // their stoops (1 m out, it was refused by one stoop and touched the tavern's by 0.14 m, which the free-place test
             // does not see), and north of the hidden ritual circle.
-            var puddle = _layout.SquareById("black_puddle");
+            var puddle = _layout.squares.FirstOrDefault(s => s.id == "black_puddle");
+            if (puddle == null)
+            {
+                return; // a district of the island that is not the Black Puddle's
+            }
+
             var board = new[] { (3f, 3f), (3f, 6f), (4f, 2f), (5f, 4f) }
                 .Select(o => Prop("NoticeBoard", Facing.E, puddle.x0 + o.Item1, puddle.y0 + o.Item2, "Notice Board"))
                 .FirstOrDefault(p => p != null);
@@ -797,7 +806,7 @@ namespace GameDev.Slice.EditorTools
                 });
             }
 
-            for (var k = 0; k < 8; k++)
+            for (var k = 0; k < (plaza.half > 0f ? 8 : 0); k++) // none where a district has no plaza of its own (the island's frames)
             {
                 foreach (var turn in new[] { 0f, 6f, -6f, 12f, -12f })
                 {
@@ -815,8 +824,13 @@ namespace GameDev.Slice.EditorTools
             }
 
             // The quay's lamps in the cell inside the quay wall's coping.
-            var quay = _layout.SquareById("quay");
-            Lamps(false, quay.x1 - Coping - 1.5f, 0, (int)quay.y0, (int)quay.y1, Bay, 8f);
+            // C5's quay runs along the sea, north to south. A district of the island has none, or one along its own
+            // waterside, whose lamps the island's waterside stage sets.
+            var quay = _layout.squares.FirstOrDefault(s => s.id == "quay");
+            if (quay != null && quay.y1 - quay.y0 > quay.x1 - quay.x0)
+            {
+                Lamps(false, quay.x1 - Coping - 1.5f, 0, (int)quay.y0, (int)quay.y1, Bay, 8f);
+            }
 
             var alternate = 0;
             foreach (var s in _layout.streets.Where(s => s.walk0 > 0f || s.walk1 > 0f))
@@ -1024,7 +1038,12 @@ namespace GameDev.Slice.EditorTools
         {
             foreach (var id in new[] { "drowsy", "black_puddle", "deaf_boiler" })
             {
-                var q = _layout.SquareById(id);
+                var q = _layout.squares.FirstOrDefault(s => s.id == id);
+                if (q == null)
+                {
+                    continue; // the square lies in another district of the island
+                }
+
                 foreach (var (px, py, dx, dy) in new[] { (q.x0 + 1f, q.y0 + 1f, 1, 1), (q.x1 - 2f, q.y0 + 1f, -1, 1), (q.x0 + 1f, q.y1 - 2f, 1, -1), (q.x1 - 2f, q.y1 - 2f, -1, -1) })
                 {
                     for (var k = 0; k < 3; k++)

@@ -65,13 +65,37 @@ public static class VeilmouthIslandLab
         { "dirt_floor", new Color(0.6f, 0.59f, 0.56f) }, { "sand_03", new Color(1.7f, 1.62f, 1.42f) }, { "leafy_grass", new Color(0.8f, 0.95f, 0.66f) },
     };
 
+    /// <summary>
+    /// The city's surfaces on the island's terrain (ISLAND_CITY_REBUILD_PLAN.md §4): the slice's own setts and cobbles,
+    /// after the land's sets. They are not in <see cref="FineGrained"/>, so the material never reads them
+    /// stochastically (owner, 2026-11-14): a paving's pattern must stay whole.
+    /// </summary>
+    private const string CityPrefix = "city:";
+
+    private static readonly string[] CitySets = { CityPrefix + "Setts", CityPrefix + "Cobbles" };
+
+    private static bool City(string set) => set.StartsWith(CityPrefix);
+
+    /// <summary>
+    /// Batch: the island's ground, the city built on it by the slice's own builder, and their views.
+    /// -executeMethod VeilmouthIslandLab.BuildCityAndRender
+    /// </summary>
+    public static void BuildCityAndRender()
+    {
+        Build();
+        GameDev.Slice.EditorTools.VeilmouthCity.BuildIsland();
+        Render();
+    }
+
     private static string Map(string set, string map) => $"{TextureRoot}/{set}/{set}_{map}_2k.{(map == "disp" ? "png" : "jpg")}";
 
     public static void Build()
     {
         var island = JsonUtility.FromJson<Island>(File.ReadAllText(DataFolder + "/island.json"));
         ImportTextures(island.layers);
-        var layers = Layers(island.layers);
+        // The city's own surfaces after the land's, with no weight until the city is built and paints them.
+        var sets = island.layers.Concat(CitySets).ToArray();
+        var layers = Layers(sets);
         var data = TerrainOf(island, layers);
 
         Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
@@ -159,7 +183,7 @@ public static class VeilmouthIslandLab
 
         if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-islandTerrainLit") < 0)
         {
-            ToMicroSplat(terrain, island.layers, layers);
+            ToMicroSplat(terrain, sets, layers);
             EditorSceneManager.SaveScene(scene, ScenePath);
         }
     }
@@ -201,6 +225,20 @@ public static class VeilmouthIslandLab
         var layers = new TerrainLayer[sets.Length];
         for (var i = 0; i < sets.Length; i++)
         {
+            if (sets[i].StartsWith(CityPrefix))
+            {
+                // The slice's own street layers, as C5 made and tuned them; their tile is theirs.
+                var street = AssetDatabase.LoadAssetAtPath<TerrainLayer>($"Assets/Settings/TerrainLayers/Slice/Slice_{sets[i].Substring(CityPrefix.Length)}.terrainlayer");
+                if (street == null)
+                {
+                    throw new FileNotFoundException("the slice's street layer is missing: " + sets[i]);
+                }
+
+                Tile[sets[i]] = street.tileSize.x;
+                layers[i] = street;
+                continue;
+            }
+
             var path = $"{LayerFolder}/Island_{sets[i]}.terrainlayer";
             var layer = AssetDatabase.LoadAssetAtPath<TerrainLayer>(path);
             if (layer == null)
@@ -250,7 +288,7 @@ public static class VeilmouthIslandLab
         var a = island.alphamap;
         var weights = Unzip(DataFolder + "/island_surfaces.bytes");
         var maps = new float[a, a, layers.Length];
-        for (var l = 0; l < layers.Length; l++)
+        for (var l = 0; l < island.layers.Length; l++)
         {
             for (var z = 0; z < a; z++)
             {
@@ -388,12 +426,13 @@ public static class VeilmouthIslandLab
             config.sourceTextures.Add(new TextureArrayConfig.TextureEntry
             {
                 terrainLayer = layers[i],
-                diffuse = AssetDatabase.LoadAssetAtPath<Texture2D>(Map(sets[i], "diff")),
-                normal = AssetDatabase.LoadAssetAtPath<Texture2D>(Map(sets[i], "nor_gl")),
-                height = AssetDatabase.LoadAssetAtPath<Texture2D>(Map(sets[i], "disp")),
-                smoothness = AssetDatabase.LoadAssetAtPath<Texture2D>(Map(sets[i], "rough")),
-                isRoughness = true,
-                ao = AssetDatabase.LoadAssetAtPath<Texture2D>(Map(sets[i], "ao")),
+                // A city surface brings its layer's two maps; a land surface its whole set.
+                diffuse = City(sets[i]) ? layers[i].diffuseTexture : AssetDatabase.LoadAssetAtPath<Texture2D>(Map(sets[i], "diff")),
+                normal = City(sets[i]) ? layers[i].normalMapTexture : AssetDatabase.LoadAssetAtPath<Texture2D>(Map(sets[i], "nor_gl")),
+                height = City(sets[i]) ? null : AssetDatabase.LoadAssetAtPath<Texture2D>(Map(sets[i], "disp")),
+                smoothness = City(sets[i]) ? null : AssetDatabase.LoadAssetAtPath<Texture2D>(Map(sets[i], "rough")),
+                isRoughness = !City(sets[i]),
+                ao = City(sets[i]) ? null : AssetDatabase.LoadAssetAtPath<Texture2D>(Map(sets[i], "ao")),
             });
         }
 
@@ -419,7 +458,7 @@ public static class VeilmouthIslandLab
         var keywords = new[]
         {
             "_MICROSPLAT", "_MICROTERRAIN", "_BRANCHSAMPLES", "_BRANCHSAMPLESAGR", "_USEGRADMIP", RenderLoop,
-            "_MAX12TEXTURES", "_PERTEXUVSCALEOFFSET", "_PERTEXTINT",
+            sets.Length > 12 ? "_MAX16TEXTURES" : "_MAX12TEXTURES", "_PERTEXUVSCALEOFFSET", "_PERTEXTINT",
         }.Concat(extra).ToArray();
         var material = MicroSplatShaderGUI.NewShaderAndMaterial(folder, name, keywords);
         material.enableInstancing = true;
@@ -515,6 +554,12 @@ public static class VeilmouthIslandLab
         ("08_spit_eye", new Vector3(820f, 800f, 0f), new Vector3(700f, 700f, 4f), 60f),
         ("09_ground_close", new Vector3(404f, 262f, 0f), new Vector3(398f, 256f, -1f), 60f),
         ("10_shore_close", new Vector3(196f, 330f, 0f), new Vector3(190f, 322f, -1f), 60f),
+        // The city, once it stands (BuildCityAndRender).
+        ("11_town_from_the_south", new Vector3(760f, 900f, 260f), new Vector3(520f, 520f, 0f), 50f),
+        ("12_penny_from_the_air", new Vector3(650f, 560f, 110f), new Vector3(520f, 440f, 5f), 55f),
+        ("13_long_tongue_eye", new Vector3(337.5f, 439.6f, 0f), new Vector3(395.6f, 555.7f, 3f), 60f),
+        ("14_tar_row_eye", new Vector3(693.8f, 724f, 0f), new Vector3(623.1f, 653.3f, 3f), 60f),
+        ("15_sleepy_from_the_river", new Vector3(470f, 470f, 28f), new Vector3(370f, 500f, 6f), 55f),
     };
 
     /// <summary>Batch: the lab built again and its views taken, in one run.</summary>

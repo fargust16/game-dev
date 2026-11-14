@@ -1,10 +1,10 @@
 # Veilmouth on the Island — the City's Rebuild
 
-Version: 0.1
+Version: 0.2
 
 Status: Draft — the rebuild is authorised by the owner (2026-11-14); this plan is the agent's, and its stages are built in order
 
-Last Updated: 2026-11-14 (first version: the way of building, the map of what must change, the stages)
+Last Updated: 2026-11-14 (§3 and §8: IC3 and IC4 built, the five districts stand in the lab scene; the builder's frame is a slip, not a current frame under the primitives. Earlier: first version: the way of building, the map of what must change, the stages)
 
 Depends On:
 [ISLAND_CONCEPTS.md](../../Documentation/Terrain/ISLAND_CONCEPTS.md), [TERRAIN_POLISH_REPORT.md](../../Documentation/Terrain/TERRAIN_POLISH_REPORT.md), [VEILMOUTH_CITY_PLAN.md](VEILMOUTH_CITY_PLAN.md) §28–§29, [SLICE_MODULAR_KIT_STANDARD.md](SLICE_MODULAR_KIT_STANDARD.md) §1, [VEILMOUTH_REFERENCE_PLAN.md](VEILMOUTH_REFERENCE_PLAN.md) R4–R5, [91 Agent Decision Record](../../../91%20Agent%20Decision%20Record.md) *Island redesign*
@@ -86,7 +86,7 @@ Old saves break: keys are built from positions.
 
 - **The layout** gains `frames`: each with its name, its origin on a whole-metre node of the plan, its turn, its size, its ground (§4), and its own lists in local metres (`streets`, `squares`, `blocks`, `buildings`, `passages`, `boxes`), in the shapes C5 uses. What lies between frames (water, the town's walls as lines, gates, bridges, quays, stairs, retaining walls, country roads, the hamlet, the woods' zones, the ritual candidates, the start) is in plan metres, as oriented pieces.
 - **The planner** is new, `tools/slice/veilmouth_island_plan.py`. It takes the districts from `tools/slice/island/concept_b.py` and fills each block by C5's own rules, which work in any frame's local metres: corner ownership, flush joins, passages, the mix of widths (`veilmouth_c5_plan.py`'s `Block`). C5's planner is not changed.
-- **The builder** gets a current frame. Its primitives (`World`, `Rect`, `Footprint`, `Put`, `Slab`, the ground readers) go through it, so the code above them (yards, parks, lamps, street trees, hedges, railings) runs unchanged in a frame's local metres. A frame is a GameObject with `KitFrame`, as `Slant` makes it.
+- **The builder** builds a district on a slip (changed in IC3, §8): the district is built by C5's own steps at C5's own mapping of plan metres to the world, with only the ground reader looking at the island where the district will lie, and the finished district is then set under a `KitFrame` that carries it to its place and turn. Nothing above the ground reader changes (yards, parks, lamps, street trees, hedges, railings), and no primitive learns of frames.
 - **The turns** are 0°, 26.565°, 45°, 63.435° and their quarter turns, the ones measured clean on the Combat Grid (`ISLAND_CONCEPTS.md` §2). `KitLayoutCheck` and the kit standard's §1 are widened to them: a frame's direction is a whole-number vector (1, 0), (2, 1), (1, 1) or (1, 2).
 
 Why not oriented rectangles everywhere: most of the builder reads `alongX` and compass facings (§2.2); a frame changes a handful of primitives and leaves the rules of §29 where they are.
@@ -174,3 +174,20 @@ In `tools/slice/island/islandgen.py` (`fit_surface`, `frame_edges`, `platforms`)
 - A single building in the middle of a side needs the two side rows to stop a passage short of its back: the block's `limit`. Without it the corner houses overlap it or stand 1 m off it.
 - **Still the concept's, to be drawn again in IC5:** the town's walls and gates (the Penny's far corner now touches the north wall's line), the bridges' ends, the country roads' ends at the frames.
 - **New street names** (the island has 32 streets, C5 has 24): Sleepers' Embankment, Eel Row, Hook Street, Gull Lane, Wet Hem, Bishop's Walk, Bellman's Row, Candle Row, Mourners' Lane, Tallow Lane, Parsons' Row. They need their Russian text in the string tables with the player's map (IC6).
+
+## IC3 and IC4, the districts built (2026-11-14)
+
+`VeilmouthCity.Island.cs` (`VeilmouthCity.BuildIsland`), run by `VeilmouthIslandLab.BuildCityAndRender` into `Assets/Scenes/Slice/Lab/IslandLab.unity`; its report is `Logs/IslandCity/report.txt`.
+
+- **A district is built on a slip, then carried.** §3 planned a current frame under the builder's primitives. The survey of the primitives showed a shorter way with the same result: build the district exactly as C5 builds, at C5's mapping of plan metres to the world, and afterwards set its root under a `KitFrame` at the district's origin and turn. The one thing that must know where the district will lie is the ground: `BareGround` reads the island's terrain through `_frameWorld` while a district is on the slip. The streets' paint is carried the same way, quad by quad (`PaintFrame`).
+- **What the builder had to learn** is that a place may be absent: on the island a district holds only its own squares, so the steps that look for one (`Parks`, `Cemetery`, `Market`'s pawnbroker, `SquareLamps`, `LampsC4`'s ring and quay, the Notice Board) pass over a place their district has not. C5 has every place, so C5 builds as before.
+- **The five districts stand:** 133 footprints, 193 doors, 215 lanes, 31 passages, 1 003 kit blocks. Every row stands on one level; the most a row was raised over its ground is 1.2 m (Parsons' End, the 6 % frame), and no run had to be cut. The streets are painted in the island's own material: setts, cobbles and yard earth from the slice's layers beside the island's twelve, none read stochastically.
+- **The kit check** now takes a frame at a measured turn (`IsMeasuredTurn`: 0°, 26.565°, 45°, 63.435° and their quarter turns) and compares two blocks of one frame in the frame's axes (`FrameBounds`): world bounds overstate a block turned 26.6° by up to a third of its width, which read as overlaps between pieces that only touch. One true fault was left, a yard bench under the clock tower's cornice; the planner now stands the tower 2 m further along the Town Hall's back. That move is checked by the next build.
+- **A fault of the first run, and its guard.** `Works.Finish` wrote every mesh into `Assets/Prefabs/SliceKit/Works/` under its group's name, so the island's cathedral and works overwrote nine of production's meshes. They were restored from git at once. Meshes now go to `_worksFolder`, which an island frame sets to `Works/Island/{frame}` (ignored by git) and a `finally` sets back. **After every island build `git status` must show no tracked change under `Assets/Prefabs` or `Assets/Art`.**
+- **Not built yet, inside the frames:** the cargo, the dwellings' doors and the dress passes (towers, graves, gates, wall dress, grates, covers), which read the built scene by C5's world mapping and need the frame's carry; the hamlet's cottages (its frame has no streets and is built in IC5).
+
+**What the views show** (`Logs/IslandLab/11` to `15`), and what IC5 must answer:
+
+1. **Each district is a paved rectangle on open turf.** Its ground follows the relief, but its outline is a ruled line with a street all round it. This is what the owner's first principle forbids, and it is the first thing IC5 answers: the walls, the quays and the roads tie the five together, and on the land sides the last street is a back lane with gardens beyond it, of uneven depth.
+2. **The Veil's banks show steps at the water's edge** along the town's reach, where the 1.3 m bank of IC1 runs across the terrain's 1 m grid at an angle. In the town the quays and embankment walls cover it; outside it the bank is eased in the generator.
+3. **The lab's light is not the game's:** shadows are near black and roofs read as one dark mass, because the lab scene has no baked ambient light or reflection probes. Materials are judged by day and by night in IC7, after the look pass.

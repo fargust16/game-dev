@@ -62,11 +62,11 @@ SPECS = {
         blocks={
             (0, 0): B("PA", "rich", dict(N="town", E="town", S="shop", W="town")),
             # The Town Hall faces the Penny across Salt Gullet; the clock tower rises behind it, 1.5 m off its back
-            # wall, its door on the yard (as C5 has them).
+            # wall, its door on the yard (as C5 has them); 2 m clear of the yard's benches, which its cornice overhangs.
             (1, 0): B("PB", "rich", dict(N="shop_rich", E="town", S=None, W="town"), kind=dict(S="penny"),
                       limit=dict(E=(0, 26), W=(0, 26)),   # the side rows end a passage short of the Town Hall's back
                       on=[("S", 11, "Civic_rich", "town_hall", "The Town Hall")],
-                      stand=[("Tower6_white", "N", 23.5, 23.5, "clock_tower", "The clock tower")]),
+                      stand=[("Tower6_white", "N", 23.5, 21.5, "clock_tower", "The clock tower")]),
             # Its yard is open to Nettle Street, the town's last street on that side, behind a yard wall.
             (2, 0): B("PC", "middling", dict(N="town", E=None, S="shop", W="town")),
             (0, 1): B("PD", "rich", dict(N="shop", E=None, S="town", W="town"), kind=dict(E="penny"),

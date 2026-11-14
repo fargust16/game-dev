@@ -64,7 +64,7 @@ namespace GameDev.Slice.EditorTools
             if (plain != null)
             {
                 Object.DestroyImmediate(plain.gameObject);
-                AssetDatabase.DeleteAsset($"{SliceKitCatalogue.Folder}/Works/{group.name} - {SaintStone}.asset");
+                AssetDatabase.DeleteAsset($"{_worksFolder}/{group.name} - {SaintStone}.asset");
             }
 
             var top = group.TransformPoint(pedestal.center + (Vector3.up * (pedestal.size.y / 2f)));

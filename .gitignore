@@ -148,3 +148,7 @@ unity/Assets/Settings/OverworldPlayerAnimator_Woman.overrideController.meta
 unity/Assets/Scenes/Overworld_Generator/
 unity/Assets/Scenes/Overworld_Generator.meta
 __pycache__/
+
+# The island city: VeilmouthCity.BuildIsland writes its districts' generated meshes again on each build.
+unity/Assets/Prefabs/SliceKit/Works/Island/
+unity/Assets/Prefabs/SliceKit/Works/Island.meta

@@ -50,7 +50,7 @@ namespace GameDev.Slice.EditorTools
     /// layers (§5), colliders (§4), and the non-overlap law (§6): solid bounds may touch, never overlap. A block under a
     /// <see cref="KitFrame"/> keeps the grid and the turns in the frame's axes, and the frame stands on a world grid
     /// node at a multiple of 45° (C1 §12, 2026-11-05); a turned block's overlap is measured on its colliders, not on
-    /// its world bounds.
+    /// its world bounds, and two blocks of one frame are compared in that frame's axes.
     /// It reports and never moves a block.
     /// </summary>
     public static class KitLayoutCheck
@@ -122,6 +122,48 @@ namespace GameDev.Slice.EditorTools
             return faults;
         }
 
+        /// <summary>
+        /// The turns a frame may take (SLICE_MODULAR_KIT_STANDARD.md §1): those whose direction is a whole-number
+        /// vector, (1, 0), (2, 1), (1, 1) or (1, 2) and their quarter turns, so 0°, 26.565°, 45° and 63.435° from an
+        /// axis. The Combat Grid was measured regular along walls at these and at no turn between them
+        /// (Documentation/Terrain/ISLAND_CONCEPTS.md §2).
+        /// </summary>
+        public static bool IsMeasuredTurn(float yawDegrees)
+        {
+            var within = Mathf.Repeat(yawDegrees, 90f);
+            foreach (var turn in MeasuredTurns)
+            {
+                if (Mathf.Abs(within - turn) <= AngleToleranceDegrees)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>The measured turn nearest an angle, to the float's last digit: atan(1/2) and atan(2) are not round numbers.</summary>
+        public static float NearestMeasuredTurn(float yawDegrees)
+        {
+            var quarter = Mathf.Floor(yawDegrees / 90f) * 90f;
+            var within = yawDegrees - quarter;
+            var best = MeasuredTurns[0];
+            foreach (var turn in MeasuredTurns)
+            {
+                if (Mathf.Abs(within - turn) < Mathf.Abs(within - best))
+                {
+                    best = turn;
+                }
+            }
+
+            return quarter + best;
+        }
+
+        private static readonly float[] MeasuredTurns =
+        {
+            0f, (float)(System.Math.Atan2(1d, 2d) * 180d / System.Math.PI), 45f, (float)(System.Math.Atan2(2d, 1d) * 180d / System.Math.PI), 90f,
+        };
+
         private static void CheckPlacement(KitBlock block, List<KitFault> faults)
         {
             var t = block.transform;
@@ -131,10 +173,10 @@ namespace GameDev.Slice.EditorTools
                 var f = frame.transform;
                 var fyaw = Mathf.Atan2(f.forward.x, f.forward.z) * Mathf.Rad2Deg;
                 if (!IsMultiple(f.position.x, 1f) || !IsMultiple(f.position.z, 1f) ||
-                    Mathf.Abs(fyaw / 45f - Mathf.Round(fyaw / 45f)) * 45f > AngleToleranceDegrees ||
+                    !IsMeasuredTurn(fyaw) ||
                     Vector3.Angle(f.up, Vector3.up) > AngleToleranceDegrees)
                 {
-                    faults.Add(new KitFault(KitFaultKind.OffGrid, block, $"its frame '{frame.name}' is off a grid node or not at a multiple of 45°"));
+                    faults.Add(new KitFault(KitFaultKind.OffGrid, block, $"its frame '{frame.name}' is off a grid node or not at a measured turn (a multiple of 45°, or 26.565° or 63.435° from one of the axes)"));
                 }
             }
 
@@ -205,6 +247,12 @@ namespace GameDev.Slice.EditorTools
                     }
 
                     var depth = Penetration(a.bounds, b.bounds);
+                    if (depth > OverlapTolerance && SharedFrame(a.block, b.block) is { } frame)
+                    {
+                        // Two blocks of one turned frame: world bounds overstate both, the frame's own axes do not.
+                        depth = Penetration(FrameBounds(a.block, frame), FrameBounds(b.block, frame));
+                    }
+
                     if (depth > OverlapTolerance && (Turned(a.block) || Turned(b.block)))
                     {
                         depth = ColliderPenetration(a.block, b.block, depth);
@@ -216,6 +264,47 @@ namespace GameDev.Slice.EditorTools
                     }
                 }
             }
+        }
+
+        /// <summary>The frame both blocks stand under, or null: only then are their bounds comparable in its axes.</summary>
+        private static Transform SharedFrame(KitBlock a, KitBlock b)
+        {
+            var frame = a.GetComponentInParent<KitFrame>();
+            return frame != null && frame == b.GetComponentInParent<KitFrame>() ? frame.transform : null;
+        }
+
+        /// <summary>The block's solid bounds in its frame's axes: each collider's own box, carried corner by corner.
+        /// A collider of a kind with no box of its own keeps its world bounds' corners, which only overstates.</summary>
+        private static Bounds FrameBounds(KitBlock block, Transform frame)
+        {
+            var bounds = default(Bounds);
+            var found = false;
+            foreach (var collider in Solids(block))
+            {
+                var (box, from) = collider switch
+                {
+                    BoxCollider c => (new Bounds(c.center, c.size), c.transform.localToWorldMatrix),
+                    MeshCollider c when c.sharedMesh != null => (c.sharedMesh.bounds, c.transform.localToWorldMatrix),
+                    _ => (collider.bounds, Matrix4x4.identity),
+                };
+                var toFrame = frame.worldToLocalMatrix * from;
+                for (var k = 0; k < 8; k++)
+                {
+                    var corner = box.center + Vector3.Scale(box.extents, new Vector3((k & 1) == 0 ? -1f : 1f, (k & 2) == 0 ? -1f : 1f, (k & 4) == 0 ? -1f : 1f));
+                    var point = toFrame.MultiplyPoint3x4(corner);
+                    if (found)
+                    {
+                        bounds.Encapsulate(point);
+                    }
+                    else
+                    {
+                        bounds = new Bounds(point, Vector3.zero);
+                        found = true;
+                    }
+                }
+            }
+
+            return bounds;
         }
 
         private static bool Turned(KitBlock block)
