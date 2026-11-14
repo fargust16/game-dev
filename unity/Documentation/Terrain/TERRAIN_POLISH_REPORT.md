@@ -1,10 +1,10 @@
 # Veilmouth Island — Terrain Polish and Anti-Tiling Research
 
-Version: 1.0
+Version: 1.1
 
-Status: Draft — a research result waiting for the owner's review. Nothing here is an accepted decision.
+Status: Draft — reviewed by the owner on 2026-11-14: §8 holds the answers. §6 is accepted as the base; §7 is the list the rebuild works from.
 
-Last Updated: 2026-11-14
+Last Updated: 2026-11-14 (§8: the owner's answers. Earlier: first version)
 
 Depends On:
 [ISLAND_CONCEPTS.md](ISLAND_CONCEPTS.md), [MICROSPLAT_STAMPIT_RESEARCH.md](MICROSPLAT_STAMPIT_RESEARCH.md), [CURRENT_WORLD_AUDIT.md](CURRENT_WORLD_AUDIT.md)
@@ -277,13 +277,15 @@ At 1920 × 1080, MSAA 4, no post-processing, ms.
 
 # 8. For the owner to decide
 
-| # | Question | The agent leans to |
-|---|---|---|
-| 1 | Is the relief natural enough to build the city on? | Yes, with §1.4 known. |
-| 2 | Way H for the terrain's material? | Yes. |
-| 3 | The sea's foam: off, or a smoothed band in a copy of WaterWorks' subgraph? | Off for now. |
-| 4 | May the agent download two or three more CC0 sets from Poly Haven: a sand without patches of tone, a second turf? About 21 MB each, under the same manifest and Git LFS. | Yes. |
-| 5 | Woodland trees: the owner's own models again, or a pack already in the project? | The owner's, as for the city's trees. |
+| # | Question | The agent leaned to | The owner, 2026-11-14 |
+|---|---|---|---|
+| 1 | Is the relief natural enough to build the city on? | Yes, with §1.4 known. | **Yes.** The island no longer reads as a set of made hills. Keep the logic of its drainage. The East Ridge's seven parallel combes do not block the work, but are to become more natural later. |
+| 2 | Way H for the terrain's material? | Yes. | **Accepted as the base.** Sand is to look natural with no visible grid. Gravel and bare earth keep their own texture. The city's paving is never read stochastically. Check every material by day and by night. |
+| 3 | The sea's foam: off, or a smoothed band in a copy of WaterWorks' subgraph? | Off for now. | **Off, in a material of the slice's own.** The water is not held solved: its grain is to be checked in motion in the game's scene. |
+| 4 | May the agent download two or three more CC0 sets from Poly Haven: a sand without patches of tone, a second turf? About 21 MB each, under the same manifest and Git LFS. | Yes. | **Allowed.** |
+| 5 | Woodland trees: the owner's own models again, or a pack already in the project? | The owner's, as for the city's trees. | **A task of its own:** forest models of five kinds (tall old trees, broadleaves, conifers if the climate suits, young growth, dead trees). Instancing, far LODs and a natural density come first, not many unique models. A wood must not read as a park or an avenue. |
+
+The owner also authorised the city's rebuild, by five principles ([91 Agent Decision Record](../../../91%20Agent%20Decision%20Record.md), *Island redesign*).
 
 ---
 
